@@ -10,10 +10,10 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.sectioninformatique</groupId>
-    <artifactId>spring-template</artifactId>
+    <artifactId>spring-auth</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-template</name>
-    <description>Template for a Rest API application with Spring Boot</description>
+    <name>spring-auth</name>
+    <description>Authentication API to be used by other applications to identify their users</description>
     <url />
     <licenses>
         <license />
