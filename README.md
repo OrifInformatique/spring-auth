@@ -1,5 +1,5 @@
 
-# Spring template
+# Spring authenticator
 <p>
     <div style="text-align: center;">
         <img src="https://sectioninformatique.ch/wp-content/uploads/2021/09/Logo_Orif__70.jpg" width=40% height=40% alt="Orif logo"></a>
@@ -7,10 +7,10 @@
     </div>
 </p>
 
-Template to start developing a new REST API application with Spring Boot.
+This project provides an authentication API to be used by other applications to identify their users.
 
 # Table of Contents
-- [Spring template](#spring-template)
+- [Spring authenticator](#spring-authenticator)
 - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -35,40 +35,40 @@ The project's environment must contain these tools. Make sure that your Windows 
 
 - [Java / openJDK 21](https://adoptium.net/fr/temurin/releases/)
 - [Maven 3.9](https://maven.apache.org/docs/history.html)
-- [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/). A MySQL equivalent can also be installed with [Laragon](https://laragon.org/download/)
+- [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
 
-#### Optionnal
+#### Docker (optional)
 
 It is recommanded to develop the app using docker.
 This is not a hard requirement but it's highly encouraged.
 For more info, head to the [Docker section](#docker) of this documentation.
 
-- [Docker](https://www.docker.com/products/docker-desktop/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Docker-compose](https://docs.docker.com/compose/)
-- On linux or WSL (Included in Docker desktop): [Docker-buildx](https://github.com/docker/buildx)
+- On linux or WSL (allready included in Docker Desktop): [Docker-buildx](https://github.com/docker/buildx)
 
 ### Environment variables and application properties
 
 #### `.env` file
 This file is used by Docker to configure the containers. The environment variables defined in `.env` can be transmitted to the container and the Spring Boot app through the `compose.yml` file.
 
-1. DON'T modify the `env-dist` file but make a copy of it in the backend root folder.
+1. DON'T modify the `env-dist` file but make a copy of it in the root folder.
 2. Rename your copied file to `.env`.
 3. If needed, change the values of the environment variables defined.
 
 `.env` file defines :
 - The environment (dev, test or prod)
 - The port to use for the Spring Boot app container
-- The dev or test database URL and credentials. Prod database informations should only be defined as environment variables in the production environment
+- The dev or test database URL and credentials. Prod database informations should only be defined as environment variables in the production environment.
 
 #### `application.properties` files
-These files are used by Spring Boot to configure the application. They can contain hard code values or use environment variables as values.
+These files are used by Spring Boot to configure the application. They can contain hard coded values or use environment variables as values.
 
-The `application.properties` file located in the backend root folder is git ignored and let's you define configurations specific to your local environment or informations that must not be synchronized in the GIT repository. Secret keys for example.
+The `application.properties` file located in the root folder is git ignored and let's you define configurations specific to your local environment or informations that must not be synchronized in the GIT repository. Secret keys for example.
 
-1. DON'T modify the `application.properties-dist` file but make a copy of it in the backend root folder.
+1. DON'T modify the `application.properties-dist` file but make a copy of it in the root folder.
 2. Rename your copied file to `application.properties`.
-3. Open the file in you IDE and set the configurations you want. They will override the configurations defined in the src/main/resources folder.
+3. Open the file in you editor and set the configurations you want. They will override the configurations defined in the src/main/resources folder.
 
 ## Docker
 
@@ -81,17 +81,20 @@ The main commands you'll have to use are described in the [commands cheat-sheet]
 First, you need to build the containers :
 
 1. Make sure `ENVIRONMENT=dev` is set in `.env` !
-2. In the `backend` folder, use the command `docker compose build`
-3. Now that the containers have been built, you can start them with `docker compose up`
+2. Open a terminal and go to your root folder
+3. If needed, reset containers and volumes (datas) with `docker compose down -v`
+4. Use the command `docker compose build`
+5. Now that the containers have been built, you can start them with `docker compose up`
 
 Note that each time you change the `ENVIRONMENT` variables, you need to use
-the command `docker compose build`.
+the command `docker compose build` you can also use the short `docker compose up --build` command.
 
 ### Run test environment using docker
 1. Make sure `ENVIRONMENT=test` is set in `.env` !
-2. If needed, reset containers and volumes (datas) with `docker compose down -v`
-3. In the `backend` folder, use the command `docker compose build`
-4. Now that the containers have been built, you can start them with `docker compose up`
+2. Open a terminal and go to your root folder
+3. If needed, reset containers and volumes (datas) with `docker compose down -v`
+4. In the root folder, use the command `docker compose build`
+5. Now that the containers have been built, you can start them with `docker compose up`
 
 ### Do actions from within Docker (CLI)
 
@@ -99,13 +102,6 @@ To manipulate your application from within a container, you simply need to
 enter it using the command `docker exec -it <container name> sh`.
 
 You're now using the container's terminal.
-
-## What's next ?
-
-Feel free to explore the code and create your own experiment branch to
-learn about Spring Boot !
-
-The item module is here as an example of how to create your own modules.
 
 ## Commands cheat-sheet
 
@@ -120,6 +116,12 @@ Start containers
 
 run in background
 `docker compose up -d`
+
+stop containers
+`docker compose down`
+
+stop containers and delete volumes, wich are containing app datas
+`docker compose down -v`
 
 Enter a container with shell
 `docker exec -it <container name> sh`
