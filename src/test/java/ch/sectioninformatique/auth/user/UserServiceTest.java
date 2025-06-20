@@ -11,8 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
-import ch.sectioninformatique.auth.item.Item;
-import ch.sectioninformatique.auth.item.ItemRepository;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
@@ -50,9 +48,6 @@ public class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private ItemRepository itemRepository;
 
     @Mock
     private SecurityContext securityContext;
@@ -294,8 +289,6 @@ public class UserServiceTest {
         when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
         when(userRepository.findByLogin("admin@test.com")).thenReturn(Optional.of(authenticatedUser));
         when(userRepository.findById(1L)).thenReturn(Optional.of(deletedUser));
-        List<Item> userItems = new ArrayList<>();
-        when(itemRepository.findAll()).thenReturn(userItems);
 
         // Act
         userService.deleteUser(userId);

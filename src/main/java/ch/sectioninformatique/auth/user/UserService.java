@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
-import ch.sectioninformatique.auth.item.ItemRepository;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
@@ -46,9 +45,6 @@ public class UserService {
 
     /** Mapper for converting between User entities and DTOs */
     private final UserMapper userMapper;
-
-    /** Repository for item data access */
-    private final ItemRepository itemRepository;
 
     /**
      * Authenticates a user with their credentials.
@@ -339,18 +335,6 @@ public class UserService {
         if (!canPerformAction(authenticatedUserEntity.getRole().getName(), userToDelete.getRole().getName())) {
             throw new RuntimeException("You don't have the necessary rights to perform this action");
         }
-
-        // Get the "deleted user" (id=1)
-        User deletedUser = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Deleted user not found"));
-
-        // Transfer all items to the "deleted user"
-        itemRepository.findAll().forEach(item -> {
-            if (item.getAuthor().equals(userToDelete)) {
-                item.setAuthor(deletedUser);
-                itemRepository.save(item);
-            }
-        });
 
         // Delete the user
         userRepository.deleteById(userId);
