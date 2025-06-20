@@ -84,12 +84,7 @@ public class UserAuthenticationProvider {
                     "SCOPE_openid", 
                     "SCOPE_profile", 
                     "SCOPE_email", 
-                    "SCOPE_User.Read",
-                    // Item permissions
-                    "item:read",
-                    "item:write",
-                    "item:update",
-                    "item:delete"
+                    "SCOPE_User.Read"
                 ))
                 .sign(algorithm);
     }
@@ -102,7 +97,7 @@ public class UserAuthenticationProvider {
      * The resulting authorities are used by Spring Security for authorization checks.
      *
      * @param role The user's role (e.g., "USER", "ADMIN")
-     * @param permissions List of permission strings (e.g., "item:read", "item:write")
+     * @param permissions List of permission strings (e.g., "user:read", "user:write")
      * @return List of SimpleGrantedAuthority objects for Spring Security
      */
     private List<SimpleGrantedAuthority> buildAuthorities(String role, List<String> permissions) {
@@ -157,12 +152,11 @@ public class UserAuthenticationProvider {
      * 1. Validates the token signature and claims
      * 2. Attempts to find the user in the database
      * 3. If user exists:
-     *    - Adds default OAuth2 scopes and item permissions
+     *    - Adds default OAuth2 scopes permissions
      *    - Preserves existing permissions
      * 4. If user doesn't exist:
      *    - Creates a new Azure user with default permissions
      *    - Sets role to "USER"
-     *    - Adds basic item permissions
      *
      * @param token The JWT token to validate
      * @return Authentication object containing the user's information and authorities
@@ -186,12 +180,7 @@ public class UserAuthenticationProvider {
                 "SCOPE_openid", 
                 "SCOPE_profile", 
                 "SCOPE_email", 
-                "SCOPE_User.Read",
-                // Item permissions
-                "item:read",
-                "item:write",
-                "item:update",
-                "item:delete"
+                "SCOPE_User.Read"
             ));
 
             // Add any existing permissions
@@ -204,6 +193,7 @@ public class UserAuthenticationProvider {
             
             List<SimpleGrantedAuthority> authorities = buildAuthorities(user.getRole(), user.getPermissions());
             log.debug("Built authorities for user {}: {}", user.getLogin(), authorities);
+            
             return new UsernamePasswordAuthenticationToken(user, null, authorities);
         } catch (Exception e) {
             // If user doesn't exist, create a new Azure user
@@ -214,12 +204,6 @@ public class UserAuthenticationProvider {
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())
                 .role("USER")
-                .permissions(List.of(
-                    "item:read",
-                    "item:write",
-                    "item:update",
-                    "item:delete"
-                ))
                 .build();
 
             // Save the new user
@@ -231,4 +215,3 @@ public class UserAuthenticationProvider {
         }
     }
 }
-
