@@ -186,7 +186,6 @@ public class UserController {
      * Deletes a user from the system.
      * This endpoint:
      * - Requires the 'user:delete' authority
-     * - Transfers the user's items to the deleted user account
      * - Validates the authenticated user has sufficient permissions
      * - Returns success/error message
      *

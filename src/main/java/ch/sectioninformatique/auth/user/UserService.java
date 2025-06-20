@@ -25,7 +25,7 @@ import java.util.List;
  * This class provides functionality for:
  * - User authentication and registration
  * - User role management (promotion, revocation)
- * - User deletion with item transfer
+ * - User deletion
  * - Azure user integration
  * - User search and retrieval
  */
@@ -307,16 +307,14 @@ public class UserService {
     }
 
     /**
-     * Deletes a user and transfers their items to the deleted user account.
+     * Deletes a user from the system.
      * This operation:
      * - Verifies the user exists
      * - Checks if the authenticated user has sufficient permissions
-     * - Transfers all items owned by the user to the deleted user account (ID 1)
      * - Deletes the user
      *
      * @param userId The ID of the user to delete
-     * @throws RuntimeException if the user is not found, the authenticated user lacks permissions,
-     *                        or the deleted user account is not found
+     * @throws RuntimeException if the user is not found or the authenticated user lacks permissions
      */
     public void deleteUser(Long userId) {
         // Get the user to delete

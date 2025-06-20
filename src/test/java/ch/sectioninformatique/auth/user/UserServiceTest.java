@@ -240,7 +240,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteUser_Successful_DeletesUserAndTransfersItems() {
+    void deleteUser_Successful_DeletesUser() {
         // Arrange
         Long userId = 2L;
         User userToDelete = new User();
@@ -267,21 +267,12 @@ public class UserServiceTest {
         adminRole.setName(RoleEnum.ADMIN);
         authenticatedUser.getRoles().add(adminRole);
         
-        User deletedUser = new User();
-        deletedUser.setId(1L);
-        deletedUser.setFirstName("Deleted");
-        deletedUser.setLastName("User");
-        deletedUser.setLogin("deleted@test.com");
-        deletedUser.setPassword("pass");
-        deletedUser.setRoles(new HashSet<>());
-        
         UserDto authenticatedUserDto = new UserDto(3L, "Admin", "User", "admin@test.com", null, "ROLE_ADMIN", null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
         when(userRepository.findByLogin("admin@test.com")).thenReturn(Optional.of(authenticatedUser));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(deletedUser));
 
         // Act
         userService.deleteUser(userId);
@@ -289,7 +280,6 @@ public class UserServiceTest {
         // Assert
         verify(userRepository).findById(userId);
         verify(userRepository).findByLogin("admin@test.com");
-        verify(userRepository).findById(1L);
         verify(userRepository).deleteById(userId);
     }
 

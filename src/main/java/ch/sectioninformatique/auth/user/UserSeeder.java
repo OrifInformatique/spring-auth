@@ -71,7 +71,7 @@ public class UserSeeder implements CommandLineRunner {
 	 * Loads initial user data into the database.
 	 * Creates a set of predefined users with different roles if the database is empty.
 	 * The users include:
-	 * - A deleted user (ID 1) for handling deleted user's items
+	 * - A deleted user (ID 1)
 	 * - Regular users with USER role (John Doe, Alice Johnson, Dan Sergeant, etc.)
 	 * - An admin user with ADMIN role (Jane Smith)
 	 * - A super admin user with SUPER_ADMIN role (Super Admin)
