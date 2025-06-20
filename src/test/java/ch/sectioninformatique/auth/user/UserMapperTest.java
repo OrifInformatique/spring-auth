@@ -9,9 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
-import ch.sectioninformatique.auth.user.User;
-import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserMapper;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Arrays;

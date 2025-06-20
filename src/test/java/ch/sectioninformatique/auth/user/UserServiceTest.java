@@ -14,11 +14,6 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-import ch.sectioninformatique.auth.user.User;
-import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserMapper;
-import ch.sectioninformatique.auth.user.UserRepository;
-import ch.sectioninformatique.auth.user.UserService;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,8 +23,6 @@ import org.springframework.http.HttpStatus;
 import java.nio.CharBuffer;
 import java.util.Optional;
 import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

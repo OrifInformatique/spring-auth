@@ -5,7 +5,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
-import ch.sectioninformatique.auth.user.User;
 
 import java.util.Date;
 import java.util.HashSet;

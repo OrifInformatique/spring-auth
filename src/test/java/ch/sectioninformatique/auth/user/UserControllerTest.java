@@ -14,12 +14,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import ch.sectioninformatique.auth.security.RoleRepository;
-import ch.sectioninformatique.auth.user.User;
-import ch.sectioninformatique.auth.user.UserController;
-import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserMapper;
-import ch.sectioninformatique.auth.user.UserRepository;
-import ch.sectioninformatique.auth.user.UserService;
 
 import org.springframework.http.HttpStatus;
 import java.util.Arrays;

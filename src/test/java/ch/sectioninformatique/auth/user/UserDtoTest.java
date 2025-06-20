@@ -2,8 +2,6 @@ package ch.sectioninformatique.auth.user;
 
 import org.junit.jupiter.api.Test;
 
-import ch.sectioninformatique.auth.user.UserDto;
-
 import java.util.Arrays;
 import java.util.List;
 
