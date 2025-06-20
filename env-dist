@@ -1,0 +1,18 @@
+# dev | test | prod : see README for more info
+# Remember to run `docker compose up --build` when changing environment
+ENVIRONMENT=dev
+
+# Define the Tomcat server port for your Docker app container
+PORT=8080
+
+# WARN: Set your database production database in `application.properties`!
+
+# Local dev database (Local mariadb)
+DEV_SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/dev_db
+
+# Local OR cloud test database
+TEST_SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/test_db
+
+# User name and password used by Docker to create the database container
+DB_USERNAME=root
+DB_PASSWORD=pwd
