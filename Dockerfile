@@ -21,11 +21,14 @@ FROM base AS test
 COPY . .
 CMD ["mvn", "test"]
 
-# Production stage
-FROM base AS prod
+# Build stage
+FROM base AS build
 COPY . .
 RUN mvn clean package -DskipTests
-COPY --from=base /app/target/*.jar app.jar
+
+# Production stage
+FROM base AS prod
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
-
