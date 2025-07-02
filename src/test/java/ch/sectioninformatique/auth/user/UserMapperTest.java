@@ -44,7 +44,7 @@ class UserMapperTest {
          */
         @org.springframework.context.annotation.Bean
         public UserMapper userMapper() {
-            return new UserMapperImpl();
+            return UserMapper.INSTANCE;
         }
     }
 

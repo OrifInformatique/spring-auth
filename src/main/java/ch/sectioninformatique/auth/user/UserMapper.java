@@ -7,6 +7,7 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.factory.Mappers;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,12 @@ import java.util.stream.Collectors;
 public interface UserMapper { 
 
     /**
+     * By convention for MapStruct, the interface declares a member INSTANCE,
+     * providing clients access to the mapper implementation.
+     */
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    /**
      * Converts a User entity to a UserDto.
      * This method:
      * - Maps basic user properties (id, firstName, lastName, login)
@@ -33,7 +40,7 @@ public interface UserMapper {
      * @param user The User entity to convert
      * @return A UserDto containing the user's information
      */
-    @Mapping(target = "role", source = "role.name")
+    @Mapping(target = "role", expression = "java(user.getRole().getName().name())")
     @Mapping(target = "permissions", source = "authorities", qualifiedByName = "authoritiesToPermissions")
     @Mapping(target = "token", ignore = true)
     @Mapping(target = "id", source = "id")
