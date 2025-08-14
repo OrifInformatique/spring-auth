@@ -11,7 +11,7 @@
     </parent>
     <groupId>ch.sectioninformatique</groupId>
     <artifactId>spring-auth</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>spring-auth</name>
     <description>Authentication API to be used by other applications to identify their users</description>
     <url />
