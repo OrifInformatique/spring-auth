@@ -103,6 +103,17 @@ enter it using the command `docker exec -it <container name> sh`.
 
 You're now using the container's terminal.
 
+## Maven package
+
+### Package the project in a .jpa archive
+As the tests are meant to run in a Docker environment, we have to skip them when creating a .jpa archive.
+
+Use this command :
+
+```
+mvn clean package -DskipTests
+```
+
 ## Commands cheat-sheet
 
 Here is a list of the most common commands you'll likely use !
