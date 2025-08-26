@@ -29,7 +29,7 @@ public enum RoleEnum {
     )),
 
     /**
-     * Administrator role with extended permissions.
+     * Manager role with extended permissions.
      * Can manage users, but cannot delete them.
      */
     MANAGER(EnumSet.of(
@@ -39,7 +39,7 @@ public enum RoleEnum {
     )),
 
     /**
-     * Super administrator role with full system access.
+     * Administrator role with full system access.
      * Has all permissions including deletion of users.
      */
     ADMIN(EnumSet.of(

@@ -102,7 +102,7 @@ public class UserController {
      * Revokes the manager role from a user.
      * This endpoint:
      * - Requires the 'user:update' authority
-     * - Validates the user exists and isn't a admin
+     * - Validates the user exists and isn't an admin
      * - Returns success/error message
      *
      * @param userId The ID of the user to revoke manager role from
