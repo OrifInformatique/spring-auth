@@ -60,7 +60,7 @@ public class Role {
      * - Is unique across all roles
      * - Cannot be null
      * - Is stored as a string in the database
-     * - Maps to predefined role types (USER, MANAGER, SUPER_ADMIN)
+     * - Maps to predefined role types (USER, MANAGER, ADMIN)
      */
     @Column(unique = true, nullable = false)
     @Enumerated(EnumType.STRING)

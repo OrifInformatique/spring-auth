@@ -17,7 +17,7 @@ import static ch.sectioninformatique.auth.security.PermissionEnum.USER_WRITE;
  * a user with that role can perform. The roles are hierarchical:
  * - USER: Basic access to resources
  * - MANAGER: Extended access to user management
- * - SUPER_ADMIN: Full access to all system features
+ * - ADMIN: Full access to all system features
  */
 public enum RoleEnum {
     /**
@@ -42,7 +42,7 @@ public enum RoleEnum {
      * Super administrator role with full system access.
      * Has all permissions including deletion of users.
      */
-    SUPER_ADMIN(EnumSet.of(
+    ADMIN(EnumSet.of(
         USER_READ, 
         USER_WRITE, 
         USER_UPDATE, 

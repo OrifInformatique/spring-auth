@@ -140,7 +140,7 @@ public class UserService {
      * Promotes a user to the manager role.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already an manager or super admin
+     * - Checks if the user is already an manager or admin
      * - Removes existing roles and assigns the manager role
      *
      * @param userId The ID of the user to promote
@@ -154,8 +154,8 @@ public class UserService {
         if (user.getRole().getName().equals(RoleEnum.MANAGER)) {
             throw new RuntimeException("The user is already an manager");
         }
-        if (user.getRole().getName().equals(RoleEnum.SUPER_ADMIN)) {
-            throw new RuntimeException("The user is already a super admin");
+        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new RuntimeException("The user is already a admin");
         }
         
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
@@ -171,7 +171,7 @@ public class UserService {
      * Revokes the manager role from a user.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already a regular user or super admin
+     * - Checks if the user is already a regular user or admin
      * - Removes existing roles and assigns the user role
      *
      * @param userId The ID of the user to revoke the manager role from
@@ -184,8 +184,8 @@ public class UserService {
         if (user.getRole().getName().equals(RoleEnum.USER)) {
             throw new RuntimeException("The user is already a user");
         }
-        if (user.getRole().getName().equals(RoleEnum.SUPER_ADMIN)) {
-            throw new RuntimeException("You don't have the necessary rights to delete a super admin");
+        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new RuntimeException("You don't have the necessary rights to delete a admin");
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
@@ -197,35 +197,35 @@ public class UserService {
     }
 
     /**
-     * Promotes a user to the super admin role.
+     * Promotes a user to the admin role.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already a super admin
-     * - Removes existing roles and assigns the super admin role
+     * - Checks if the user is already a admin
+     * - Removes existing roles and assigns the admin role
      *
      * @param userId The ID of the user to promote
      * @return UserDto containing the updated user's information
-     * @throws RuntimeException if the user is not found, already a super admin, or the super admin role is not found
+     * @throws RuntimeException if the user is not found, already a admin, or the admin role is not found
      */
-    public UserDto promoteToSuperAdmin(Long userId) {
+    public UserDto promoteToAdmin(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRole().getName().equals(RoleEnum.SUPER_ADMIN)) {
-            throw new RuntimeException("The user is already a super admin");
+        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new RuntimeException("The user is already a admin");
         }
 
-        Role superAdminRole = roleRepository.findByName(RoleEnum.SUPER_ADMIN)
-            .orElseThrow(() -> new RuntimeException("Super admin role not found"));
+        Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
+            .orElseThrow(() -> new RuntimeException("Admin role not found"));
 
         user.getRoles().clear();
-        user.getRoles().add(superAdminRole);
+        user.getRoles().add(adminRole);
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
 
     /**
-     * Downgrades a super admin to an manager role.
+     * Downgrades a admin to an manager role.
      * This operation:
      * - Verifies the user exists
      * - Checks if the user is already an manager or has lower rights
@@ -234,7 +234,7 @@ public class UserService {
      * @param userId The ID of the user to downgrade
      * @throws RuntimeException if the user is not found, already an manager, or the manager role is not found
      */
-    public void downgradeSuperAdminRole(Long userId) {
+    public void downgradeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
@@ -254,16 +254,16 @@ public class UserService {
     }
 
     /**
-     * Revokes the super admin role from a user.
+     * Revokes the admin role from a user.
      * This operation:
      * - Verifies the user exists
      * - Checks if the user is already a regular user
      * - Removes existing roles and assigns the user role
      *
-     * @param userId The ID of the user to revoke the super admin role from
+     * @param userId The ID of the user to revoke the admin role from
      * @throws RuntimeException if the user is not found, already a user, or the user role is not found
      */
-    public void revokeSuperAdminRole(Long userId) {
+    public void revokeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -282,7 +282,7 @@ public class UserService {
     /**
      * Checks if an actor can perform an action on a target based on their roles.
      * The hierarchy is:
-     * - SUPER_ADMIN can perform actions on all roles
+     * - ADMIN can perform actions on all roles
      * - MANGER can perform actions on USER and MANAGER roles
      * - USER cannot perform actions on any role
      *
@@ -292,10 +292,10 @@ public class UserService {
      */
     private boolean canPerformAction(RoleEnum actorRole, RoleEnum targetRole) {
         switch (actorRole) {
-            case SUPER_ADMIN:
+            case ADMIN:
                 return true;
             case MANAGER:
-                if (targetRole == RoleEnum.SUPER_ADMIN) {
+                if (targetRole == RoleEnum.ADMIN) {
                     return false;
                 }
                 return true;

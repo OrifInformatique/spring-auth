@@ -102,7 +102,7 @@ public class UserController {
      * Revokes the manager role from a user.
      * This endpoint:
      * - Requires the 'user:update' authority
-     * - Validates the user exists and isn't a super admin
+     * - Validates the user exists and isn't a admin
      * - Returns success/error message
      *
      * @param userId The ID of the user to revoke manager role from
@@ -120,63 +120,63 @@ public class UserController {
     }
 
     /**
-     * Promotes a user to the super admin role.
+     * Promotes a user to the admin role.
      * This endpoint:
-     * - Requires both 'user:update' authority and 'SUPER_ADMIN' role
-     * - Validates the user exists and isn't already a super admin
+     * - Requires both 'user:update' authority and 'ADMIN' role
+     * - Validates the user exists and isn't already a admin
      * - Returns success/error message
      *
-     * @param userId The ID of the user to promote to super admin
+     * @param userId The ID of the user to promote to admin
      * @return ResponseEntity with success message or error details
      */
-    @PreAuthorize("hasAuthority('user:update') && hasRole('SUPER_ADMIN')")
-    @PutMapping("/{userId}/promote-super-admin")
-    public ResponseEntity<?> promoteToSuperAdmin(@PathVariable Long userId) {
+    @PreAuthorize("hasAuthority('user:update') && hasRole('ADMIN')")
+    @PutMapping("/{userId}/promote-admin")
+    public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
         try {
-            userService.promoteToSuperAdmin(userId);
-            return ResponseEntity.ok().body("Super admin role assigned successfully");
+            userService.promoteToAdmin(userId);
+            return ResponseEntity.ok().body("Admin role assigned successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     /**
-     * Revokes the super admin role from a user.
+     * Revokes the admin role from a user.
      * This endpoint:
-     * - Requires both 'user:update' authority and 'SUPER_ADMIN' role
+     * - Requires both 'user:update' authority and 'ADMIN' role
      * - Validates the user exists and isn't already a regular user
      * - Returns success/error message
      *
-     * @param userId The ID of the user to revoke super admin role from
+     * @param userId The ID of the user to revoke admin role from
      * @return ResponseEntity with success message or error details
      */
-    @PreAuthorize("hasAuthority('user:update') && hasRole('SUPER_ADMIN')")
-    @PutMapping("/{userId}/revoke-super-admin")
-    public ResponseEntity<?> revokeSuperAdminRole(@PathVariable Long userId) {
+    @PreAuthorize("hasAuthority('user:update') && hasRole('ADMIN')")
+    @PutMapping("/{userId}/revoke-admin")
+    public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
         try {
-            userService.revokeSuperAdminRole(userId);
-            return ResponseEntity.ok().body("Super admin role revoked successfully");
+            userService.revokeAdminRole(userId);
+            return ResponseEntity.ok().body("admin role revoked successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     /**
-     * Downgrades a super admin to a regular manager role.
+     * Downgrades a admin to a regular manager role.
      * This endpoint:
-     * - Requires both 'user:update' authority and 'SUPER_ADMIN' role
-     * - Validates the user exists and is currently a super admin
+     * - Requires both 'user:update' authority and 'ADMIN' role
+     * - Validates the user exists and is currently a admin
      * - Returns success/error message
      *
-     * @param userId The ID of the super admin to downgrade
+     * @param userId The ID of the admin to downgrade
      * @return ResponseEntity with success message or error details
      */
-    @PreAuthorize("hasAuthority('user:update') && hasRole('SUPER_ADMIN')")
-    @PutMapping("/{userId}/downgrade-super-admin")
-    public ResponseEntity<?> downgradeSuperAdminRole(@PathVariable Long userId) {
+    @PreAuthorize("hasAuthority('user:update') && hasRole('ADMIN')")
+    @PutMapping("/{userId}/downgrade-admin")
+    public ResponseEntity<?> downgradeAdminRole(@PathVariable Long userId) {
         try {
-            userService.downgradeSuperAdminRole(userId);
-            return ResponseEntity.ok().body("Super admin role downgraded successfully");
+            userService.downgradeAdminRole(userId);
+            return ResponseEntity.ok().body("Admin role downgraded successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

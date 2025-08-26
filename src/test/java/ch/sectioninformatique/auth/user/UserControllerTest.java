@@ -150,91 +150,91 @@ public class UserControllerTest {
     void promoteToSuperManager_SuccessfulPromotion_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
-        UserDto expectedUser = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_SUPER_ADMIN", null);
-        when(userService.promoteToSuperAdmin(userId)).thenReturn(expectedUser);
+        UserDto expectedUser = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_ADMIN", null);
+        when(userService.promoteToAdmin(userId)).thenReturn(expectedUser);
 
         // Act
-        ResponseEntity<?> response = userController.promoteToSuperAdmin(userId);
+        ResponseEntity<?> response = userController.promoteToAdmin(userId);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("Super admin role assigned successfully", response.getBody());
-        verify(userService, times(1)).promoteToSuperAdmin(userId);
+        assertEquals("Admin role assigned successfully", response.getBody());
+        verify(userService, times(1)).promoteToAdmin(userId);
     }
 
     @Test
-    void promoteToSuperAdmin_UserNotFound_ReturnsBadRequest() {
+    void promoteToAdmin_UserNotFound_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        doThrow(new RuntimeException("User not found")).when(userService).promoteToSuperAdmin(userId);
+        doThrow(new RuntimeException("User not found")).when(userService).promoteToAdmin(userId);
 
         // Act
-        ResponseEntity<?> response = userController.promoteToSuperAdmin(userId);
+        ResponseEntity<?> response = userController.promoteToAdmin(userId);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
         assertEquals("User not found", response.getBody());
-        verify(userService, times(1)).promoteToSuperAdmin(userId);
+        verify(userService, times(1)).promoteToAdmin(userId);
     }
 
     @Test
-    void revokeSuperAdminRole_SuccessfulRevocation_ReturnsOkResponse() {
+    void revokeAdminRole_SuccessfulRevocation_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
-        doNothing().when(userService).revokeSuperAdminRole(userId);
+        doNothing().when(userService).revokeAdminRole(userId);
 
         // Act
-        ResponseEntity<?> response = userController.revokeSuperAdminRole(userId);
+        ResponseEntity<?> response = userController.revokeAdminRole(userId);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("Super admin role revoked successfully", response.getBody());
-        verify(userService, times(1)).revokeSuperAdminRole(userId);
+        assertEquals("Admin role revoked successfully", response.getBody());
+        verify(userService, times(1)).revokeAdminRole(userId);
     }
 
     @Test
-    void revokeSuperAdminRole_UserNotFound_ReturnsBadRequest() {
+    void revokeAdminRole_UserNotFound_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        doThrow(new RuntimeException("User not found")).when(userService).revokeSuperAdminRole(userId);
+        doThrow(new RuntimeException("User not found")).when(userService).revokeAdminRole(userId);
 
         // Act
-        ResponseEntity<?> response = userController.revokeSuperAdminRole(userId);
+        ResponseEntity<?> response = userController.revokeAdminRole(userId);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
         assertEquals("User not found", response.getBody());
-        verify(userService, times(1)).revokeSuperAdminRole(userId);
+        verify(userService, times(1)).revokeAdminRole(userId);
     }
 
     @Test
-    void downgradeSuperAdminRole_SuccessfulDowngrade_ReturnsOkResponse() {
+    void downgradeAdminRole_SuccessfulDowngrade_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
-        doNothing().when(userService).downgradeSuperAdminRole(userId);
+        doNothing().when(userService).downgradeAdminRole(userId);
 
         // Act
-        ResponseEntity<?> response = userController.downgradeSuperAdminRole(userId);
+        ResponseEntity<?> response = userController.downgradeAdminRole(userId);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("Super admin role downgraded successfully", response.getBody());
-        verify(userService, times(1)).downgradeSuperAdminRole(userId);
+        assertEquals("Admin role downgraded successfully", response.getBody());
+        verify(userService, times(1)).downgradeAdminRole(userId);
     }
 
     @Test
-    void downgradeSuperAdminRole_UserNotFound_ReturnsBadRequest() {
+    void downgradeAdminRole_UserNotFound_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        doThrow(new RuntimeException("User not found")).when(userService).downgradeSuperAdminRole(userId);
+        doThrow(new RuntimeException("User not found")).when(userService).downgradeAdminRole(userId);
 
         // Act
-        ResponseEntity<?> response = userController.downgradeSuperAdminRole(userId);
+        ResponseEntity<?> response = userController.downgradeAdminRole(userId);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
         assertEquals("User not found", response.getBody());
-        verify(userService, times(1)).downgradeSuperAdminRole(userId);
+        verify(userService, times(1)).downgradeAdminRole(userId);
     }
 
     @Test
