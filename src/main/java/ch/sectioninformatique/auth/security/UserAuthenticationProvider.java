@@ -78,14 +78,8 @@ public class UserAuthenticationProvider {
                 .withExpiresAt(validity)
                 .withClaim("firstName", user.getFirstName())
                 .withClaim("lastName", user.getLastName())
-                .withClaim("role", "ROLE_USER")  // Default role for OAuth2 users
-                .withClaim("permissions", List.of(
-                    // OAuth2 scopes
-                    "SCOPE_openid", 
-                    "SCOPE_profile", 
-                    "SCOPE_email", 
-                    "SCOPE_User.Read"
-                ))
+                .withClaim("role", user.getRole())
+                .withClaim("permissions", user.getPermissions())
                 .sign(algorithm);
     }
 
