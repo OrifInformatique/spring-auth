@@ -1,17 +1,17 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * REST controller for managing user operations.
@@ -78,42 +78,42 @@ public class UserController {
     }
 
     /**
-     * Promotes a user to the admin role.
+     * Promotes a user to the manager role.
      * This endpoint:
      * - Requires the 'user:update' authority
-     * - Validates the user exists and isn't already an admin
+     * - Validates the user exists and isn't already an manager
      * - Returns success/error message
      *
      * @param userId The ID of the user to promote
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:update')")
-    @PutMapping("/{userId}/promote-admin")
-    public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
+    @PutMapping("/{userId}/promote-manager")
+    public ResponseEntity<?> promoteToManager(@PathVariable Long userId) {
         try {
-            userService.promoteToAdmin(userId);
-            return ResponseEntity.ok().body("User promoted to admin successfully");
+            userService.promoteToManager(userId);
+            return ResponseEntity.ok().body("User promoted to manager successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     /**
-     * Revokes the admin role from a user.
+     * Revokes the manager role from a user.
      * This endpoint:
      * - Requires the 'user:update' authority
      * - Validates the user exists and isn't a super admin
      * - Returns success/error message
      *
-     * @param userId The ID of the user to revoke admin role from
+     * @param userId The ID of the user to revoke manager role from
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:update')")
-    @PutMapping("/{userId}/revoke-admin")
-    public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
+    @PutMapping("/{userId}/revoke-manager")
+    public ResponseEntity<?> revokeManagerRole(@PathVariable Long userId) {
         try {
-            userService.revokeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role revoked successfully");
+            userService.revokeManagerRole(userId);
+            return ResponseEntity.ok().body("Manager role revoked successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -162,7 +162,7 @@ public class UserController {
     }
 
     /**
-     * Downgrades a super admin to a regular admin role.
+     * Downgrades a super admin to a regular manager role.
      * This endpoint:
      * - Requires both 'user:update' authority and 'SUPER_ADMIN' role
      * - Validates the user exists and is currently a super admin

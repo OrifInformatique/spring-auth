@@ -69,7 +69,7 @@ class UserMapperTest {
         user.setLogin("johndoe");
         
         Role role = new Role();
-        role.setName(RoleEnum.ADMIN);
+        role.setName(RoleEnum.MANAGER);
         Set<Role> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);
@@ -83,7 +83,7 @@ class UserMapperTest {
         assertEquals("John", userDto.getFirstName());
         assertEquals("Doe", userDto.getLastName());
         assertEquals("johndoe", userDto.getLogin());
-        assertEquals("ADMIN", userDto.getRole());
+        assertEquals("MANAGER", userDto.getRole());
         assertNotNull(userDto.getPermissions());
     }
 

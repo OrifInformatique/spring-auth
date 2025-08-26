@@ -1,19 +1,22 @@
 package ch.sectioninformatique.auth.security;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import static ch.sectioninformatique.auth.security.PermissionEnum.*;
-
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import static ch.sectioninformatique.auth.security.PermissionEnum.USER_DELETE;
+import static ch.sectioninformatique.auth.security.PermissionEnum.USER_READ;
+import static ch.sectioninformatique.auth.security.PermissionEnum.USER_UPDATE;
+import static ch.sectioninformatique.auth.security.PermissionEnum.USER_WRITE;
 
 /**
  * Enumeration defining the available roles in the application.
  * Each role has a predefined set of permissions that determine what actions
  * a user with that role can perform. The roles are hierarchical:
  * - USER: Basic access to resources
- * - ADMIN: Extended access to user management
+ * - MANAGER: Extended access to user management
  * - SUPER_ADMIN: Full access to all system features
  */
 public enum RoleEnum {
@@ -29,7 +32,7 @@ public enum RoleEnum {
      * Administrator role with extended permissions.
      * Can manage users, but cannot delete them.
      */
-    ADMIN(EnumSet.of(
+    MANAGER(EnumSet.of(
         USER_READ, 
         USER_WRITE, 
         USER_UPDATE

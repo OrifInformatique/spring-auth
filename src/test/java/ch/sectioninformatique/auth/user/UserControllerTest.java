@@ -85,69 +85,69 @@ public class UserControllerTest {
     }
 
     @Test
-    void promoteToAdmin_Successful_ReturnsUserDto() {
+    void promoteToManager_Successful_ReturnsUserDto() {
         // Arrange
         Long userId = 1L;
-        UserDto expectedDto = new UserDto(1L, "John", "Doe", "john@test.com", null, "ROLE_ADMIN", null);
+        UserDto expectedDto = new UserDto(1L, "John", "Doe", "john@test.com", null, "ROLE_MANAGER", null);
         
-        when(userService.promoteToAdmin(userId)).thenReturn(expectedDto);
+        when(userService.promoteToManager(userId)).thenReturn(expectedDto);
 
         // Act
-        ResponseEntity<?> response = userController.promoteToAdmin(userId);
+        ResponseEntity<?> response = userController.promoteToManager(userId);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User promoted to admin successfully", response.getBody());
-        verify(userService).promoteToAdmin(userId);
+        assertEquals("User promoted to manager successfully", response.getBody());
+        verify(userService).promoteToManager(userId);
     }
 
     @Test
-    void promoteToAdmin_UserNotFound_ReturnsBadRequest() {
+    void promoteToManager_UserNotFound_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        doThrow(new RuntimeException("User not found")).when(userService).promoteToAdmin(userId);
+        doThrow(new RuntimeException("User not found")).when(userService).promoteToManager(userId);
 
         // Act
-        ResponseEntity<?> response = userController.promoteToAdmin(userId);
+        ResponseEntity<?> response = userController.promoteToManager(userId);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
         assertEquals("User not found", response.getBody());
-        verify(userService, times(1)).promoteToAdmin(userId);
+        verify(userService, times(1)).promoteToManager(userId);
     }
 
     @Test
-    void revokeAdminRole_SuccessfulRevocation_ReturnsOkResponse() {
+    void revokeManagerRole_SuccessfulRevocation_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
-        doNothing().when(userService).revokeAdminRole(userId);
+        doNothing().when(userService).revokeManagerRole(userId);
 
         // Act
-        ResponseEntity<?> response = userController.revokeAdminRole(userId);
+        ResponseEntity<?> response = userController.revokeManagerRole(userId);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("Admin role revoked successfully", response.getBody());
-        verify(userService, times(1)).revokeAdminRole(userId);
+        assertEquals("Manager role revoked successfully", response.getBody());
+        verify(userService, times(1)).revokeManagerRole(userId);
     }
 
     @Test
-    void revokeAdminRole_UserNotFound_ReturnsBadRequest() {
+    void revokeManagerRole_UserNotFound_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        doThrow(new RuntimeException("User not found")).when(userService).revokeAdminRole(userId);
+        doThrow(new RuntimeException("User not found")).when(userService).revokeManagerRole(userId);
 
         // Act
-        ResponseEntity<?> response = userController.revokeAdminRole(userId);
+        ResponseEntity<?> response = userController.revokeManagerRole(userId);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
         assertEquals("User not found", response.getBody());
-        verify(userService, times(1)).revokeAdminRole(userId);
+        verify(userService, times(1)).revokeManagerRole(userId);
     }
 
     @Test
-    void promoteToSuperAdmin_SuccessfulPromotion_ReturnsOkResponse() {
+    void promoteToSuperManager_SuccessfulPromotion_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
         UserDto expectedUser = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_SUPER_ADMIN", null);
@@ -242,8 +242,8 @@ public class UserControllerTest {
         // Arrange
         Long userId = 1L;
         UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null);
-        authenticatedUser.setLogin("admin@test.com");
-        authenticatedUser.setRole("ROLE_ADMIN");
+        authenticatedUser.setLogin("manager@test.com");
+        authenticatedUser.setRole("ROLE_MANAGER");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUser);
@@ -263,8 +263,8 @@ public class UserControllerTest {
         // Arrange
         Long userId = 1L;
         UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null);
-        authenticatedUser.setLogin("admin@test.com");
-        authenticatedUser.setRole("ROLE_ADMIN");
+        authenticatedUser.setLogin("manager@test.com");
+        authenticatedUser.setRole("ROLE_MANAGER");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUser);

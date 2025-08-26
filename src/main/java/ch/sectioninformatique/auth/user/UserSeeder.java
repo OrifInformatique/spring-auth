@@ -17,7 +17,7 @@ import java.util.Set;
  * Seeder class for initializing the database with default user data.
  * This class implements CommandLineRunner to execute the seeding process
  * when the application starts. It creates a set of predefined users with
- * different roles (USER, ADMIN, SUPER_ADMIN) for testing and development purposes.
+ * different roles (USER, MANAGER, SUPER_ADMIN) for testing and development purposes.
  * The seeder runs after the RoleSeeder (Order(2)) to ensure roles exist before
  * creating users.
  */
@@ -73,7 +73,7 @@ public class UserSeeder implements CommandLineRunner {
 	 * The users include:
 	 * - A deleted user (ID 1)
 	 * - Regular users with USER role (John Doe, Alice Johnson, Dan Sergeant, etc.)
-	 * - An admin user with ADMIN role (Jane Smith)
+	 * - An admin user with MANAGER role (Jane Smith)
 	 * - A super admin user with SUPER_ADMIN role (Super Admin)
 	 * 
 	 * Each user is created with:
@@ -82,14 +82,14 @@ public class UserSeeder implements CommandLineRunner {
 	 * - First and last name
 	 * - Appropriate role(s)
 	 *
-	 * @throws RuntimeException if any required role (USER, ADMIN, SUPER_ADMIN) is not found in the database
+	 * @throws RuntimeException if any required role (USER, MANAGER, SUPER_ADMIN) is not found in the database
 	 */
 	private void loadUserData() {
 		if (this.userRepository.count() == 0) {
 			Role userRole = roleRepository.findByName(RoleEnum.USER)
 					.orElseThrow(() -> new RuntimeException("Role USER not found"));
-			Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-					.orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+			Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
+					.orElseThrow(() -> new RuntimeException("Role MANAGER not found"));
 			Role superAdminRole = roleRepository.findByName(RoleEnum.SUPER_ADMIN)
 					.orElseThrow(() -> new RuntimeException("Role SUPER_ADMIN not found"));
 
@@ -115,7 +115,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("SMITH")
 					.login("jane.smith@test.com")
 					.password(passwordEncoder.encode("Complex#789Pwd"))
-					.roles(Set.of(adminRole))
+					.roles(Set.of(managerRole))
 					.build();
 
 			User user3 = User.builder()
