@@ -237,9 +237,13 @@ public class User implements UserDetails {
      * @return The all roles assigned to the user
      */
     public Set<Role> getAllRoles() {
-        Set<Role> allRoles = appSpecificRoles;
-        allRoles.add(mainRole);
-        return appSpecificRoles;
+        Set<Role> allRoles = new HashSet<>();
+            if (appSpecificRoles != null) {
+                for (Role role : appSpecificRoles) {
+                    allRoles.add(role);
+                }
+            }
+        return allRoles;
     }
 
     /**
