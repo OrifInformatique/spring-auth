@@ -61,8 +61,8 @@ public class UserServiceTest {
         // Arrange
         String login = "john@test.com";
         String password = "password123";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, null);
-        UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, "ROLE_USER", null);
+        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, null, null);
+        UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, "ROLE_USER", null, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(true);
@@ -97,7 +97,7 @@ public class UserServiceTest {
         // Arrange
         String login = "john@test.com";
         String password = "wrongpassword";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, null);
+        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, null,null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(false);
@@ -122,9 +122,9 @@ public class UserServiceTest {
         user.setLastName("User");
         user.setLogin(login);
         user.setPassword("hashedPassword");
-        user.setRoles(new HashSet<>());
+        user.setMainRole(new Role());
         
-        UserDto expectedDto = new UserDto(1L, "New", "User", login, null, "ROLE_USER", null);
+        UserDto expectedDto = new UserDto(1L, "New", "User", login, null, "ROLE_USER", null, null);
         Role userRole = new Role();
         userRole.setId(1L);
         userRole.setName(RoleEnum.USER);
@@ -154,7 +154,7 @@ public class UserServiceTest {
         String password = "password123";
         SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray());
         
-        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, null);
+        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, null, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(existingUser));
 
@@ -175,7 +175,7 @@ public class UserServiceTest {
         user.setLastName("Doe");
         user.setLogin("john@test.com");
         user.setPassword("pass");
-        user.setRoles(new HashSet<>());
+        user.setMainRole(new Role());
         
         Role userRole = new Role();
         userRole.setId(1L);
@@ -183,9 +183,9 @@ public class UserServiceTest {
         Role managerRole = new Role();
         managerRole.setId(2L);
         managerRole.setName(RoleEnum.MANAGER);
-        user.getRoles().add(userRole);
+        user.setMainRole(userRole);
         
-        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_MANAGER", null);
+        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_MANAGER", null, null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(roleRepository.findByName(RoleEnum.MANAGER)).thenReturn(Optional.of(managerRole));
@@ -224,12 +224,12 @@ public class UserServiceTest {
         user.setLastName("Doe");
         user.setLogin("john@test.com");
         user.setPassword("pass");
-        user.setRoles(new HashSet<>());
+        user.setMainRole(new Role());
         
         Role managerRole = new Role();
         managerRole.setId(2L);
         managerRole.setName(RoleEnum.MANAGER);
-        user.getRoles().add(managerRole);
+        user.setMainRole(managerRole);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -249,11 +249,11 @@ public class UserServiceTest {
         userToDelete.setLastName("Doe");
         userToDelete.setLogin("john@test.com");
         userToDelete.setPassword("pass");
-        userToDelete.setRoles(new HashSet<>());
+        userToDelete.setMainRole(new Role());
         Role userRole = new Role();
         userRole.setId(1L);
         userRole.setName(RoleEnum.USER);
-        userToDelete.getRoles().add(userRole);
+        userToDelete.setMainRole(userRole);
         
         User authenticatedUser = new User();
         authenticatedUser.setId(3L);
@@ -261,13 +261,13 @@ public class UserServiceTest {
         authenticatedUser.setLastName("User");
         authenticatedUser.setLogin("manager@test.com");
         authenticatedUser.setPassword("pass");
-        authenticatedUser.setRoles(new HashSet<>());
+        authenticatedUser.setMainRole(new Role());
         Role managerRole = new Role();
         managerRole.setId(2L);
         managerRole.setName(RoleEnum.MANAGER);
-        authenticatedUser.getRoles().add(managerRole);
+        authenticatedUser.setMainRole(managerRole);
         
-        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, "ROLE_MANAGER", null);
+        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, "ROLE_MANAGER", null, null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -293,11 +293,11 @@ public class UserServiceTest {
         userToDelete.setLastName("Doe");
         userToDelete.setLogin("john@test.com");
         userToDelete.setPassword("pass");
-        userToDelete.setRoles(new HashSet<>());
+        userToDelete.setMainRole(new Role());
         Role managerRole = new Role();
         managerRole.setId(2L);
         managerRole.setName(RoleEnum.MANAGER);
-        userToDelete.getRoles().add(managerRole);
+        userToDelete.setMainRole(managerRole);
         
         User authenticatedUser = new User();
         authenticatedUser.setId(3L);
@@ -305,13 +305,13 @@ public class UserServiceTest {
         authenticatedUser.setLastName("User");
         authenticatedUser.setLogin("user@test.com");
         authenticatedUser.setPassword("pass");
-        authenticatedUser.setRoles(new HashSet<>());
+        authenticatedUser.setMainRole(new Role());
         Role userRole = new Role();
         userRole.setId(1L);
         userRole.setName(RoleEnum.USER);
-        authenticatedUser.getRoles().add(userRole);
+        authenticatedUser.setMainRole(userRole);
         
-        UserDto authenticatedUserDto = new UserDto(3L, "Regular", "User", "user@test.com", null, "ROLE_USER", null);
+        UserDto authenticatedUserDto = new UserDto(3L, "Regular", "User", "user@test.com", null, "ROLE_USER", null, null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);

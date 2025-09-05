@@ -88,7 +88,7 @@ public class UserService {
         // Add default USER role
         Role userRole = roleRepository.findByName(RoleEnum.USER)
             .orElseThrow(() -> new AppException("Default role not found", HttpStatus.INTERNAL_SERVER_ERROR));
-        user.addRole(userRole);
+        user.setMainRole(userRole);
 
         User savedUser = userRepository.save(user);
         return userMapper.toUserDto(savedUser);
@@ -116,11 +116,11 @@ public class UserService {
                 
         log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}", 
             user.getId(), user.getFirstName(), user.getLastName(), 
-            user.getRoles().stream().map(role -> role.getName().toString()).toList());
+            user.getAllRoles().stream().map(role -> role.getName().toString()).toList());
             
         UserDto userDto = userMapper.toUserDto(user);
         log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}", 
-            userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getRole());
+            userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
             
         return userDto;
     }
@@ -151,18 +151,18 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
             
-        if (user.getRole().getName().equals(RoleEnum.MANAGER)) {
+        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
             throw new RuntimeException("The user is already an manager");
         }
-        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
             throw new RuntimeException("The user is already a admin");
         }
         
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
             .orElseThrow(() -> new RuntimeException("Manager role not found"));
             
-        user.getRoles().clear();
-        user.getRoles().add(managerRole);
+
+        user.setMainRole(managerRole);
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
@@ -181,18 +181,18 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
-        if (user.getRole().getName().equals(RoleEnum.USER)) {
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new RuntimeException("The user is already a user");
         }
-        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
             throw new RuntimeException("You don't have the necessary rights to delete a admin");
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
             .orElseThrow(() -> new RuntimeException("User role not found"));
 
-        user.getRoles().clear();
-        user.getRoles().add(userRole);
+
+        user.setMainRole(userRole);
         userRepository.save(user);
     }
 
@@ -211,15 +211,14 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
             throw new RuntimeException("The user is already a admin");
         }
 
         Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
             .orElseThrow(() -> new RuntimeException("Admin role not found"));
 
-        user.getRoles().clear();
-        user.getRoles().add(adminRole);
+        user.setMainRole(adminRole);
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
@@ -238,18 +237,17 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
-        if (user.getRole().getName().equals(RoleEnum.USER)) {
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new RuntimeException("The user has lower rights than desired");
         }
-        if (user.getRole().getName().equals(RoleEnum.MANAGER)) {
+        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
             throw new RuntimeException("The user is already an manager");
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
             .orElseThrow(() -> new RuntimeException("Manager role not found"));
 
-        user.getRoles().clear();
-        user.getRoles().add(managerRole);
+        user.setMainRole(managerRole);
         userRepository.save(user);
     }
 
@@ -267,15 +265,14 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRole().getName().equals(RoleEnum.USER)) {
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new RuntimeException("The user is already a user");
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
             .orElseThrow(() -> new RuntimeException("User role not found"));
 
-        user.getRoles().clear();
-        user.getRoles().add(userRole);
+        user.setMainRole(userRole);
         userRepository.save(user);
     }
 
@@ -330,7 +327,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
         // Check if the action is authorized
-        if (!canPerformAction(authenticatedUserEntity.getRole().getName(), userToDelete.getRole().getName())) {
+        if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
             throw new RuntimeException("You don't have the necessary rights to perform this action");
         }
 
@@ -370,7 +367,7 @@ public class UserService {
         // Add default USER role
         Role userRole = roleRepository.findByName(RoleEnum.USER)
             .orElseThrow(() -> new AppException("Default role not found", HttpStatus.INTERNAL_SERVER_ERROR));
-        user.addRole(userRole);
+        user.setMainRole(userRole);
 
         // Save the user
         User savedUser = userRepository.save(user);

@@ -70,9 +70,7 @@ class UserMapperTest {
         
         Role role = new Role();
         role.setName(RoleEnum.MANAGER);
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
+        user.setMainRole(role);
 
         // When
         UserDto userDto = userMapper.toUserDto(user);
@@ -83,7 +81,7 @@ class UserMapperTest {
         assertEquals("John", userDto.getFirstName());
         assertEquals("Doe", userDto.getLastName());
         assertEquals("johndoe", userDto.getLogin());
-        assertEquals("MANAGER", userDto.getRole());
+        assertEquals("MANAGER", userDto.getMainRole());
         assertNotNull(userDto.getPermissions());
     }
 
@@ -113,7 +111,7 @@ class UserMapperTest {
         assertEquals("Smith", user.getLastName());
         assertEquals("janesmith", user.getLogin());
         assertNull(user.getPassword()); // Password should be ignored as per mapping
-        assertTrue(user.getRoles().isEmpty()); // Roles should be empty as per mapping
+        assertTrue(user.getMainRole() == null); // Roles should be empty as per mapping
     }
 
     /**

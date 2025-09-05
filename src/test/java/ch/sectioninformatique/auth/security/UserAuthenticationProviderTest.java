@@ -65,7 +65,7 @@ class UserAuthenticationProviderTest {
                 .login(TEST_LOGIN)
                 .firstName(TEST_FIRST_NAME)
                 .lastName(TEST_LAST_NAME)
-                .role("USER")
+                .mainRole("USER")
                 .permissions(Arrays.asList("read", "write"))
                 .build();
 
@@ -91,7 +91,7 @@ class UserAuthenticationProviderTest {
                 .login(TEST_LOGIN)
                 .firstName(TEST_FIRST_NAME)
                 .lastName(TEST_LAST_NAME)
-                .role("USER")
+                .mainRole("USER")
                 .permissions(Arrays.asList("read", "write"))
                 .build();
 
@@ -122,7 +122,7 @@ class UserAuthenticationProviderTest {
                 .login(TEST_LOGIN)
                 .firstName(TEST_FIRST_NAME)
                 .lastName(TEST_LAST_NAME)
-                .role("USER")
+                .mainRole("USER")
                 .permissions(Arrays.asList("read", "write"))
                 .build();
 
@@ -152,7 +152,7 @@ class UserAuthenticationProviderTest {
                 .login(TEST_LOGIN)
                 .firstName(TEST_FIRST_NAME)
                 .lastName(TEST_LAST_NAME)
-                .role("USER")
+                .mainRole("USER")
                 .permissions(Arrays.asList("read", "write"))
                 .build();
 

@@ -19,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -99,7 +100,20 @@ public class Role {
     private Date updatedAt;
 
     /**
-     * Set of users who have this role.
+     * Set of users who have this mainRole.
+     * This field:
+     * - Implements a one-to-many relationship with User entity
+     * - Is mapped by the 'roles' field in the User class
+     * - Uses eager fetching to ensure roles are always available
+     * - Is ignored during JSON serialization to prevent infinite recursion
+     * - Is initialized as an empty HashSet to prevent null pointer exceptions
+     */
+    @OneToMany(mappedBy = "mainRole", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<User> usersMains = new HashSet<>();
+
+    /**
+     * Set of users who have this appspecificRole.
      * This field:
      * - Implements a many-to-many relationship with User entity
      * - Is mapped by the 'roles' field in the User class
@@ -107,8 +121,8 @@ public class Role {
      * - Is ignored during JSON serialization to prevent infinite recursion
      * - Is initialized as an empty HashSet to prevent null pointer exceptions
      */
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "appSpecificRoles", fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    private Set<User> usersAppSpecifique = new HashSet<>();
 }
 

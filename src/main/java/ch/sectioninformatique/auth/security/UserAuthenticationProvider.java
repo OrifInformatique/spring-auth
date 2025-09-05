@@ -3,6 +3,7 @@ package ch.sectioninformatique.auth.security;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -37,11 +38,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class UserAuthenticationProvider {
 
-    /** Secret key for JWT token signing and verification, configured via application properties */
+    /**
+     * Secret key for JWT token signing and verification, configured via application
+     * properties
+     */
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretKey;
 
-    /** Service for user-related operations, including user creation and retrieval */
+    /**
+     * Service for user-related operations, including user creation and retrieval
+     */
     private final UserService userService;
 
     /**
@@ -78,8 +84,8 @@ public class UserAuthenticationProvider {
                 .withExpiresAt(validity)
                 .withClaim("firstName", user.getFirstName())
                 .withClaim("lastName", user.getLastName())
-                .withClaim("role", user.getRole())
-                .withClaim("permissions", user.getPermissions())
+                .withClaim("mainRole", user.getMainRole())
+                .withClaim("appSpecificRoles", user.getAppSpecificRoles())
                 .sign(algorithm);
     }
 
@@ -88,23 +94,25 @@ public class UserAuthenticationProvider {
      * This method converts:
      * - Role into a "ROLE_" prefixed authority
      * - Permissions into individual authorities
-     * The resulting authorities are used by Spring Security for authorization checks.
+     * The resulting authorities are used by Spring Security for authorization
+     * checks.
      *
-     * @param role The user's role (e.g., "USER", "MANAGER")
-     * @param permissions List of permission strings (e.g., "user:read", "user:write")
+     * @param role        The user's role (e.g., "USER", "MANAGER")
+     * @param permissions List of permission strings (e.g., "user:read",
+     *                    "user:write")
      * @return List of SimpleGrantedAuthority objects for Spring Security
      */
-    private List<SimpleGrantedAuthority> buildAuthorities(String role, List<String> permissions) {
+    private List<SimpleGrantedAuthority> buildAuthorities(List<String> roles, List<String> permissions) {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        if (role != null && !role.isEmpty()) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+        for (String role : roles) {
+            if (role != null && !role.isEmpty()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                Set<SimpleGrantedAuthority> authoritySet = RoleEnum.valueOf(role).getGrantedAuthorities();
+                authorities.addAll(authoritySet);
+            }
         }
-        if (permissions != null) {
-            authorities.addAll(permissions.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList()));
-        }
-        log.debug("Built authorities for role {}: {}", role, authorities);
+
+        log.debug("Built authorities for role {}: {}", roles, authorities);
         return authorities;
     }
 
@@ -117,7 +125,8 @@ public class UserAuthenticationProvider {
      * - Token claims (user information)
      *
      * @param token The JWT token to validate
-     * @return Authentication object containing the user's information and authorities
+     * @return Authentication object containing the user's information and
+     *         authorities
      */
     public Authentication validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
@@ -132,11 +141,18 @@ public class UserAuthenticationProvider {
                 .login(decoded.getSubject())
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())
-                .role(decoded.getClaim("role").asString())
+                .mainRole(decoded.getClaim("mainRole").asString())
+                .appSpecificRoles(decoded.getClaim("appSpecificRoles").asList(String.class))
                 .permissions(decoded.getClaim("permissions").asList(String.class))
                 .build();
-
-        List<SimpleGrantedAuthority> authorities = buildAuthorities(user.getRole(), user.getPermissions());
+        List<String> allRoles = new ArrayList<>();
+        if (user.getAppSpecificRoles() != null) {
+            for (String role : user.getAppSpecificRoles()) {
+                allRoles.add(role);
+            }
+        }
+        allRoles.add(user.getMainRole());
+        List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
         return new UsernamePasswordAuthenticationToken(user, null, authorities);
     }
 
@@ -146,14 +162,15 @@ public class UserAuthenticationProvider {
      * 1. Validates the token signature and claims
      * 2. Attempts to find the user in the database
      * 3. If user exists:
-     *    - Adds default OAuth2 scopes permissions
-     *    - Preserves existing permissions
+     * - Adds default OAuth2 scopes permissions
+     * - Preserves existing permissions
      * 4. If user doesn't exist:
-     *    - Creates a new Azure user with default permissions
-     *    - Sets role to "USER"
+     * - Creates a new Azure user with default permissions
+     * - Sets role to "USER"
      *
      * @param token The JWT token to validate
-     * @return Authentication object containing the user's information and authorities
+     * @return Authentication object containing the user's information and
+     *         authorities
      */
     public Authentication validateTokenStrongly(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
@@ -167,15 +184,14 @@ public class UserAuthenticationProvider {
         try {
             // Try to find the user in the database
             UserDto user = userService.findByLogin(decoded.getSubject());
-            
+
             // Add default permissions for OAuth2 users
             List<String> permissions = new ArrayList<>(List.of(
-                // OAuth2 scopes
-                "SCOPE_openid", 
-                "SCOPE_profile", 
-                "SCOPE_email", 
-                "SCOPE_User.Read"
-            ));
+                    // OAuth2 scopes
+                    "SCOPE_openid",
+                    "SCOPE_profile",
+                    "SCOPE_email",
+                    "SCOPE_User.Read"));
 
             // Add any existing permissions
             if (user.getPermissions() != null) {
@@ -184,27 +200,44 @@ public class UserAuthenticationProvider {
 
             user.setPermissions(permissions);
             user.setToken(token);
-            
-            List<SimpleGrantedAuthority> authorities = buildAuthorities(user.getRole(), user.getPermissions());
+
+            List<String> allRoles = new ArrayList<>();
+            if (user.getAppSpecificRoles() != null) {
+                for (String role : user.getAppSpecificRoles()) {
+                    allRoles.add(role);
+                }
+            }
+            allRoles.add(user.getMainRole());
+
+            List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
             log.debug("Built authorities for user {}: {}", user.getLogin(), authorities);
-            
+
             return new UsernamePasswordAuthenticationToken(user, null, authorities);
         } catch (Exception e) {
             // If user doesn't exist, create a new Azure user
             log.debug("User not found, creating new Azure user: {}", decoded.getSubject());
-            
+
             UserDto newUser = UserDto.builder()
-                .login(decoded.getSubject())
-                .firstName(decoded.getClaim("firstName").asString())
-                .lastName(decoded.getClaim("lastName").asString())
-                .role("USER")
-                .build();
+                    .login(decoded.getSubject())
+                    .firstName(decoded.getClaim("firstName").asString())
+                    .lastName(decoded.getClaim("lastName").asString())
+                    .mainRole("USER")
+                    .build();
 
             // Save the new user
             userService.createAzureUser(newUser);
-            
+
+            List<String> allRoles = new ArrayList<>();
+            if (newUser.getAppSpecificRoles() != null) {
+                for (String role : newUser.getAppSpecificRoles()) {
+                    allRoles.add(role);
+                }
+            }
+            allRoles.add(newUser.getMainRole());
+
             // Create authentication with authorities
-            List<SimpleGrantedAuthority> authorities = buildAuthorities(newUser.getRole(), newUser.getPermissions());
+            List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles,
+                    newUser.getPermissions());
             return new UsernamePasswordAuthenticationToken(newUser, null, authorities);
         }
     }

@@ -99,7 +99,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("user")
 					.login("deleted.user@test.com")
 					.password(passwordEncoder.encode("NoN33dPassword@nymore!"))
-					.roles(Set.of(userRole))
+					.mainRole(userRole)
 					.build();
 
 			User user1 = User.builder()
@@ -107,7 +107,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("DOE")
 					.login("john.doe@test.com")
 					.password(passwordEncoder.encode("Secure123@Pass"))
-					.roles(Set.of(userRole))
+					.mainRole(userRole)
 					.build();
 
 			User user2 = User.builder()
@@ -115,7 +115,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("SMITH")
 					.login("jane.smith@test.com")
 					.password(passwordEncoder.encode("Complex#789Pwd"))
-					.roles(Set.of(managerRole))
+					.mainRole(managerRole)
 					.build();
 
 			User user3 = User.builder()
@@ -123,7 +123,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("JOHNSON")
 					.login("alice.johnson@test.com")
 					.password(passwordEncoder.encode("Test$4321Now"))
-					.roles(Set.of(userRole))
+					.mainRole(userRole)
 					.build();
 
 			User user4 = User.builder()
@@ -131,7 +131,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("SERGEANT")
 					.login("dan.sergeant@test.com")
 					.password(passwordEncoder.encode("Spring2024@Dev"))
-					.roles(Set.of(userRole))
+					.mainRole(userRole)
 					.build();
 
 			User user5 = User.builder()
@@ -139,7 +139,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("BALLOONZI")
 					.login("bobby.balloonzi@test.com")
 					.password(passwordEncoder.encode("P@ssw0rd2024"))
-					.roles(Set.of(userRole))
+					.mainRole(userRole)
 					.build();
 
 			User user6 = User.builder()
@@ -147,7 +147,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("JAKE")
 					.login("rob.jake@test.com")
 					.password(passwordEncoder.encode("Inf0#Security24"))
-					.roles(Set.of(userRole))
+					.mainRole(userRole)
 					.build();
 
 			User user7 = User.builder()
@@ -155,7 +155,7 @@ public class UserSeeder implements CommandLineRunner {
 					.lastName("Admin")
 					.login("super.admin@test.com")
 					.password(passwordEncoder.encode("ReallySecure123@PassWordBecauseIWantToBeSuperSafe"))
-					.roles(Set.of(adminRole))
+					.mainRole(adminRole)
 					.build();
 
 			userRepository.saveAll(Arrays.asList(user0, user1, user2, user3, user4, user5, user6, user7));
