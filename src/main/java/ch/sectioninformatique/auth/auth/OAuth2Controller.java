@@ -93,7 +93,7 @@ public class OAuth2Controller {
         String jwt = userAuthenticationProvider.createToken(user);
 
         // Construct a redirect URL for your frontend with the token
-        String redirectUrl = String.format("http://localhost:4000/oauth2/success?token=%s&loginType=azure",
+        String redirectUrl = String.format("https://localhost:4000/oauth2/success?token=%s&loginType=azure",
                 URLEncoder.encode(jwt, StandardCharsets.UTF_8));
 
         log.debug("Redirecting to frontend with JWT token");
