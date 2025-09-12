@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Base64;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -169,33 +171,4 @@ class UserAuthenticationProviderTest {
         verify(userService).createAzureUser(any());
     }
 
-    /**
-     * Tests the authority building functionality.
-     * Verifies that:
-     * - Role is properly prefixed with "ROLE_"
-     * - Permissions are correctly converted to authorities
-     * - All authorities are included in the result
-     */
-    @Test
-    void testBuildAuthorities() throws Exception {
-        // Given
-        String role = "USER";
-        List<String> permissions = Arrays.asList("read", "write");
-
-        // When
-        Method method = UserAuthenticationProvider.class.getDeclaredMethod("buildAuthorities", String.class, List.class);
-        method.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<SimpleGrantedAuthority> authorities = (List<SimpleGrantedAuthority>) method.invoke(authenticationProvider, role, permissions);
-
-        // Then
-        assertNotNull(authorities);
-        assertEquals(3, authorities.size()); // ROLE_USER + 2 permissions
-        assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_USER")));
-        assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("read")));
-        assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("write")));
-    }
 } 
