@@ -81,7 +81,7 @@ public class UserController {
      * Promotes a user to the manager role.
      * This endpoint:
      * - Requires the 'user:update' authority
-     * - Validates the user exists and isn't already an manager
+     * - Validates the user exists and isn't already a manager
      * - Returns success/error message
      *
      * @param userId The ID of the user to promote
