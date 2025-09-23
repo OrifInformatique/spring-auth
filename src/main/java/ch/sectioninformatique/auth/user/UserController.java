@@ -122,14 +122,14 @@ public class UserController {
     /**
      * Promotes a user to the admin role.
      * This endpoint:
-     * - Requires both 'user:update' authority and 'ADMIN' role
+     * - Requires 'ADMIN' role
      * - Validates the user exists and isn't already a admin
      * - Returns success/error message
      *
      * @param userId The ID of the user to promote to admin
      * @return ResponseEntity with success message or error details
      */
-    @PreAuthorize("hasAuthority('user:update') && hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/promote-admin")
     public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
         try {
@@ -143,14 +143,14 @@ public class UserController {
     /**
      * Revokes the admin role from a user.
      * This endpoint:
-     * - Requires both 'user:update' authority and 'ADMIN' role
+     * - Requires 'ADMIN' role
      * - Validates the user exists and isn't already a regular user
      * - Returns success/error message
      *
      * @param userId The ID of the user to revoke admin role from
      * @return ResponseEntity with success message or error details
      */
-    @PreAuthorize("hasAuthority('user:update') && hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
         try {
