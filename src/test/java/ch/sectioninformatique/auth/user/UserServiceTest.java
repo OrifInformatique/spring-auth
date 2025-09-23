@@ -234,7 +234,7 @@ public class UserServiceTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.promoteToManager(userId));
-        assertEquals("The user is already an manager", exception.getMessage());
+        assertEquals("The user is already a manager", exception.getMessage());
     }
 
     @Test
