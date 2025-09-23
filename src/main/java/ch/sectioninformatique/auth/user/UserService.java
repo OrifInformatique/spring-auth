@@ -152,10 +152,10 @@ public class UserService {
             .orElseThrow(() -> new RuntimeException("User not found"));
             
         if (user.getRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already an manager");
+            throw new RuntimeException("The user is already a manager");
         }
         if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already a admin");
+            throw new RuntimeException("The user is already an admin");
         }
         
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
@@ -185,7 +185,7 @@ public class UserService {
             throw new RuntimeException("The user is already a user");
         }
         if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("You don't have the necessary rights to delete a admin");
+            throw new RuntimeException("You don't have the necessary rights to revoke an admin");
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
@@ -212,7 +212,7 @@ public class UserService {
             .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already a admin");
+            throw new RuntimeException("The user is already an admin");
         }
 
         Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
@@ -242,7 +242,7 @@ public class UserService {
             throw new RuntimeException("The user has lower rights than desired");
         }
         if (user.getRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already an manager");
+            throw new RuntimeException("The user is already a manager");
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
