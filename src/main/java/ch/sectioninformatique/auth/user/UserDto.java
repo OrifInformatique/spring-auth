@@ -10,7 +10,7 @@ import lombok.Data;
  * Data Transfer Object (DTO) for user information.
  * This class is used to transfer user data between the client and server,
  * excluding sensitive information like passwords. It includes basic user details,
- * authentication token, role, and permissions.
+ * authentication token, role.
  */
 @Data
 @Builder(toBuilder = true)
@@ -47,13 +47,6 @@ public class UserDto {
      */
     @Builder.Default
     private String mainRole = "ROLE_USER";
-
-    /**
-     * List of additional app specific roles.
-     * Defaults to an empty list if not specified.
-     */
-    @Builder.Default
-    private List<String> appSpecificRoles = new ArrayList<>();
     
     /**
      * List of permissions granted to the user.

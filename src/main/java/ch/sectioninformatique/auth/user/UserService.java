@@ -12,7 +12,6 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
@@ -116,7 +115,7 @@ public class UserService {
                 
         log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}", 
             user.getId(), user.getFirstName(), user.getLastName(), 
-            user.getAllRoles().stream().map(role -> role.getName().toString()).toList());
+            user.getMainRole());
             
         UserDto userDto = userMapper.toUserDto(user);
         log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}", 

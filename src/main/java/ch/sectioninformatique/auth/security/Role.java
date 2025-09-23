@@ -18,7 +18,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -111,18 +110,5 @@ public class Role {
     @OneToMany(mappedBy = "mainRole", fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<User> usersMains = new HashSet<>();
-
-    /**
-     * Set of users who have this appspecificRole.
-     * This field:
-     * - Implements a many-to-many relationship with User entity
-     * - Is mapped by the 'roles' field in the User class
-     * - Uses eager fetching to ensure roles are always available
-     * - Is ignored during JSON serialization to prevent infinite recursion
-     * - Is initialized as an empty HashSet to prevent null pointer exceptions
-     */
-    @ManyToMany(mappedBy = "appSpecificRoles", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private Set<User> usersAppSpecifique = new HashSet<>();
 }
 

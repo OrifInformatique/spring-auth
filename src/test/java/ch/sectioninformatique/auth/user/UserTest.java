@@ -7,8 +7,6 @@ import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;

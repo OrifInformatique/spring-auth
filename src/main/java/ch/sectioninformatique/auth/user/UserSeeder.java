@@ -11,7 +11,6 @@ import ch.sectioninformatique.auth.security.RoleRepository;
 import org.springframework.core.annotation.Order;
 
 import java.util.Arrays;
-import java.util.Set;
 
 /**
  * Seeder class for initializing the database with default user data.
