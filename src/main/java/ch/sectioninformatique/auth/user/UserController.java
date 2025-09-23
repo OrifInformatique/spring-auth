@@ -155,7 +155,7 @@ public class UserController {
     public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
         try {
             userService.revokeAdminRole(userId);
-            return ResponseEntity.ok().body("admin role revoked successfully");
+            return ResponseEntity.ok().body("Admin role revoked successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
