@@ -4,7 +4,7 @@
 
 services:
   app:
-    container_name: "Spring-boot-${ENVIRONMENT}"
+    container_name: "spring-auth-${ENVIRONMENT}"
     build:
       context: .
       dockerfile: Dockerfile
@@ -26,7 +26,7 @@ services:
       - spring_network
 
   db:
-    container_name: "mariadb"
+    container_name: "spring-auth-mariadb"
     image: mariadb:11.4
     environment:
       MARIADB_ROOT_PASSWORD: "${DB_PASSWORD}"
