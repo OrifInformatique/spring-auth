@@ -166,7 +166,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void promoteToAdmin_Successful_ReturnsUserDto() {
+    void promoteToManager_Successful_ReturnsUserDto() {
         // Arrange
         Long userId = 1L;
         User user = new User();
@@ -180,42 +180,42 @@ public class UserServiceTest {
         Role userRole = new Role();
         userRole.setId(1L);
         userRole.setName(RoleEnum.USER);
-        Role adminRole = new Role();
-        adminRole.setId(2L);
-        adminRole.setName(RoleEnum.ADMIN);
+        Role managerRole = new Role();
+        managerRole.setId(2L);
+        managerRole.setName(RoleEnum.MANAGER);
         user.getRoles().add(userRole);
         
-        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_ADMIN", null);
+        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, "ROLE_MANAGER", null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(roleRepository.findByName(RoleEnum.ADMIN)).thenReturn(Optional.of(adminRole));
+        when(roleRepository.findByName(RoleEnum.MANAGER)).thenReturn(Optional.of(managerRole));
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toUserDto(user)).thenReturn(expectedDto);
 
         // Act
-        UserDto result = userService.promoteToAdmin(userId);
+        UserDto result = userService.promoteToManager(userId);
 
         // Assert
         assertEquals(expectedDto, result);
         verify(userRepository).findById(userId);
-        verify(roleRepository).findByName(RoleEnum.ADMIN);
+        verify(roleRepository).findByName(RoleEnum.MANAGER);
         verify(userRepository).save(user);
     }
 
     @Test
-    void promoteToAdmin_UserNotFound_ThrowsRuntimeException() {
+    void promoteToManager_UserNotFound_ThrowsRuntimeException() {
         // Arrange
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> userService.promoteToAdmin(userId));
+            () -> userService.promoteToManager(userId));
         assertEquals("User not found", exception.getMessage());
     }
 
     @Test
-    void promoteToAdmin_AlreadyAdmin_ThrowsRuntimeException() {
+    void promoteToManager_AlreadyManager_ThrowsRuntimeException() {
         // Arrange
         Long userId = 1L;
         User user = new User();
@@ -226,17 +226,17 @@ public class UserServiceTest {
         user.setPassword("pass");
         user.setRoles(new HashSet<>());
         
-        Role adminRole = new Role();
-        adminRole.setId(2L);
-        adminRole.setName(RoleEnum.ADMIN);
-        user.getRoles().add(adminRole);
+        Role managerRole = new Role();
+        managerRole.setId(2L);
+        managerRole.setName(RoleEnum.MANAGER);
+        user.getRoles().add(managerRole);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> userService.promoteToAdmin(userId));
-        assertEquals("The user is already an admin", exception.getMessage());
+            () -> userService.promoteToManager(userId));
+        assertEquals("The user is already a manager", exception.getMessage());
     }
 
     @Test
@@ -257,29 +257,29 @@ public class UserServiceTest {
         
         User authenticatedUser = new User();
         authenticatedUser.setId(3L);
-        authenticatedUser.setFirstName("Admin");
+        authenticatedUser.setFirstName("Manager");
         authenticatedUser.setLastName("User");
-        authenticatedUser.setLogin("admin@test.com");
+        authenticatedUser.setLogin("manager@test.com");
         authenticatedUser.setPassword("pass");
         authenticatedUser.setRoles(new HashSet<>());
-        Role adminRole = new Role();
-        adminRole.setId(2L);
-        adminRole.setName(RoleEnum.ADMIN);
-        authenticatedUser.getRoles().add(adminRole);
+        Role managerRole = new Role();
+        managerRole.setId(2L);
+        managerRole.setName(RoleEnum.MANAGER);
+        authenticatedUser.getRoles().add(managerRole);
         
-        UserDto authenticatedUserDto = new UserDto(3L, "Admin", "User", "admin@test.com", null, "ROLE_ADMIN", null);
+        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, "ROLE_MANAGER", null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
-        when(userRepository.findByLogin("admin@test.com")).thenReturn(Optional.of(authenticatedUser));
+        when(userRepository.findByLogin("manager@test.com")).thenReturn(Optional.of(authenticatedUser));
 
         // Act
         userService.deleteUser(userId);
 
         // Assert
         verify(userRepository).findById(userId);
-        verify(userRepository).findByLogin("admin@test.com");
+        verify(userRepository).findByLogin("manager@test.com");
         verify(userRepository).deleteById(userId);
     }
 
@@ -294,10 +294,10 @@ public class UserServiceTest {
         userToDelete.setLogin("john@test.com");
         userToDelete.setPassword("pass");
         userToDelete.setRoles(new HashSet<>());
-        Role adminRole = new Role();
-        adminRole.setId(2L);
-        adminRole.setName(RoleEnum.ADMIN);
-        userToDelete.getRoles().add(adminRole);
+        Role managerRole = new Role();
+        managerRole.setId(2L);
+        managerRole.setName(RoleEnum.MANAGER);
+        userToDelete.getRoles().add(managerRole);
         
         User authenticatedUser = new User();
         authenticatedUser.setId(3L);

@@ -78,14 +78,8 @@ public class UserAuthenticationProvider {
                 .withExpiresAt(validity)
                 .withClaim("firstName", user.getFirstName())
                 .withClaim("lastName", user.getLastName())
-                .withClaim("role", "ROLE_USER")  // Default role for OAuth2 users
-                .withClaim("permissions", List.of(
-                    // OAuth2 scopes
-                    "SCOPE_openid", 
-                    "SCOPE_profile", 
-                    "SCOPE_email", 
-                    "SCOPE_User.Read"
-                ))
+                .withClaim("role", user.getRole())
+                .withClaim("permissions", user.getPermissions())
                 .sign(algorithm);
     }
 
@@ -96,7 +90,7 @@ public class UserAuthenticationProvider {
      * - Permissions into individual authorities
      * The resulting authorities are used by Spring Security for authorization checks.
      *
-     * @param role The user's role (e.g., "USER", "ADMIN")
+     * @param role The user's role (e.g., "USER", "MANAGER")
      * @param permissions List of permission strings (e.g., "user:read", "user:write")
      * @return List of SimpleGrantedAuthority objects for Spring Security
      */

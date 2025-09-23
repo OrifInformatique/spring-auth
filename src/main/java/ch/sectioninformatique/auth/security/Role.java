@@ -1,17 +1,27 @@
 package ch.sectioninformatique.auth.security;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import ch.sectioninformatique.auth.user.User;
-import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.*;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import ch.sectioninformatique.auth.user.User;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Entity class representing a role in the system.
@@ -50,7 +60,7 @@ public class Role {
      * - Is unique across all roles
      * - Cannot be null
      * - Is stored as a string in the database
-     * - Maps to predefined role types (USER, ADMIN, SUPER_ADMIN)
+     * - Maps to predefined role types (USER, MANAGER, ADMIN)
      */
     @Column(unique = true, nullable = false)
     @Enumerated(EnumType.STRING)
