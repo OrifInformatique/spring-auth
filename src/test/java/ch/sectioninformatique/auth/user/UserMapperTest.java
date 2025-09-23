@@ -108,7 +108,7 @@ class UserMapperTest {
         assertEquals("Smith", user.getLastName());
         assertEquals("janesmith", user.getLogin());
         assertNull(user.getPassword()); // Password should be ignored as per mapping
-        assertTrue(user.getMainRole() == null); // Roles should be empty as per mapping
+        assertTrue(user.getMainRole().getName() == null); // Roles should be empty as per mapping
     }
 
     /**
