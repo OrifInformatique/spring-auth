@@ -63,13 +63,13 @@ public class UserService {
     }
 
     /**
-     * Authenticates a user with their login for revalidation.
+     * Authenticates a user refreshing his login.
      *
      * @param login The user's login
      * @return UserDto containing the authenticated user's information
      * @throws AppException if the user is not found 
      */
-    public UserDto revalidateLogin(String login) {
+    public UserDto refreshLogin(String login) {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);

@@ -87,14 +87,14 @@ public class UserAuthenticationProvider {
     }
 
     /**
-     * Creates a JWT token for a user to revalidate their access beyond 1h.
+     * Creates a JWT token for a user to refresh their access beyond 1h.
      * The token includes:
      * - Issue time and expiration time (200 hours validity)
      *
      * @param user The user to create a token for
      * @return A JWT token string containing the user's information and permissions
      */
-    public String createRevalidateToken(UserDto user) {
+    public String createRefreshToken(UserDto user) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + 720000000); // 200 hours ~8 days
 

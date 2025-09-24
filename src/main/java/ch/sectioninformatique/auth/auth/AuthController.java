@@ -43,25 +43,25 @@ public class AuthController {
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto));
-        userDto.setRevalidateToken(userAuthenticationProvider.createRevalidateToken(userDto));
+        userDto.setRefreshToken(userAuthenticationProvider.createRefreshToken(userDto));
         return ResponseEntity.ok(userDto);
     }
 
     /**
-     * revalidate a user's access token from his revalidate token.
+     * refresh a user's access token from his refresh token.
      *
      * @return ResponseEntity containing the authenticated user's information and
      *         JWT token
      */
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/revalidate")
-    public ResponseEntity<UserDto> revalidateLogin() {
+    @GetMapping("/refresh")
+    public ResponseEntity<UserDto> refreshLogin() {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
 
         UserDto currentUser = (UserDto) authentication.getPrincipal();
-        currentUser = userService.revalidateLogin(currentUser.getLogin());
+        currentUser = userService.refreshLogin(currentUser.getLogin());
         currentUser.setToken(userAuthenticationProvider.createToken(currentUser));
         return ResponseEntity.ok(currentUser);
     }
@@ -77,7 +77,7 @@ public class AuthController {
     public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
         UserDto createdUser = userService.register(user);
         createdUser.setToken(userAuthenticationProvider.createToken(createdUser));
-        createdUser.setRevalidateToken(userAuthenticationProvider.createRevalidateToken(createdUser));
+        createdUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(createdUser));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 }

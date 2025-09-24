@@ -41,9 +41,9 @@ public class UserDto {
     private String token;
 
     /**
-     * JWT token for user revalidation.
+     * JWT token to refresh user's authentication.
      */
-    private String revalidateToken;
+    private String refreshToken;
     
     /**
      * User's role in the system.
