@@ -109,6 +109,6 @@ public class Role {
      */
     @OneToMany(mappedBy = "mainRole", fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<User> usersMains = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 }
 
