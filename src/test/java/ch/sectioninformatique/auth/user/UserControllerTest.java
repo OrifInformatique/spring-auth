@@ -55,7 +55,7 @@ public class UserControllerTest {
     @Test
     void authenticatedUser_ReturnsCurrentUser() {
         // Arrange
-        UserDto currentUser = new UserDto(1L, "John", "Doe", "john@test.com", null, "ROLE_USER", null);
+        UserDto currentUser = new UserDto(1L, "John", "Doe", "john@test.com", null, "USER", null);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(currentUser);
 
@@ -243,7 +243,7 @@ public class UserControllerTest {
         Long userId = 1L;
         UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null);
         authenticatedUser.setLogin("manager@test.com");
-        authenticatedUser.setRole("ROLE_MANAGER");
+        authenticatedUser.setMainRole("ROLE_MANAGER");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUser);
@@ -264,7 +264,7 @@ public class UserControllerTest {
         Long userId = 1L;
         UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null);
         authenticatedUser.setLogin("manager@test.com");
-        authenticatedUser.setRole("ROLE_MANAGER");
+        authenticatedUser.setMainRole("ROLE_MANAGER");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUser);
@@ -285,7 +285,7 @@ public class UserControllerTest {
         Long userId = 1L;
         UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null);
         authenticatedUser.setLogin("user@test.com");
-        authenticatedUser.setRole("ROLE_USER");
+        authenticatedUser.setMainRole("USER");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUser);

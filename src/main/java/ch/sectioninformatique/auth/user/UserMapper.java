@@ -1,16 +1,16 @@
 package ch.sectioninformatique.auth.user;
 
-import org.springframework.security.core.GrantedAuthority;
-
-import ch.sectioninformatique.auth.auth.SignUpDto;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
+
+import ch.sectioninformatique.auth.auth.SignUpDto;
 
 /**
  * Mapper interface for converting between User entities and DTOs.
@@ -40,7 +40,7 @@ public interface UserMapper {
      * @param user The User entity to convert
      * @return A UserDto containing the user's information
      */
-    @Mapping(target = "role", expression = "java(user.getRole().getName().name())")
+    @Mapping(target = "mainRole", expression = "java(user.getMainRole().getName().name())")
     @Mapping(target = "permissions", source = "authorities", qualifiedByName = "authoritiesToPermissions")
     @Mapping(target = "token", ignore = true)
     @Mapping(target = "id", source = "id")
@@ -60,7 +60,7 @@ public interface UserMapper {
      * @return A new User entity with the signup information
      */
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "mainRole", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

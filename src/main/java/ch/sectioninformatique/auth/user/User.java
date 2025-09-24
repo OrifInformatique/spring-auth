@@ -1,15 +1,26 @@
 package ch.sectioninformatique.auth.user;
 
-import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import ch.sectioninformatique.auth.security.Role;
 
-import org.springframework.security.core.GrantedAuthority;
-import java.util.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -85,19 +96,18 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        for (Role role : this.roles) {
-            authorities.addAll(role.getName().getGrantedAuthorities());
-        }
+        Set<Role> roleList = new HashSet<>();
+        roleList.add(this.mainRole);
         return authorities;
     }
-    
+
     /**
-     * Set of roles assigned to the user.
-     * Uses eager fetching to ensure roles are always available.
+     * Main role of the user
      */
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @Builder.Default
-    private Set<Role> roles = new HashSet<>();
+    private Role mainRole = new Role();
+    
 
     /**
      * Constructs a new User with all required fields.
@@ -109,7 +119,7 @@ public class User implements UserDetails {
      * @param password The user's hashed password
      * @param createdAt The timestamp when the user was created
      * @param updatedAt The timestamp when the user was last updated
-     * @param roles The set of roles assigned to the user
+     * @param mainRole The Main role assigned to the user
      */
     public User(long id,
                 String firstName, 
@@ -118,7 +128,7 @@ public class User implements UserDetails {
                 String password, 
                 Date createdAt, 
                 Date updatedAt,
-                Set<Role> roles) {
+                Role mainRole) {
         super();
         this.id = id;
         this.firstName = firstName;
@@ -127,7 +137,7 @@ public class User implements UserDetails {
         this.password = password;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.roles = roles;
+        this.mainRole = mainRole;
     }
 
     /**
@@ -197,21 +207,23 @@ public class User implements UserDetails {
     }
 
     /**
-     * Returns the first role assigned to the user.
+     * Returns the Main role assigned to the user.
      * This method assumes the user has at least one role.
      *
-     * @return The first role in the user's role set
+     * @return The main role 
      */
-    public Role getRole() {
-        return roles.iterator().next();
+    public Role getMainRole() {
+        return mainRole;
     }
     
+
     /**
-     * Adds a new role to the user's set of roles.
+     * Adds a new main role to the user.
      *
-     * @param role The role to add to the user
+     * @param role The main role to set for the user
      */
-    public void addRole(Role role) {
-        roles.add(role);
-    }   
+    public void setMainRole(Role role) {
+        mainRole = role;
+    } 
+    
 }

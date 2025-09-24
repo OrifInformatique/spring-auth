@@ -1,15 +1,15 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Data Transfer Object (DTO) for user information.
  * This class is used to transfer user data between the client and server,
  * excluding sensitive information like passwords. It includes basic user details,
- * authentication token, role, and permissions.
+ * authentication token, role.
  */
 @Data
 @Builder(toBuilder = true)
@@ -42,10 +42,10 @@ public class UserDto {
     
     /**
      * User's role in the system.
-     * Defaults to "ROLE_USER" if not specified.
+     * Defaults to "USER" if not specified.
      */
     @Builder.Default
-    private String role = "ROLE_USER";
+    private String mainRole = "USER";
     
     /**
      * List of permissions granted to the user.

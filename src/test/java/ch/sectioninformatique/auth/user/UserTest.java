@@ -7,8 +7,6 @@ import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,34 +54,26 @@ class UserTest {
     }
 
     /**
-     * Tests authority management with roles.
+     * Tests authority management with mainRole.
      * Verifies that:
-     * - Authorities are correctly created from roles
+     * - Authorities are correctly created from mainRole
      * - Role names are properly prefixed with "ROLE_"
      */
     @Test
     void testAuthoritiesWithRoles() {
         // Given
-        Role userRole = new Role();
-        userRole.setName(RoleEnum.USER);
         Role managerRole = new Role();
         managerRole.setName(RoleEnum.MANAGER);
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(userRole);
-        roles.add(managerRole);
-
         User user = User.builder()
-                .roles(roles)
+                .mainRole(managerRole)
                 .build();
 
         // When
-        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = user.getMainRole().getName().getGrantedAuthorities();
 
         // Then
         System.out.println("Authorities found: " + authorities);
-        assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_USER")));
         assertTrue(authorities.stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER")));
     }
@@ -97,10 +87,8 @@ class UserTest {
     @Test
     void testBuilderWithAllFields() {
         // Given
-        Set<Role> roles = new HashSet<>();
         Role role = new Role();
         role.setName(RoleEnum.USER);
-        roles.add(role);
 
         // When
         User user = User.builder()
@@ -111,7 +99,7 @@ class UserTest {
                 .password(TEST_PASSWORD)
                 .createdAt(TEST_CREATED_AT)
                 .updatedAt(TEST_UPDATED_AT)
-                .roles(roles)
+                .mainRole(role)
                 .build();
 
         // Then
@@ -122,14 +110,14 @@ class UserTest {
         assertEquals(TEST_PASSWORD, user.getPassword());
         assertEquals(TEST_CREATED_AT, user.getCreatedAt());
         assertEquals(TEST_UPDATED_AT, user.getUpdatedAt());
-        assertEquals(roles, user.getRoles());
+        assertEquals(role, user.getMainRole());
     }
 
     /**
      * Tests role management.
      * Verifies that:
-     * - Roles can be added
-     * - First role can be retrieved
+     * - mainRole can be set
+     * - mainRole can be retrieved
      */
     @Test
     void testRoleManagement() {
@@ -139,10 +127,9 @@ class UserTest {
         role.setName(RoleEnum.USER);
 
         // When
-        user.addRole(role);
+        user.setMainRole(role);
 
         // Then
-        assertEquals(role, user.getRole());
-        assertTrue(user.getRoles().contains(role));
+        assertEquals(role, user.getMainRole());
     }
 } 
