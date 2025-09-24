@@ -1,31 +1,3 @@
-#          ╭──────────────────────────────────────────────────────────╮
-#          │                          oauth2                          │
-#          ╰──────────────────────────────────────────────────────────╯
-### Azure ###
-custom.azure.account.tenant-id=
-
-# Azure Provider Configuration
-spring.security.oauth2.client.provider.azure.issuer-uri=https://login.microsoftonline.com/${custom.azure.account.tenant-id}/v2.0
-spring.security.oauth2.client.provider.azure.authorization-uri=https://login.microsoftonline.com/${custom.azure.account.tenant-id}/oauth2/v2.0/authorize
-spring.security.oauth2.client.provider.azure.token-uri=https://login.microsoftonline.com/${custom.azure.account.tenant-id}/oauth2/v2.0/token
-spring.security.oauth2.client.provider.azure.user-info-uri=https://graph.microsoft.com/oidc/userinfo
-spring.security.oauth2.client.provider.azure.jwk-set-uri=https://login.microsoftonline.com/${custom.azure.account.tenant-id}/discovery/v2.0/keys
-spring.security.oauth2.client.provider.azure.user-name-attribute=email
-
-# Azure Client Configuration
-spring.security.oauth2.client.registration.azure.client-id=
-spring.security.oauth2.client.registration.azure.client-secret=
-spring.security.oauth2.client.registration.azure.client-authentication-method=client_secret_post
-spring.security.oauth2.client.registration.azure.authorization-grant-type=authorization_code
-spring.security.oauth2.client.registration.azure.redirect-uri={baseUrl}/login/oauth2/code/{registrationId}
-spring.security.oauth2.client.registration.azure.scope=openid,profile,email,User.Read
-spring.security.oauth2.client.registration.azure.client-name=Azure
-
-### Google exemple for multiple provider login ###
-spring.security.oauth2.client.registration.google.client-id=0
-spring.security.oauth2.client.registration.google.client-secret=0
-spring.security.oauth2.client.registration.google.scope=0
-
 ### Logging levels ###
 logging.level.root=ERROR
 logging.level.ch.sectioninformatique=ERROR

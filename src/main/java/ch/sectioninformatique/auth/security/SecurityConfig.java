@@ -80,62 +80,75 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.debug("Configuring SecurityFilterChain");
         http
-            .exceptionHandling(customizer -> {
-                log.debug("Configuring exception handling with UserAuthenticationEntryPoint");
-                customizer.authenticationEntryPoint(userAuthenticationEntryPoint);
-            })
-            .addFilterBefore(jwtAuthFilter, BasicAuthenticationFilter.class)
-            .csrf(csrf -> {
-                log.debug("Disabling CSRF protection");
-                csrf.disable();
-            })
-            .sessionManagement(customizer -> {
-                log.debug("Setting session creation policy to ALWAYS");
-                customizer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
-            })
-            .cors(cors -> {
-                log.debug("Configuring CORS");
-                cors.configurationSource(request -> {
-                    var corsConfig = new CorsConfiguration();
-                    corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4000")); 
-                    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    corsConfig.setAllowedHeaders(Arrays.asList("*"));
-                    corsConfig.setAllowCredentials(true);
-                    return corsConfig;
-                });
-            })
-            .oauth2Login(oauth2 -> {
-                log.debug("Configuring OAuth2 login");
-                oauth2
-                    .defaultSuccessUrl("/oauth2/success", true)
-                    .failureUrl("/oauth2/error")
-                    .userInfoEndpoint(userInfo -> 
-                        userInfo.userService(oauth2UserService())
-                    )
-                    .successHandler((request, response, authentication) -> {
-                        log.debug("OAuth2 authentication successful: {}", authentication);
-                        response.sendRedirect("/oauth2/success");
+                .exceptionHandling(customizer -> {
+                    log.debug("Configuring exception handling with UserAuthenticationEntryPoint");
+                    customizer.authenticationEntryPoint(userAuthenticationEntryPoint);
+                })
+                .addFilterBefore(jwtAuthFilter, BasicAuthenticationFilter.class)
+                .csrf(csrf -> {
+                    log.debug("Disabling CSRF protection");
+                    csrf.disable();
+                })
+                .sessionManagement(customizer -> {
+                    log.debug("Setting session creation policy to ALWAYS");
+                    customizer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+                })
+                .cors(cors -> {
+                    log.debug("Configuring CORS");
+                    cors.configurationSource(request -> {
+                        var corsConfig = new CorsConfiguration();
+                        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4000"));
+                        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                        corsConfig.setAllowedHeaders(Arrays.asList("*"));
+                        corsConfig.setAllowCredentials(true);
+                        return corsConfig;
                     });
-            })
-            .authorizeHttpRequests(requests -> {
-                log.debug("Configuring HTTP request authorization rules");
-                requests
-                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/oauth2/authorization/**").permitAll()
-                    .requestMatchers("/oauth2/success").authenticated()
-                    .requestMatchers("/oauth2/error").permitAll()
-                    .requestMatchers("/login/oauth2/code/**").permitAll()
-                    .anyRequest().authenticated();
-                log.debug("HTTP request authorization rules configured");
-            });
-            
+                })
+                .oauth2Login(oauth2 -> {
+                    log.debug("Configuring OAuth2 login");
+                    oauth2
+                            .defaultSuccessUrl("/oauth2/success", true)
+                            .failureHandler((request, response, exception) -> {
+                                log.error("OAuth2 authentication failed: {}", exception.getMessage(), exception);
+                                Throwable cause = exception.getCause();
+                                if (exception instanceof org.springframework.security.oauth2.core.OAuth2AuthenticationException) {
+                                    var oauth2Ex = (org.springframework.security.oauth2.core.OAuth2AuthenticationException) exception;
+                                    log.error("OAuth2 Error Code: {}", oauth2Ex.getError().getErrorCode());
+                                    log.error("OAuth2 Error Description: {}", oauth2Ex.getError().getDescription());
+                                    if (cause != null) {
+                                        log.error("OAuth2 Exception Cause: {}", cause.toString(), cause);
+                                    }
+                                }
+                                // Print full stack trace for debugging
+                                log.error("Full stack trace:", exception);
+                                response.sendRedirect("/oauth2/error");
+                            })
+                            .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService()))
+                            .successHandler((request, response, authentication) -> {
+                                log.debug("OAuth2 authentication successful: {}", authentication);
+                                response.sendRedirect("/oauth2/success");
+                            });
+                })
+                .authorizeHttpRequests(requests -> {
+                    log.debug("Configuring HTTP request authorization rules");
+                    requests
+                            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers("/oauth2/authorization/**").permitAll()
+                            .requestMatchers("/oauth2/success").authenticated()
+                            .requestMatchers("/oauth2/error").permitAll()
+                            .requestMatchers("/login/oauth2/code/**").permitAll()
+                            .anyRequest().authenticated();
+                    log.debug("HTTP request authorization rules configured");
+                });
+
         return http.build();
     }
 
     /**
-     * Creates and configures the OAuth2 user service for handling OAuth2 authentication.
+     * Creates and configures the OAuth2 user service for handling OAuth2
+     * authentication.
      * This service:
      * - Loads user information from the OAuth2 provider
      * - Converts OAuth2 user data into an OAuth2User object
