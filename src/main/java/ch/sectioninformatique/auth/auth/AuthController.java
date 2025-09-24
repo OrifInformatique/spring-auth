@@ -48,7 +48,7 @@ public class AuthController {
     }
 
     /**
-     * revalidate an user access token from their revalidate token.
+     * revalidate a user's access token from his revalidate token.
      *
      * @return ResponseEntity containing the authenticated user's information and
      *         JWT token
