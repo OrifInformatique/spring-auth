@@ -70,7 +70,7 @@ class UserTest {
                 .build();
 
         // When
-        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = user.getMainRole().getName().getGrantedAuthorities();
 
         // Then
         System.out.println("Authorities found: " + authorities);

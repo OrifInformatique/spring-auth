@@ -94,7 +94,7 @@ public class UserAuthenticationProvider {
      * The resulting authorities are used by Spring Security for authorization
      * checks.
      *
-     * @param role        The user's role (e.g., "USER", "MANAGER")
+     * @param roles       The user's roles (e.g., "USER", "MANAGER")
      * @param permissions List of permission strings (e.g., "user:read",
      *                    "user:write")
      * @return List of SimpleGrantedAuthority objects for Spring Security

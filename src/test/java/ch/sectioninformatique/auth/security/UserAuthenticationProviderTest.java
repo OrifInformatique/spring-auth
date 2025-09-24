@@ -179,14 +179,14 @@ class UserAuthenticationProviderTest {
     @Test
     void testBuildAuthorities() throws Exception {
         // Given
-        String role = "USER";
-        List<String> permissions = Arrays.asList("read", "write");
+        List<String> roles = Arrays.asList("USER");
+        List<String> permissions = Arrays.asList("user:read");
 
         // When
-        Method method = UserAuthenticationProvider.class.getDeclaredMethod("buildAuthorities", String.class, List.class);
+        Method method = UserAuthenticationProvider.class.getDeclaredMethod("buildAuthorities", List.class, List.class);
         method.setAccessible(true);
         @SuppressWarnings("unchecked")
-        List<SimpleGrantedAuthority> authorities = (List<SimpleGrantedAuthority>) method.invoke(authenticationProvider, role, permissions);
+        List<SimpleGrantedAuthority> authorities = (List<SimpleGrantedAuthority>) method.invoke(authenticationProvider, roles, permissions);
 
         // Then
         assertNotNull(authorities);
@@ -194,8 +194,6 @@ class UserAuthenticationProviderTest {
         assertTrue(authorities.stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_USER")));
         assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("read")));
-        assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("write")));
+                .anyMatch(auth -> auth.getAuthority().equals("user:read")));
     }
 } 
