@@ -97,7 +97,7 @@ public class SecurityConfig {
                 log.debug("Configuring CORS");
                 cors.configurationSource(request -> {
                     var corsConfig = new CorsConfiguration();
-                    corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4000")); 
+                    corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4000", "http://localhost:8080")); 
                     corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfig.setAllowedHeaders(Arrays.asList("*"));
                     corsConfig.setAllowCredentials(true);
