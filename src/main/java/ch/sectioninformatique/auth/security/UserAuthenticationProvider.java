@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -85,7 +83,6 @@ public class UserAuthenticationProvider {
                 .withClaim("firstName", user.getFirstName())
                 .withClaim("lastName", user.getLastName())
                 .withClaim("mainRole", user.getMainRole())
-                .withClaim("appSpecificRoles", user.getAppSpecificRoles())
                 .sign(algorithm);
     }
 
@@ -117,7 +114,7 @@ public class UserAuthenticationProvider {
      * The resulting authorities are used by Spring Security for authorization
      * checks.
      *
-     * @param role        The user's role (e.g., "USER", "MANAGER")
+     * @param roles       The user's roles (e.g., "USER", "MANAGER")
      * @param permissions List of permission strings (e.g., "user:read",
      *                    "user:write")
      * @return List of SimpleGrantedAuthority objects for Spring Security
@@ -162,15 +159,9 @@ public class UserAuthenticationProvider {
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())
                 .mainRole(decoded.getClaim("mainRole").asString())
-                .appSpecificRoles(decoded.getClaim("appSpecificRoles").asList(String.class))
                 .permissions(decoded.getClaim("permissions").asList(String.class))
                 .build();
         List<String> allRoles = new ArrayList<>();
-        if (user.getAppSpecificRoles() != null) {
-            for (String role : user.getAppSpecificRoles()) {
-                allRoles.add(role);
-            }
-        }
         allRoles.add(user.getMainRole());
         List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
         return new UsernamePasswordAuthenticationToken(user, null, authorities);
@@ -222,11 +213,6 @@ public class UserAuthenticationProvider {
             user.setToken(token);
 
             List<String> allRoles = new ArrayList<>();
-            if (user.getAppSpecificRoles() != null) {
-                for (String role : user.getAppSpecificRoles()) {
-                    allRoles.add(role);
-                }
-            }
             allRoles.add(user.getMainRole());
 
             List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
@@ -248,11 +234,6 @@ public class UserAuthenticationProvider {
             userService.createAzureUser(newUser);
 
             List<String> allRoles = new ArrayList<>();
-            if (newUser.getAppSpecificRoles() != null) {
-                for (String role : newUser.getAppSpecificRoles()) {
-                    allRoles.add(role);
-                }
-            }
             allRoles.add(newUser.getMainRole());
 
             // Create authentication with authorities

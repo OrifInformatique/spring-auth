@@ -13,9 +13,6 @@ import ch.sectioninformatique.auth.security.RoleEnum;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Arrays;
 import java.util.List;
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -111,7 +108,7 @@ class UserMapperTest {
         assertEquals("Smith", user.getLastName());
         assertEquals("janesmith", user.getLogin());
         assertNull(user.getPassword()); // Password should be ignored as per mapping
-        assertTrue(user.getMainRole() == null); // Roles should be empty as per mapping
+        assertTrue(user.getMainRole().getName() == null); // Roles should be empty as per mapping
     }
 
     /**

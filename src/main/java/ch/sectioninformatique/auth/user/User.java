@@ -1,15 +1,26 @@
 package ch.sectioninformatique.auth.user;
 
-import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import ch.sectioninformatique.auth.security.Role;
 
-import org.springframework.security.core.GrantedAuthority;
-import java.util.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -85,11 +96,8 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        Set<Role> roleList = this.appSpecificRoles;
+        Set<Role> roleList = new HashSet<>();
         roleList.add(this.mainRole);
-        for (Role role : roleList) {
-            authorities.addAll(role.getName().getGrantedAuthorities());
-        }
         return authorities;
     }
 
@@ -100,13 +108,6 @@ public class User implements UserDetails {
     @Builder.Default
     private Role mainRole = new Role();
     
-    /**
-     * Set of roles assigned to the user.
-     * Uses eager fetching to ensure roles are always available.
-     */
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Builder.Default
-    private Set<Role> appSpecificRoles = new HashSet<>();
 
     /**
      * Constructs a new User with all required fields.
@@ -119,7 +120,6 @@ public class User implements UserDetails {
      * @param createdAt The timestamp when the user was created
      * @param updatedAt The timestamp when the user was last updated
      * @param mainRole The Main role assigned to the user
-     * @param appSpecificRoles The set of app specifique roles assigned to the user
      */
     public User(long id,
                 String firstName, 
@@ -128,8 +128,7 @@ public class User implements UserDetails {
                 String password, 
                 Date createdAt, 
                 Date updatedAt,
-                Role mainRole,
-                Set<Role> appSpecificRoles) {
+                Role mainRole) {
         super();
         this.id = id;
         this.firstName = firstName;
@@ -139,7 +138,6 @@ public class User implements UserDetails {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.mainRole = mainRole;
-        this.appSpecificRoles = appSpecificRoles;
     }
 
     /**
@@ -217,34 +215,7 @@ public class User implements UserDetails {
     public Role getMainRole() {
         return mainRole;
     }
-
-    /**
-     * Returns a list of app specific roles' names assigned to the user.
-     *
-     * @return The user's app specific role set
-     */
-    public List<String> getAppSpecificRolesString() {
-        List<String> appSpecificRolesSrting = new ArrayList<String>();
-        for(Role role : appSpecificRoles){
-            appSpecificRolesSrting.add(role.getName().name());
-        }
-        return appSpecificRolesSrting;
-    }
     
-    /**
-     * Returns all roles assigned to the user.
-     *
-     * @return The all roles assigned to the user
-     */
-    public Set<Role> getAllRoles() {
-        Set<Role> allRoles = new HashSet<>();
-            if (appSpecificRoles != null) {
-                for (Role role : appSpecificRoles) {
-                    allRoles.add(role);
-                }
-            }
-        return allRoles;
-    }
 
     /**
      * Adds a new main role to the user.
@@ -255,12 +226,4 @@ public class User implements UserDetails {
         mainRole = role;
     } 
     
-    /**
-     * Adds a new role to the user's set of app specific roles.
-     *
-     * @param role The app specific role to add to the user
-     */
-    public void addAppSpecificRoles(Role role) {
-        appSpecificRoles.add(role);
-    } 
 }

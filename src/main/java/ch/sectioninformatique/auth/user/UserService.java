@@ -12,7 +12,6 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
@@ -127,11 +126,11 @@ public class UserService {
                     log.error("User not found with login: {}", login);
                     return new AppException("Unknown user", HttpStatus.NOT_FOUND);
                 });
-
-        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}",
-                user.getId(), user.getFirstName(), user.getLastName(),
-                user.getAllRoles().stream().map(role -> role.getName().toString()).toList());
-
+                
+        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}", 
+            user.getId(), user.getFirstName(), user.getLastName(), 
+            user.getMainRole());
+            
         UserDto userDto = userMapper.toUserDto(user);
         log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}",
                 userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
@@ -167,10 +166,10 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already an manager");
+            throw new RuntimeException("The user is already a manager");
         }
         if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already a admin");
+            throw new RuntimeException("The user is already an admin");
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
@@ -200,7 +199,7 @@ public class UserService {
             throw new RuntimeException("The user is already a user");
         }
         if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("You don't have the necessary rights to delete a admin");
+            throw new RuntimeException("You don't have the necessary rights to delete an admin");
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
@@ -227,7 +226,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already a admin");
+            throw new RuntimeException("The user is already an admin");
         }
 
         Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
@@ -257,7 +256,7 @@ public class UserService {
             throw new RuntimeException("The user has lower rights than desired");
         }
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already an manager");
+            throw new RuntimeException("The user is already a manager");
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
