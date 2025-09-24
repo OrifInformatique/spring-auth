@@ -41,9 +41,9 @@ public interface UserMapper {
      * @return A UserDto containing the user's information
      */
     @Mapping(target = "mainRole", expression = "java(user.getMainRole().getName().name())")
-    @Mapping(target = "appSpecificRoles", expression = "java(user.getAppSpecificRolesString())")
     @Mapping(target = "permissions", source = "authorities", qualifiedByName = "authoritiesToPermissions")
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "refreshToken", ignore = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
@@ -62,7 +62,6 @@ public interface UserMapper {
      */
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "mainRole", ignore = true)
-    @Mapping(target = "appSpecificRoles", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

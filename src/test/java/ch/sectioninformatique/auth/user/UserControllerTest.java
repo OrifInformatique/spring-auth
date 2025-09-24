@@ -55,7 +55,7 @@ public class UserControllerTest {
     @Test
     void authenticatedUser_ReturnsCurrentUser() {
         // Arrange
-        UserDto currentUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ROLE_USER", null, null);
+        UserDto currentUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "USER", null);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(currentUser);
 
@@ -71,8 +71,8 @@ public class UserControllerTest {
     void allUsers_ReturnsListOfUsers() {
         // Arrange
         List<User> users = Arrays.asList(
-            new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null, null),
-            new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null, null)
+            new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null),
+            new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null)
         );
         when(userService.allUsers()).thenReturn(users);
 
@@ -88,7 +88,7 @@ public class UserControllerTest {
     void promoteToManager_Successful_ReturnsUserDto() {
         // Arrange
         Long userId = 1L;
-        UserDto expectedDto = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ROLE_MANAGER", null, null);
+        UserDto expectedDto = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ROLE_MANAGER", null);
         
         when(userService.promoteToManager(userId)).thenReturn(expectedDto);
 
@@ -150,7 +150,7 @@ public class UserControllerTest {
     void promoteToSuperManager_SuccessfulPromotion_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
-        UserDto expectedUser = new UserDto(userId, "John", "Doe", "john@test.com", null, null, "ROLE_ADMIN", null, null);
+        UserDto expectedUser = new UserDto(userId, "John", "Doe", "john@test.com", null, null, "ROLE_ADMIN", null);
         when(userService.promoteToAdmin(userId)).thenReturn(expectedUser);
 
         // Act
@@ -241,7 +241,7 @@ public class UserControllerTest {
     void deleteUser_SuccessfulDeletion_ReturnsOkResponse() {
         // Arrange
         Long userId = 1L;
-        UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null, null, null);
+        UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null, null);
         authenticatedUser.setLogin("manager@test.com");
         authenticatedUser.setMainRole("ROLE_MANAGER");
 
@@ -262,7 +262,7 @@ public class UserControllerTest {
     void deleteUser_UserNotFound_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null, null, null);
+        UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null, null);
         authenticatedUser.setLogin("manager@test.com");
         authenticatedUser.setMainRole("ROLE_MANAGER");
 
@@ -283,9 +283,9 @@ public class UserControllerTest {
     void deleteUser_UnauthorizedAccess_ReturnsBadRequest() {
         // Arrange
         Long userId = 1L;
-        UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null, null, null);
+        UserDto authenticatedUser = new UserDto(userId, null, null, null, null, null, null, null);
         authenticatedUser.setLogin("user@test.com");
-        authenticatedUser.setMainRole("ROLE_USER");
+        authenticatedUser.setMainRole("USER");
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUser);

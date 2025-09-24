@@ -171,4 +171,31 @@ class UserAuthenticationProviderTest {
         verify(userService).createAzureUser(any());
     }
 
+    /**
+     * Tests the authority building functionality.
+     * Verifies that:
+     * - Role is properly prefixed with "ROLE_"
+     * - Permissions are correctly converted to authorities
+     * - All authorities are included in the result
+     */
+    @Test
+    void testBuildAuthorities() throws Exception {
+        // Given
+        List<String> roles = Arrays.asList("USER");
+        List<String> permissions = Arrays.asList("user:read");
+
+        // When
+        Method method = UserAuthenticationProvider.class.getDeclaredMethod("buildAuthorities", List.class, List.class);
+        method.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<SimpleGrantedAuthority> authorities = (List<SimpleGrantedAuthority>) method.invoke(authenticationProvider, roles, permissions);
+
+        // Then
+        assertNotNull(authorities);
+        assertEquals(3, authorities.size()); // ROLE_USER + 2 permissions
+        assertTrue(authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_USER")));
+        assertTrue(authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals("user:read")));
+    }
 } 
