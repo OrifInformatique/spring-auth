@@ -12,8 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import ch.sectioninformatique.auth.security.Role;
-import ch.sectioninformatique.auth.security.RoleEnum;
-import ch.sectioninformatique.auth.security.RoleRepository;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
