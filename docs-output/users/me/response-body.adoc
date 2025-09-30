@@ -1,0 +1,4 @@
+[source,json,options="nowrap"]
+----
+{"id":1,"firstName":"John","lastName":"Doe","login":"john@test.com","token":null,"refreshToken":null,"mainRole":"USER","permissions":null}
+----
