@@ -10,9 +10,9 @@
   "updatedAt" : null,
   "mainRole" : null,
   "authorities" : [ ],
-  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "credentialsNonExpired" : true,
   "username" : "john@test.com",
   "enabled" : true
 }, {
@@ -25,9 +25,9 @@
   "updatedAt" : null,
   "mainRole" : null,
   "authorities" : [ ],
-  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "credentialsNonExpired" : true,
   "username" : "jane@test.com",
   "enabled" : true
 } ]

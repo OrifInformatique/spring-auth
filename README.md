@@ -169,3 +169,13 @@ Check if the project's structure is valid
 [Microsoft oAuth2 grant flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
 
 ---
+
+## Spring REST Docs
+
+The application work with an automated documentation from the Spring REST Docs package that is created when it run with docker and the test environment
+
+It creates an .adoc file in src/asciidoc and an html page in src/asciidoc/hmtl that can be consulted in github
+
+Link to the generated .adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
+
+Link to the generated .html : [src/asciidoc/html/index.html](src/asciidoc/html/index.html)
