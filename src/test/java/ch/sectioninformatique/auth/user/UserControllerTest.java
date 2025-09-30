@@ -1,6 +1,5 @@
 package ch.sectioninformatique.auth.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.core.Authentication;
@@ -11,13 +10,16 @@ import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
 import org.springframework.http.MediaType;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
@@ -26,6 +28,9 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 
 
@@ -54,8 +59,9 @@ class UserControllerTest {
     @MockBean
     private UserAuthenticationProvider userAuthenticationProvider;
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void authenticatedUser_ReturnsCurrentUser_Doc() throws Exception {
+
         UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "USER", null);
 
         Authentication authentication = Mockito.mock(Authentication.class);
@@ -65,13 +71,25 @@ class UserControllerTest {
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
         SecurityContextHolder.setContext(securityContext);
-    }
 
-    @Test
-    void authenticatedUser_ReturnsCurrentUser_Doc() throws Exception {
         this.mockMvc.perform(get("/users/me")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("users/me"));
+                .andDo(document("users/me", preprocessResponse(prettyPrint())));
+    }
+
+    @Test
+    void allUsers_ReturnsListOfUsers_Doc() throws Exception {
+        // Arrange
+        List<User> users = Arrays.asList(
+            new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null),
+            new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null)
+        );
+        Mockito.when(userService.allUsers()).thenReturn(users);
+
+        this.mockMvc.perform(get("/users/all")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("users/all", preprocessResponse(prettyPrint())));
     }
 }

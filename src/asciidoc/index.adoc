@@ -1,5 +1,8 @@
 = Spring Auth API Documentation
 
+== User Endpoints
+
+=== Get Authenticated User
 This is an example output for the `GET /users/me` endpoint.
 
 .request
@@ -9,3 +12,15 @@ include::users/me/http-request.adoc[]
 include::users/me/http-response.adoc[]
 
 It gives informations about the authenticated user.
+
+
+=== Get All Users
+This is an example output for the `GET /users/all` endpoint.
+
+.request
+include::users/all/http-request.adoc[]
+
+.response
+include::users/all/http-response.adoc[]
+
+It gives informations about all users.
