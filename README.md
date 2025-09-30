@@ -179,3 +179,5 @@ It creates an .adoc file in src/asciidoc and an html page in the docs that can b
 Link to the generated .adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
 
 Link to the generated .html : [src/asciidoc/index.html](docs/index.html)
+
+Link to the doc : [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
