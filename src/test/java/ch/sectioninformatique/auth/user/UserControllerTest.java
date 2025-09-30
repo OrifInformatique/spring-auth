@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
@@ -94,4 +95,28 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andDo(document("users/all", preprocessResponse(prettyPrint())));
     }
+
+    @Test
+    void promoteToManager_Successful_ReturnsUserDto_Doc() throws Exception {
+        UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "Admin", null);
+
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
+        // Arrange
+        Long userId = 2L;
+        UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
+
+        when(userService.promoteToManager(userId)).thenReturn(expectedDto);
+
+        this.mockMvc.perform(put("/users/{userId}/promote-manager", userId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("users/promote-manager", preprocessResponse(prettyPrint())));
+    }
+
 }

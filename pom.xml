@@ -179,7 +179,7 @@
                         <configuration>
                             <sourceDirectory>src/asciidoc</sourceDirectory>
                             <sourceDocumentName>index.adoc</sourceDocumentName>
-                            <outputDirectory>/app/build/generated-snippets/html</outputDirectory> 
+                            <outputDirectory>/app/build/generated-snippets-html</outputDirectory> 
                         </configuration>
                     </execution>
                 </executions>

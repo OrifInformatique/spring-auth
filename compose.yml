@@ -11,6 +11,7 @@ services:
       target: "${ENVIRONMENT}" # Use the environment variable to target the desired stage
     volumes:
       - ./src/asciidoc:/app/build/generated-snippets
+      - ./docs:/app/build/generated-snippets-html
     environment:
       # Pass environment variables to the container and the Spring Boot app
       SPRING_PROFILES_ACTIVE: "${ENVIRONMENT}"

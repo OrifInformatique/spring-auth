@@ -24,3 +24,14 @@ include::users/all/http-request.adoc[]
 include::users/all/http-response.adoc[]
 
 It gives informations about all users.
+
+=== Promote User to Manager
+This is an example output for the `PUT /users/{userId}/promote-manager` endpoint.
+
+.request
+include::users/promote-manager/http-request.adoc[]
+
+.response
+include::users/promote-manager/http-response.adoc[]
+
+It promotes a user to the "MANAGER" role.

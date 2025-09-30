@@ -174,8 +174,8 @@ Check if the project's structure is valid
 
 The application work with an automated documentation from the Spring REST Docs package that is created when it run with docker and the test environment
 
-It creates an .adoc file in src/asciidoc and an html page in src/asciidoc/hmtl that can be consulted in github
+It creates an .adoc file in src/asciidoc and an html page in the docs that can be consulted in github
 
 Link to the generated .adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
 
-Link to the generated .html : [src/asciidoc/html/index.html](src/asciidoc/html/index.html)
+Link to the generated .html : [src/asciidoc/index.html](docs/index.html)

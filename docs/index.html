@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.15">
-<title>Getting Started With Spring REST Docs</title>
+<title>Spring Auth API Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -437,11 +437,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1>Getting Started With Spring REST Docs</h1>
+<h1>Spring Auth API Documentation</h1>
 </div>
 <div id="content">
+<div class="sect1">
+<h2 id="_user_endpoints">User Endpoints</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_get_authenticated_user">Get Authenticated User</h3>
 <div class="paragraph">
-<p>This is an example output for a service running at <a href="http://localhost:8080" class="bare">http://localhost:8080</a>:</p>
+<p>This is an example output for the <code>GET /users/me</code> endpoint.</p>
 </div>
 <div class="listingblock">
 <div class="title">request</div>
@@ -456,18 +461,115 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 138
+Content-Length: 179
 
-{"id":1,"firstName":"John","lastName":"Doe","login":"john@test.com","token":null,"refreshToken":null,"mainRole":"USER","permissions":null}</code></pre>
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : null,
+  "refreshToken" : null,
+  "mainRole" : "USER",
+  "permissions" : null
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see the format is very simple. In fact, you always get the same message.</p>
+<p>It gives informations about the authenticated user.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_get_all_users">Get All Users</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>GET /users/all</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 698
+
+[ {
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "password" : "pass",
+  "createdAt" : null,
+  "updatedAt" : null,
+  "mainRole" : null,
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "username" : "john@test.com",
+  "enabled" : true
+}, {
+  "id" : 2,
+  "firstName" : "Jane",
+  "lastName" : "Smith",
+  "login" : "jane@test.com",
+  "password" : "pass",
+  "createdAt" : null,
+  "updatedAt" : null,
+  "mainRole" : null,
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "username" : "jane@test.com",
+  "enabled" : true
+} ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It gives informations about all users.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_promote_user_to_manager">Promote User to Manager</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>PUT /users/{userId}/promote-manager</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-manager HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 37
+
+User promoted to manager successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It promotes a user to the "MANAGER" role.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-30 08:43:08 UTC
+Last updated 2025-09-30 10:50:30 UTC
 </div>
 </div>
 </body>
