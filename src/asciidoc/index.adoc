@@ -1,0 +1,11 @@
+= Spring Auth API Documentation
+
+This is an example output for the `GET /users/me` endpoint.
+
+.request
+include::users/me/http-request.adoc[]
+
+.response
+include::users/me/http-response.adoc[]
+
+It gives informations about the authenticated user.

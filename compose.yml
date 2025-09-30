@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
       target: "${ENVIRONMENT}" # Use the environment variable to target the desired stage
     volumes:
-      - ./docs-output:/app/build/generated-snippets
+      - ./src/asciidoc:/app/build/generated-snippets
     environment:
       # Pass environment variables to the container and the Spring Boot app
       SPRING_PROFILES_ACTIVE: "${ENVIRONMENT}"
