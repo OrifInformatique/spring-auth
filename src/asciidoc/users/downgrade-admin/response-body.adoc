@@ -1,0 +1,4 @@
+[source,json,options="nowrap"]
+----
+Admin role downgraded successfully
+----

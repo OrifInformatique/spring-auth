@@ -191,7 +191,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a user, or the
      *                          user role is not found
      */
-    public void revokeManagerRole(Long userId) {
+    public UserDto revokeManagerRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -207,6 +207,8 @@ public class UserService {
 
         user.setMainRole(userRole);
         userRepository.save(user);
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -248,7 +250,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already an manager, or the
      *                          manager role is not found
      */
-    public void downgradeAdminRole(Long userId) {
+    public UserDto downgradeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -264,6 +266,8 @@ public class UserService {
 
         user.setMainRole(managerRole);
         userRepository.save(user);
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -277,7 +281,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a user, or the
      *                          user role is not found
      */
-    public void revokeAdminRole(Long userId) {
+    public UserDto revokeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -290,6 +294,8 @@ public class UserService {
 
         user.setMainRole(userRole);
         userRepository.save(user);
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -327,10 +333,11 @@ public class UserService {
      * - Deletes the user
      *
      * @param userId The ID of the user to delete
+     * @return The deleted User entity, or null if deletion was successful
      * @throws RuntimeException if the user is not found or the authenticated user
      *                          lacks permissions
      */
-    public void deleteUser(Long userId) {
+    public UserDto deleteUser(Long userId) {
         // Get the user to delete
         User userToDelete = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -350,6 +357,7 @@ public class UserService {
 
         // Delete the user
         userRepository.deleteById(userId);
+        return userMapper.toUserDto(userToDelete);
     }
 
     /**

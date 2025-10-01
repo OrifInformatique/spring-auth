@@ -508,11 +508,11 @@ Content-Length: 698
   "createdAt" : null,
   "updatedAt" : null,
   "mainRole" : null,
+  "username" : "john@test.com",
   "authorities" : [ ],
-  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "john@test.com",
+  "credentialsNonExpired" : true,
   "enabled" : true
 }, {
   "id" : 2,
@@ -523,11 +523,11 @@ Content-Length: 698
   "createdAt" : null,
   "updatedAt" : null,
   "mainRole" : null,
+  "username" : "jane@test.com",
   "authorities" : [ ],
-  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "jane@test.com",
+  "credentialsNonExpired" : true,
   "enabled" : true
 } ]</code></pre>
 </div>
@@ -564,12 +564,124 @@ User promoted to manager successfully</code></pre>
 <p>It promotes a user to the "MANAGER" role.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_revoke_manager_to_user">Revoke Manager to User</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>PUT /users/{userId}/revoke-manager</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 33
+
+Manager role revoked successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It revokes a manager to "USER" role.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_promote_to_admin">Promote to Admin</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>PUT /users/{userId}/promote-admin</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 32
+
+Admin role assigned successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It promotes a user or manager to "ADMIN" role.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_revoke_admin_to_user">Revoke Admin to User</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>PUT /users/{userId}/revoke-admin</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 31
+
+Admin role revoked successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It revokes a admin to "USER" role.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_downgrade_admin_to_manager">Downgrade Admin to Manager</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>PUT /users/{userId}/downgrade-admin</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/downgrade-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 34
+
+Admin role downgraded successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It downgrades a admin to "MANAGER" role.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-30 10:50:30 UTC
+Last updated 2025-10-01 11:18:46 UTC
 </div>
 </div>
 </body>

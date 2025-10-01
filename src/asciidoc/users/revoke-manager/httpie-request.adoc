@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ http PUT 'http://localhost:8080/users/2/revoke-manager' \
+    'Accept:application/json'
+----

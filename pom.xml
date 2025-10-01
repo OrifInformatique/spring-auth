@@ -7,7 +7,8 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.5</version>
-        <relativePath /> <!-- lookup parent from repository -->
+        <relativePath />
+        <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.sectioninformatique</groupId>
     <artifactId>spring-auth</artifactId>
@@ -67,7 +68,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>       
+            <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -91,7 +92,7 @@
                     <groupId>org.junit.vintage</groupId>
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
-             </exclusions>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -131,9 +132,12 @@
             <version>4.0.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
         <!-- (duplicate removed above) -->
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -154,14 +158,14 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <plugin> 
+            <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
                 <version>2.2.1</version>
                 <executions>
                     <execution>
                         <id>generate-docs</id>
-                        <phase>prepare-package</phase> 
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
@@ -172,26 +176,26 @@
                     </execution>
                     <execution>
                         <id>convert-to-html</id>
-                        <phase>generate-resources</phase> 
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
                         <configuration>
                             <sourceDirectory>src/asciidoc</sourceDirectory>
                             <sourceDocumentName>index.adoc</sourceDocumentName>
-                            <outputDirectory>/app/build/generated-snippets-html</outputDirectory> 
+                            <outputDirectory>/app/build/generated-snippets-html</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
                 <dependencies>
-                    <dependency> 
+                    <dependency>
                         <groupId>org.springframework.restdocs</groupId>
                         <artifactId>spring-restdocs-asciidoctor</artifactId>
                         <version>${spring-restdocs.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin> 
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
@@ -200,7 +204,7 @@
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
-                        <configuration> 
+                        <configuration>
                             <outputDirectory>
                                 ${project.build.outputDirectory}/static/docs
                             </outputDirectory>

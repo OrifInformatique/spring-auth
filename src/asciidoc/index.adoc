@@ -35,3 +35,59 @@ include::users/promote-manager/http-request.adoc[]
 include::users/promote-manager/http-response.adoc[]
 
 It promotes a user to the "MANAGER" role.
+
+=== Revoke Manager to User
+This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.
+
+.request
+include::users/revoke-manager/http-request.adoc[]
+
+.response
+include::users/revoke-manager/http-response.adoc[]
+
+It revokes a manager to "USER" role.
+
+=== Promote to Admin
+This is an example output for the `PUT /users/{userId}/promote-admin` endpoint.
+
+.request
+include::users/promote-admin/http-request.adoc[]
+
+.response
+include::users/promote-admin/http-response.adoc[]
+
+It promotes a user or manager to "ADMIN" role.
+
+=== Revoke Admin to User
+This is an example output for the `PUT /users/{userId}/revoke-admin` endpoint.
+
+.request
+include::users/revoke-admin/http-request.adoc[]
+
+.response
+include::users/revoke-admin/http-response.adoc[]
+
+It revokes a admin to "USER" role.
+
+=== Downgrade Admin to Manager
+This is an example output for the `PUT /users/{userId}/downgrade-admin` endpoint.
+
+.request
+include::users/downgrade-admin/http-request.adoc[]
+
+.response
+include::users/downgrade-admin/http-response.adoc[]
+
+It downgrades a admin to "MANAGER" role.
+
+=== Delete User
+This is an example output for the `DELETE /users/{userId}` endpoint.
+
+.request
+include::users/delete/http-request.adoc[]
+
+.response
+include::users/delete/http-response.adoc[]
+
+It deletes a user.
+

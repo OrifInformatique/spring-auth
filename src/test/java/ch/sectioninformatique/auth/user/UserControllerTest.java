@@ -9,22 +9,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,85 +35,262 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
+/**
+ * Test class for UserController.
+ * This class uses MockMvc to perform HTTP requests and validate responses.
+ * It includes tests for:
+ * - Retrieving the authenticated user's information
+ * - Listing all users
+ * - Promoting a user to manager role
+ * - Revoking a user's manager role
+ */
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(controllers = UserController.class, excludeAutoConfiguration = { SecurityAutoConfiguration.class,
-        OAuth2ClientAutoConfiguration.class })
+                OAuth2ClientAutoConfiguration.class })
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs(outputDir = "build/generated-snippets")
 class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        /** MockMvc for performing HTTP requests in tests */
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockBean
-    private UserService userService;
+        /** Mocked UserService for simulating user-related operations */
+        @MockBean
+        private UserService userService;
 
-    @MockBean
-    private UserMapper userMapper;
+        /** Mocked UserMapper for simulating user-related mapping operations */
+        @MockBean
+        private UserMapper userMapper;
 
-    @MockBean
-    private RoleRepository roleRepository;
+        /** Mocked RoleRepository for simulating role-related database operations */
+        @MockBean
+        private RoleRepository roleRepository;
 
-    @MockBean
-    private UserRepository userRepository;
+        /** Mocked UserRepository for simulating user-related database operations */
+        @MockBean
+        private UserRepository userRepository;
 
-    @MockBean
-    private UserAuthenticationProvider userAuthenticationProvider;
+        /** Mocked UserAuthenticationProvider for simulating authentication operations */
+        @MockBean
+        private UserAuthenticationProvider userAuthenticationProvider;
 
-    @Test
-    void authenticatedUser_ReturnsCurrentUser_Doc() throws Exception {
+        /**
+         * Test for retrieving the authenticated user's information.
+         * This test verifies that the correct user information is returned
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void authenticatedUser_ReturnsCurrentUser_Doc() throws Exception {
 
-        UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "USER", null);
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "USER", null);
 
-        Authentication authentication = Mockito.mock(Authentication.class);
-        Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
-        SecurityContextHolder.setContext(securityContext);
+                SecurityContextHolder.setContext(securityContext);
 
-        this.mockMvc.perform(get("/users/me")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(document("users/me", preprocessResponse(prettyPrint())));
-    }
+                this.mockMvc.perform(get("/users/me")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/me", preprocessResponse(prettyPrint())));
+        }
 
-    @Test
-    void allUsers_ReturnsListOfUsers_Doc() throws Exception {
-        // Arrange
-        List<User> users = Arrays.asList(
-                new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null),
-                new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null));
-        Mockito.when(userService.allUsers()).thenReturn(users);
+        /**
+         * Test for retrieving all users.
+         * This test verifies that a list of users is returned 
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void allUsers_ReturnsListOfUsers_Doc() throws Exception {
+                // Arrange
+                List<User> users = Arrays.asList(
+                                new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null),
+                                new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null));
+                Mockito.when(userService.allUsers()).thenReturn(users);
 
-        this.mockMvc.perform(get("/users/all")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(document("users/all", preprocessResponse(prettyPrint())));
-    }
+                this.mockMvc.perform(get("/users/all")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/all", preprocessResponse(prettyPrint())));
+        }
 
-    @Test
-    void promoteToManager_Successful_ReturnsUserDto_Doc() throws Exception {
-        UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "Admin", null);
+        /**
+         * Test for promoting a user to manager role.
+         * This test verifies that the user is successfully promoted
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void promoteToManager_Successful_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
 
-        Authentication authentication = Mockito.mock(Authentication.class);
-        Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
-        SecurityContextHolder.setContext(securityContext);
-        // Arrange
-        Long userId = 2L;
-        UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
+                SecurityContextHolder.setContext(securityContext);
+                // Arrange
+                Long userId = 2L;
+                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
 
-        when(userService.promoteToManager(userId)).thenReturn(expectedDto);
+                when(userService.promoteToManager(userId)).thenReturn(expectedDto);
 
-        this.mockMvc.perform(put("/users/{userId}/promote-manager", userId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(document("users/promote-manager", preprocessResponse(prettyPrint())));
-    }
+                this.mockMvc.perform(put("/users/{userId}/promote-manager", userId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/promote-manager", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test for revoking a user's manager role.
+         * This test verifies that the user is successfully revoked
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void revokeManagerRole_Successful_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
+
+                // Arrange
+                Long userId = 2L;
+                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "USER", null);
+
+                when(userService.revokeManagerRole(userId)).thenReturn(expectedDto);
+
+                this.mockMvc.perform(put("/users/{userId}/revoke-manager", userId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/revoke-manager", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test for promoting a user or manager to admin role.
+         * This test verifies that the user is successfully promoted
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void promoteToAdmin_Successful_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
+                
+                // Arrange
+                Long userId = 2L;
+                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "ADMIN", null);
+
+                when(userService.promoteToAdmin(userId)).thenReturn(expectedDto);
+
+                this.mockMvc.perform(put("/users/{userId}/promote-admin", userId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/promote-admin", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test for revoking a user's admin role.
+         * This test verifies that the user is successfully revoked
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void revokeAdminRole_Successful_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
+                
+                // Arrange
+                Long userId = 2L;
+                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "USER", null);
+
+                when(userService.revokeAdminRole(userId)).thenReturn(expectedDto);
+
+                this.mockMvc.perform(put("/users/{userId}/revoke-admin", userId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/revoke-admin", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test for downgrading an admin to manager role.
+         * This test verifies that the admin is successfully downgraded
+         * and generates API documentation using Spring REST Docs.
+         * @throws Exception
+         */
+        @Test
+        void downgradeAdminRole_Successful_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
+                
+                // Arrange
+                Long userId = 2L;
+                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
+
+                when(userService.downgradeAdminRole(userId)).thenReturn(expectedDto);
+
+                this.mockMvc.perform(put("/users/{userId}/downgrade-admin", userId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/downgrade-admin", preprocessResponse(prettyPrint())));
+        }
+
+        @Test
+        void deleteUser_Successful_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
+                
+                // Arrange
+                Long userId = 2L;
+                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
+
+                when(userService.deleteUser(userId)).thenReturn(expectedDto);
+
+                this.mockMvc.perform(delete("/users/{userId}", userId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(document("users/delete", preprocessResponse(prettyPrint())));
+        }
 
 }

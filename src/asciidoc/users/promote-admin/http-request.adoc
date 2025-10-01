@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+PUT /users/2/promote-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded
+
+----
