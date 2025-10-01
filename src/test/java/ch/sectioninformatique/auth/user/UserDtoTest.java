@@ -22,13 +22,13 @@ class UserDtoTest {
     private static final String TEST_LAST_NAME = "Doe";
     private static final String TEST_LOGIN = "john.doe@example.com";
     private static final String TEST_TOKEN = "test-token";
-    private static final String TEST_ROLE = "ROLE_USER";
+    private static final String TEST_ROLE = "USER";
     private static final List<String> TEST_PERMISSIONS = Arrays.asList("read", "write");
 
     /**
      * Tests the default values initialization.
      * Verifies that:
-     * - Role defaults to "ROLE_USER"
+     * - Role defaults to "USER"
      * - Permissions list is initialized but empty
      */
     @Test
@@ -37,7 +37,7 @@ class UserDtoTest {
         UserDto userDto = UserDto.builder().build();
 
         // Then
-        assertEquals("ROLE_USER", userDto.getRole());
+        assertEquals("USER", userDto.getMainRole());
         assertNotNull(userDto.getPermissions());
         assertTrue(userDto.getPermissions().isEmpty());
     }
@@ -57,7 +57,7 @@ class UserDtoTest {
                 .lastName(TEST_LAST_NAME)
                 .login(TEST_LOGIN)
                 .token(TEST_TOKEN)
-                .role(TEST_ROLE)
+                .mainRole(TEST_ROLE)
                 .permissions(TEST_PERMISSIONS)
                 .build();
 
@@ -67,7 +67,7 @@ class UserDtoTest {
         assertEquals(TEST_LAST_NAME, userDto.getLastName());
         assertEquals(TEST_LOGIN, userDto.getLogin());
         assertEquals(TEST_TOKEN, userDto.getToken());
-        assertEquals(TEST_ROLE, userDto.getRole());
+        assertEquals(TEST_ROLE, userDto.getMainRole());
         assertEquals(TEST_PERMISSIONS, userDto.getPermissions());
     }
 

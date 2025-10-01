@@ -12,7 +12,6 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
@@ -64,6 +63,19 @@ public class UserService {
     }
 
     /**
+     * Authenticates a user refreshing his login.
+     *
+     * @param login The user's login
+     * @return UserDto containing the authenticated user's information
+     * @throws AppException if the user is not found 
+     */
+    public UserDto refreshLogin(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        return userMapper.toUserDto(user);
+    }
+
+    /**
      * Registers a new user in the system.
      * This method:
      * - Checks if the login is already taken
@@ -73,7 +85,8 @@ public class UserService {
      *
      * @param userDto The user registration data
      * @return UserDto containing the created user's information
-     * @throws AppException if the login already exists or the default role is not found
+     * @throws AppException if the login already exists or the default role is not
+     *                      found
      */
     public UserDto register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
@@ -87,8 +100,8 @@ public class UserService {
 
         // Add default USER role
         Role userRole = roleRepository.findByName(RoleEnum.USER)
-            .orElseThrow(() -> new AppException("Default role not found", HttpStatus.INTERNAL_SERVER_ERROR));
-        user.addRole(userRole);
+                .orElseThrow(() -> new AppException("Default role not found", HttpStatus.INTERNAL_SERVER_ERROR));
+        user.setMainRole(userRole);
 
         User savedUser = userRepository.save(user);
         return userMapper.toUserDto(savedUser);
@@ -104,10 +117,10 @@ public class UserService {
      */
     public UserDto findByLogin(String login) {
         log.debug("Searching for user with login: {}", login);
-        
+
         Optional<User> userOptional = userRepository.findByLogin(login);
         log.debug("User found in database: {}", userOptional.isPresent());
-        
+
         User user = userOptional
                 .orElseThrow(() -> {
                     log.error("User not found with login: {}", login);
@@ -116,12 +129,12 @@ public class UserService {
                 
         log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}", 
             user.getId(), user.getFirstName(), user.getLastName(), 
-            user.getRoles().stream().map(role -> role.getName().toString()).toList());
+            user.getMainRole());
             
         UserDto userDto = userMapper.toUserDto(user);
-        log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}", 
-            userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getRole());
-            
+        log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}",
+                userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
+
         return userDto;
     }
 
@@ -137,165 +150,165 @@ public class UserService {
     }
 
     /**
+     * Promotes a user to the manager role.
+     * This operation:
+     * - Verifies the user exists
+     * - Checks if the user is already an manager or admin
+     * - Removes existing roles and assigns the manager role
+     *
+     * @param userId The ID of the user to promote
+     * @return UserDto containing the updated user's information
+     * @throws RuntimeException if the user is not found, already an manager, or the
+     *                          manager role is not found
+     */
+    public UserDto promoteToManager(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
+            throw new RuntimeException("The user is already a manager");
+        }
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new RuntimeException("The user is already an admin");
+        }
+
+        Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
+                .orElseThrow(() -> new RuntimeException("Manager role not found"));
+
+        user.setMainRole(managerRole);
+        userRepository.save(user);
+        return userMapper.toUserDto(user);
+    }
+
+    /**
+     * Revokes the manager role from a user.
+     * This operation:
+     * - Verifies the user exists
+     * - Checks if the user is already a regular user or admin
+     * - Removes existing roles and assigns the user role
+     *
+     * @param userId The ID of the user to revoke the manager role from
+     * @throws RuntimeException if the user is not found, already a user, or the
+     *                          user role is not found
+     */
+    public void revokeManagerRole(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
+            throw new RuntimeException("The user is already a user");
+        }
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new RuntimeException("You don't have the necessary rights to delete an admin");
+        }
+
+        Role userRole = roleRepository.findByName(RoleEnum.USER)
+                .orElseThrow(() -> new RuntimeException("User role not found"));
+
+        user.setMainRole(userRole);
+        userRepository.save(user);
+    }
+
+    /**
      * Promotes a user to the admin role.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already an admin or super admin
+     * - Checks if the user is already a admin
      * - Removes existing roles and assigns the admin role
      *
      * @param userId The ID of the user to promote
      * @return UserDto containing the updated user's information
-     * @throws RuntimeException if the user is not found, already an admin, or the admin role is not found
+     * @throws RuntimeException if the user is not found, already a admin, or the
+     *                          admin role is not found
      */
     public UserDto promoteToAdmin(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-            
-        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
             throw new RuntimeException("The user is already an admin");
         }
-        if (user.getRole().getName().equals(RoleEnum.SUPER_ADMIN)) {
-            throw new RuntimeException("The user is already a super admin");
-        }
-        
+
         Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-            .orElseThrow(() -> new RuntimeException("Admin role not found"));
-            
-        user.getRoles().clear();
-        user.getRoles().add(adminRole);
+                .orElseThrow(() -> new RuntimeException("Admin role not found"));
+
+        user.setMainRole(adminRole);
         userRepository.save(user);
         return userMapper.toUserDto(user);
+    }
+
+    /**
+     * Downgrades a admin to an manager role.
+     * This operation:
+     * - Verifies the user exists
+     * - Checks if the user is already an manager or has lower rights
+     * - Removes existing roles and assigns the manager role
+     *
+     * @param userId The ID of the user to downgrade
+     * @throws RuntimeException if the user is not found, already an manager, or the
+     *                          manager role is not found
+     */
+    public void downgradeAdminRole(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
+            throw new RuntimeException("The user has lower rights than desired");
+        }
+        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
+            throw new RuntimeException("The user is already a manager");
+        }
+
+        Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
+                .orElseThrow(() -> new RuntimeException("Manager role not found"));
+
+        user.setMainRole(managerRole);
+        userRepository.save(user);
     }
 
     /**
      * Revokes the admin role from a user.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already a regular user or super admin
-     * - Removes existing roles and assigns the user role
-     *
-     * @param userId The ID of the user to revoke the admin role from
-     * @throws RuntimeException if the user is not found, already a user, or the user role is not found
-     */
-    public void revokeAdminRole(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        if (user.getRole().getName().equals(RoleEnum.USER)) {
-            throw new RuntimeException("The user is already a user");
-        }
-        if (user.getRole().getName().equals(RoleEnum.SUPER_ADMIN)) {
-            throw new RuntimeException("You don't have the necessary rights to delete a super admin");
-        }
-
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-            .orElseThrow(() -> new RuntimeException("User role not found"));
-
-        user.getRoles().clear();
-        user.getRoles().add(userRole);
-        userRepository.save(user);
-    }
-
-    /**
-     * Promotes a user to the super admin role.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already a super admin
-     * - Removes existing roles and assigns the super admin role
-     *
-     * @param userId The ID of the user to promote
-     * @return UserDto containing the updated user's information
-     * @throws RuntimeException if the user is not found, already a super admin, or the super admin role is not found
-     */
-    public UserDto promoteToSuperAdmin(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (user.getRole().getName().equals(RoleEnum.SUPER_ADMIN)) {
-            throw new RuntimeException("The user is already a super admin");
-        }
-
-        Role superAdminRole = roleRepository.findByName(RoleEnum.SUPER_ADMIN)
-            .orElseThrow(() -> new RuntimeException("Super admin role not found"));
-
-        user.getRoles().clear();
-        user.getRoles().add(superAdminRole);
-        userRepository.save(user);
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Downgrades a super admin to an admin role.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already an admin or has lower rights
-     * - Removes existing roles and assigns the admin role
-     *
-     * @param userId The ID of the user to downgrade
-     * @throws RuntimeException if the user is not found, already an admin, or the admin role is not found
-     */
-    public void downgradeSuperAdminRole(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        if (user.getRole().getName().equals(RoleEnum.USER)) {
-            throw new RuntimeException("The user has lower rights than desired");
-        }
-        if (user.getRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already an admin");
-        }
-
-        Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-            .orElseThrow(() -> new RuntimeException("Admin role not found"));
-
-        user.getRoles().clear();
-        user.getRoles().add(adminRole);
-        userRepository.save(user);
-    }
-
-    /**
-     * Revokes the super admin role from a user.
-     * This operation:
-     * - Verifies the user exists
      * - Checks if the user is already a regular user
      * - Removes existing roles and assigns the user role
      *
-     * @param userId The ID of the user to revoke the super admin role from
-     * @throws RuntimeException if the user is not found, already a user, or the user role is not found
+     * @param userId The ID of the user to revoke the admin role from
+     * @throws RuntimeException if the user is not found, already a user, or the
+     *                          user role is not found
      */
-    public void revokeSuperAdminRole(Long userId) {
+    public void revokeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRole().getName().equals(RoleEnum.USER)) {
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new RuntimeException("The user is already a user");
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
-            .orElseThrow(() -> new RuntimeException("User role not found"));
+                .orElseThrow(() -> new RuntimeException("User role not found"));
 
-        user.getRoles().clear();
-        user.getRoles().add(userRole);
+        user.setMainRole(userRole);
         userRepository.save(user);
     }
 
     /**
      * Checks if an actor can perform an action on a target based on their roles.
      * The hierarchy is:
-     * - SUPER_ADMIN can perform actions on all roles
-     * - ADMIN can perform actions on USER and ADMIN roles
+     * - ADMIN can perform actions on all roles
+     * - MANGER can perform actions on USER and MANAGER roles
      * - USER cannot perform actions on any role
      *
-     * @param actorRole The role of the actor performing the action
+     * @param actorRole  The role of the actor performing the action
      * @param targetRole The role of the target of the action
      * @return true if the actor can perform the action, false otherwise
      */
     private boolean canPerformAction(RoleEnum actorRole, RoleEnum targetRole) {
         switch (actorRole) {
-            case SUPER_ADMIN:
-                return true;
             case ADMIN:
-                if (targetRole == RoleEnum.SUPER_ADMIN) {
+                return true;
+            case MANAGER:
+                if (targetRole == RoleEnum.ADMIN) {
                     return false;
                 }
                 return true;
@@ -314,7 +327,8 @@ public class UserService {
      * - Deletes the user
      *
      * @param userId The ID of the user to delete
-     * @throws RuntimeException if the user is not found or the authenticated user lacks permissions
+     * @throws RuntimeException if the user is not found or the authenticated user
+     *                          lacks permissions
      */
     public void deleteUser(Long userId) {
         // Get the user to delete
@@ -330,7 +344,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
         // Check if the action is authorized
-        if (!canPerformAction(authenticatedUserEntity.getRole().getName(), userToDelete.getRole().getName())) {
+        if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
             throw new RuntimeException("You don't have the necessary rights to perform this action");
         }
 
@@ -352,7 +366,7 @@ public class UserService {
      */
     public UserDto createAzureUser(UserDto userDto) {
         log.debug("Creating new Azure user: {}", userDto.getLogin());
-        
+
         // Check if user already exists
         if (userRepository.existsByLogin(userDto.getLogin())) {
             log.debug("User already exists: {}", userDto.getLogin());
@@ -361,22 +375,21 @@ public class UserService {
 
         // Create new user
         User user = User.builder()
-            .login(userDto.getLogin())
-            .firstName(userDto.getFirstName())
-            .lastName(userDto.getLastName())
-            .password(passwordEncoder.encode("AzureUser" + System.currentTimeMillis())) // Temporary password
-            .build();
+                .login(userDto.getLogin())
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .password(passwordEncoder.encode("AzureUser" + System.currentTimeMillis())) // Temporary password
+                .build();
 
         // Add default USER role
         Role userRole = roleRepository.findByName(RoleEnum.USER)
-            .orElseThrow(() -> new AppException("Default role not found", HttpStatus.INTERNAL_SERVER_ERROR));
-        user.addRole(userRole);
+                .orElseThrow(() -> new AppException("Default role not found", HttpStatus.INTERNAL_SERVER_ERROR));
+        user.setMainRole(userRole);
 
         // Save the user
         User savedUser = userRepository.save(user);
         log.debug("Azure user created successfully: {}", savedUser.getLogin());
-        
+
         return userMapper.toUserDto(savedUser);
     }
 }
-

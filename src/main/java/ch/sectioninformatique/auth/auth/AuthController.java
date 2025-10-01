@@ -3,7 +3,12 @@ package ch.sectioninformatique.auth.auth;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,25 +36,48 @@ public class AuthController {
      * Authenticates a user with their credentials and returns a JWT token.
      *
      * @param credentialsDto The user credentials containing login and password
-     * @return ResponseEntity containing the authenticated user's information and JWT token
+     * @return ResponseEntity containing the authenticated user's information and
+     *         JWT token
      */
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto));
+        userDto.setRefreshToken(userAuthenticationProvider.createRefreshToken(userDto));
         return ResponseEntity.ok(userDto);
+    }
+
+    /**
+     * refresh a user's access token from his refresh token.
+     *
+     * @return ResponseEntity containing the authenticated user's information and
+     *         JWT token
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/refresh")
+    public ResponseEntity<UserDto> refreshLogin() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        UserDto currentUser = (UserDto) authentication.getPrincipal();
+        currentUser = userService.refreshLogin(currentUser.getLogin());
+        currentUser.setToken(userAuthenticationProvider.createToken(currentUser));
+        return ResponseEntity.ok(currentUser);
     }
 
     /**
      * Registers a new user in the system.
      *
      * @param user The signup data containing the new user's information
-     * @return ResponseEntity containing the created user's information and JWT token
+     * @return ResponseEntity containing the created user's information and JWT
+     *         token
      */
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
         UserDto createdUser = userService.register(user);
         createdUser.setToken(userAuthenticationProvider.createToken(createdUser));
+        createdUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(createdUser));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 }
