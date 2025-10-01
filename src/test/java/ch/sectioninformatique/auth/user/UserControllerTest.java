@@ -9,9 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import org.junit.jupiter.api.extension.ExtendWith;
