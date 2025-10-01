@@ -1,0 +1,4 @@
+[source,json,options="nowrap"]
+----
+User promoted to manager successfully
+----

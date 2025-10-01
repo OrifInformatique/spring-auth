@@ -16,3 +16,10 @@ TEST_SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/test_db
 # User name and password used by Docker to create the database container
 DB_USERNAME=root
 DB_PASSWORD=pwd
+
+# Azure OAuth2 settings
+# Set these values according to your Azure app registration
+AZURE_REDIRECT_BASE_URL=http://localhost:8080
+AZURE_TENANT_ID=
+AZURE_CLIENT_ID=
+AZURE_CLIENT_SECRET=

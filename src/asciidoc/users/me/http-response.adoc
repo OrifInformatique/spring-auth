@@ -1,0 +1,17 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 179
+
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : null,
+  "refreshToken" : null,
+  "mainRole" : "USER",
+  "permissions" : null
+}
+----
