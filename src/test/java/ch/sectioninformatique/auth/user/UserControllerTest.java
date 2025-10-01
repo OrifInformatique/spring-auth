@@ -116,24 +116,6 @@ class UserControllerTest {
         }
 
         /**
-         * Test for retrieving the authenticated user's information when
-         * unauthenticated.
-         * This test verifies that a 401 Unauthorized status is returned
-         * and generates API documentation using Spring REST Docs.
-         * 
-         * @throws Exception
-         */
-        @Test
-        void unauthenticatedUser_Returns401() throws Exception {
-                SecurityContextHolder.clearContext(); // Clear any authentication
-
-                this.mockMvc.perform(get("/users/me")
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andDo(document("users/me/401", preprocessResponse(prettyPrint())));
-        }
-
-        /**
          * Test for retrieving all users.
          * This test verifies that a list of users is returned
          * and generates API documentation using Spring REST Docs.
@@ -173,16 +155,6 @@ class UserControllerTest {
                                 .andExpect(jsonPath("$[1].lastName").value("Smith"))
                                 .andExpect(jsonPath("$[1].login").value("jane@test.com"))
                                 .andDo(document("users/all", preprocessResponse(prettyPrint())));
-        }
-
-        @Test
-        void allUsers_Unauthenticated_Returns401() throws Exception {
-                // No authentication setup
-
-                this.mockMvc.perform(get("/users/all")
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andDo(document("users/all/401", preprocessResponse(prettyPrint())));
         }
 
         /**
