@@ -676,12 +676,39 @@ Admin role downgraded successfully</code></pre>
 <p>It downgrades a admin to "MANAGER" role.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_delete_user">Delete User</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>DELETE /users/{userId}</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/2 HTTP/1.1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 25
+
+User deleted successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It deletes a user.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-01 11:18:46 UTC
+Last updated 2025-10-01 11:38:56 UTC
 </div>
 </div>
 </body>

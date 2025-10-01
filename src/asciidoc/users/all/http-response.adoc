@@ -15,9 +15,9 @@ Content-Length: 698
   "mainRole" : null,
   "username" : "john@test.com",
   "authorities" : [ ],
-  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "credentialsNonExpired" : true,
   "enabled" : true
 }, {
   "id" : 2,
@@ -30,9 +30,9 @@ Content-Length: 698
   "mainRole" : null,
   "username" : "jane@test.com",
   "authorities" : [ ],
-  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "credentialsNonExpired" : true,
   "enabled" : true
 } ]
 ----

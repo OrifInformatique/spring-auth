@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +35,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 /**
  * Test class for UserController.
@@ -71,7 +78,9 @@ class UserControllerTest {
         @MockBean
         private UserRepository userRepository;
 
-        /** Mocked UserAuthenticationProvider for simulating authentication operations */
+        /**
+         * Mocked UserAuthenticationProvider for simulating authentication operations
+         */
         @MockBean
         private UserAuthenticationProvider userAuthenticationProvider;
 
@@ -79,12 +88,13 @@ class UserControllerTest {
          * Test for retrieving the authenticated user's information.
          * This test verifies that the correct user information is returned
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
         void authenticatedUser_ReturnsCurrentUser_Doc() throws Exception {
-
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "USER", null);
+                UserDto mockUser = new UserDto(
+                                1L, "John", "Doe", "john@test.com", null, null, "USER", null);
 
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
@@ -97,13 +107,19 @@ class UserControllerTest {
                 this.mockMvc.perform(get("/users/me")
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(mockUser.getId()))
+                                .andExpect(jsonPath("$.firstName").value(mockUser.getFirstName()))
+                                .andExpect(jsonPath("$.lastName").value(mockUser.getLastName()))
+                                .andExpect(jsonPath("$.login").value(mockUser.getLogin()))
+                                .andExpect(jsonPath("$.mainRole").value(mockUser.getMainRole()))
                                 .andDo(document("users/me", preprocessResponse(prettyPrint())));
         }
 
         /**
          * Test for retrieving all users.
-         * This test verifies that a list of users is returned 
+         * This test verifies that a list of users is returned
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
@@ -114,9 +130,19 @@ class UserControllerTest {
                                 new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null));
                 Mockito.when(userService.allUsers()).thenReturn(users);
 
+                // Act & Assert
                 this.mockMvc.perform(get("/users/all")
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(2))
+                                .andExpect(jsonPath("$[0].id").value(1))
+                                .andExpect(jsonPath("$[0].firstName").value("John"))
+                                .andExpect(jsonPath("$[0].lastName").value("Doe"))
+                                .andExpect(jsonPath("$[0].login").value("john@test.com"))
+                                .andExpect(jsonPath("$[1].id").value(2))
+                                .andExpect(jsonPath("$[1].firstName").value("Jane"))
+                                .andExpect(jsonPath("$[1].lastName").value("Smith"))
+                                .andExpect(jsonPath("$[1].login").value("jane@test.com"))
                                 .andDo(document("users/all", preprocessResponse(prettyPrint())));
         }
 
@@ -124,6 +150,7 @@ class UserControllerTest {
          * Test for promoting a user to manager role.
          * This test verifies that the user is successfully promoted
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
@@ -137,15 +164,17 @@ class UserControllerTest {
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
                 SecurityContextHolder.setContext(securityContext);
+
                 // Arrange
                 Long userId = 2L;
                 UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
-
                 when(userService.promoteToManager(userId)).thenReturn(expectedDto);
 
+                // Act & Assert
                 this.mockMvc.perform(put("/users/{userId}/promote-manager", userId)
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string("User promoted to manager successfully"))
                                 .andDo(document("users/promote-manager", preprocessResponse(prettyPrint())));
         }
 
@@ -153,6 +182,7 @@ class UserControllerTest {
          * Test for revoking a user's manager role.
          * This test verifies that the user is successfully revoked
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
@@ -176,6 +206,7 @@ class UserControllerTest {
                 this.mockMvc.perform(put("/users/{userId}/revoke-manager", userId)
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string("Manager role revoked successfully"))
                                 .andDo(document("users/revoke-manager", preprocessResponse(prettyPrint())));
         }
 
@@ -183,6 +214,7 @@ class UserControllerTest {
          * Test for promoting a user or manager to admin role.
          * This test verifies that the user is successfully promoted
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
@@ -196,7 +228,7 @@ class UserControllerTest {
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
                 SecurityContextHolder.setContext(securityContext);
-                
+
                 // Arrange
                 Long userId = 2L;
                 UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "ADMIN", null);
@@ -206,6 +238,7 @@ class UserControllerTest {
                 this.mockMvc.perform(put("/users/{userId}/promote-admin", userId)
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string("Admin role assigned successfully"))
                                 .andDo(document("users/promote-admin", preprocessResponse(prettyPrint())));
         }
 
@@ -213,6 +246,7 @@ class UserControllerTest {
          * Test for revoking a user's admin role.
          * This test verifies that the user is successfully revoked
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
@@ -226,7 +260,7 @@ class UserControllerTest {
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
                 SecurityContextHolder.setContext(securityContext);
-                
+
                 // Arrange
                 Long userId = 2L;
                 UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "USER", null);
@@ -236,6 +270,7 @@ class UserControllerTest {
                 this.mockMvc.perform(put("/users/{userId}/revoke-admin", userId)
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string("Admin role revoked successfully"))
                                 .andDo(document("users/revoke-admin", preprocessResponse(prettyPrint())));
         }
 
@@ -243,6 +278,7 @@ class UserControllerTest {
          * Test for downgrading an admin to manager role.
          * This test verifies that the admin is successfully downgraded
          * and generates API documentation using Spring REST Docs.
+         * 
          * @throws Exception
          */
         @Test
@@ -256,7 +292,7 @@ class UserControllerTest {
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
                 SecurityContextHolder.setContext(securityContext);
-                
+
                 // Arrange
                 Long userId = 2L;
                 UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
@@ -266,9 +302,17 @@ class UserControllerTest {
                 this.mockMvc.perform(put("/users/{userId}/downgrade-admin", userId)
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string("Admin role downgraded successfully"))
                                 .andDo(document("users/downgrade-admin", preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test for deleting a user.
+         * This test verifies that the user is successfully deleted
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
         @Test
         void deleteUser_Successful_Doc() throws Exception {
                 UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
@@ -280,7 +324,7 @@ class UserControllerTest {
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
                 SecurityContextHolder.setContext(securityContext);
-                
+
                 // Arrange
                 Long userId = 2L;
                 UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
@@ -290,6 +334,7 @@ class UserControllerTest {
                 this.mockMvc.perform(delete("/users/{userId}", userId)
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(content().string("User deleted successfully"))
                                 .andDo(document("users/delete", preprocessResponse(prettyPrint())));
         }
 
