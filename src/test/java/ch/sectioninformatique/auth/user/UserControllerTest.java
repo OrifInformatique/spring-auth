@@ -38,9 +38,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Test class for UserController.
@@ -99,6 +97,8 @@ class UserControllerTest {
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
@@ -116,6 +116,24 @@ class UserControllerTest {
         }
 
         /**
+         * Test for retrieving the authenticated user's information when
+         * unauthenticated.
+         * This test verifies that a 401 Unauthorized status is returned
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
+        @Test
+        void unauthenticatedUser_Returns401() throws Exception {
+                SecurityContextHolder.clearContext(); // Clear any authentication
+
+                this.mockMvc.perform(get("/users/me")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/me/401", preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test for retrieving all users.
          * This test verifies that a list of users is returned
          * and generates API documentation using Spring REST Docs.
@@ -124,6 +142,17 @@ class UserControllerTest {
          */
         @Test
         void allUsers_ReturnsListOfUsers_Doc() throws Exception {
+                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+
+                Authentication authentication = Mockito.mock(Authentication.class);
+                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+
+                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
                 // Arrange
                 List<User> users = Arrays.asList(
                                 new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null),
@@ -146,6 +175,16 @@ class UserControllerTest {
                                 .andDo(document("users/all", preprocessResponse(prettyPrint())));
         }
 
+        @Test
+        void allUsers_Unauthenticated_Returns401() throws Exception {
+                // No authentication setup
+
+                this.mockMvc.perform(get("/users/all")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/all/401", preprocessResponse(prettyPrint())));
+        }
+
         /**
          * Test for promoting a user to manager role.
          * This test verifies that the user is successfully promoted
@@ -159,6 +198,8 @@ class UserControllerTest {
 
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
 
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -192,6 +233,8 @@ class UserControllerTest {
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
@@ -223,6 +266,8 @@ class UserControllerTest {
 
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
 
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -256,6 +301,8 @@ class UserControllerTest {
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
@@ -288,6 +335,8 @@ class UserControllerTest {
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
@@ -319,6 +368,8 @@ class UserControllerTest {
 
                 Authentication authentication = Mockito.mock(Authentication.class);
                 Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+
+                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
 
                 SecurityContext securityContext = Mockito.mock(SecurityContext.class);
                 Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);

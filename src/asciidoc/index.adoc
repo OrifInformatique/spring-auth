@@ -13,6 +13,16 @@ include::users/me/http-response.adoc[]
 
 It gives informations about the authenticated user.
 
+==== 401 Unauthorized
+This is an example output for the `GET /users/me` endpoint when the user is not authenticated.
+
+.request
+include::users/me/401/http-request.adoc[]
+
+.response
+include::users/me/401/http-response.adoc[]
+
+It gives a 401 Unauthorized response when the user is not authenticated.
 
 === Get All Users
 This is an example output for the `GET /users/all` endpoint.
@@ -24,6 +34,17 @@ include::users/all/http-request.adoc[]
 include::users/all/http-response.adoc[]
 
 It gives informations about all users.
+
+==== 401 Unauthorized
+This is an example output for the `GET /users/all` endpoint when the user is not authenticated.
+
+.request
+include::users/all/401/http-request.adoc[]
+
+.response
+include::users/all/401/http-response.adoc[]
+
+It gives a 401 Unauthorized response when the user is not authenticated.
 
 === Promote User to Manager
 This is an example output for the `PUT /users/{userId}/promote-manager` endpoint.

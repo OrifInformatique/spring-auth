@@ -2,6 +2,7 @@ package ch.sectioninformatique.auth.user;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -21,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
  * - User deletion
  * - User listing and retrieval
  * 
- * All endpoints are secured with appropriate authorization checks using Spring Security's
- * @PreAuthorize annotations. The controller follows RESTful conventions and returns
- * appropriate HTTP responses with success/error messages.
+ * All endpoints are secured with appropriate authorization checks using Spring
+ * Security's
+ * 
+ * @PreAuthorize annotations. The controller follows RESTful conventions and
+ *               returns
+ *               appropriate HTTP responses with success/error messages.
  */
 @RequestMapping("/users")
 @RestController
@@ -36,8 +40,7 @@ public class UserController {
      *
      * @param userService Service for handling user-related operations
      */
-    public UserController(UserService userService)
-    {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -56,9 +59,23 @@ public class UserController {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
-        
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
-        return ResponseEntity.ok(currentUser);
+
+        // Extra check in case of anonymous authentication
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Get the current user details
+        Object principal = authentication.getPrincipal();
+
+        // Ensure the principal is of type UserDto
+        if (principal instanceof UserDto) {
+            UserDto user = (UserDto) principal;
+            return ResponseEntity.ok(user);
+        }
+
+        // If the principal is not a UserDto, return 401 Unauthorized
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     /**
@@ -73,7 +90,17 @@ public class UserController {
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<List<User>> allUsers() {
-        List <User> users = userService.allUsers();
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        // Extra check in case of anonymous authentication
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<User> users = userService.allUsers();
         return ResponseEntity.ok(users);
     }
 

@@ -478,6 +478,29 @@ Content-Length: 179
 <div class="paragraph">
 <p>It gives informations about the authenticated user.</p>
 </div>
+<div class="sect3">
+<h4 id="_401_unauthorized">401 Unauthorized</h4>
+<div class="paragraph">
+<p>This is an example output for the <code>GET /users/me</code> endpoint when the user is not authenticated.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It gives a 401 Unauthorized response when the user is not authenticated.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_get_all_users">Get All Users</h3>
@@ -534,6 +557,29 @@ Content-Length: 698
 </div>
 <div class="paragraph">
 <p>It gives informations about all users.</p>
+</div>
+<div class="sect3">
+<h4 id="_401_unauthorized_2">401 Unauthorized</h4>
+<div class="paragraph">
+<p>This is an example output for the <code>GET /users/all</code> endpoint when the user is not authenticated.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It gives a 401 Unauthorized response when the user is not authenticated.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -708,7 +754,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-01 11:38:56 UTC
+Last updated 2025-10-01 14:04:41 UTC
 </div>
 </div>
 </body>
