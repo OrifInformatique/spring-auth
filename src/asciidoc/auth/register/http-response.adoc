@@ -1,0 +1,18 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 201 Created
+Location: /users/1
+Content-Type: application/json
+Content-Length: 210
+
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : "mocked-jwt-token",
+  "refreshToken" : "mocked-refresh-token",
+  "mainRole" : "USER",
+  "permissions" : [ ]
+}
+----

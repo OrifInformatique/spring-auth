@@ -1,5 +1,40 @@
 = Spring Auth API Documentation
 
+== Auth Endpoints
+
+=== Login
+This is an example output for the `POST /auth/login` endpoint.
+
+.request
+include::auth/login/http-request.adoc[]
+
+.response
+include::auth/login/http-response.adoc[]
+
+It gives informations about the authenticated user along with a JWT token.
+
+=== Register
+This is an example output for the `POST /auth/register` endpoint.
+
+.request
+include::auth/register/http-request.adoc[]
+
+.response
+include::auth/register/http-response.adoc[]
+
+It registers a new user and gives informations about the created user along with a JWT token.
+
+=== Refresh
+This is an example output for the `GET /auth/refresh` endpoint.
+
+.request
+include::auth/refresh/http-request.adoc[]
+
+.response
+include::auth/refresh/http-response.adoc[]
+
+It refreshes the JWT token for the authenticated user.
+
 == User Endpoints
 
 === Get Authenticated User

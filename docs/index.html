@@ -441,6 +441,136 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
+<h2 id="_auth_endpoints">Auth Endpoints</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_login">Login</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>POST /auth/login</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Content-Length: 55
+Host: localhost:8080
+
+{
+  "login": "john@test.com",
+  "password": "secret"
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 210
+
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : "mocked-jwt-token",
+  "refreshToken" : "mocked-refresh-token",
+  "mainRole" : "USER",
+  "permissions" : [ ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It gives informations about the authenticated user along with a JWT token.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register">Register</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>POST /auth/register</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Content-Length: 99
+Host: localhost:8080
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "login": "john@test.com",
+  "password": "secret"
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
+Location: /users/1
+Content-Type: application/json
+Content-Length: 210
+
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : "mocked-jwt-token",
+  "refreshToken" : "mocked-refresh-token",
+  "mainRole" : "USER",
+  "permissions" : [ ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It registers a new user and gives informations about the created user along with a JWT token.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refresh">Refresh</h3>
+<div class="paragraph">
+<p>This is an example output for the <code>GET /auth/refresh</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 210
+
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : "mocked-jwt-token",
+  "refreshToken" : "mocked-refresh-token",
+  "mainRole" : "USER",
+  "permissions" : [ ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It refreshes the JWT token for the authenticated user.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_user_endpoints">User Endpoints</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -478,29 +608,6 @@ Content-Length: 179
 <div class="paragraph">
 <p>It gives informations about the authenticated user.</p>
 </div>
-<div class="sect3">
-<h4 id="_401_unauthorized">401 Unauthorized</h4>
-<div class="paragraph">
-<p>This is an example output for the <code>GET /users/me</code> endpoint when the user is not authenticated.</p>
-</div>
-<div class="listingblock">
-<div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
-Accept: application/json
-Host: localhost:8080</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It gives a 401 Unauthorized response when the user is not authenticated.</p>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_get_all_users">Get All Users</h3>
@@ -533,9 +640,9 @@ Content-Length: 698
   "mainRole" : null,
   "username" : "john@test.com",
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "enabled" : true
 }, {
   "id" : 2,
@@ -548,38 +655,15 @@ Content-Length: 698
   "mainRole" : null,
   "username" : "jane@test.com",
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "enabled" : true
 } ]</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>It gives informations about all users.</p>
-</div>
-<div class="sect3">
-<h4 id="_401_unauthorized_2">401 Unauthorized</h4>
-<div class="paragraph">
-<p>This is an example output for the <code>GET /users/all</code> endpoint when the user is not authenticated.</p>
-</div>
-<div class="listingblock">
-<div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
-Accept: application/json
-Host: localhost:8080</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It gives a 401 Unauthorized response when the user is not authenticated.</p>
-</div>
 </div>
 </div>
 <div class="sect2">
@@ -754,7 +838,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-01 14:04:41 UTC
+Last updated 2025-10-03 07:25:52 UTC
 </div>
 </div>
 </body>

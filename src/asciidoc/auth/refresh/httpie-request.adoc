@@ -1,5 +1,5 @@
 [source,bash]
 ----
-$ http GET 'http://localhost:8080/users/me' \
+$ http GET 'http://localhost:8080/auth/refresh' \
     'Accept:application/json'
 ----

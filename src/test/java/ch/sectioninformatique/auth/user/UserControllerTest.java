@@ -38,10 +38,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import static org.hamcrest.Matchers.containsString;
-
 /**
- * Test class for UserController.
+ * Test class for {@link UserController}.
  * This class uses MockMvc to perform HTTP requests and validate responses.
  * It includes tests for:
  * - Retrieving the authenticated user's information

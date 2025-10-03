@@ -1,0 +1,13 @@
+[source,json,options="nowrap"]
+----
+{
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "token" : "mocked-jwt-token",
+  "refreshToken" : "mocked-refresh-token",
+  "mainRole" : "USER",
+  "permissions" : [ ]
+}
+----
