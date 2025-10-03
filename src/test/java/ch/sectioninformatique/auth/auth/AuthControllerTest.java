@@ -30,6 +30,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 /**
  * Test class for {@link AuthController}.
  * This class uses MockMvc to perform HTTP requests and validate responses.
@@ -100,6 +102,13 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON) // ✅ Set correct content type
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUser.getId()))
+                .andExpect(jsonPath("$.firstName").value(mockUser.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(mockUser.getLastName()))
+                .andExpect(jsonPath("$.login").value(mockUser.getLogin()))
+                .andExpect(jsonPath("$.token").value("mocked-jwt-token"))
+                .andExpect(jsonPath("$.refreshToken").value("mocked-refresh-token"))
+                .andExpect(jsonPath("$.mainRole").value(mockUser.getMainRole()))
                 .andDo(document("auth/login", preprocessResponse(prettyPrint())));
 
     }
@@ -108,7 +117,8 @@ public class AuthControllerTest {
      * Test for the register endpoint.
      * This test verifies that a user can successfully register with valid
      * information.
-     * It checks that the response status is CREATED and documents the API using Spring
+     * It checks that the response status is CREATED and documents the API using
+     * Spring
      * REST Docs.
      *
      * @throws Exception if an error occurs during the test
@@ -143,6 +153,13 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON) // ✅ Set correct content type
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(mockUser.getId()))
+                .andExpect(jsonPath("$.firstName").value(mockUser.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(mockUser.getLastName()))
+                .andExpect(jsonPath("$.login").value(mockUser.getLogin()))
+                .andExpect(jsonPath("$.token").value("mocked-jwt-token"))
+                .andExpect(jsonPath("$.refreshToken").value("mocked-refresh-token"))
+                .andExpect(jsonPath("$.mainRole").value(mockUser.getMainRole()))
                 .andDo(document("auth/register", preprocessResponse(prettyPrint())));
 
     }
@@ -166,15 +183,15 @@ public class AuthControllerTest {
                 .mainRole("USER")
                 .build();
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+        Mockito.when(authentication.isAuthenticated()).thenReturn(true);
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 
-                SecurityContextHolder.setContext(securityContext);
+        SecurityContextHolder.setContext(securityContext);
 
         // Arrange
         Mockito.when(userService.refreshLogin(Mockito.any())).thenReturn(mockUser);
@@ -184,6 +201,13 @@ public class AuthControllerTest {
         this.mockMvc.perform(get("/auth/refresh")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUser.getId()))
+                .andExpect(jsonPath("$.firstName").value(mockUser.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(mockUser.getLastName()))
+                .andExpect(jsonPath("$.login").value(mockUser.getLogin()))
+                .andExpect(jsonPath("$.token").value("mocked-new-jwt-token"))
+                .andExpect(jsonPath("$.refreshToken").value("mocked-refresh-token"))
+                .andExpect(jsonPath("$.mainRole").value(mockUser.getMainRole()))
                 .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
 
     }
