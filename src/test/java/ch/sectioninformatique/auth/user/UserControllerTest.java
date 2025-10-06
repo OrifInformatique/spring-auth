@@ -37,6 +37,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 /**
  * Test class for {@link UserController}.
@@ -51,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class, excludeAutoConfiguration = { SecurityAutoConfiguration.class,
                 OAuth2ClientAutoConfiguration.class })
 @AutoConfigureMockMvc(addFilters = false)
-@AutoConfigureRestDocs(outputDir = "build/generated-snippets")
+@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 class UserControllerTest {
 
         /** MockMvc for performing HTTP requests in tests */
@@ -103,7 +104,8 @@ class UserControllerTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 this.mockMvc.perform(get("/users/me")
-                                .accept(MediaType.APPLICATION_JSON))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(user("john").roles("USER")))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.id").value(mockUser.getId()))
                                 .andExpect(jsonPath("$.firstName").value(mockUser.getFirstName()))
@@ -112,6 +114,17 @@ class UserControllerTest {
                                 .andExpect(jsonPath("$.mainRole").value(mockUser.getMainRole()))
                                 .andDo(document("users/me", preprocessResponse(prettyPrint())));
         }
+
+        /*
+         * @Test
+         * void authenticatedUser_Unauthenticated_ReturnsUnauthorized() throws Exception
+         * {
+         * this.mockMvc.perform(get("/users/me")
+         * .accept(MediaType.APPLICATION_JSON))
+         * .andExpect(status().isUnauthorized())
+         * .andDo(document("users/me/401", preprocessResponse(prettyPrint())));
+         * }
+         */
 
         /**
          * Test for retrieving all users.

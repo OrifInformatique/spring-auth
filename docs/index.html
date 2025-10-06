@@ -452,14 +452,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
-Content-Length: 55
+Content-Length: 63
 Host: localhost:8080
 
 {
   "login": "john@test.com",
-  "password": "secret"
+  "password": "Secure123@Pass"
 }</code></pre>
 </div>
 </div>
@@ -495,7 +495,7 @@ Content-Length: 210
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Content-Length: 99
 Host: localhost:8080
@@ -638,11 +638,11 @@ Content-Length: 698
   "createdAt" : null,
   "updatedAt" : null,
   "mainRole" : null,
-  "username" : "john@test.com",
-  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "john@test.com",
+  "authorities" : [ ],
   "enabled" : true
 }, {
   "id" : 2,
@@ -653,11 +653,11 @@ Content-Length: 698
   "createdAt" : null,
   "updatedAt" : null,
   "mainRole" : null,
-  "username" : "jane@test.com",
-  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "jane@test.com",
+  "authorities" : [ ],
   "enabled" : true
 } ]</code></pre>
 </div>

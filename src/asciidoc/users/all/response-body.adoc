@@ -9,11 +9,11 @@
   "createdAt" : null,
   "updatedAt" : null,
   "mainRole" : null,
-  "username" : "john@test.com",
   "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "john@test.com",
   "enabled" : true
 }, {
   "id" : 2,
@@ -24,11 +24,11 @@
   "createdAt" : null,
   "updatedAt" : null,
   "mainRole" : null,
-  "username" : "jane@test.com",
   "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "jane@test.com",
   "enabled" : true
 } ]
 ----

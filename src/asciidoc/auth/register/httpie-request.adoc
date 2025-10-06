@@ -7,6 +7,6 @@ $ echo '{
   "password": "secret"
 }
 ' | http POST 'http://localhost:8080/auth/register' \
-    'Content-Type:application/json' \
+    'Content-Type:application/json;charset=UTF-8' \
     'Accept:application/json'
 ----

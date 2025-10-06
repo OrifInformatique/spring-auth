@@ -2,16 +2,16 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 210
+Content-Length: 596
 
 {
-  "id" : 1,
-  "firstName" : "John",
-  "lastName" : "Doe",
-  "login" : "john@test.com",
-  "token" : "mocked-jwt-token",
-  "refreshToken" : "mocked-refresh-token",
-  "mainRole" : "USER",
+  "id" : 8,
+  "firstName" : "Super",
+  "lastName" : "Admin",
+  "login" : "super.admin@test.com",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk3NDE0MDAsImlhdCI6MTc1OTczNzgwMH0.HyXoi8w8PnKh-IeF8YlwplBg7ZzCUSzitiYwO1WXv0I",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImV4cCI6MTc2MDQ1NzgwMCwiaWF0IjoxNzU5NzM3ODAwfQ.b0TF0YYwmRyHmPRJIn4MHx_rZfO6slcA6H9if1Wdfl8",
+  "mainRole" : "ADMIN",
   "permissions" : [ ]
 }
 ----
