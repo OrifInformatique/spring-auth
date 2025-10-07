@@ -37,6 +37,7 @@ public class AuthControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    /** UserAuthenticationProvider instance for managing user authentication. */
     @Autowired
     private UserAuthenticationProvider userAuthenticationProvider;
 
@@ -124,5 +125,10 @@ public class AuthControllerIntegrationTest {
         Path path = Paths.get("target/test-data/auth-refresh-response.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, responseBody);
+
+        // Save token to file for later tests
+        Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
+        Files.createDirectories(pathToken.getParent());
+        Files.writeString(pathToken, refreshToken);
     }
 }

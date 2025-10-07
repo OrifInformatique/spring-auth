@@ -9,7 +9,7 @@ Content-Length: 431
   "firstName" : "Super",
   "lastName" : "Admin",
   "login" : "super.admin@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4MzgxOTcsImlhdCI6MTc1OTgzNDU5N30.EoUSXUUmkdgk3gWf-o2VOHxqcv9MO3Zdi7VhD3piNMY",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4NDc1OTMsImlhdCI6MTc1OTg0Mzk5M30.xLFVJei3WGjaTTMRNOikNZRlGI-PmLQ9eOma1GXsGcc",
   "refreshToken" : null,
   "mainRole" : "ADMIN",
   "permissions" : [ ]

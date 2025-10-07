@@ -3,15 +3,15 @@
 HTTP/1.1 201 Created
 Location: /users/9
 Content-Type: application/json
-Content-Length: 348
+Content-Length: 585
 
 {
   "id" : 9,
   "firstName" : "Test",
   "lastName" : "Test",
   "login" : "test.login@test.com",
-  "token" : null,
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZXhwIjoxNzYwNTU0NTk4LCJpYXQiOjE3NTk4MzQ1OTh9.O6wbekmnqpgDqVLVnZ_D7JJolW9o75Evv5idqaPtLPE",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVGVzdCIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTg0NzU5MywiaWF0IjoxNzU5ODQzOTkzfQ.oSAUrz653cwH6_DKjphKV9SJvbtcVsHFZYhr6SE0ntE",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZXhwIjoxNzYwNTYzOTkzLCJpYXQiOjE3NTk4NDM5OTN9.yaTzJixcnxA4QDh_BTXjYfhSNsv_TltP0GjKkHgJVIs",
   "mainRole" : "USER",
   "permissions" : [ ]
 }

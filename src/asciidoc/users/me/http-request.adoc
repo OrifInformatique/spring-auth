@@ -2,6 +2,7 @@
 ----
 GET /users/me HTTP/1.1
 Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRPRSIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTg0NzYwMiwiaWF0IjoxNzU5ODQ0MDAyfQ.LdPy4K5r6iHo7rE8CO7251jP6Qj-_wICas0pO_oFxJ8
 Host: localhost:8080
 
 ----

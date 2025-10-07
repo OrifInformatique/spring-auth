@@ -1,13 +1,13 @@
 [source,json,options="nowrap"]
 ----
 {
-  "id" : 1,
+  "id" : 0,
   "firstName" : "John",
-  "lastName" : "Doe",
-  "login" : "john@test.com",
+  "lastName" : "DOE",
+  "login" : "john.doe@test.com",
   "token" : null,
   "refreshToken" : null,
   "mainRole" : "USER",
-  "permissions" : null
+  "permissions" : [ ]
 }
 ----

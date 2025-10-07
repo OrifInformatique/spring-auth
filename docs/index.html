@@ -471,8 +471,8 @@ Content-Length: 576
   "firstName" : "John",
   "lastName" : "DOE",
   "login" : "john.doe@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRPRSIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTgzNzk0NywiaWF0IjoxNzU5ODM0MzQ3fQ.7uM2D2oG5Y2Dg5X-3QOkYlWuIrIj58zBzJmkO_gdEU0",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImV4cCI6MTc2MDU1NDM0NywiaWF0IjoxNzU5ODM0MzQ3fQ.EiZxyfcd2W6Cj1OMPjShZ5yf2QV8i5kJhHMqN4R0Rj0",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRPRSIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTg0NzI2MCwiaWF0IjoxNzU5ODQzNjYwfQ.aJapM_jJrd4AYJ94uBp0dZpWRFawk7QjyhFZqm83kUE",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImV4cCI6MTc2MDU2MzY2MCwiaWF0IjoxNzU5ODQzNjYwfQ.fcw3MNhBxmwxBpb27sfQHOS1Fob_8gjoPpczSVOs3gc",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -504,15 +504,15 @@ Host: localhost:8080
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /users/9
 Content-Type: application/json
-Content-Length: 348
+Content-Length: 585
 
 {
   "id" : 9,
   "firstName" : "Test",
   "lastName" : "Test",
   "login" : "test.login@test.com",
-  "token" : null,
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZXhwIjoxNzYwNTU0MzQ3LCJpYXQiOjE3NTk4MzQzNDd9.N2ALtraEk7vMEFQZ4wL12T4l7LFc5rO_72fLWzvShXQ",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVGVzdCIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTg0NzI2MCwiaWF0IjoxNzU5ODQzNjYwfQ.ZfcWVN6lmBEE_nAjtEvxx8L2qEe7Qgzwy8PhUn5W02w",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZXhwIjoxNzYwNTYzNjYwLCJpYXQiOjE3NTk4NDM2NjB9.dWQDcRS1jGXw9U8MSsHICp-27ax1WJFCPolkwjicuk4",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -532,7 +532,7 @@ Content-Length: 348
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer null
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImV4cCI6MTc2MDU2MzY1OSwiaWF0IjoxNzU5ODQzNjU5fQ.iQzbGdhFNP0IqzpwnvNTp4CaNvxqrcgsNNZdZEEmW9E
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -548,7 +548,7 @@ Content-Length: 431
   "firstName" : "Super",
   "lastName" : "Admin",
   "login" : "super.admin@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4Mzc5NDcsImlhdCI6MTc1OTgzNDM0N30.lR1wfTaGVHp8-kkUvr9CzSIqe8iaRxjdx9-046euXy4",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4NDcyNjAsImlhdCI6MTc1OTg0MzY2MH0.vMVhU8XiRzK6s8MmW3jt3venQdpBV_TxnSJo7atNOXk",
   "refreshToken" : null,
   "mainRole" : "ADMIN",
   "permissions" : [ ]
@@ -574,6 +574,7 @@ Content-Length: 431
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRPRSIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTg0NzI2OSwiaWF0IjoxNzU5ODQzNjY5fQ.zEvQoMk1Q7vSkgsydwZD-wmuBipS_PZHnSxvmauyz34
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -582,17 +583,17 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 179
+Content-Length: 182
 
 {
-  "id" : 1,
+  "id" : 0,
   "firstName" : "John",
-  "lastName" : "Doe",
-  "login" : "john@test.com",
+  "lastName" : "DOE",
+  "login" : "john.doe@test.com",
   "token" : null,
   "refreshToken" : null,
   "mainRole" : "USER",
-  "permissions" : null
+  "permissions" : [ ]
 }</code></pre>
 </div>
 </div>
@@ -631,8 +632,8 @@ Content-Length: 698
   "mainRole" : null,
   "authorities" : [ ],
   "credentialsNonExpired" : true,
-  "accountNonLocked" : true,
   "accountNonExpired" : true,
+  "accountNonLocked" : true,
   "username" : "john@test.com",
   "enabled" : true
 }, {
@@ -646,8 +647,8 @@ Content-Length: 698
   "mainRole" : null,
   "authorities" : [ ],
   "credentialsNonExpired" : true,
-  "accountNonLocked" : true,
   "accountNonExpired" : true,
+  "accountNonLocked" : true,
   "username" : "jane@test.com",
   "enabled" : true
 } ]</code></pre>
@@ -829,7 +830,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-07 08:38:45 UTC
+Last updated 2025-10-07 13:28:52 UTC
 </div>
 </div>
 </body>

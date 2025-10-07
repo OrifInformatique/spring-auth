@@ -10,19 +10,29 @@ import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
 import org.springframework.http.MediaType;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,12 +58,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
  * - Promoting a user to manager role
  * - Revoking a user's manager role
  */
+@Tag("restdocs")
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(controllers = UserController.class, excludeAutoConfiguration = { SecurityAutoConfiguration.class,
                 OAuth2ClientAutoConfiguration.class })
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
-class UserControllerTest {
+class UserControllerDocTest {
 
         /** MockMvc for performing HTTP requests in tests */
         @Autowired
@@ -81,6 +92,15 @@ class UserControllerTest {
         @MockBean
         private UserAuthenticationProvider userAuthenticationProvider;
 
+        @MockBean
+        private Authentication authentication;
+
+        @MockBean
+        private SecurityContext securityContext;
+
+        private static String meResponseJson;
+        private static String meToken;
+
         /**
          * Test for retrieving the authenticated user's information.
          * This test verifies that the correct user information is returned
@@ -89,29 +109,46 @@ class UserControllerTest {
          * @throws Exception
          */
         @Test
-        void authenticatedUser_ReturnsCurrentUser_Doc() throws Exception {
-                UserDto mockUser = new UserDto(
-                                1L, "John", "Doe", "john@test.com", null, null, "USER", null);
+        void me_withMockedService_generatesDoc() throws Exception {
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Path path = Paths.get("target/test-data/users-me-response.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required me response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meResponseJson = Files.readString(path);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                Path pathToken = Paths.get("target/test-data/users-me-token.txt");
+                if (!Files.exists(pathToken)) {
+                        throw new IllegalStateException(
+                                        "Missing required token data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meToken = Files.readString(pathToken);
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(meResponseJson);
+
+                UserDto userDto = UserDto.builder()
+                                .id(jsonNode.get("id").asLong())
+                                .firstName(jsonNode.get("firstName").asText())
+                                .lastName(jsonNode.get("lastName").asText())
+                                .login(jsonNode.get("login").asText())
+                                .token(jsonNode.get("token").asText(null))
+                                .refreshToken(jsonNode.get("refreshToken").asText(null))
+                                .mainRole(jsonNode.get("mainRole").asText("USER"))
+                                .permissions(new ArrayList<String>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(userDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
 
                 SecurityContextHolder.setContext(securityContext);
 
                 this.mockMvc.perform(get("/users/me")
                                 .accept(MediaType.APPLICATION_JSON)
-                                .with(user("john").roles("USER")))
+                                .header("Authorization", "Bearer " + meToken))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").value(mockUser.getId()))
-                                .andExpect(jsonPath("$.firstName").value(mockUser.getFirstName()))
-                                .andExpect(jsonPath("$.lastName").value(mockUser.getLastName()))
-                                .andExpect(jsonPath("$.login").value(mockUser.getLogin()))
-                                .andExpect(jsonPath("$.mainRole").value(mockUser.getMainRole()))
                                 .andDo(document("users/me", preprocessResponse(prettyPrint())));
         }
 

@@ -7,7 +7,6 @@ import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +39,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 
 /**
  * Documentation tests for AuthController.
@@ -68,6 +65,8 @@ public class AuthControllerDocTest {
         private static String registerResponseJson;
 
         private static String refreshResponseJson;
+
+        private static String refreshToken;
 
         /** Mocked UserService for simulating user-related operations. */
         @MockBean
@@ -114,6 +113,7 @@ public class AuthControllerDocTest {
                                 .mainRole(jsonNode.get("mainRole").asText("USER"))
                                 .permissions(new ArrayList<String>())
                                 .build();
+                                
                 when(userService.login(any())).thenReturn(userDto);
 
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
@@ -187,6 +187,13 @@ public class AuthControllerDocTest {
                 }
                 refreshResponseJson = Files.readString(path);
 
+                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
+                if (!Files.exists(pathToken)) {
+                        throw new IllegalStateException(
+                                        "Missing required token data. Make sure AuthControllerIntegrationTest ran first.");
+                }
+                refreshToken = Files.readString(pathToken);
+
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(refreshResponseJson);
 
@@ -212,7 +219,7 @@ public class AuthControllerDocTest {
 
                 mockMvc.perform(get("/auth/refresh")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + userDto.getRefreshToken()))
+                                .header("Authorization", "Bearer " + refreshToken))
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
         }
