@@ -1,12 +1,12 @@
 [source,json,options="nowrap"]
 ----
 {
-  "id" : 1,
-  "firstName" : "John",
-  "lastName" : "Doe",
-  "login" : "john@test.com",
-  "token" : "mocked-jwt-token",
-  "refreshToken" : "mocked-refresh-token",
+  "id" : 9,
+  "firstName" : "Test",
+  "lastName" : "Test",
+  "login" : "test.login@test.com",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVGVzdCIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTgyODE0NiwiaWF0IjoxNzU5ODI0NTQ2fQ.cJgF7moAXE3FEGTzprkcYY-xPx-B9IY3MLVO8kMXFb8",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZXhwIjoxNzYwNTQ0NTQ2LCJpYXQiOjE3NTk4MjQ1NDZ9.FJRBrHVfO6yciTKash0S50Csw7ceVRJ9nzEavb2U2Oc",
   "mainRole" : "USER",
   "permissions" : [ ]
 }

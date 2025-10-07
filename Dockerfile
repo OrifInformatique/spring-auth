@@ -16,10 +16,10 @@ COPY --from=base /root/.m2 /root/.m2
 COPY . .
 CMD ["mvn", "spring-boot:run", "-DskipTests"]
 
-# Testing stage
+# Testing stage 
 FROM base AS test
 COPY . .
-CMD ["mvn", "test"]
+CMD ["mvn", "verify"]
 
 # Build stage
 FROM base AS build

@@ -173,18 +173,12 @@
                         <configuration>
                             <backend>html</backend>
                             <doctype>book</doctype>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>convert-to-html</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>process-asciidoc</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>src/asciidoc</sourceDirectory>
+                            <attributes>
+                                <snippets>${project.build.directory}/generated-snippets</snippets>
+                            </attributes>
                             <sourceDocumentName>index.adoc</sourceDocumentName>
-                            <outputDirectory>/app/build/generated-snippets-html</outputDirectory>
+                            <sourceDirectory>${project.basedir}/src/asciidoc</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-snippets-html</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -196,68 +190,21 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.outputDirectory}/static/docs
-                            </outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>
-                                        ${project.build.directory}/generated-docs
-                                    </directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <groups>restdocs</groups>
-                    <useModulePath>false</useModulePath>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <profiles>
-        <!-- Run only unit tests with 'restdocs' group -->
         <profile>
-            <id>restdocs-tests</id>
+            <id>test-all</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <groups>restdocs</groups>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <!-- Run only integration tests with 'integration' group -->
-        <profile>
-            <id>integration-tests</id>
-            <build>
-                <plugins>
+                    <!-- Integration Tests -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>3.1.2</version>
                         <executions>
                             <execution>
+                                <id>integration-tests</id>
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
@@ -268,50 +215,30 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <!-- Run both: unit tests first, then integration tests -->
-        <profile>
-            <id>test-all</id>
-            <build>
-                <plugins>
-                    <!-- Surefire for restdocs group -->
+                    <!-- REST Docs Tests (Run after integration tests) -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
-                                <id>run-restdocs</id>
+                                <id>restdocs-tests</id>
+                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>test</goal>
                                 </goals>
                                 <configuration>
                                     <groups>restdocs</groups>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Failsafe for integration group -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>3.1.2</version>
-                        <executions>
-                            <execution>
-                                <id>run-integration</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                                <configuration>
-                                    <groups>integration</groups>
+                                    <useModulePath>false</useModulePath>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 </project>

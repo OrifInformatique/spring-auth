@@ -37,64 +37,110 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
+/**
+ * Documentation tests for AuthController.
+ * These tests generate API documentation snippets using Spring REST Docs.
+ */
 @Tag("restdocs")
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(controllers = AuthController.class, excludeAutoConfiguration = {
-        SecurityAutoConfiguration.class,
-        OAuth2ClientAutoConfiguration.class
+                SecurityAutoConfiguration.class,
+                OAuth2ClientAutoConfiguration.class
 })
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class AuthControllerDocTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        /** MockMvc instance for performing HTTP requests in tests. */
+        @Autowired
+        private MockMvc mockMvc;
 
-    private static String loginResponseJson;
+        /** Static variable to hold the login response JSON for use in tests. */
+        private static String loginResponseJson;
 
-    @MockBean
-    private UserService userService;
+        /** Static variable to hold the register response JSON for use in tests. */
+        private static String registerResponseJson;
 
-    @MockBean
-    private UserAuthenticationProvider userAuthenticationProvider;
+        /** Mocked UserService for simulating user-related operations. */
+        @MockBean
+        private UserService userService;
 
-    @BeforeAll
-    static void loadResponse() throws IOException {
-        Path path = Paths.get("target/test-data/auth-login-response.json");
-        if (!Files.exists(path)) {
-            throw new IllegalStateException(
-                    "Missing required login response data. Make sure AuthControllerIntegrationTest ran first.");
+        /** Mocked UserAuthenticationProvider for simulating authentication operations. */
+        @MockBean
+        private UserAuthenticationProvider userAuthenticationProvider;
+
+        /**
+         * Test the /auth/login endpoint with mocked services to generate documentation.
+         * This test stubs the UserService and UserAuthenticationProvider to return
+         * predefined data, performs a login request, and generates API documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc() throws Exception {
+                Path path = Paths.get("target/test-data/auth-login-response.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required login response data. Make sure AuthControllerIntegrationTest ran first.");
+                }
+                loginResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(loginResponseJson);
+
+                UserDto userDto = UserDto.builder()
+                                .id(jsonNode.get("id").asLong())
+                                .firstName(jsonNode.get("firstName").asText())
+                                .lastName(jsonNode.get("lastName").asText())
+                                .login(jsonNode.get("login").asText())
+                                .token(jsonNode.get("token").asText(null))
+                                .refreshToken(jsonNode.get("refreshToken").asText(null))
+                                .mainRole(jsonNode.get("mainRole").asText("USER"))
+                                .permissions(new ArrayList<String>())
+                                .build();
+                when(userService.login(any())).thenReturn(userDto);
+
+                when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
+                when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
+
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"super.admin@test.com\", \"password\":\"ReallySecure123@PassWordBecauseIWantToBeSuperSafe\"}"))
+                                .andExpect(status().isOk())
+                                .andDo(document("auth/login", preprocessResponse(prettyPrint())));
         }
-        loginResponseJson = Files.readString(path);
-    }
 
-    @Test
-    public void login_withMockedService_generatesDoc() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(loginResponseJson);
+        @Test
+        public void register_withMockedService_generatesDoc() throws Exception {
+                Path path = Paths.get("target/test-data/auth-register-response.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required register response data. Make sure AuthControllerIntegrationTest ran first.");
+                }
+                registerResponseJson = Files.readString(path);
 
-        UserDto userDto = UserDto.builder()
-                .id(jsonNode.get("id").asLong())
-                .firstName(jsonNode.get("firstName").asText())
-                .lastName(jsonNode.get("lastName").asText())
-                .login(jsonNode.get("login").asText())
-                .token(jsonNode.get("token").asText(null))
-                .refreshToken(jsonNode.get("refreshToken").asText(null))
-                .mainRole(jsonNode.get("mainRole").asText("USER"))
-                .permissions(new ArrayList<String>())
-                .build();
-        when(userService.login(any())).thenReturn(userDto);
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(registerResponseJson);
 
-        // You might stub the token provider to avoid NPE if it’s called:
-        // (optional if your controller does not call it in the test path)
-        when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
-        when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
+                UserDto userDto = UserDto.builder()
+                                .id(jsonNode.get("id").asLong())
+                                .firstName(jsonNode.get("firstName").asText())
+                                .lastName(jsonNode.get("lastName").asText())
+                                .login(jsonNode.get("login").asText())
+                                .token(jsonNode.get("token").asText(null))
+                                .refreshToken(jsonNode.get("refreshToken").asText(null))
+                                .mainRole(jsonNode.get("mainRole").asText("USER"))
+                                .permissions(new ArrayList<String>())
+                                .build();
+                when(userService.register(any())).thenReturn(userDto);
 
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        "{\"login\":\"super.admin@test.com\", \"password\":\"ReallySecure123@PassWordBecauseIWantToBeSuperSafe\"}"))
-                .andExpect(status().isOk())
-                .andDo(document("auth/login", preprocessResponse(prettyPrint())));
-    }
+                when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
+                when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
+
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"Test\",\"login\":\"test.login@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isCreated())
+                                .andDo(document("auth/register", preprocessResponse(prettyPrint())));
+        }
 }
