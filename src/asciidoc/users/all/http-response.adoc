@@ -14,10 +14,10 @@ Content-Length: 698
   "updatedAt" : null,
   "mainRole" : null,
   "authorities" : [ ],
+  "username" : "john@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "john@test.com",
   "enabled" : true
 }, {
   "id" : 2,
@@ -29,10 +29,10 @@ Content-Length: 698
   "updatedAt" : null,
   "mainRole" : null,
   "authorities" : [ ],
+  "username" : "jane@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "jane@test.com",
   "enabled" : true
 } ]
 ----

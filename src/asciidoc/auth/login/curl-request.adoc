@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/auth/login' -i -X POST \
     -H 'Content-Type: application/json' \
-    -d '{"login":"john.doe@test.com", "password":"Secure123@Pass"}'
+    -d '{"login":"test.user@test.com", "password":"Test1234!"}'
 ----

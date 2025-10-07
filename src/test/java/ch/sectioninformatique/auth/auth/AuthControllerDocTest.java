@@ -121,7 +121,7 @@ public class AuthControllerDocTest {
 
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"john.doe@test.com\", \"password\":\"Secure123@Pass\"}"))
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/login", preprocessResponse(prettyPrint())));
         }
@@ -164,7 +164,7 @@ public class AuthControllerDocTest {
 
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"Test\",\"login\":\"test.login@test.com\", \"password\":\"testPassword\"}"))
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isCreated())
                                 .andDo(document("auth/register", preprocessResponse(prettyPrint())));
         }

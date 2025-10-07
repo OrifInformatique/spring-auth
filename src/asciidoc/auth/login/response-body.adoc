@@ -1,12 +1,12 @@
 [source,json,options="nowrap"]
 ----
 {
-  "id" : 2,
-  "firstName" : "John",
-  "lastName" : "DOE",
-  "login" : "john.doe@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRPRSIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTg0NzU5MywiaWF0IjoxNzU5ODQzOTkzfQ.03HexsKJXsTSMhk9yfvC4uxrHOT8wxN5HckKJMOA1Pw",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImV4cCI6MTc2MDU2Mzk5MywiaWF0IjoxNzU5ODQzOTkzfQ._TGVmr2ngbYzYuK-BGZ7SQNO-w_QmO7s4gZceIucKs0",
+  "id" : 1,
+  "firstName" : "Test",
+  "lastName" : "User",
+  "login" : "test.user@test.com",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzU5ODUwMzg2LCJpYXQiOjE3NTk4NDY3ODZ9.rQCPpdXrWl4W6i1OcxnKF2AIM7DuMWt2jX0x34Z2Lmc",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA1NjY3ODYsImlhdCI6MTc1OTg0Njc4Nn0.oIBm6BJFDpGaZcdZIE3pGrOoQSYm_CNh_It-sEz5BBw",
   "mainRole" : "USER",
   "permissions" : [ ]
 }

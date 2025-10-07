@@ -2,8 +2,8 @@
 ----
 POST /auth/register HTTP/1.1
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 100
 Host: localhost:8080
 
-{"firstName":"Test","lastName":"Test","login":"test.login@test.com", "password":"testPassword"}
+{"firstName":"Test","lastName":"NewUser","login":"test.newuser@test.com", "password":"testPassword"}
 ----

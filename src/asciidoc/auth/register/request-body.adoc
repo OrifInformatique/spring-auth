@@ -1,4 +1,4 @@
 [source,json,options="nowrap"]
 ----
-{"firstName":"Test","lastName":"Test","login":"test.login@test.com", "password":"testPassword"}
+{"firstName":"Test","lastName":"NewUser","login":"test.newuser@test.com", "password":"testPassword"}
 ----

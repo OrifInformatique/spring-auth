@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/auth/register' -i -X POST \
     -H 'Content-Type: application/json' \
-    -d '{"firstName":"Test","lastName":"Test","login":"test.login@test.com", "password":"testPassword"}'
+    -d '{"firstName":"Test","lastName":"NewUser","login":"test.newuser@test.com", "password":"testPassword"}'
 ----

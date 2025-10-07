@@ -36,7 +36,7 @@ public class UserControllerIntegrationTest {
 
         @Test
         public void me_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("john.doe@test.com");
+                UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
@@ -44,9 +44,9 @@ public class UserControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.firstName").value("John"))
-                                .andExpect(jsonPath("$.lastName").value("DOE"))
-                                .andExpect(jsonPath("$.login").value("john.doe@test.com"))
+                                .andExpect(jsonPath("$.firstName").value("Test"))
+                                .andExpect(jsonPath("$.lastName").value("User"))
+                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andReturn();
 
@@ -64,7 +64,7 @@ public class UserControllerIntegrationTest {
 
         @Test
         public void all_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("john.doe@test.com");
+                UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
 

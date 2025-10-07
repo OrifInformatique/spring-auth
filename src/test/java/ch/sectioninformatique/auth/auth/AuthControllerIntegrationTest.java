@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
+import ch.sectioninformatique.auth.user.UserService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,6 +42,9 @@ public class AuthControllerIntegrationTest {
     @Autowired
     private UserAuthenticationProvider userAuthenticationProvider;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * Test the /auth/login endpoint with real data.
      * This test performs a login request and expects a successful response.
@@ -53,12 +57,11 @@ public class AuthControllerIntegrationTest {
         MvcResult result = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
-                        "{\"login\":\"john.doe@test.com\", \"password\":\"Secure123@Pass\"}"))
+                        "{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("2"))
-                .andExpect(jsonPath("$.firstName").value("John"))
-                .andExpect(jsonPath("$.lastName").value("DOE"))
-                .andExpect(jsonPath("$.login").value("john.doe@test.com"))
+                .andExpect(jsonPath("$.firstName").value("Test"))
+                .andExpect(jsonPath("$.lastName").value("User"))
+                .andExpect(jsonPath("$.login").value("test.user@test.com"))
                 .andExpect(jsonPath("$.mainRole").value("USER"))
                 .andReturn();
 
@@ -81,7 +84,7 @@ public class AuthControllerIntegrationTest {
         MvcResult result = mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
-                        "{\"firstName\":\"Test\",\"lastName\":\"Test\",\"login\":\"test.login@test.com\", \"password\":\"testPassword\"}"))
+                        "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -101,16 +104,7 @@ public class AuthControllerIntegrationTest {
      */
     @Test
     public void refresh_withRealData_shouldReturnSuccess() throws Exception {
-        UserDto userDto = UserDto.builder()
-                .id(8L)
-                .firstName("Super")
-                .lastName("Admin")
-                .login("super.admin@test.com")
-                .token(null)
-                .refreshToken(null)
-                .mainRole("ADMIN")
-                .permissions(new ArrayList<String>())
-                .build();
+        UserDto userDto = userService.findByLogin("test.user@test.com");
 
         String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
 

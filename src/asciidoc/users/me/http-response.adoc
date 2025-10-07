@@ -2,13 +2,13 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 182
+Content-Length: 184
 
 {
   "id" : 0,
-  "firstName" : "John",
-  "lastName" : "DOE",
-  "login" : "john.doe@test.com",
+  "firstName" : "Test",
+  "lastName" : "User",
+  "login" : "test.user@test.com",
   "token" : null,
   "refreshToken" : null,
   "mainRole" : "USER",

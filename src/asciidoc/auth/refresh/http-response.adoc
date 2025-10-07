@@ -2,16 +2,16 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 431
+Content-Length: 419
 
 {
-  "id" : 8,
-  "firstName" : "Super",
-  "lastName" : "Admin",
-  "login" : "super.admin@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4NDc1OTMsImlhdCI6MTc1OTg0Mzk5M30.xLFVJei3WGjaTTMRNOikNZRlGI-PmLQ9eOma1GXsGcc",
+  "id" : 1,
+  "firstName" : "Test",
+  "lastName" : "User",
+  "login" : "test.user@test.com",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzU5ODUwMzg1LCJpYXQiOjE3NTk4NDY3ODV9.pSSLFutG02KLt0hCJ3idzun2Z4yTIqlypCHTQYQAm2E",
   "refreshToken" : null,
-  "mainRole" : "ADMIN",
+  "mainRole" : "USER",
   "permissions" : [ ]
 }
 ----
