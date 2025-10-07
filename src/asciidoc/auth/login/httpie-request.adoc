@@ -1,5 +1,5 @@
 [source,bash]
 ----
-$ echo '{"login":"super.admin@test.com", "password":"ReallySecure123@PassWordBecauseIWantToBeSuperSafe"}' | http POST 'http://localhost:8080/auth/login' \
+$ echo '{"login":"john.doe@test.com", "password":"Secure123@Pass"}' | http POST 'http://localhost:8080/auth/login' \
     'Content-Type:application/json'
 ----

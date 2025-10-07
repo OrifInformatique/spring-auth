@@ -28,14 +28,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 
 /**
  * Documentation tests for AuthController.
@@ -61,13 +67,23 @@ public class AuthControllerDocTest {
         /** Static variable to hold the register response JSON for use in tests. */
         private static String registerResponseJson;
 
+        private static String refreshResponseJson;
+
         /** Mocked UserService for simulating user-related operations. */
         @MockBean
         private UserService userService;
 
-        /** Mocked UserAuthenticationProvider for simulating authentication operations. */
+        /**
+         * Mocked UserAuthenticationProvider for simulating authentication operations.
+         */
         @MockBean
         private UserAuthenticationProvider userAuthenticationProvider;
+
+        @MockBean
+        private Authentication authentication;
+
+        @MockBean
+        private SecurityContext securityContext;
 
         /**
          * Test the /auth/login endpoint with mocked services to generate documentation.
@@ -105,11 +121,20 @@ public class AuthControllerDocTest {
 
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"super.admin@test.com\", \"password\":\"ReallySecure123@PassWordBecauseIWantToBeSuperSafe\"}"))
+                                .content("{\"login\":\"john.doe@test.com\", \"password\":\"Secure123@Pass\"}"))
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/login", preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /auth/register endpoint with mocked services to generate
+         * documentation.
+         * This test stubs the UserService and UserAuthenticationProvider to return
+         * predefined data, performs a registration request, and generates API
+         * documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void register_withMockedService_generatesDoc() throws Exception {
                 Path path = Paths.get("target/test-data/auth-register-response.json");
@@ -142,5 +167,53 @@ public class AuthControllerDocTest {
                                 .content("{\"firstName\":\"Test\",\"lastName\":\"Test\",\"login\":\"test.login@test.com\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isCreated())
                                 .andDo(document("auth/register", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/refresh endpoint with mocked services to generate
+         * documentation.
+         * This test stubs the UserService and UserAuthenticationProvider to return
+         * predefined data, performs a token refresh request, and generates API
+         * documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void refresh_withMockedService_generatesDoc() throws Exception {
+                Path path = Paths.get("target/test-data/auth-refresh-response.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required refresh response data. Make sure AuthControllerIntegrationTest ran first.");
+                }
+                refreshResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(refreshResponseJson);
+
+                UserDto userDto = UserDto.builder()
+                                .id(jsonNode.get("id").asLong())
+                                .firstName(jsonNode.get("firstName").asText())
+                                .lastName(jsonNode.get("lastName").asText())
+                                .login(jsonNode.get("login").asText())
+                                .token(jsonNode.get("token").asText(null))
+                                .refreshToken(jsonNode.get("refreshToken").asText(null))
+                                .mainRole(jsonNode.get("mainRole").asText("USER"))
+                                .permissions(new ArrayList<String>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(userDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+
+                SecurityContextHolder.setContext(securityContext);
+
+                when(userService.refreshLogin(any())).thenReturn(userDto);
+                when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
+
+                mockMvc.perform(get("/auth/refresh")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + userDto.getRefreshToken()))
+                                .andExpect(status().isOk())
+                                .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
         }
 }

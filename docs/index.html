@@ -453,10 +453,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json
-Content-Length: 96
+Content-Length: 58
 Host: localhost:8080
 
-{"login":"super.admin@test.com", "password":"ReallySecure123@PassWordBecauseIWantToBeSuperSafe"}</code></pre>
+{"login":"john.doe@test.com", "password":"Secure123@Pass"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -464,16 +464,16 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 596
+Content-Length: 576
 
 {
-  "id" : 8,
-  "firstName" : "Super",
-  "lastName" : "Admin",
-  "login" : "super.admin@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4Mjc5NjQsImlhdCI6MTc1OTgyNDM2NH0.qeP42yKDCzy6iUw3DiDzDn20-DJDoge2cF4OApOzg1Q",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImV4cCI6MTc2MDU0NDM2NCwiaWF0IjoxNzU5ODI0MzY0fQ.oT8T2DND_V2MC6VGSMngZikYWk6PZAwoTxEBE-f6hjY",
-  "mainRole" : "ADMIN",
+  "id" : 2,
+  "firstName" : "John",
+  "lastName" : "DOE",
+  "login" : "john.doe@test.com",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRPRSIsIm1haW5Sb2xlIjoiVVNFUiIsImV4cCI6MTc1OTgzNzk0NywiaWF0IjoxNzU5ODM0MzQ3fQ.7uM2D2oG5Y2Dg5X-3QOkYlWuIrIj58zBzJmkO_gdEU0",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUB0ZXN0LmNvbSIsImV4cCI6MTc2MDU1NDM0NywiaWF0IjoxNzU5ODM0MzQ3fQ.EiZxyfcd2W6Cj1OMPjShZ5yf2QV8i5kJhHMqN4R0Rj0",
+  "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
 </div>
@@ -504,7 +504,7 @@ Host: localhost:8080
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /users/9
 Content-Type: application/json
-Content-Length: 185
+Content-Length: 348
 
 {
   "id" : 9,
@@ -512,7 +512,7 @@ Content-Length: 185
   "lastName" : "Test",
   "login" : "test.login@test.com",
   "token" : null,
-  "refreshToken" : null,
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmxvZ2luQHRlc3QuY29tIiwiZXhwIjoxNzYwNTU0MzQ3LCJpYXQiOjE3NTk4MzQzNDd9.N2ALtraEk7vMEFQZ4wL12T4l7LFc5rO_72fLWzvShXQ",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -531,7 +531,8 @@ Content-Length: 185
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
-Accept: application/json
+Content-Type: application/json
+Authorization: Bearer null
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -540,16 +541,16 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 214
+Content-Length: 431
 
 {
-  "id" : 1,
-  "firstName" : "John",
-  "lastName" : "Doe",
-  "login" : "john@test.com",
-  "token" : "mocked-new-jwt-token",
-  "refreshToken" : "mocked-refresh-token",
-  "mainRole" : "USER",
+  "id" : 8,
+  "firstName" : "Super",
+  "lastName" : "Admin",
+  "login" : "super.admin@test.com",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlci5hZG1pbkB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6IlN1cGVyIiwibGFzdE5hbWUiOiJBZG1pbiIsIm1haW5Sb2xlIjoiQURNSU4iLCJleHAiOjE3NTk4Mzc5NDcsImlhdCI6MTc1OTgzNDM0N30.lR1wfTaGVHp8-kkUvr9CzSIqe8iaRxjdx9-046euXy4",
+  "refreshToken" : null,
+  "mainRole" : "ADMIN",
   "permissions" : [ ]
 }</code></pre>
 </div>
@@ -630,8 +631,8 @@ Content-Length: 698
   "mainRole" : null,
   "authorities" : [ ],
   "credentialsNonExpired" : true,
-  "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "accountNonExpired" : true,
   "username" : "john@test.com",
   "enabled" : true
 }, {
@@ -645,8 +646,8 @@ Content-Length: 698
   "mainRole" : null,
   "authorities" : [ ],
   "credentialsNonExpired" : true,
-  "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "accountNonExpired" : true,
   "username" : "jane@test.com",
   "enabled" : true
 } ]</code></pre>
@@ -828,7 +829,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-07 07:39:28 UTC
+Last updated 2025-10-07 08:38:45 UTC
 </div>
 </div>
 </body>

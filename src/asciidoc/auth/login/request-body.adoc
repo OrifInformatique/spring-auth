@@ -1,4 +1,4 @@
 [source,json,options="nowrap"]
 ----
-{"login":"super.admin@test.com", "password":"ReallySecure123@PassWordBecauseIWantToBeSuperSafe"}
+{"login":"john.doe@test.com", "password":"Secure123@Pass"}
 ----

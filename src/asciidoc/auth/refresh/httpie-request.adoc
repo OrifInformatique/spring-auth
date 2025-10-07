@@ -1,5 +1,6 @@
 [source,bash]
 ----
 $ http GET 'http://localhost:8080/auth/refresh' \
-    'Accept:application/json'
+    'Content-Type:application/json' \
+    'Authorization:Bearer null'
 ----

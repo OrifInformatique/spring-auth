@@ -1,7 +1,8 @@
 [source,http,options="nowrap"]
 ----
 GET /auth/refresh HTTP/1.1
-Accept: application/json
+Content-Type: application/json
+Authorization: Bearer null
 Host: localhost:8080
 
 ----
