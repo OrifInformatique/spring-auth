@@ -309,6 +309,13 @@ public class UserControllerIntegrationTest {
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
+
+                // Assert: fetch admin again and verify role changed to USER
+                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
+                assertNotNull(updatedAdmin.getMainRole(), "Admin role should not be null after promotion");
+                assertEquals("USER", updatedAdmin.getMainRole(),
+                                "Admin role should be USER after promotion");
+
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-revokeAdminRole-response.txt");
                 Files.createDirectories(path.getParent());
