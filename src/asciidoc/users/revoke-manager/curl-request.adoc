@@ -1,5 +1,6 @@
 [source,bash]
 ----
-$ curl 'http://localhost:8080/users/2/revoke-manager' -i -X PUT \
-    -H 'Accept: application/json'
+$ curl 'http://localhost:8080/users/100/revoke-manager' -i -X PUT \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg0MzMwLCJpYXQiOjE3NjAwODA3MzB9.kKr6ZEPuo_gmZq7YOdb-COkz2I91OLXQgsW1IeFArnE'
 ----
