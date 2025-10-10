@@ -43,6 +43,11 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 /**
  * Documentation tests for AuthController.
  * These tests generate API documentation snippets using Spring REST Docs.
+ * 
+ * NOTE: These tests depend on test output files (JSON response files) generated
+ * by a separate integration test (AuthControllerIntegrationTest). If those
+ * files
+ * are missing, the tests will fail early with a clear message.
  */
 @Tag("restdocs")
 @ExtendWith(RestDocumentationExtension.class)
@@ -64,8 +69,10 @@ public class AuthControllerDocTest {
         /** Static variable to hold the register response JSON for use in tests. */
         private static String registerResponseJson;
 
+        /** Static variable to hold the refresh response JSON for use in tests. */
         private static String refreshResponseJson;
 
+        /** Static variable to hold the refresh token for use in tests. */
         private static String refreshToken;
 
         /** Mocked UserService for simulating user-related operations. */
@@ -78,9 +85,11 @@ public class AuthControllerDocTest {
         @MockBean
         private UserAuthenticationProvider userAuthenticationProvider;
 
+        /** Mocked Authentication for simulating security context. */
         @MockBean
         private Authentication authentication;
 
+        /** Mocked SecurityContext for simulating security context. */
         @MockBean
         private SecurityContext securityContext;
 
@@ -93,16 +102,24 @@ public class AuthControllerDocTest {
          */
         @Test
         public void login_withMockedService_generatesDoc() throws Exception {
+                // Load login response from integration test output to ensure consistency
+                // between doc and actual behavior
                 Path path = Paths.get("target/test-data/auth-login-response.json");
+
+                // Early fail if the required file is missing
                 if (!Files.exists(path)) {
                         throw new IllegalStateException(
                                         "Missing required login response data. Make sure AuthControllerIntegrationTest ran first.");
                 }
+
+                // Read the JSON response from file
                 loginResponseJson = Files.readString(path);
 
+                // Parse JSON to extract fields for mocking
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(loginResponseJson);
 
+                // Build a UserDto from the parsed JSON to simulate a real login response
                 UserDto userDto = UserDto.builder()
                                 .id(jsonNode.get("id").asLong())
                                 .firstName(jsonNode.get("firstName").asText())
@@ -113,12 +130,15 @@ public class AuthControllerDocTest {
                                 .mainRole(jsonNode.get("mainRole").asText("USER"))
                                 .permissions(new ArrayList<String>())
                                 .build();
-                                
-                when(userService.login(any())).thenReturn(userDto);
 
+                // Mock userService.login(...) and token creation methods to return expected
+                // data
+                when(userService.login(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
                 when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
 
+                // Perform the /auth/login request with expected input and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
@@ -137,16 +157,23 @@ public class AuthControllerDocTest {
          */
         @Test
         public void register_withMockedService_generatesDoc() throws Exception {
+                /* Load register response from integration test output to ensure consistency between doc and actual behavior */
                 Path path = Paths.get("target/test-data/auth-register-response.json");
+
+                // Early fail if the required file is missing
                 if (!Files.exists(path)) {
                         throw new IllegalStateException(
                                         "Missing required register response data. Make sure AuthControllerIntegrationTest ran first.");
                 }
+
+                // Read the JSON response from file
                 registerResponseJson = Files.readString(path);
 
+                // Parse JSON to extract fields for mocking
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(registerResponseJson);
 
+                // Build a UserDto from the parsed JSON to simulate a real register response
                 UserDto userDto = UserDto.builder()
                                 .id(jsonNode.get("id").asLong())
                                 .firstName(jsonNode.get("firstName").asText())
@@ -157,11 +184,14 @@ public class AuthControllerDocTest {
                                 .mainRole(jsonNode.get("mainRole").asText("USER"))
                                 .permissions(new ArrayList<String>())
                                 .build();
-                when(userService.register(any())).thenReturn(userDto);
 
+                // Mock userService.register(...) and token creation methods to return expected data
+                when(userService.register(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
                 when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
 
+                // Perform the /auth/register request with expected input and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
@@ -180,23 +210,29 @@ public class AuthControllerDocTest {
          */
         @Test
         public void refresh_withMockedService_generatesDoc() throws Exception {
+                // Load refresh response and token from integration test output to ensure consistency between doc and actual behavior
                 Path path = Paths.get("target/test-data/auth-refresh-response.json");
+                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
+
+                // Early fails if the required files are missing
                 if (!Files.exists(path)) {
                         throw new IllegalStateException(
                                         "Missing required refresh response data. Make sure AuthControllerIntegrationTest ran first.");
                 }
-                refreshResponseJson = Files.readString(path);
-
-                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
                 if (!Files.exists(pathToken)) {
                         throw new IllegalStateException(
                                         "Missing required token data. Make sure AuthControllerIntegrationTest ran first.");
                 }
+
+                // Read the JSON response and token from files
+                refreshResponseJson = Files.readString(path);
                 refreshToken = Files.readString(pathToken);
 
+                // Parse JSON to extract fields for mocking
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(refreshResponseJson);
 
+                // Build a UserDto from the parsed JSON to simulate a real refresh response
                 UserDto userDto = UserDto.builder()
                                 .id(jsonNode.get("id").asLong())
                                 .firstName(jsonNode.get("firstName").asText())
@@ -208,15 +244,18 @@ public class AuthControllerDocTest {
                                 .permissions(new ArrayList<String>())
                                 .build();
 
+                // Mock Spring Security context and authentication to simulate a valid authenticated user
                 when(authentication.getPrincipal()).thenReturn(userDto);
                 when(authentication.isAuthenticated()).thenReturn(true);
                 when(securityContext.getAuthentication()).thenReturn(authentication);
-
                 SecurityContextHolder.setContext(securityContext);
 
+                // Mock userService.refreshLogin(...) and token creation method to return expected data
                 when(userService.refreshLogin(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
 
+                // Perform the /auth/refresh request with expected input and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(get("/auth/refresh")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + refreshToken))
