@@ -357,6 +357,13 @@ public class UserControllerIntegrationTest {
                 String responseBody = result.getResponse().getContentAsString();
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-downgradeAdminRole-response.txt");
+
+                // Assert: fetch admin again and verify role changed to MANAGER
+                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
+                assertNotNull(updatedAdmin.getMainRole(), "Admin role should not be null after promotion");
+                assertEquals("MANAGER", updatedAdmin.getMainRole(),
+                                "Admin role should be MANAGER after promotion");
+
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, responseBody);
 

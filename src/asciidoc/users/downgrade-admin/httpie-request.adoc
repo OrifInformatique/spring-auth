@@ -2,5 +2,5 @@
 ----
 $ http PUT 'http://localhost:8080/users/100/downgrade-admin' \
     'Content-Type:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDkxMDk4LCJpYXQiOjE3NjAwODc0OTh9.whcow-IleO9Fj2oLxgBu7_lKkEKGu5_1Udf7Pd4AwL4'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDkxMjQ5LCJpYXQiOjE3NjAwODc2NDl9.btWqmDSWRloKNv27jIAgbtU2vTpG9ouMpFWeDJfqwtY'
 ----
