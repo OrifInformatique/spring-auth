@@ -218,6 +218,13 @@ public class UserControllerIntegrationTest {
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
+
+                // Assert: fetch manager again and verify role changed to USER
+                UserDto updatedManager = userService.findByLogin("test.manager@test.com");
+                assertNotNull(updatedManager.getMainRole(), "Manager role should not be null after promotion");
+                assertEquals("USER", updatedManager.getMainRole(),
+                                "Manager role should be USER after promotion");
+
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-revokeManagerRole-response.txt");
                 Files.createDirectories(path.getParent());
@@ -256,6 +263,13 @@ public class UserControllerIntegrationTest {
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
+
+                // Assert: fetch manager again and verify role changed to ADMIN
+                UserDto updatedManager = userService.findByLogin("test.manager@test.com");
+                assertNotNull(updatedManager.getMainRole(), "Manager role should not be null after promotion");
+                assertEquals("ADMIN", updatedManager.getMainRole(),
+                                "Manager role should be ADMIN after promotion");
+
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-promoteToAdmin-response.txt");
                 Files.createDirectories(path.getParent());

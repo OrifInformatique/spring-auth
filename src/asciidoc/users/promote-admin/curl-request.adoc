@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/users/100/promote-admin' -i -X PUT \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDkwNTY0LCJpYXQiOjE3NjAwODY5NjR9.ZfiKt4HyKiVpn3IUJqQThntq2cYw5FfklOC2PYhxYAA'
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDkwOTA5LCJpYXQiOjE3NjAwODczMDl9.wS_hpirxtWkbdIlvgkpf0dzxV81_kalSo9YLcZ0clRs'
 ----
