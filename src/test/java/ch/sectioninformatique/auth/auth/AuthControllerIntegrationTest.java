@@ -67,7 +67,8 @@ public class AuthControllerIntegrationTest {
                                 .andExpect(jsonPath("$.login").value("test.user@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and not empty
+                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
+                                                                                    // not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
@@ -97,12 +98,13 @@ public class AuthControllerIntegrationTest {
                                 .andExpect(jsonPath("$.login").value("test.newuser@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and not empty
+                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
+                                                                                    // not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
 
-                // Assert: fetch user again and verify user created 
+                // Assert: fetch user again and verify user created
                 UserDto updatedUser = userService.findByLogin("test.newuser@test.com");
                 assertNotNull(updatedUser, "User should not be null after registration");
                 assertEquals("Test", updatedUser.getFirstName(), "User first name should match");
@@ -133,6 +135,12 @@ public class AuthControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + refreshToken))
                                 .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").isNotEmpty())
+                                .andExpect(jsonPath("$.firstName").value("Test"))
+                                .andExpect(jsonPath("$.lastName").value("User"))
+                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
+                                .andExpect(jsonPath("$.mainRole").value("USER"))
+                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
