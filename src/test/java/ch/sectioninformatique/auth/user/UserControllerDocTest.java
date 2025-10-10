@@ -408,36 +408,68 @@ class UserControllerDocTest {
         }
 
         /**
-         * Test for revoking a user's admin role.
-         * This test verifies that the user is successfully revoked
-         * and generates API documentation using Spring REST Docs.
-         * 
-         * @throws Exception
+         * Test the /users/{userId}/revoke-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.revokeAdminRole call,
+         * mocks authenticated admin user, performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
          */
         @Test
-        void revokeAdminRole_Successful_Doc() throws Exception {
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+        void revokeAdminRole_withMockedService_generatesDoc() throws Exception {
+                // Paths to saved response and token files
+                Path responsePath = Paths.get("target/test-data/users-revokeAdminRole-response.txt");
+                if (!Files.exists(responsePath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-revokeAdminRole-response.txt. Run revokeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String revokeResponse = Files.readString(responsePath);
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Path tokenPath = Paths.get("target/test-data/users-revokeAdminRole-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-revokeAdminRole-token.txt. Run revokeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                UserDto mockedAdminDto = UserDto.builder()
+                                .id(1L)
+                                .login("test.admin2@test.com")
+                                .firstName("Test2")
+                                .lastName("Admin2")
+                                .mainRole("USER")
+                                .permissions(new ArrayList<>())
+                                .build();
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                when(userService.revokeAdminRole(anyLong())).thenReturn(mockedAdminDto);
 
+                // Mock authenticated admin user with authority user:update
+                UserDto adminDto = UserDto.builder()
+                                .id(200L)
+                                .login("test.admin@test.com")
+                                .firstName("Admin")
+                                .lastName("Test")
+                                .mainRole("ADMIN")
+                                .permissions(new ArrayList<>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(adminDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Arrange
-                Long userId = 2L;
-                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "USER", null);
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
 
-                when(userService.revokeAdminRole(userId)).thenReturn(expectedDto);
-
-                this.mockMvc.perform(put("/users/{userId}/revoke-admin", userId)
-                                .accept(MediaType.APPLICATION_JSON))
+                // Perform the PUT request to revoke the admin role into an user
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-admin")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role revoked successfully"))
+                                .andExpect(content().string(revokeResponse))
                                 .andDo(document("users/revoke-admin", preprocessResponse(prettyPrint())));
         }
 

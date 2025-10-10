@@ -471,8 +471,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3MDQxLCJpYXQiOjE3NjAwODM0NDF9.mcyBeRqvWCcF0nziuJZd_HrJalJnOylBk4GcPupdw6U",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDM0NDEsImlhdCI6MTc2MDA4MzQ0MX0.X0h6H4nTxy1RYsSR8oNWeOwEiMhRotnme1tq41FU9ZI",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3OTM5LCJpYXQiOjE3NjAwODQzMzl9.lh21CJrFan-ryRYPXH1fBDvGKKRjnJVHy55LIp4D9Ss",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDQzMzksImlhdCI6MTc2MDA4NDMzOX0.ZNGQdfJtKXwG_BeQLtZrZlhoj4mKhzwOxTkm1a7Ad1E",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -502,17 +502,17 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Location: /users/4
+Location: /users/5
 Content-Type: application/json
 Content-Length: 599
 
 {
-  "id" : 4,
+  "id" : 5,
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3MDQyLCJpYXQiOjE3NjAwODM0NDJ9.TWzfBZ5chjnXhh9dxqUlDoyt2SzYRBCmXnbyeVsrEI0",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDM0NDIsImlhdCI6MTc2MDA4MzQ0Mn0.CmAfjFEWZzoaIOe-Nkc710QWtRb_6Vlr86-J-uW6YxI",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3OTM5LCJpYXQiOjE3NjAwODQzMzl9.6wHjsgsnXAJgDO9v2bvaVWzQ3pWa8ofyTznsl_1Hq3I",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDQzMzksImlhdCI6MTc2MDA4NDMzOX0.Dk1wHi2HWEm-J1Fu89VQ9VFPpDJvhCoeHcn9SbP7Rlo",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -532,7 +532,7 @@ Content-Length: 599
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDM0NDEsImlhdCI6MTc2MDA4MzQ0MX0.X0h6H4nTxy1RYsSR8oNWeOwEiMhRotnme1tq41FU9ZI
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDQzMzksImlhdCI6MTc2MDA4NDMzOX0.ZNGQdfJtKXwG_BeQLtZrZlhoj4mKhzwOxTkm1a7Ad1E
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -548,7 +548,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3MDQxLCJpYXQiOjE3NjAwODM0NDF9.mcyBeRqvWCcF0nziuJZd_HrJalJnOylBk4GcPupdw6U",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3OTM5LCJpYXQiOjE3NjAwODQzMzl9.lh21CJrFan-ryRYPXH1fBDvGKKRjnJVHy55LIp4D9Ss",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -574,7 +574,7 @@ Content-Length: 419
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3MDUwLCJpYXQiOjE3NjAwODM0NTB9.5EZSJojWzq1L-2HnjJxGUjG3dFFlv9UNqGsENk0mKkE
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3OTQ3LCJpYXQiOjE3NjAwODQzNDd9.E0VvUtjKpsACq3ZhOz0gK8Msy6u5pQlUyDqLns36EzE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -611,7 +611,7 @@ Content-Length: 184
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3MDUwLCJpYXQiOjE3NjAwODM0NTB9.5EZSJojWzq1L-2HnjJxGUjG3dFFlv9UNqGsENk0mKkE
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3OTQ3LCJpYXQiOjE3NjAwODQzNDd9.E0VvUtjKpsACq3ZhOz0gK8Msy6u5pQlUyDqLns36EzE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -620,70 +620,91 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 1952
+Content-Length: 2607
 
 [ {
   "id" : 1,
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$LFlmrJxIvywXi.oTQKRYLOlP64rrv9UkSv/Oupf6Vgn4pYbvU4ree",
-  "createdAt" : "2025-10-10T08:04:08.555+00:00",
-  "updatedAt" : "2025-10-10T08:04:08.555+00:00",
+  "password" : "$2a$10$U08.eX4UEbOJ/Ho.PJxERur42bVA0aEhaH2nlFikfKgTgNhgxsiyC",
+  "createdAt" : "2025-10-10T08:19:06.095+00:00",
+  "updatedAt" : "2025-10-10T08:19:06.095+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-10-10T08:04:08.341+00:00",
-    "updatedAt" : "2025-10-10T08:04:08.341+00:00"
+    "createdAt" : "2025-10-10T08:19:05.821+00:00",
+    "updatedAt" : "2025-10-10T08:19:05.821+00:00"
   },
   "authorities" : [ ],
-  "username" : "test.user@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "test.user@test.com",
   "enabled" : true
 }, {
   "id" : 2,
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$Xkm/Yf7ApOR0fbE5RcdKKeZLEBviH6vRTyZYdWdA1KF.1Zx4jOame",
-  "createdAt" : "2025-10-10T08:04:08.556+00:00",
-  "updatedAt" : "2025-10-10T08:04:08.556+00:00",
+  "password" : "$2a$10$Lz8CaeWKyI4ENeRhEBihAOtK/eqI9L6eB1mVdNRmYnL8H/mskvk8C",
+  "createdAt" : "2025-10-10T08:19:06.096+00:00",
+  "updatedAt" : "2025-10-10T08:19:06.096+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-10-10T08:04:08.353+00:00",
-    "updatedAt" : "2025-10-10T08:04:08.353+00:00"
+    "createdAt" : "2025-10-10T08:19:05.828+00:00",
+    "updatedAt" : "2025-10-10T08:19:05.828+00:00"
   },
   "authorities" : [ ],
-  "username" : "test.manager@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "test.manager@test.com",
   "enabled" : true
 }, {
   "id" : 3,
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$sr5caWl/FG6SmJsgh8ZVzeA2Lq/rIl0kdI16b4.GeeH7rAwPp6Mja",
-  "createdAt" : "2025-10-10T08:04:08.557+00:00",
-  "updatedAt" : "2025-10-10T08:04:08.557+00:00",
+  "password" : "$2a$10$5ApxBeWTAGSPQVHuXtzED.zwYHYRM26md1KELa6v5FBMx2wojBdai",
+  "createdAt" : "2025-10-10T08:19:06.097+00:00",
+  "updatedAt" : "2025-10-10T08:19:06.097+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-10T08:04:08.357+00:00",
-    "updatedAt" : "2025-10-10T08:04:08.357+00:00"
+    "createdAt" : "2025-10-10T08:19:05.832+00:00",
+    "updatedAt" : "2025-10-10T08:19:05.832+00:00"
   },
   "authorities" : [ ],
-  "username" : "test.admin@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
+  "username" : "test.admin@test.com",
+  "enabled" : true
+}, {
+  "id" : 4,
+  "firstName" : "Test2",
+  "lastName" : "Admin2",
+  "login" : "test.admin2@test.com",
+  "password" : "$2a$10$LJ6jwQ.XYGW952eUp.RCl.O/unA2FLKlVeAnT5SYoCvKyz07mCHx.",
+  "createdAt" : "2025-10-10T08:19:06.097+00:00",
+  "updatedAt" : "2025-10-10T08:19:06.097+00:00",
+  "mainRole" : {
+    "id" : 3,
+    "name" : "ADMIN",
+    "description" : "Administrator role",
+    "createdAt" : "2025-10-10T08:19:05.832+00:00",
+    "updatedAt" : "2025-10-10T08:19:05.832+00:00"
+  },
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "username" : "test.admin2@test.com",
   "enabled" : true
 } ]</code></pre>
 </div>
@@ -702,7 +723,7 @@ Content-Length: 1952
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg3MDUwLCJpYXQiOjE3NjAwODM0NTB9.cYZJbQo9qiIXZ8XvA4_x4fBkedv5jBHXdq2vZASmzrM
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg3OTQ3LCJpYXQiOjE3NjAwODQzNDd9.ObLcoTITKG-xtmukFhuSDXOsEIikTzcNe5Qkb8HYL4c
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -730,7 +751,7 @@ User promoted to manager successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg3MDUwLCJpYXQiOjE3NjAwODM0NTB9.cYZJbQo9qiIXZ8XvA4_x4fBkedv5jBHXdq2vZASmzrM
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg3OTQ3LCJpYXQiOjE3NjAwODQzNDd9.ObLcoTITKG-xtmukFhuSDXOsEIikTzcNe5Qkb8HYL4c
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -756,17 +777,17 @@ Manager role revoked successfully</code></pre>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
-Accept: application/json
-Host: localhost:8080
-Content-Type: application/x-www-form-urlencoded</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg3OTQ3LCJpYXQiOjE3NjAwODQzNDd9.ObLcoTITKG-xtmukFhuSDXOsEIikTzcNe5Qkb8HYL4c
+Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
+Content-Type: text/plain;charset=UTF-8
 Content-Length: 32
 
 Admin role assigned successfully</code></pre>
@@ -784,17 +805,17 @@ Admin role assigned successfully</code></pre>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-admin HTTP/1.1
-Accept: application/json
-Host: localhost:8080
-Content-Type: application/x-www-form-urlencoded</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg3OTQ3LCJpYXQiOjE3NjAwODQzNDd9.ObLcoTITKG-xtmukFhuSDXOsEIikTzcNe5Qkb8HYL4c
+Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
+Content-Type: text/plain;charset=UTF-8
 Content-Length: 31
 
 Admin role revoked successfully</code></pre>

@@ -1,17 +1,17 @@
 [source,http,options="nowrap"]
 ----
 HTTP/1.1 201 Created
-Location: /users/4
+Location: /users/5
 Content-Type: application/json
 Content-Length: 599
 
 {
-  "id" : 4,
+  "id" : 5,
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg3MjkzLCJpYXQiOjE3NjAwODM2OTN9.rgyLHIplIE31o2QloGcIN4co1Rpoj2c62n4AMHLriIM",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDM2OTMsImlhdCI6MTc2MDA4MzY5M30.1mA3t_mmEba41WUCCyG632pEmMofr5NHmg0veXI6Jh0",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg4MTU4LCJpYXQiOjE3NjAwODQ1NTh9.J6leeo2GN7mJc13lnyvk1Sy3JFHkInU9CeTqD5cNTng",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDQ1NTgsImlhdCI6MTc2MDA4NDU1OH0.itmLaU-FVhKtrzltu6KOEV7DUU8-XQZjdD36O6gZrtA",
   "mainRole" : "USER",
   "permissions" : [ ]
 }

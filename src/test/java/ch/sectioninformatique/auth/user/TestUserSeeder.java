@@ -122,7 +122,15 @@ public class TestUserSeeder implements CommandLineRunner {
 					.mainRole(adminRole)
 					.build();
 
-			userRepository.saveAll(Arrays.asList(testUser, testManager, testAdmin));
+			User testAdmin2 = User.builder()
+					.firstName("Test2")
+					.lastName("Admin2")
+					.login("test.admin2@test.com")
+					.password(passwordEncoder.encode("AdminTest123!2"))
+					.mainRole(adminRole)
+					.build();
+
+			userRepository.saveAll(Arrays.asList(testUser, testManager, testAdmin, testAdmin2));
 		} else {
 			System.out.println("Users table not empty - Skipping user seeding");
 		}
