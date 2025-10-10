@@ -16,8 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -29,10 +31,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,9 +48,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 /**
  * Test class for {@link UserController}.
@@ -103,7 +103,7 @@ class UserControllerDocTest {
 
         /**
          * Test for retrieving the authenticated user's information.
-         * This test verifies that the correct user information is returned
+         * This test verifies that the authenticated user's details are returned
          * and generates API documentation using Spring REST Docs.
          * 
          * @throws Exception
@@ -152,90 +152,126 @@ class UserControllerDocTest {
                                 .andDo(document("users/me", preprocessResponse(prettyPrint())));
         }
 
-        /*
-         * @Test
-         * void authenticatedUser_Unauthenticated_ReturnsUnauthorized() throws Exception
-         * {
-         * this.mockMvc.perform(get("/users/me")
-         * .accept(MediaType.APPLICATION_JSON))
-         * .andExpect(status().isUnauthorized())
-         * .andDo(document("users/me/401", preprocessResponse(prettyPrint())));
-         * }
-         */
-
         /**
          * Test for retrieving all users.
-         * This test verifies that a list of users is returned
+         * This test verifies that the list of all users is returned
          * and generates API documentation using Spring REST Docs.
          * 
          * @throws Exception
          */
         @Test
-        void allUsers_ReturnsListOfUsers_Doc() throws Exception {
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+        void all_withMockedService_generatesDoc() throws Exception {
+                // Read saved user list response JSON
+                Path responsePath = Paths.get("target/test-data/users-all-response.json");
+                if (!Files.exists(responsePath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-all-response.json. Run all_withRealData_shouldReturnSuccess first.");
+                }
+                String allUsersJson = Files.readString(responsePath);
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                // Read saved token
+                Path tokenPath = Paths.get("target/test-data/users-all-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-all-token.txt. Run all_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                // Parse user list from JSON
+                ObjectMapper objectMapper = new ObjectMapper()
+                                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                List<User> users = objectMapper.readValue(allUsersJson, new TypeReference<>() {
+                });
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                // Mock the userService to return the loaded users
+                when(userService.allUsers()).thenReturn(users);
 
+                // Mock authenticated principal
+                UserDto userDto = UserDto.builder()
+                                .id(100L)
+                                .login("test.user@test.com")
+                                .firstName("Test")
+                                .lastName("User")
+                                .mainRole("USER")
+                                .permissions(new ArrayList<String>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(userDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
-                // Arrange
-                List<User> users = Arrays.asList(
-                                new User(1L, "John", "Doe", "john@test.com", "pass", null, null, null),
-                                new User(2L, "Jane", "Smith", "jane@test.com", "pass", null, null, null));
-                Mockito.when(userService.allUsers()).thenReturn(users);
 
-                // Act & Assert
+                // Perform request and generate REST Docs
                 this.mockMvc.perform(get("/users/all")
-                                .accept(MediaType.APPLICATION_JSON))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.length()").value(2))
-                                .andExpect(jsonPath("$[0].id").value(1))
-                                .andExpect(jsonPath("$[0].firstName").value("John"))
-                                .andExpect(jsonPath("$[0].lastName").value("Doe"))
-                                .andExpect(jsonPath("$[0].login").value("john@test.com"))
-                                .andExpect(jsonPath("$[1].id").value(2))
-                                .andExpect(jsonPath("$[1].firstName").value("Jane"))
-                                .andExpect(jsonPath("$[1].lastName").value("Smith"))
-                                .andExpect(jsonPath("$[1].login").value("jane@test.com"))
                                 .andDo(document("users/all", preprocessResponse(prettyPrint())));
         }
 
         /**
-         * Test for promoting a user to manager role.
-         * This test verifies that the user is successfully promoted
-         * and generates API documentation using Spring REST Docs.
-         * 
-         * @throws Exception
+         * Test the /users/{userId}/promote-manager endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToManager call,
+         * mocks authenticated admin user, performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
          */
         @Test
-        void promoteToManager_Successful_Doc() throws Exception {
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+        void promoteToManager_withMockedService_generatesDoc() throws Exception {
+                // Paths to saved response and token files
+                Path responsePath = Paths.get("target/test-data/users-promoteToManager-response.txt");
+                if (!Files.exists(responsePath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-promoteToManager-response.txt. Run promoteToManager_withRealData_shouldReturnSuccess first.");
+                }
+                String promoteResponse = Files.readString(responsePath);
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Path tokenPath = Paths.get("target/test-data/users-promoteToManager-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-promoteToManager-token.txt. Run promoteToManager_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                UserDto mockedUserDto = UserDto.builder()
+                                .id(1L)
+                                .login("test.user@test.com")
+                                .firstName("Test")
+                                .lastName("User")
+                                .mainRole("MANAGER")
+                                .permissions(new ArrayList<>())
+                                .build();
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                when(userService.promoteToManager(anyLong())).thenReturn(mockedUserDto);
 
+                // Mock authenticated admin user with authority user:update
+                UserDto adminDto = UserDto.builder()
+                                .id(200L)
+                                .login("test.admin@test.com")
+                                .firstName("Admin")
+                                .lastName("User")
+                                .mainRole("ADMIN")
+                                .permissions(new ArrayList<>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(adminDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Arrange
-                Long userId = 2L;
-                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
-                when(userService.promoteToManager(userId)).thenReturn(expectedDto);
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
 
-                // Act & Assert
-                this.mockMvc.perform(put("/users/{userId}/promote-manager", userId)
-                                .accept(MediaType.APPLICATION_JSON))
+                // Perform the PUT request to promote the user to manager
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-manager")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string("User promoted to manager successfully"))
+                                .andExpect(content().string(promoteResponse))
                                 .andDo(document("users/promote-manager", preprocessResponse(prettyPrint())));
         }
 

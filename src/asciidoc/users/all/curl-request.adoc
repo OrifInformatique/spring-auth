@@ -1,5 +1,6 @@
 [source,bash]
 ----
 $ curl 'http://localhost:8080/users/all' -i -X GET \
-    -H 'Accept: application/json'
+    -H 'Accept: application/json' \
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDgzMjAxLCJpYXQiOjE3NjAwNzk2MDF9.xmrt8MNssPdFAPpRTaaROXvcQgC4LTJ-w0N25uwhdxY'
 ----
