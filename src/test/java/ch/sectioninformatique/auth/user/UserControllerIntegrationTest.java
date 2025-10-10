@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.sectioninformatique.auth.AuthApplication;
+import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -171,6 +173,13 @@ public class UserControllerIntegrationTest {
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
+
+                // Assert: fetch user again and verify role changed to MANAGER
+                UserDto updatedUser = userService.findByLogin("test.user@test.com");
+                assertNotNull(updatedUser.getMainRole(), "User role should not be null after promotion");
+                assertEquals("MANAGER", updatedUser.getMainRole(),
+                                "User role should be MANAGER after promotion");
+
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-promoteToManager-response.txt");
                 Files.createDirectories(path.getParent());
