@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.sectioninformatique.auth.AuthApplication;
+import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import java.nio.file.Files;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -400,6 +403,12 @@ public class UserControllerIntegrationTest {
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
+
+                // Assert: verify user no longer exists
+                assertThrows(AppException.class, () -> {
+                        userService.findByLogin("test.user@test.com");
+                }, "Expected AppException when fetching deleted user");
+
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-deleteUser-response.txt");
                 Files.createDirectories(path.getParent());
