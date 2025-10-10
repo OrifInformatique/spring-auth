@@ -1,7 +1,8 @@
 [source,http,options="nowrap"]
 ----
-DELETE /users/2 HTTP/1.1
-Accept: application/json
+DELETE /users/100 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg5Mzc0LCJpYXQiOjE3NjAwODU3NzR9.cbm3rIPnztEH4Os4FeWTNEPUU41Qx0DY6oEEg5zAE6w
 Host: localhost:8080
 
 ----

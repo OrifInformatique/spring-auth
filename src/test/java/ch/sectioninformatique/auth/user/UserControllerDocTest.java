@@ -540,36 +540,67 @@ class UserControllerDocTest {
         }
 
         /**
-         * Test for deleting a user.
-         * This test verifies that the user is successfully deleted
-         * and generates API documentation using Spring REST Docs.
-         * 
-         * @throws Exception
+         * Test the /users/{userId} DELETE endpoint using mocked service and security.
+         * This test loads saved response and token files, mocks the userService.deleteUser
+         * call,
+         * mocks authenticated admin user, performs DELETE request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
          */
         @Test
-        void deleteUser_Successful_Doc() throws Exception {
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+        void deleteUser_withMockedService_generatesDoc() throws Exception {
+                // Paths to saved response and token files
+                Path responsePath = Paths.get("target/test-data/users-deleteUser-response.txt");
+                if (!Files.exists(responsePath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-deleteUser-response.txt. Run deleteUser_withRealData_shouldReturnSuccess first.");
+                }
+                String deleteResponse = Files.readString(responsePath);
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Path tokenPath = Paths.get("target/test-data/users-deleteUser-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-deleteUser-token.txt. Run deleteUser_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                UserDto mockedUserDto = UserDto.builder()
+                                .id(1L)
+                                .login("test.user@test.com")
+                                .firstName("Test")
+                                .lastName("User")
+                                .mainRole("USER")
+                                .permissions(new ArrayList<>())
+                                .build();
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                when(userService.deleteUser(anyLong())).thenReturn(mockedUserDto);
 
+                // Mock authenticated admin user with authority user:update
+                UserDto adminDto = UserDto.builder()
+                                .id(200L)
+                                .login("test.admin@test.com")
+                                .firstName("Admin")
+                                .lastName("Test")
+                                .mainRole("ADMIN")
+                                .permissions(new ArrayList<>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(adminDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Arrange
-                Long userId = 2L;
-                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
 
-                when(userService.deleteUser(userId)).thenReturn(expectedDto);
-
-                this.mockMvc.perform(delete("/users/{userId}", userId)
-                                .accept(MediaType.APPLICATION_JSON))
+                // Perform the DELETE request to delete a user
+                this.mockMvc.perform(delete("/users/" + exampleUserId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string("User deleted successfully"))
+                                .andExpect(content().string(deleteResponse))
                                 .andDo(document("users/delete", preprocessResponse(prettyPrint())));
         }
 
