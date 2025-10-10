@@ -185,4 +185,42 @@ public class UserControllerIntegrationTest {
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
+
+        /**
+         * Test the /users/{userId}/promote-admin endpoint with real data.
+         * This test retrieves a known manager user and an admin user,
+         * generates an authentication token for the admin,
+         * and performs a PUT request to promote the manager to admin.
+         * It verifies that the response status is OK and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void promoteToAdmin_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Admin role assigned successfully"))
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-promoteToAdmin-response.txt");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
 }

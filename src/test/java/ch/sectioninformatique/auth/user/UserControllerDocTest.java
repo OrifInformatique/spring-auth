@@ -342,36 +342,68 @@ class UserControllerDocTest {
         }
 
         /**
-         * Test for promoting a user or manager to admin role.
-         * This test verifies that the user is successfully promoted
-         * and generates API documentation using Spring REST Docs.
-         * 
-         * @throws Exception
+         * Test the /users/{userId}/promote-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToAdmin call,
+         * mocks authenticated admin user, performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
          */
         @Test
-        void promoteToAdmin_Successful_Doc() throws Exception {
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+        void promoteToAdmin_withMockedService_generatesDoc() throws Exception {
+                // Paths to saved response and token files
+                Path responsePath = Paths.get("target/test-data/users-promoteToAdmin-response.txt");
+                if (!Files.exists(responsePath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-promoteToAdmin-response.txt. Run promoteToAdmin_withRealData_shouldReturnSuccess first.");
+                }
+                String promoteResponse = Files.readString(responsePath);
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Path tokenPath = Paths.get("target/test-data/users-promoteToAdmin-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-promoteToAdmin-token.txt. Run promoteToAdmin_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                UserDto mockedManagerDto = UserDto.builder()
+                                .id(1L)
+                                .login("test.manager@test.com")
+                                .firstName("Test")
+                                .lastName("Manager")
+                                .mainRole("ADMIN")
+                                .permissions(new ArrayList<>())
+                                .build();
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                when(userService.promoteToAdmin(anyLong())).thenReturn(mockedManagerDto);
 
+                // Mock authenticated admin user with authority user:update
+                UserDto adminDto = UserDto.builder()
+                                .id(200L)
+                                .login("test.admin@test.com")
+                                .firstName("Admin")
+                                .lastName("Test")
+                                .mainRole("ADMIN")
+                                .permissions(new ArrayList<>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(adminDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Arrange
-                Long userId = 2L;
-                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "ADMIN", null);
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
 
-                when(userService.promoteToAdmin(userId)).thenReturn(expectedDto);
-
-                this.mockMvc.perform(put("/users/{userId}/promote-admin", userId)
-                                .accept(MediaType.APPLICATION_JSON))
+                // Perform the PUT request to promote the user to admin
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role assigned successfully"))
+                                .andExpect(content().string(promoteResponse))
                                 .andDo(document("users/promote-admin", preprocessResponse(prettyPrint())));
         }
 
