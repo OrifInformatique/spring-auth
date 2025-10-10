@@ -1,5 +1,6 @@
 [source,bash]
 ----
-$ http PUT 'http://localhost:8080/users/2/downgrade-admin' \
-    'Accept:application/json'
+$ http PUT 'http://localhost:8080/users/100/downgrade-admin' \
+    'Content-Type:application/json' \
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwMDg4NjMzLCJpYXQiOjE3NjAwODUwMzN9.-s-NdRoG0KBrgGEHZBmpPcIHj32GZ87JGulhLCPnwNA'
 ----

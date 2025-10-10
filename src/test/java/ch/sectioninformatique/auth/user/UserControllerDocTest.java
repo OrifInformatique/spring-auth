@@ -474,36 +474,68 @@ class UserControllerDocTest {
         }
 
         /**
-         * Test for downgrading an admin to manager role.
-         * This test verifies that the admin is successfully downgraded
-         * and generates API documentation using Spring REST Docs.
-         * 
-         * @throws Exception
+         * Test the /users/{userId}/downgrade-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.downgradeAdminRole call,
+         * mocks authenticated admin user, performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
          */
         @Test
-        void downgradeAdminRole_Successful_Doc() throws Exception {
-                UserDto mockUser = new UserDto(1L, "John", "Doe", "john@test.com", null, null, "ADMIN", null);
+        void downgradeAdminRole_withMockedService_generatesDoc() throws Exception {
+                // Paths to saved response and token files
+                Path responsePath = Paths.get("target/test-data/users-downgradeAdminRole-response.txt");
+                if (!Files.exists(responsePath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-downgradeAdminRole-response.txt. Run downgradeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String downgradeResponse = Files.readString(responsePath);
 
-                Authentication authentication = Mockito.mock(Authentication.class);
-                Mockito.when(authentication.getPrincipal()).thenReturn(mockUser);
+                Path tokenPath = Paths.get("target/test-data/users-downgradeAdminRole-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing users-downgradeAdminRole-token.txt. Run downgradeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
 
-                Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+                UserDto mockedAdminDto = UserDto.builder()
+                                .id(1L)
+                                .login("test.admin2@test.com")
+                                .firstName("Test2")
+                                .lastName("Admin2")
+                                .mainRole("MANAGER")
+                                .permissions(new ArrayList<>())
+                                .build();
 
-                SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-                Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+                when(userService.downgradeAdminRole(anyLong())).thenReturn(mockedAdminDto);
 
+                // Mock authenticated admin user with authority user:update
+                UserDto adminDto = UserDto.builder()
+                                .id(200L)
+                                .login("test.admin@test.com")
+                                .firstName("Admin")
+                                .lastName("Test")
+                                .mainRole("ADMIN")
+                                .permissions(new ArrayList<>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(adminDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Arrange
-                Long userId = 2L;
-                UserDto expectedDto = new UserDto(2L, "Jane", "Smith", "jane@test.com", null, null, "MANAGER", null);
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
 
-                when(userService.downgradeAdminRole(userId)).thenReturn(expectedDto);
-
-                this.mockMvc.perform(put("/users/{userId}/downgrade-admin", userId)
-                                .accept(MediaType.APPLICATION_JSON))
+                // Perform the PUT request to downgrade the admin role into an Manager
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/downgrade-admin")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role downgraded successfully"))
+                                .andExpect(content().string(downgradeResponse))
                                 .andDo(document("users/downgrade-admin", preprocessResponse(prettyPrint())));
         }
 

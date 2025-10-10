@@ -261,4 +261,42 @@ public class UserControllerIntegrationTest {
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
+
+        /**
+         * Test the /users/{userId}/downgrade-admin endpoint with real data.
+         * This test retrieves a known admin user and another admin user,
+         * generates an authentication token for the first admin,
+         * and performs a PUT request to downgrade the second admin to manager.
+         * It verifies that the response status is OK and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void downgradeAdminRole_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
+
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                MvcResult result = mockMvc.perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Admin role downgraded successfully"))
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response.txt");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-downgradeAdminRole-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
 }
