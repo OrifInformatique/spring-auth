@@ -9,8 +9,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg5MzY2LCJpYXQiOjE3NjAwODU3NjZ9.sJ-tvMJZW8O5Xio20CkbY_xuXAz73BtJbE5m40eItdY",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDU3NjYsImlhdCI6MTc2MDA4NTc2Nn0.Wa4eLsNkFaE2tDEAS0R1Vhh2lgLD5KwFzA9Nv6Clo7Y",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwMDg5OTgwLCJpYXQiOjE3NjAwODYzODB9.It8Huwi7nqkhgkF1RciV5He5JFR0K93dNjPe5oF_K2w",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjA4MDYzODAsImlhdCI6MTc2MDA4NjM4MH0.hi-DAujMnCpr5o7TDeLy62Tgn9XBkIfpzbxHpLC_sd0",
   "mainRole" : "USER",
   "permissions" : [ ]
 }

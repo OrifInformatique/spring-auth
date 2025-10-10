@@ -10,12 +10,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -101,6 +109,30 @@ public class UserControllerIntegrationTest {
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
+
+                // Parse the JSON response
+                ObjectMapper mapper = new ObjectMapper();
+                List<Map<String, Object>> users = mapper.readValue(responseBody,
+                                new TypeReference<List<Map<String, Object>>>() {
+                                });
+
+                // Assert the number of users is 4 (from the seeder)
+                assertEquals(4, users.size(), "Should return 4 users");
+
+                // Assert specific users are present
+                List<String> expectedLogins = List.of(
+                                "test.user@test.com",
+                                "test.manager@test.com",
+                                "test.admin@test.com",
+                                "test.admin2@test.com");
+
+                List<String> returnedLogins = users.stream()
+                                .map(user -> (String) user.get("login"))
+                                .collect(Collectors.toList());
+
+                assertTrue(returnedLogins.containsAll(expectedLogins),
+                                "Returned users should include all seeded logins");
+
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-all-response.json");
                 Files.createDirectories(path.getParent());
