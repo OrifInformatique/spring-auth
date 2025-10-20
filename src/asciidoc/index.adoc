@@ -13,6 +13,20 @@ include::auth/login/http-response.adoc[]
 
 It gives informations about the authenticated user along with a JWT token.
 
+==== Error Response - 400
+These are example outputs for the `POST /auth/login` endpoint for bad request.
+
+==== Missing Login
+This is an example output when the login field is missing in the request.
+
+.request
+include::auth/login-missing-login/http-request.adoc[]
+
+.response
+include::auth/login-missing-login/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the login field is required.
+
 === Register
 This is an example output for the `POST /auth/register` endpoint.
 

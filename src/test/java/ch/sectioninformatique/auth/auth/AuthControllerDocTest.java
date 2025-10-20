@@ -102,8 +102,7 @@ public class AuthControllerDocTest {
          */
         @Test
         public void login_withMockedService_generatesDoc() throws Exception {
-                // Load login response from integration test output to ensure consistency
-                // between doc and actual behavior
+                // Load login response from integration test output to ensure consistency between doc and actual behavior
                 Path path = Paths.get("target/test-data/auth-login-response.json");
 
                 // Early fail if the required file is missing
@@ -146,6 +145,17 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/login", preprocessResponse(prettyPrint())));
         }
 
+        @Test
+        public void login_withMockedService_generatesDoc_missingLogin() throws Exception {
+                // Perform the /auth/login request with missing login and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"password\":\"Test1234!\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/login-missing-login", preprocessResponse(prettyPrint())));
+        }
+
         /**
          * Test the /auth/register endpoint with mocked services to generate
          * documentation.
@@ -157,7 +167,10 @@ public class AuthControllerDocTest {
          */
         @Test
         public void register_withMockedService_generatesDoc() throws Exception {
-                /* Load register response from integration test output to ensure consistency between doc and actual behavior */
+                /*
+                 * Load register response from integration test output to ensure consistency
+                 * between doc and actual behavior
+                 */
                 Path path = Paths.get("target/test-data/auth-register-response.json");
 
                 // Early fail if the required file is missing
@@ -185,7 +198,8 @@ public class AuthControllerDocTest {
                                 .permissions(new ArrayList<String>())
                                 .build();
 
-                // Mock userService.register(...) and token creation methods to return expected data
+                // Mock userService.register(...) and token creation methods to return expected
+                // data
                 when(userService.register(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
                 when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
@@ -210,7 +224,8 @@ public class AuthControllerDocTest {
          */
         @Test
         public void refresh_withMockedService_generatesDoc() throws Exception {
-                // Load refresh response and token from integration test output to ensure consistency between doc and actual behavior
+                // Load refresh response and token from integration test output to ensure
+                // consistency between doc and actual behavior
                 Path path = Paths.get("target/test-data/auth-refresh-response.json");
                 Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
 
@@ -244,13 +259,15 @@ public class AuthControllerDocTest {
                                 .permissions(new ArrayList<String>())
                                 .build();
 
-                // Mock Spring Security context and authentication to simulate a valid authenticated user
+                // Mock Spring Security context and authentication to simulate a valid
+                // authenticated user
                 when(authentication.getPrincipal()).thenReturn(userDto);
                 when(authentication.isAuthenticated()).thenReturn(true);
                 when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Mock userService.refreshLogin(...) and token creation method to return expected data
+                // Mock userService.refreshLogin(...) and token creation method to return
+                // expected data
                 when(userService.refreshLogin(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
 
