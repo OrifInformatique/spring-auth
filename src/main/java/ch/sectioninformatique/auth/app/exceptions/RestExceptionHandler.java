@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 
 /**
@@ -27,7 +30,8 @@ public class RestExceptionHandler {
      * - Is used for all REST endpoints in the application
      *
      * @param ex The AppException that was thrown
-     * @return ResponseEntity containing the error details and appropriate status code
+     * @return ResponseEntity containing the error details and appropriate status
+     *         code
      */
     @ExceptionHandler(value = { AppException.class })
     @ResponseBody
@@ -36,7 +40,27 @@ public class RestExceptionHandler {
                 .status(ex.getStatus())
                 .body(new ErrorDto(ex.getMessage()));
     }
+    
+    /**
+     * Handles validation exceptions and converts them to error responses.
+     * This method:
+     * - Is annotated with @ExceptionHandler to catch MethodArgumentNotValidException instances
+     * - Returns a ResponseEntity with HTTP 400 Bad Request status and validation error message
+     * - Wraps the error message in an ErrorDto object
+     * - Is used for all REST endpoints in the application
+     *
+     * @param ex The MethodArgumentNotValidException that was thrown
+     * @return ResponseEntity containing the validation error details and HTTP 400 status
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorDto> handleValidationException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(fieldError -> fieldError.getDefaultMessage())
+                .orElse("Invalid request");
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorDto(errorMessage));
+    }
 }
-
-
-
