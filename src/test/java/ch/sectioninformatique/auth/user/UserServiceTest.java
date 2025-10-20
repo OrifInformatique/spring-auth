@@ -104,7 +104,7 @@ public class UserServiceTest {
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
         assertEquals("Invalid password", exception.getMessage());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test

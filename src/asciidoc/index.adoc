@@ -71,6 +71,20 @@ include::auth/login-malformed-json/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is malformed.
 
+=== Error Response - 401
+These are example outputs for the `POST /auth/login` endpoint for unauthorized access.
+
+==== Wrong Password
+This is an example output when the password provided is incorrect.
+
+.request
+include::auth/login-wrong-password/http-request.adoc[]
+
+.response
+include::auth/login-wrong-password/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the password is invalid.
+
 === Register
 This is an example output for the `POST /auth/register` endpoint.
 

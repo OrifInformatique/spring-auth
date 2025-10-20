@@ -3,6 +3,7 @@ package ch.sectioninformatique.auth.auth;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -221,6 +223,13 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/login-empty-body", preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /auth/login endpoint with malformed JSON to generate documentation.
+         * This test performs a login request with malformed JSON and expects a bad
+         * request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void login_withMockedService_generatesDoc_malformedJson() throws Exception {
                 // Perform the /auth/login request with malformed JSON and validate response
@@ -230,6 +239,28 @@ public class AuthControllerDocTest {
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\""))
                                 .andExpect(status().isBadRequest())
                                 .andDo(document("auth/login-malformed-json", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/login endpoint with wrong password to generate documentation.
+         * This test stubs the UserService to throw an AppException for invalid
+         * password,
+         * performs a login request, and generates API documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc_wrongPassword() throws Exception {
+
+                when(userService.login(any()))
+                .thenThrow(new AppException("Invalid password", HttpStatus.UNAUTHORIZED));
+                // Perform the /auth/login request with wrong password and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("auth/login-wrong-password", preprocessResponse(prettyPrint())));
         }
 
         /**
