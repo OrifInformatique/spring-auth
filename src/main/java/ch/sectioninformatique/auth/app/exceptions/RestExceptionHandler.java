@@ -1,6 +1,7 @@
 package ch.sectioninformatique.auth.app.exceptions;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,17 +41,20 @@ public class RestExceptionHandler {
                 .status(ex.getStatus())
                 .body(new ErrorDto(ex.getMessage()));
     }
-    
+
     /**
      * Handles validation exceptions and converts them to error responses.
      * This method:
-     * - Is annotated with @ExceptionHandler to catch MethodArgumentNotValidException instances
-     * - Returns a ResponseEntity with HTTP 400 Bad Request status and validation error message
+     * - Is annotated with @ExceptionHandler to catch
+     * MethodArgumentNotValidException instances
+     * - Returns a ResponseEntity with HTTP 400 Bad Request status and validation
+     * error message
      * - Wraps the error message in an ErrorDto object
      * - Is used for all REST endpoints in the application
      *
      * @param ex The MethodArgumentNotValidException that was thrown
-     * @return ResponseEntity containing the validation error details and HTTP 400 status
+     * @return ResponseEntity containing the validation error details and HTTP 400
+     *         status
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
@@ -62,5 +66,27 @@ public class RestExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorDto(errorMessage));
+    }
+
+    /**
+     * Handles HTTP message not readable exceptions and converts them to error
+     * responses.
+     * This method:
+     * - Is annotated with @ExceptionHandler to catch
+     * HttpMessageNotReadableException instances
+     * - Returns a ResponseEntity with HTTP 400 Bad Request status and error message
+     * - Wraps the error message in an ErrorDto object
+     * - Is used for all REST endpoints in the application
+     *
+     * @param ex The HttpMessageNotReadableException that was thrown
+     * @return ResponseEntity containing the error details and HTTP 400 status
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorDto> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        String message = "Request body is missing or unreadable";
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorDto(message));
     }
 }

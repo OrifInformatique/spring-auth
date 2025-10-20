@@ -187,6 +187,34 @@ public class AuthControllerIntegrationTest {
                 Files.writeString(path, wrappedResponse);
         }
 
+        @Test
+        public void login_emptyBody_shouldReturnBadRequest() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(""))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/auth-login-response-empty-body.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
         /**
          * Test the /auth/register endpoint with real data.
          * This test performs a registration request and expects a successful response.

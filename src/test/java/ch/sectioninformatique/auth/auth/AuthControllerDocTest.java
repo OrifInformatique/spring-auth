@@ -203,6 +203,17 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/login-invalid-email-format", preprocessResponse(prettyPrint())));
         }
 
+        @Test
+        public void login_withMockedService_generatesDoc_emptyBody() throws Exception {
+                // Perform the /auth/login request with empty body and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(""))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/login-empty-body", preprocessResponse(prettyPrint())));
+        }
+
         /**
          * Test the /auth/register endpoint with mocked services to generate
          * documentation.
