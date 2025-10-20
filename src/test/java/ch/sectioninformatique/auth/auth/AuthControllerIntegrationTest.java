@@ -293,6 +293,41 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
+         * Test the /auth/login endpoint with non-existent user.
+         * This test performs a login request with non-existent user and expects an unauthorized response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_nonExistentUser_shouldReturnUnauthorized() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"non.existent@test.com\", \"password\":\"WrongPassword!\"}"))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-login-response-non-existent-user.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
          * Test the /auth/register endpoint with real data.
          * This test performs a registration request and expects a successful response.
          * The response is saved to a file for use in other tests.

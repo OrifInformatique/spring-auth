@@ -253,7 +253,8 @@ public class AuthControllerDocTest {
         public void login_withMockedService_generatesDoc_wrongPassword() throws Exception {
 
                 when(userService.login(any()))
-                .thenThrow(new AppException("Invalid password", HttpStatus.UNAUTHORIZED));
+                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+
                 // Perform the /auth/login request with wrong password and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
@@ -261,6 +262,30 @@ public class AuthControllerDocTest {
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("auth/login-wrong-password", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/login endpoint with non-existent user to generate
+         * documentation.
+         * This test stubs the UserService to throw an AppException for non-existent
+         * user,
+         * performs a login request, and generates API documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc_nonExistentUser() throws Exception {
+
+                when(userService.login(any()))
+                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+
+                // Perform the /auth/login request with non-existent user and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"non.existent@test.com\", \"password\":\"WrongPassword!\"}"))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("auth/login-non-existent-user", preprocessResponse(prettyPrint())));
         }
 
         /**

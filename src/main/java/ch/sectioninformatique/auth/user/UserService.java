@@ -54,12 +54,12 @@ public class UserService {
      */
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByLogin(credentialsDto.getLogin())
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
-        throw new AppException("Invalid password", HttpStatus.UNAUTHORIZED);
+        throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -71,7 +71,7 @@ public class UserService {
      */
     public UserDto refreshLogin(String login) {
         User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
         return userMapper.toUserDto(user);
     }
 

@@ -85,6 +85,17 @@ include::auth/login-wrong-password/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the password is invalid.
 
+=== Non-Existent User
+This is an example output when the user does not exist.
+
+.request
+include::auth/login-non-existent-user/http-request.adoc[]
+
+.response
+include::auth/login-non-existent-user/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the credentials are invalid.
+
 === Register
 This is an example output for the `POST /auth/register` endpoint.
 

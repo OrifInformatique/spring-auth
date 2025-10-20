@@ -86,8 +86,8 @@ public class UserServiceTest {
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
-        assertEquals("Unknown user", exception.getMessage());
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals("Invalid credentials", exception.getMessage());
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class UserServiceTest {
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
-        assertEquals("Invalid password", exception.getMessage());
+        assertEquals("Invalid credentials", exception.getMessage());
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
