@@ -102,7 +102,8 @@ public class AuthControllerDocTest {
          */
         @Test
         public void login_withMockedService_generatesDoc() throws Exception {
-                // Load login response from integration test output to ensure consistency between doc and actual behavior
+                // Load login response from integration test output to ensure consistency
+                // between doc and actual behavior
                 Path path = Paths.get("target/test-data/auth-login-response.json");
 
                 // Early fail if the required file is missing
@@ -149,7 +150,6 @@ public class AuthControllerDocTest {
          * Test the /auth/login endpoint with missing login to generate documentation.
          * This test performs a login request with missing login and expects a bad
          * request response.
-         * The response is saved to a file for use in other tests.
          *
          * @throws Exception if an error occurs during the test
          */
@@ -165,10 +165,10 @@ public class AuthControllerDocTest {
         }
 
         /**
-         * Test the /auth/login endpoint with missing password to generate documentation.
+         * Test the /auth/login endpoint with missing password to generate
+         * documentation.
          * This test performs a login request with missing password and expects a bad
          * request response.
-         * The response is saved to a file for use in other tests.
          *
          * @throws Exception if an error occurs during the test
          */
@@ -188,13 +188,13 @@ public class AuthControllerDocTest {
          * documentation.
          * This test performs a login request with invalid email format and expects a
          * bad request response.
-         * The response is saved to a file for use in other tests.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
         public void login_withMockedService_generatesDoc_invalidEmailFormat() throws Exception {
-                // Perform the /auth/login request with invalid email format and validate response
+                // Perform the /auth/login request with invalid email format and validate
+                // response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -203,6 +203,13 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/login-invalid-email-format", preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /auth/login endpoint with empty body to generate documentation.
+         * This test performs a login request with empty body and expects a bad
+         * request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void login_withMockedService_generatesDoc_emptyBody() throws Exception {
                 // Perform the /auth/login request with empty body and validate response
@@ -212,6 +219,17 @@ public class AuthControllerDocTest {
                                 .content(""))
                                 .andExpect(status().isBadRequest())
                                 .andDo(document("auth/login-empty-body", preprocessResponse(prettyPrint())));
+        }
+
+        @Test
+        public void login_withMockedService_generatesDoc_malformedJson() throws Exception {
+                // Perform the /auth/login request with malformed JSON and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\""))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/login-malformed-json", preprocessResponse(prettyPrint())));
         }
 
         /**

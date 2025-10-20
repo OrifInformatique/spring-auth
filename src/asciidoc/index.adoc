@@ -60,6 +60,17 @@ include::auth/login-empty-body/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is missing.
 
+==== Malformed JSON
+This is an example output when the request body contains malformed JSON.
+
+.request
+include::auth/login-malformed-json/http-request.adoc[]
+
+.response
+include::auth/login-malformed-json/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the request body is malformed.
+
 === Register
 This is an example output for the `POST /auth/register` endpoint.
 
