@@ -145,6 +145,14 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/login", preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /auth/login endpoint with missing login to generate documentation.
+         * This test performs a login request with missing login and expects a bad
+         * request response.
+         * The response is saved to a file for use in other tests.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void login_withMockedService_generatesDoc_missingLogin() throws Exception {
                 // Perform the /auth/login request with missing login and validate response
@@ -154,6 +162,25 @@ public class AuthControllerDocTest {
                                 .content("{\"password\":\"Test1234!\"}"))
                                 .andExpect(status().isBadRequest())
                                 .andDo(document("auth/login-missing-login", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/login endpoint with missing password to generate documentation.
+         * This test performs a login request with missing password and expects a bad
+         * request response.
+         * The response is saved to a file for use in other tests.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc_missingPassword() throws Exception {
+                // Perform the /auth/login request with missing password and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"test.user@test.com\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/login-missing-password", preprocessResponse(prettyPrint())));
         }
 
         /**

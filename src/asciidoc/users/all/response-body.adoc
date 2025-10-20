@@ -5,20 +5,20 @@
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$/fItnJhUv38vFSN0AsJpEueNasOBZllBy.zQFDE8AkWbxg1lMNnby",
-  "createdAt" : "2025-10-20T08:13:05.149+00:00",
-  "updatedAt" : "2025-10-20T08:13:05.149+00:00",
+  "password" : "$2a$10$WImBHbS8QgcKzZDirx1/OeCeirDuCVCGwHzXjlMkGk24aOxvvDKBO",
+  "createdAt" : "2025-10-20T08:28:24.061+00:00",
+  "updatedAt" : "2025-10-20T08:28:24.061+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-10-20T08:13:04.873+00:00",
-    "updatedAt" : "2025-10-20T08:13:04.873+00:00"
+    "createdAt" : "2025-10-20T08:28:23.795+00:00",
+    "updatedAt" : "2025-10-20T08:28:23.795+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.user@test.com",
   "enabled" : true
 }, {
@@ -26,20 +26,20 @@
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$LMhRwraApXhhuhnnt6C3SOu8UwqbmXV8fS8ZQlxkyBSuBCVXnnCAq",
-  "createdAt" : "2025-10-20T08:13:05.151+00:00",
-  "updatedAt" : "2025-10-20T08:13:05.151+00:00",
+  "password" : "$2a$10$IDkcgFOMt/wTvD9SuI6dVOcDHXXvrrgc1JRmzucwaggVoGJKQ2LwK",
+  "createdAt" : "2025-10-20T08:28:24.062+00:00",
+  "updatedAt" : "2025-10-20T08:28:24.062+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-10-20T08:13:04.880+00:00",
-    "updatedAt" : "2025-10-20T08:13:04.880+00:00"
+    "createdAt" : "2025-10-20T08:28:23.805+00:00",
+    "updatedAt" : "2025-10-20T08:28:23.805+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.manager@test.com",
   "enabled" : true
 }, {
@@ -47,20 +47,20 @@
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$BHasW8dDrzHH6ss2DUr7eOXi66dpp9qelwLpXfdRT9XY/cZ6ugeIO",
-  "createdAt" : "2025-10-20T08:13:05.152+00:00",
-  "updatedAt" : "2025-10-20T08:13:05.152+00:00",
+  "password" : "$2a$10$dGB8d44/Amsiw8wgPx5iye6hyI9/0uoDs0L0cRY5PgKmkuhgU0q9C",
+  "createdAt" : "2025-10-20T08:28:24.063+00:00",
+  "updatedAt" : "2025-10-20T08:28:24.063+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-20T08:13:04.885+00:00",
-    "updatedAt" : "2025-10-20T08:13:04.885+00:00"
+    "createdAt" : "2025-10-20T08:28:23.809+00:00",
+    "updatedAt" : "2025-10-20T08:28:23.809+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.admin@test.com",
   "enabled" : true
 }, {
@@ -68,20 +68,20 @@
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$88AOkrgxilPtaZmoa8EpIe2Btj3nBr.VNitHcQWm6H/UmjV0Cxqte",
-  "createdAt" : "2025-10-20T08:13:05.152+00:00",
-  "updatedAt" : "2025-10-20T08:13:05.152+00:00",
+  "password" : "$2a$10$CRPL3VhAQTYPJVl/dUqRe.wc6YZWGFIoOE4aOcjXSgRABG/gkAupC",
+  "createdAt" : "2025-10-20T08:28:24.064+00:00",
+  "updatedAt" : "2025-10-20T08:28:24.064+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-20T08:13:04.885+00:00",
-    "updatedAt" : "2025-10-20T08:13:04.885+00:00"
+    "createdAt" : "2025-10-20T08:28:23.809+00:00",
+    "updatedAt" : "2025-10-20T08:28:23.809+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.admin2@test.com",
   "enabled" : true
 } ]

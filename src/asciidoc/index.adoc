@@ -27,6 +27,17 @@ include::auth/login-missing-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the login field is required.
 
+==== Missing Password
+This is an example output when the password field is missing in the request.
+
+.request
+include::auth/login-missing-password/http-request.adoc[]
+
+.response
+include::auth/login-missing-password/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the password field is required.
+
 === Register
 This is an example output for the `POST /auth/register` endpoint.
 
