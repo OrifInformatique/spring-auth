@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/users/100/downgrade-admin' -i -X PUT \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDQ3NTc2LCJpYXQiOjE3NjEwNDM5NzZ9.SNP2OrHdoUWULZA_TvO8Nkw6ppbipX1LRI3w3Y3I8-g'
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDQ4NjE5LCJpYXQiOjE3NjEwNDUwMTl9.CnkbVbTTfAJgN-0VR1MO2O0I7ycjvzWLOAdfASXNHuE'
 ----

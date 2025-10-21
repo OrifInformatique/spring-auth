@@ -234,6 +234,17 @@ include::auth/register-sql-injection-attempt-first-name/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the first name field is invalid.
 
+===== SQL Injection Attempt Last Name
+This is an example output when the last name field contains a SQL injection attempt.
+
+.request
+include::auth/register-sql-injection-attempt-last-name/http-request.adoc[]
+
+.response
+include::auth/register-sql-injection-attempt-last-name/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the last name field is invalid.
+
 ===== SQL Injection Attempt Login
 This is an example output when the login field contains a SQL injection attempt.
 

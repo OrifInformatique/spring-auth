@@ -5,7 +5,7 @@
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDQ3NTY3LCJpYXQiOjE3NjEwNDM5Njd9.ioay8wPFqsfAxZS_swcMqBshtYKBTpnf5T3w-XTkmYw",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDQ4NjEwLCJpYXQiOjE3NjEwNDUwMTB9.BG3tm6oKxFFiVcsXrpJ3-VM4YiuwwD6Qy6xmzeMCZUc",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
