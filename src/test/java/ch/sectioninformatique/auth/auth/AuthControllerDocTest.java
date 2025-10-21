@@ -739,4 +739,25 @@ public class AuthControllerDocTest {
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
         }
+
+        @Test
+        public void refresh_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                // Mock Spring Security context and authentication
+                when(authentication.getPrincipal()).thenReturn(null);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContextHolder.setContext(securityContext);
+
+                when(securityContext.getAuthentication()).thenThrow(
+                                new AppException("Full authentication is required to access this resource", HttpStatus.UNAUTHORIZED));
+
+                // Perform the /auth/refresh request without Authorization header and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(get("/auth/refresh")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("auth/refresh-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
 }
