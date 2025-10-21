@@ -628,6 +628,26 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/register endpoint with wrong media type to generate
+         * documentation.
+         * This test performs a registration request with wrong media type and expects
+         * an unsupported media type response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_wrongMediaType() throws Exception {
+                // Perform the /auth/login request with non-existent MediaType and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isUnsupportedMediaType())
+                                .andDo(document("auth/register-wrong-media-type", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /auth/refresh endpoint with mocked services to generate
          * documentation.
          * This test stubs the UserService and UserAuthenticationProvider to return

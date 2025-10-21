@@ -862,6 +862,42 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
+         * Test the /auth/register endpoint with wrong content type.
+         * This test performs a registration request with wrong content type and
+         * expects an unsupported media type response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_wrongContentType_shouldReturnUnsupportedMediaType() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/register")
+                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isUnsupportedMediaType())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-register-wrong-content-type.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
          * Test the /auth/refresh endpoint with real data.
          * This test performs a token refresh request and expects a successful response.
          * The response is saved to a file for use in other tests.

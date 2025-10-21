@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ echo '{
+  "firstName" : "Test",
+  "lastName" : "User",
+  "login" : "test.newuser@test.com",
+  "password" : "testPassword"
+}' | http POST 'http://localhost:8080/auth/register'
+----

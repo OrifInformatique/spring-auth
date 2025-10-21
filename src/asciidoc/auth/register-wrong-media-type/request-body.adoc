@@ -1,0 +1,9 @@
+[source,options="nowrap"]
+----
+{
+  "firstName" : "Test",
+  "lastName" : "User",
+  "login" : "test.newuser@test.com",
+  "password" : "testPassword"
+}
+----

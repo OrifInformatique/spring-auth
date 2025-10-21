@@ -256,6 +256,20 @@ include::auth/register-sql-injection-attempt-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the email format is invalid.
 
+===== Error Response - 415
+These are example outputs for the `POST /auth/register` endpoint for unsupported media types.
+
+===== Unsupported Media Type
+This is an example output when the media type of the request is unsupported.
+
+.request
+include::auth/register-wrong-media-type/http-request.adoc[]
+
+.response
+include::auth/register-wrong-media-type/http-response.adoc[]
+
+It returns a 415 Unsupported Media Type error indicating that the media type is not supported.
+
 === Refresh
 This is an example output for the `GET /auth/refresh` endpoint.
 
