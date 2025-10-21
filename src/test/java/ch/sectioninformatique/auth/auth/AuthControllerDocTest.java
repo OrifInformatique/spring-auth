@@ -498,7 +498,7 @@ public class AuthControllerDocTest {
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.user@test.com\"}"))
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.newuser@test.com\"}"))
                                 .andExpect(status().isBadRequest())
                                 .andDo(document("auth/register-missing-password", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
@@ -558,10 +558,31 @@ public class AuthControllerDocTest {
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.user@test.com\", \"password\":\"testPassword\""))
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\""))
                                 .andExpect(status().isBadRequest())
                                 .andDo(document("auth/register-malformed-json", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/register endpoint with SQL injection attempt in first name to
+         * generate documentation.
+         * This test performs a registration request with SQL injection attempt in
+         * first name and expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_sqlInjectionAttemptFirstName() throws Exception {
+                // Perform the /auth/register request with SQL injection attempt and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"' OR '1'='1\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-sql-injection-attempt-first-name",
+                                                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -584,7 +605,6 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/register-sql-injection-attempt-login",
                                                 preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
         }
-        
 
         /**
          * Test the /auth/refresh endpoint with mocked services to generate

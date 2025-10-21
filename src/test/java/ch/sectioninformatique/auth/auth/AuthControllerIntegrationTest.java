@@ -614,7 +614,7 @@ public class AuthControllerIntegrationTest {
         public void register_missingPassword_shouldReturnBadRequest() throws Exception {
                 MvcResult result = mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.user@test.com\"}"))
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.newuser@test.com\"}"))
                                 .andExpect(status().isBadRequest())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -725,7 +725,7 @@ public class AuthControllerIntegrationTest {
         public void register_malformedJson_shouldReturnBadRequest() throws Exception {
                 MvcResult result = mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.user@test.com\", \"password\":\"testPassword\""))
+                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\""))
                                 .andExpect(status().isBadRequest())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -750,6 +750,43 @@ public class AuthControllerIntegrationTest {
                 Files.writeString(path, wrappedResponse);
         }
 
+        @Test
+        public void register_sqlInjectionAttemptFirstName_shouldReturnBadRequest() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"' OR '1'='1\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-first-name.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
+         * Test the /auth/register endpoint with SQL injection attempt in login.
+         * This test performs a registration request with SQL injection attempt in
+         * login and expects a bad request response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void register_sqlInjectionAttemptLogin_shouldReturnBadRequest() throws Exception {
                 MvcResult result = mockMvc.perform(post("/auth/register")
