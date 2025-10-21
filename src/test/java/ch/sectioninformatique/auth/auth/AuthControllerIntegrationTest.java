@@ -638,6 +638,43 @@ public class AuthControllerIntegrationTest {
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
         }
+        
+        /**
+         * Test the /auth/register endpoint with invalid email format.
+         * This test performs a registration request with invalid email format and
+         * expects a bad request response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_invalidEmailFormat_shouldReturnBadRequest() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"invalid-email-format\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-register-response-invalid-email-format.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
 
         /**
          * Test the /auth/refresh endpoint with real data.

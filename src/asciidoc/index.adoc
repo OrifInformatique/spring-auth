@@ -190,6 +190,17 @@ include::auth/register-missing-password/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the password field is required.
 
+===== Invalid Email Format
+This is an example output when the email format is invalid in the request.
+
+.request
+include::auth/register-invalid-email-format/http-request.adoc[]
+
+.response
+include::auth/register-invalid-email-format/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the email format is invalid.
+
 === Refresh
 This is an example output for the `GET /auth/refresh` endpoint.
 

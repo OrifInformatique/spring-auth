@@ -505,6 +505,27 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/register endpoint with invalid email format to generate
+         * documentation.
+         * This test performs a registration request with invalid email format and
+         * expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_invalidEmailFormat() throws Exception {
+                // Perform the /auth/register request with invalid email format and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"invalid-email-format\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-invalid-email-format", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /auth/refresh endpoint with mocked services to generate
          * documentation.
          * This test stubs the UserService and UserAuthenticationProvider to return

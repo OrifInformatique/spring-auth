@@ -1,0 +1,10 @@
+[source,bash]
+----
+$ echo '{
+  "firstName" : "Test",
+  "lastName" : "NewUser",
+  "login" : "invalid-email-format",
+  "password" : "testPassword"
+}' | http POST 'http://localhost:8080/auth/register' \
+    'Content-Type:application/json'
+----
