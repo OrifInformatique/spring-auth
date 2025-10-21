@@ -565,6 +565,28 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/register endpoint with SQL injection attempt in login to
+         * generate documentation.
+         * This test performs a registration request with SQL injection attempt in
+         * login and expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_sqlInjectionAttemptLogin() throws Exception {
+                // Perform the /auth/register request with SQL injection attempt and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"' OR '1'='1\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-sql-injection-attempt-login",
+                                                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
+        }
+        
+
+        /**
          * Test the /auth/refresh endpoint with mocked services to generate
          * documentation.
          * This test stubs the UserService and UserAuthenticationProvider to return

@@ -1,0 +1,9 @@
+[source,json,options="nowrap"]
+----
+{
+  "firstName" : "Test",
+  "lastName" : "User",
+  "login" : "' OR '1'='1",
+  "password" : "testPassword"
+}
+----

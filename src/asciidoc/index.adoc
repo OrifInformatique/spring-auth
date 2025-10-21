@@ -223,6 +223,17 @@ include::auth/register-malformed-json/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is malformed.
 
+===== SQL Injection Attempt Login
+This is an example output when the login field contains a SQL injection attempt.
+
+.request
+include::auth/register-sql-injection-attempt-login/http-request.adoc[]
+
+.response
+include::auth/register-sql-injection-attempt-login/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the email format is invalid.
+
 === Refresh
 This is an example output for the `GET /auth/refresh` endpoint.
 
