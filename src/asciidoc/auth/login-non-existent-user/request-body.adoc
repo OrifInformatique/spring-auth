@@ -1,4 +1,4 @@
 [source,json,options="nowrap"]
 ----
-{"login":"non.existent@test.com", "password":"WrongPassword!"}
+{"login":"test.user@test.com", "password":"WrongPassword!"}
 ----

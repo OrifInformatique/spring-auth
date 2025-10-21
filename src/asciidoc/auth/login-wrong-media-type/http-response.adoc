@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 415 Unsupported Media Type
+Content-Type: application/json
+Content-Length: 70
+
+{
+  "message" : "Unsupported content type: application/octet-stream"
+}
+----

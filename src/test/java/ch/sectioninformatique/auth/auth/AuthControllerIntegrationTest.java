@@ -328,6 +328,40 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
+         * Test the /auth/login endpoint with wrong content type.
+         * This test performs a login request with wrong content type and expects an unsupported media type response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_wrongContentType_shouldReturnUnsupportedMediaType() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/login")
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
+                                .andExpect(status().isUnsupportedMediaType())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-login-wrong-content-type.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
          * Test the /auth/register endpoint with real data.
          * This test performs a registration request and expects a successful response.
          * The response is saved to a file for use in other tests.

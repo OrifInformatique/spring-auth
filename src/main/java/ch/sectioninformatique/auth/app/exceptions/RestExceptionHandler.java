@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 
@@ -87,6 +88,15 @@ public class RestExceptionHandler {
         String message = "Request body is missing or unreadable";
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorDto(message));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorDto> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex) {
+        String message = "Unsupported content type: " + ex.getContentType();
+        return ResponseEntity
+                .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                 .body(new ErrorDto(message));
     }
 }

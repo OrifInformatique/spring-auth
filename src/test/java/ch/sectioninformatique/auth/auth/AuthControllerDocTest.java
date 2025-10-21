@@ -253,7 +253,7 @@ public class AuthControllerDocTest {
         public void login_withMockedService_generatesDoc_wrongPassword() throws Exception {
 
                 when(userService.login(any()))
-                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+                                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
                 // Perform the /auth/login request with wrong password and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
@@ -275,17 +275,34 @@ public class AuthControllerDocTest {
          */
         @Test
         public void login_withMockedService_generatesDoc_nonExistentUser() throws Exception {
-
                 when(userService.login(any()))
-                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+                                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
                 // Perform the /auth/login request with non-existent user and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"non.existent@test.com\", \"password\":\"WrongPassword!\"}"))
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("auth/login-non-existent-user", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/login endpoint with wrong media type to generate
+         * documentation.
+         * This test performs a login request with wrong media type and expects an
+         * unsupported media type response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc_wrongMediaType() throws Exception {
+                // Perform the /auth/login request with non-existent MediaType and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .content("{\"login\":\"non.existent@test.com\", \"password\":\"Test1234!\"}"))
+                                .andExpect(status().isUnsupportedMediaType())
+                                .andDo(document("auth/login-wrong-media-type", preprocessResponse(prettyPrint())));
         }
 
         /**

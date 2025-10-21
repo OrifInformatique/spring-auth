@@ -471,8 +471,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwOTQ4NTU1LCJpYXQiOjE3NjA5NDQ5NTV9.7YzDICMruSRrgzQBTcRoP97WuJFZTm8ZNLD4W1ugmTI",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE2NjQ5NTUsImlhdCI6MTc2MDk0NDk1NX0.p7_BfOBBwLP-3vWAufLy92uFHvQnNlwljxNAq0W6wAI",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDAyLCJpYXQiOjE3NjEwMjc4MDJ9.pugy_SGe4jsRZLzNDSAPcl88_ShJb5VNy9d5opCOnjI",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NDc4MDIsImlhdCI6MTc2MTAyNzgwMn0._Cj-cJ9IwYZJBEx5OZ6rS0ZeQMMWsUZhofUYZ0uaJQE",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -480,6 +480,239 @@ Content-Length: 581
 </div>
 <div class="paragraph">
 <p>It gives informations about the authenticated user along with a JWT token.</p>
+</div>
+<div class="sect3">
+<h4 id="_error_response_400">Error Response - 400</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>POST /auth/login</code> endpoint for bad request.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_missing_login">Missing Login</h4>
+<div class="paragraph">
+<p>This is an example output when the login field is missing in the request.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 24
+Host: localhost:8080
+
+{"password":"Test1234!"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 37
+
+{
+  "message" : "Login is required"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 400 Bad Request error indicating that the login field is required.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_missing_password">Missing Password</h4>
+<div class="paragraph">
+<p>This is an example output when the password field is missing in the request.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 30
+Host: localhost:8080
+
+{"login":"test.user@test.com"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 40
+
+{
+  "message" : "Password is required"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 400 Bad Request error indicating that the password field is required.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_invalid_email_format">Invalid Email Format</h4>
+<div class="paragraph">
+<p>This is an example output when the email format is invalid in the request.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 56
+Host: localhost:8080
+
+{"login":"invalid-email-format", "password":"Test1234!"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 40
+
+{
+  "message" : "Invalid email format"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 400 Bad Request error indicating that the email format is invalid.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_empty_body">Empty Body</h4>
+<div class="paragraph">
+<p>This is an example output when the request body is empty.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 57
+
+{
+  "message" : "Request body is missing or unreadable"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 400 Bad Request error indicating that the request body is missing.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_malformed_json">Malformed JSON</h4>
+<div class="paragraph">
+<p>This is an example output when the request body contains malformed JSON.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 53
+Host: localhost:8080
+
+{"login":"test.user@test.com", "password":"Test1234!"</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 57
+
+{
+  "message" : "Request body is missing or unreadable"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 400 Bad Request error indicating that the request body is malformed.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_error_response_401">Error Response - 401</h3>
+<div class="paragraph">
+<p>These are example outputs for the <code>POST /auth/login</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect3">
+<h4 id="_wrong_password">Wrong Password</h4>
+<div class="paragraph">
+<p>This is an example output when the password provided is incorrect.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 59
+Host: localhost:8080
+
+{"login":"test.user@test.com", "password":"WrongPassword!"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 39
+
+{
+  "message" : "Invalid credentials"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the password is invalid.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_non_existent_user">Non-Existent User</h3>
+<div class="paragraph">
+<p>This is an example output when the user does not exist.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 62
+Host: localhost:8080
+
+{"login":"non.existent@test.com", "password":"WrongPassword!"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 39
+
+{
+  "message" : "Invalid credentials"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the credentials are invalid.</p>
 </div>
 </div>
 <div class="sect2">
@@ -511,8 +744,8 @@ Content-Length: 599
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwOTQ4NTU1LCJpYXQiOjE3NjA5NDQ5NTV9.ga_s-ajOPvQe53U9uY-46J5bh6TEDhJA54r4xcIyhZk",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE2NjQ5NTUsImlhdCI6MTc2MDk0NDk1NX0.DBQ2spp-xyjXjYpJgds6jzHrU_RmnGvT2TLXjSP4vm4",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDAyLCJpYXQiOjE3NjEwMjc4MDJ9.AxqsVLacKWel8IthYWxbwTMfmq_nGwAAUQFqdJ4FdI0",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NDc4MDIsImlhdCI6MTc2MTAyNzgwMn0.jmz144JQBpKXc06tyP6UmwTZNBo0q-Vimf0BXYZWiQk",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -532,7 +765,7 @@ Content-Length: 599
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE2NjQ5NTUsImlhdCI6MTc2MDk0NDk1NX0.p7_BfOBBwLP-3vWAufLy92uFHvQnNlwljxNAq0W6wAI
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NDc4MDIsImlhdCI6MTc2MTAyNzgwMn0._Cj-cJ9IwYZJBEx5OZ6rS0ZeQMMWsUZhofUYZ0uaJQE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -548,7 +781,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwOTQ4NTU1LCJpYXQiOjE3NjA5NDQ5NTV9.7YzDICMruSRrgzQBTcRoP97WuJFZTm8ZNLD4W1ugmTI",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDAyLCJpYXQiOjE3NjEwMjc4MDJ9.pugy_SGe4jsRZLzNDSAPcl88_ShJb5VNy9d5opCOnjI",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -574,7 +807,7 @@ Content-Length: 419
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.VoCPpn6lz7s2mPtTIdfWH5CYGcUPNIhuAQGMNurJb54
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.JsvkB_e3CiZf_bxbZTAJummsqBp6e9EerEzAKWxAEcQ
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -611,7 +844,7 @@ Content-Length: 184
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.VoCPpn6lz7s2mPtTIdfWH5CYGcUPNIhuAQGMNurJb54
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.JsvkB_e3CiZf_bxbZTAJummsqBp6e9EerEzAKWxAEcQ
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -627,20 +860,20 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$T5QRf8Rm4qP9i8qMT25UZ.RR0jKhenBaUgluwqcieckIpOLAY7k7q",
-  "createdAt" : "2025-10-20T07:22:42.523+00:00",
-  "updatedAt" : "2025-10-20T07:22:42.523+00:00",
+  "password" : "$2a$10$po2yWFGhfYSiDNMoFEbgUOQYB9hZG9nviA8ZlqMqmdfDLiql2cD7e",
+  "createdAt" : "2025-10-21T06:23:30.882+00:00",
+  "updatedAt" : "2025-10-21T06:23:30.882+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-10-20T07:22:42.251+00:00",
-    "updatedAt" : "2025-10-20T07:22:42.251+00:00"
+    "createdAt" : "2025-10-21T06:23:30.615+00:00",
+    "updatedAt" : "2025-10-21T06:23:30.615+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.user@test.com",
   "enabled" : true
 }, {
@@ -648,20 +881,20 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$2J1SCndKRFg1P33JCclQEeiuFg9fx7Pws1FNpALDbavAAaCJE1r2O",
-  "createdAt" : "2025-10-20T07:22:42.525+00:00",
-  "updatedAt" : "2025-10-20T07:22:42.525+00:00",
+  "password" : "$2a$10$MS39jHDb3zxdzueJPWDpken53sD5TaerWa9jjV4GaZxu2NH1K/Rd2",
+  "createdAt" : "2025-10-21T06:23:30.884+00:00",
+  "updatedAt" : "2025-10-21T06:23:30.884+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-10-20T07:22:42.257+00:00",
-    "updatedAt" : "2025-10-20T07:22:42.257+00:00"
+    "createdAt" : "2025-10-21T06:23:30.625+00:00",
+    "updatedAt" : "2025-10-21T06:23:30.625+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.manager@test.com",
   "enabled" : true
 }, {
@@ -669,20 +902,20 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$D5AzVVkEPetbrRiDxIoXOOdy7dTkKTjQ5gXALAIzZO.OnJqQxL/Z6",
-  "createdAt" : "2025-10-20T07:22:42.526+00:00",
-  "updatedAt" : "2025-10-20T07:22:42.526+00:00",
+  "password" : "$2a$10$ibyWvpQie3Jh2IWHRnM2B.I4B1UXO8GwNBPgBxRFQfV08r4DW.f1O",
+  "createdAt" : "2025-10-21T06:23:30.885+00:00",
+  "updatedAt" : "2025-10-21T06:23:30.885+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-20T07:22:42.262+00:00",
-    "updatedAt" : "2025-10-20T07:22:42.262+00:00"
+    "createdAt" : "2025-10-21T06:23:30.629+00:00",
+    "updatedAt" : "2025-10-21T06:23:30.629+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.admin@test.com",
   "enabled" : true
 }, {
@@ -690,20 +923,20 @@ Content-Length: 2607
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$8FMZpFCr6dBUVz45xwohVeCRXp7aODAIB6TaOUtU.CKWxwHLuF/3S",
-  "createdAt" : "2025-10-20T07:22:42.527+00:00",
-  "updatedAt" : "2025-10-20T07:22:42.527+00:00",
+  "password" : "$2a$10$U.hfjy3E/G8/qruHO/Nmw.qPIE12qmn2rSPbI8QBHoujHD5BFIN2u",
+  "createdAt" : "2025-10-21T06:23:30.890+00:00",
+  "updatedAt" : "2025-10-21T06:23:30.890+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-20T07:22:42.262+00:00",
-    "updatedAt" : "2025-10-20T07:22:42.262+00:00"
+    "createdAt" : "2025-10-21T06:23:30.629+00:00",
+    "updatedAt" : "2025-10-21T06:23:30.629+00:00"
   },
   "authorities" : [ ],
+  "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "credentialsNonExpired" : true,
   "username" : "test.admin2@test.com",
   "enabled" : true
 } ]</code></pre>
@@ -723,7 +956,7 @@ Content-Length: 2607
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.skEX3jcJhehvHTEOITOSOJfvDFQoi6vf-HuIKBDW6b4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -751,7 +984,7 @@ User promoted to manager successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.skEX3jcJhehvHTEOITOSOJfvDFQoi6vf-HuIKBDW6b4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -779,7 +1012,7 @@ Manager role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.skEX3jcJhehvHTEOITOSOJfvDFQoi6vf-HuIKBDW6b4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -807,7 +1040,7 @@ Admin role assigned successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.skEX3jcJhehvHTEOITOSOJfvDFQoi6vf-HuIKBDW6b4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -835,7 +1068,7 @@ Admin role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.skEX3jcJhehvHTEOITOSOJfvDFQoi6vf-HuIKBDW6b4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -863,7 +1096,7 @@ Admin role downgraded successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYwOTQ4NTY0LCJpYXQiOjE3NjA5NDQ5NjR9.skEX3jcJhehvHTEOITOSOJfvDFQoi6vf-HuIKBDW6b4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -886,7 +1119,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-07 13:28:52 UTC
+Last updated 2025-10-20 09:52:18 UTC
 </div>
 </div>
 </body>
