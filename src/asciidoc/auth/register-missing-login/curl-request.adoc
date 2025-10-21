@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/auth/register' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"firstName":"Test","lastName":"NewUser", "password":"testPassword"}'
+----

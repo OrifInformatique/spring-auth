@@ -444,6 +444,17 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/register-missing-last-name", preprocessResponse(prettyPrint())));
         }
 
+        @Test
+        public void register_withMockedService_generatesDoc_missingLogin() throws Exception {
+                // Perform the /auth/register request with missing login and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-missing-login", preprocessResponse(prettyPrint())));
+        }
+
         /**
          * Test the /auth/refresh endpoint with mocked services to generate
          * documentation.
