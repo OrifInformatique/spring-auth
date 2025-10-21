@@ -1,4 +1,7 @@
 [source,json,options="nowrap"]
 ----
-{"login":"test.user@test.com", "password":"' OR '1'='1"}
+{
+  "login" : "test.user@test.com",
+  "password" : "' OR '1'='1"
+}
 ----

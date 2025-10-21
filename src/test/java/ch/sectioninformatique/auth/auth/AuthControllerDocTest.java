@@ -40,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 /**
@@ -145,7 +146,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
                                 .andExpect(status().isOk())
-                                .andDo(document("auth/login", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -163,7 +165,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"password\":\"Test1234!\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/login-missing-login", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-missing-login", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -182,7 +185,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/login-missing-password", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-missing-password", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -202,7 +206,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"invalid-email-format\", \"password\":\"Test1234!\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/login-invalid-email-format", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-invalid-email-format", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -220,7 +225,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(""))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/login-empty-body", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-empty-body", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -238,7 +244,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\""))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/login-malformed-json", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-malformed-json", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -251,13 +258,15 @@ public class AuthControllerDocTest {
          */
         @Test
         public void login_withMockedService_generatesDoc_sqlInjectionAttemptLogin() throws Exception {
-                // Perform the /auth/login request with SQL injection attempt and validate response
+                // Perform the /auth/login request with SQL injection attempt and validate
+                // response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"' OR '1'='1\", \"password\":\"Test1234!\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/login-sql-injection-attempt-login", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-sql-injection-attempt-login",
+                                                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -275,13 +284,15 @@ public class AuthControllerDocTest {
                 when(userService.login(any()))
                                 .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
-                // Perform the /auth/login request with SQL injection attempt in password and validate response
+                // Perform the /auth/login request with SQL injection attempt in password and
+                // validate response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"' OR '1'='1\"}"))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/login-sql-injection-attempt-password", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-sql-injection-attempt-password",
+                                                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -304,7 +315,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/login-wrong-password", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-wrong-password", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -327,7 +339,8 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/login-non-existent-user", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-non-existent-user", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -340,12 +353,14 @@ public class AuthControllerDocTest {
          */
         @Test
         public void login_withMockedService_generatesDoc_wrongMediaType() throws Exception {
-                // Perform the /auth/login request with non-existent MediaType and validate response
+                // Perform the /auth/login request with non-existent MediaType and validate
+                // response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/login")
                                 .content("{\"login\":\"non.existent@test.com\", \"password\":\"Test1234!\"}"))
                                 .andExpect(status().isUnsupportedMediaType())
-                                .andDo(document("auth/login-wrong-media-type", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/login-wrong-media-type", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -402,9 +417,9 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isCreated())
-                                .andDo(document("auth/register", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/register", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
-
 
         /**
          * Test the /auth/register endpoint with missing first name to generate
@@ -416,13 +431,15 @@ public class AuthControllerDocTest {
          */
         @Test
         public void register_withMockedService_generatesDoc_missingFirstName() throws Exception {
-                // Perform the /auth/register request with missing first name and validate response
+                // Perform the /auth/register request with missing first name and validate
+                // response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/register-missing-first-name", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/register-missing-first-name", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -435,15 +452,25 @@ public class AuthControllerDocTest {
          */
         @Test
         public void register_withMockedService_generatesDoc_missingLastName() throws Exception {
-                // Perform the /auth/register request with missing last name and validate response
+                // Perform the /auth/register request with missing last name and validate
+                // response
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"firstName\":\"Test\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/register-missing-last-name", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/register-missing-last-name", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /auth/register endpoint with missing login to generate
+         * documentation.
+         * This test performs a registration request with missing login and
+         * expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void register_withMockedService_generatesDoc_missingLogin() throws Exception {
                 // Perform the /auth/register request with missing login and validate response
@@ -452,7 +479,29 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/register-missing-login", preprocessResponse(prettyPrint())));
+                                .andDo(document("auth/register-missing-login", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/register endpoint with missing password to generate
+         * documentation.
+         * This test performs a registration request with missing password and
+         * expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_missingPassword() throws Exception {
+                // Perform the /auth/register request with missing password and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.user@test.com\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-missing-password", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**

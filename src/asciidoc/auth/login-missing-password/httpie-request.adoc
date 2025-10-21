@@ -1,5 +1,7 @@
 [source,bash]
 ----
-$ echo '{"login":"test.user@test.com"}' | http POST 'http://localhost:8080/auth/login' \
+$ echo '{
+  "login" : "test.user@test.com"
+}' | http POST 'http://localhost:8080/auth/login' \
     'Content-Type:application/json'
 ----

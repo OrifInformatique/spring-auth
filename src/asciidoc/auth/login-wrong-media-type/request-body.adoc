@@ -1,4 +1,7 @@
 [source,options="nowrap"]
 ----
-{"login":"non.existent@test.com", "password":"Test1234!"}
+{
+  "login" : "non.existent@test.com",
+  "password" : "Test1234!"
+}
 ----

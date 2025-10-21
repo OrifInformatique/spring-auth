@@ -43,6 +43,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 /**
@@ -145,7 +146,8 @@ class UserControllerDocTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + meToken))
                                 .andExpect(status().isOk())
-                                .andDo(document("users/me", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/me", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -202,7 +204,8 @@ class UserControllerDocTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andDo(document("users/all", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/all", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -268,7 +271,8 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(promoteResponse))
-                                .andDo(document("users/promote-manager", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/promote-manager", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -334,7 +338,8 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(revokeResponse))
-                                .andDo(document("users/revoke-manager", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/revoke-manager", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -400,7 +405,8 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(promoteResponse))
-                                .andDo(document("users/promote-admin", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/promote-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -466,7 +472,8 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(revokeResponse))
-                                .andDo(document("users/revoke-admin", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/revoke-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
@@ -532,12 +539,14 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(downgradeResponse))
-                                .andDo(document("users/downgrade-admin", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/downgrade-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
         /**
          * Test the /users/{userId} DELETE endpoint using mocked service and security.
-         * This test loads saved response and token files, mocks the userService.deleteUser
+         * This test loads saved response and token files, mocks the
+         * userService.deleteUser
          * call,
          * mocks authenticated admin user, performs DELETE request,
          * verifies response, and generates API documentation using Spring REST Docs.
@@ -597,7 +606,8 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(deleteResponse))
-                                .andDo(document("users/delete", preprocessResponse(prettyPrint())));
+                                .andDo(document("users/delete", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
         }
 
 }

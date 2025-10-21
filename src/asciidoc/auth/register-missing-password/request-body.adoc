@@ -3,7 +3,6 @@
 {
   "firstName" : "Test",
   "lastName" : "NewUser",
-  "login" : "test.newuser@test.com",
-  "password" : "testPassword"
+  "login" : "test.user@test.com"
 }
 ----

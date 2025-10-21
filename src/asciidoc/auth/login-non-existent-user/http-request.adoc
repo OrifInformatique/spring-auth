@@ -2,8 +2,11 @@
 ----
 POST /auth/login HTTP/1.1
 Content-Type: application/json
-Content-Length: 59
+Content-Length: 69
 Host: localhost:8080
 
-{"login":"test.user@test.com", "password":"WrongPassword!"}
+{
+  "login" : "test.user@test.com",
+  "password" : "WrongPassword!"
+}
 ----

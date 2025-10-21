@@ -2,8 +2,8 @@
 ----
 $ echo '{
   "firstName" : "Test",
-  "login" : "test.newuser@test.com",
-  "password" : "testPassword"
+  "lastName" : "NewUser",
+  "login" : "test.user@test.com"
 }' | http POST 'http://localhost:8080/auth/register' \
     'Content-Type:application/json'
 ----

@@ -1,4 +1,7 @@
 [source,json,options="nowrap"]
 ----
-{"login":"invalid-email-format", "password":"Test1234!"}
+{
+  "login" : "invalid-email-format",
+  "password" : "Test1234!"
+}
 ----

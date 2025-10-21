@@ -1,4 +1,6 @@
 [source,json,options="nowrap"]
 ----
-{"password":"Test1234!"}
+{
+  "password" : "Test1234!"
+}
 ----

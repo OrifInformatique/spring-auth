@@ -1,4 +1,7 @@
 [source,bash]
 ----
-$ echo '{"login":"non.existent@test.com", "password":"Test1234!"}' | http POST 'http://localhost:8080/auth/login'
+$ echo '{
+  "login" : "non.existent@test.com",
+  "password" : "Test1234!"
+}' | http POST 'http://localhost:8080/auth/login'
 ----
