@@ -628,6 +628,32 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/register endpoint with duplicate login to generate
+         * documentation.
+         * This test stubs the UserService to throw an AppException for duplicate
+         * login,
+         * performs a registration request, and generates API documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_duplicateLogin() throws Exception {
+
+                when(userService.register(any()))
+                                .thenThrow(new AppException("Login already exists", HttpStatus.CONFLICT));
+
+                // Perform the /auth/register request with duplicate login and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
+                                .andExpect(status().isConflict())
+                                .andDo(document("auth/register-duplicate-login",
+                                                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /auth/register endpoint with wrong media type to generate
          * documentation.
          * This test performs a registration request with wrong media type and expects

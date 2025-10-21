@@ -160,7 +160,7 @@ public class UserServiceTest {
         AppException exception = assertThrows(AppException.class, 
             () -> userService.register(signUpDto));
         assertEquals("Login already exists", exception.getMessage());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
     }
 
     @Test

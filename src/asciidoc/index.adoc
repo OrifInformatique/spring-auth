@@ -256,6 +256,20 @@ include::auth/register-sql-injection-attempt-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the email format is invalid.
 
+==== Error Response - 409
+These are example outputs for the `POST /auth/register` endpoint for conflict errors.
+
+===== Duplicate Login
+This is an example output when the login provided already exists.
+
+.request
+include::auth/register-duplicate-login/http-request.adoc[]
+
+.response
+include::auth/register-duplicate-login/http-response.adoc[]
+
+It returns a 409 Conflict error indicating that the login already exists.
+
 ===== Error Response - 415
 These are example outputs for the `POST /auth/register` endpoint for unsupported media types.
 
