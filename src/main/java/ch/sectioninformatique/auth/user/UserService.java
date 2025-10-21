@@ -53,10 +53,10 @@ public class UserService {
      * @throws AppException if the user is not found or the password is invalid
      */
     public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByLogin(credentialsDto.getLogin())
+        User user = userRepository.findByLogin(credentialsDto.login())
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
-        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
+        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
         throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);

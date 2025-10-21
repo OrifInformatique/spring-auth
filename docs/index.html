@@ -471,8 +471,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDAyLCJpYXQiOjE3NjEwMjc4MDJ9.pugy_SGe4jsRZLzNDSAPcl88_ShJb5VNy9d5opCOnjI",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NDc4MDIsImlhdCI6MTc2MTAyNzgwMn0._Cj-cJ9IwYZJBEx5OZ6rS0ZeQMMWsUZhofUYZ0uaJQE",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDM1MTQ4LCJpYXQiOjE3NjEwMzE1NDh9._qNUKBoE_79VhOrrzIJBQ8Oqoo2M99nOr6ju-r7gMYU",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NTE1NDgsImlhdCI6MTc2MTAzMTU0OH0.guOTOEgxPgD-w-QuNiTHEH4FOzLRVaO_V4IJWvlFSag",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -644,11 +644,75 @@ Content-Length: 57
 <p>It returns a 400 Bad Request error indicating that the request body is malformed.</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_sql_injection_attempt_login">SQL Injection Attempt Login</h4>
+<div class="paragraph">
+<p>This is an example output when the login field contains a SQL injection attempt.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 47
+Host: localhost:8080
+
+{"login":"' OR '1'='1", "password":"Test1234!"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 40
+
+{
+  "message" : "Invalid email format"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 400 Bad Request error indicating that the email format is invalid.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_error_response_401">Error Response - 401</h3>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/login</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect3">
+<h4 id="_sql_injection_attempt_password">SQL Injection Attempt Password</h4>
+<div class="paragraph">
+<p>This is an example output when the password field contains a SQL injection attempt.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 56
+Host: localhost:8080
+
+{"login":"test.user@test.com", "password":"' OR '1'='1"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 39
+
+{
+  "message" : "Invalid credentials"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the credentials are invalid.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_wrong_password">Wrong Password</h4>
@@ -693,10 +757,10 @@ Content-Length: 39
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json
-Content-Length: 62
+Content-Length: 59
 Host: localhost:8080
 
-{"login":"non.existent@test.com", "password":"WrongPassword!"}</code></pre>
+{"login":"test.user@test.com", "password":"WrongPassword!"}</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -713,6 +777,43 @@ Content-Length: 39
 </div>
 <div class="paragraph">
 <p>It returns a 401 Unauthorized error indicating that the credentials are invalid.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_error_response_415">Error Response - 415</h3>
+<div class="paragraph">
+<p>These are example outputs for the <code>POST /auth/login</code> endpoint for unsupported media types.</p>
+</div>
+<div class="sect3">
+<h4 id="_unsupported_media_type">Unsupported Media Type</h4>
+<div class="paragraph">
+<p>This is an example output when the media type of the request is unsupported.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
+Content-Length: 57
+Host: localhost:8080
+
+{"login":"non.existent@test.com", "password":"Test1234!"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 415 Unsupported Media Type
+Content-Type: application/json
+Content-Length: 70
+
+{
+  "message" : "Unsupported content type: application/octet-stream"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 415 Unsupported Media Type error indicating that the media type is not supported.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -744,8 +845,8 @@ Content-Length: 599
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDAyLCJpYXQiOjE3NjEwMjc4MDJ9.AxqsVLacKWel8IthYWxbwTMfmq_nGwAAUQFqdJ4FdI0",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NDc4MDIsImlhdCI6MTc2MTAyNzgwMn0.jmz144JQBpKXc06tyP6UmwTZNBo0q-Vimf0BXYZWiQk",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDM1MTQ4LCJpYXQiOjE3NjEwMzE1NDh9.-wK_ckb6iUtHv100bjhd3J0B0xBPSbD_P_0fjzYz1Sc",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NTE1NDgsImlhdCI6MTc2MTAzMTU0OH0.Rc9T5TF_YNhrOKTI2DUyh46buOR0BYrVdGKjvYHbjKU",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -765,7 +866,7 @@ Content-Length: 599
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NDc4MDIsImlhdCI6MTc2MTAyNzgwMn0._Cj-cJ9IwYZJBEx5OZ6rS0ZeQMMWsUZhofUYZ0uaJQE
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NTE1NDcsImlhdCI6MTc2MTAzMTU0N30.6_J9kb4I1dvP6D1ivsnmwgMWEUW2UbwiFx0YVx_13xU
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -781,7 +882,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDAyLCJpYXQiOjE3NjEwMjc4MDJ9.pugy_SGe4jsRZLzNDSAPcl88_ShJb5VNy9d5opCOnjI",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDM1MTQ3LCJpYXQiOjE3NjEwMzE1NDd9.v0vexxf-I17P-e7s1z7zwWNYBCv7c4A6Xh9hsgQGm6E",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -807,7 +908,7 @@ Content-Length: 419
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.JsvkB_e3CiZf_bxbZTAJummsqBp6e9EerEzAKWxAEcQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.4CJCAqkPj0U98ryz5hS6S4xLEYDw0YOczck_XYQt3fs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -844,7 +945,7 @@ Content-Length: 184
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.JsvkB_e3CiZf_bxbZTAJummsqBp6e9EerEzAKWxAEcQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.4CJCAqkPj0U98ryz5hS6S4xLEYDw0YOczck_XYQt3fs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -860,15 +961,15 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$po2yWFGhfYSiDNMoFEbgUOQYB9hZG9nviA8ZlqMqmdfDLiql2cD7e",
-  "createdAt" : "2025-10-21T06:23:30.882+00:00",
-  "updatedAt" : "2025-10-21T06:23:30.882+00:00",
+  "password" : "$2a$10$K0cHx6jfwOkAVoaIJfHanexyXgIgkAkKjtBk/qVXloOyOmvkaD4xK",
+  "createdAt" : "2025-10-21T07:25:54.939+00:00",
+  "updatedAt" : "2025-10-21T07:25:54.939+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-10-21T06:23:30.615+00:00",
-    "updatedAt" : "2025-10-21T06:23:30.615+00:00"
+    "createdAt" : "2025-10-21T07:25:54.673+00:00",
+    "updatedAt" : "2025-10-21T07:25:54.673+00:00"
   },
   "authorities" : [ ],
   "credentialsNonExpired" : true,
@@ -881,15 +982,15 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$MS39jHDb3zxdzueJPWDpken53sD5TaerWa9jjV4GaZxu2NH1K/Rd2",
-  "createdAt" : "2025-10-21T06:23:30.884+00:00",
-  "updatedAt" : "2025-10-21T06:23:30.884+00:00",
+  "password" : "$2a$10$0a55v2j7b7OVM4pv4jV/w.uNAYCfsbi8lfc0oG75QlSl80tzUZsTS",
+  "createdAt" : "2025-10-21T07:25:54.940+00:00",
+  "updatedAt" : "2025-10-21T07:25:54.940+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-10-21T06:23:30.625+00:00",
-    "updatedAt" : "2025-10-21T06:23:30.625+00:00"
+    "createdAt" : "2025-10-21T07:25:54.681+00:00",
+    "updatedAt" : "2025-10-21T07:25:54.681+00:00"
   },
   "authorities" : [ ],
   "credentialsNonExpired" : true,
@@ -902,15 +1003,15 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$ibyWvpQie3Jh2IWHRnM2B.I4B1UXO8GwNBPgBxRFQfV08r4DW.f1O",
-  "createdAt" : "2025-10-21T06:23:30.885+00:00",
-  "updatedAt" : "2025-10-21T06:23:30.885+00:00",
+  "password" : "$2a$10$X9wAzangiMj0n1jcxOV2TeWWxw8CCAGsTje56qGcY6ZLwQAEdQzK2",
+  "createdAt" : "2025-10-21T07:25:54.941+00:00",
+  "updatedAt" : "2025-10-21T07:25:54.941+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-21T06:23:30.629+00:00",
-    "updatedAt" : "2025-10-21T06:23:30.629+00:00"
+    "createdAt" : "2025-10-21T07:25:54.686+00:00",
+    "updatedAt" : "2025-10-21T07:25:54.686+00:00"
   },
   "authorities" : [ ],
   "credentialsNonExpired" : true,
@@ -923,15 +1024,15 @@ Content-Length: 2607
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$U.hfjy3E/G8/qruHO/Nmw.qPIE12qmn2rSPbI8QBHoujHD5BFIN2u",
-  "createdAt" : "2025-10-21T06:23:30.890+00:00",
-  "updatedAt" : "2025-10-21T06:23:30.890+00:00",
+  "password" : "$2a$10$HrpQ5.4MGJAu4pu7Rj2/7uWpYnR1CsmaXtyvHOIdP/gdnbZwvN8TK",
+  "createdAt" : "2025-10-21T07:25:54.942+00:00",
+  "updatedAt" : "2025-10-21T07:25:54.942+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-21T06:23:30.629+00:00",
-    "updatedAt" : "2025-10-21T06:23:30.629+00:00"
+    "createdAt" : "2025-10-21T07:25:54.686+00:00",
+    "updatedAt" : "2025-10-21T07:25:54.686+00:00"
   },
   "authorities" : [ ],
   "credentialsNonExpired" : true,
@@ -956,7 +1057,7 @@ Content-Length: 2607
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.dOX8qhRbQ81StTsZYwtUaOA8bOy0AQ9ZI0FVuO5rNRs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -984,7 +1085,7 @@ User promoted to manager successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.dOX8qhRbQ81StTsZYwtUaOA8bOy0AQ9ZI0FVuO5rNRs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1012,7 +1113,7 @@ Manager role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.dOX8qhRbQ81StTsZYwtUaOA8bOy0AQ9ZI0FVuO5rNRs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1040,7 +1141,7 @@ Admin role assigned successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.dOX8qhRbQ81StTsZYwtUaOA8bOy0AQ9ZI0FVuO5rNRs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1068,7 +1169,7 @@ Admin role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.dOX8qhRbQ81StTsZYwtUaOA8bOy0AQ9ZI0FVuO5rNRs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1096,7 +1197,7 @@ Admin role downgraded successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDMxNDEyLCJpYXQiOjE3NjEwMjc4MTJ9.jiEexa8wC6TjkWbRb57DyezHwl2GZow6LqXec8QliEw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDM1MTU2LCJpYXQiOjE3NjEwMzE1NTZ9.dOX8qhRbQ81StTsZYwtUaOA8bOy0AQ9ZI0FVuO5rNRs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1119,7 +1220,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-20 09:52:18 UTC
+Last updated 2025-10-21 07:03:52 UTC
 </div>
 </div>
 </body>

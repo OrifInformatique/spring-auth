@@ -304,7 +304,6 @@ public class AuthControllerIntegrationTest {
                 Files.writeString(path, wrappedResponse);
         }
 
-
         /**
          * Test the /auth/login endpoint with SQL injection attempt in password.
          * This test performs a login request with SQL injection attempt in password and
@@ -490,6 +489,43 @@ public class AuthControllerIntegrationTest {
                 Path path = Paths.get("target/test-data/auth-register-response.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, responseBody);
+        }
+
+        /**
+         * Test the /auth/register endpoint with missing first name.
+         * This test performs a registration request with missing first name and
+         * expects a bad request response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_missingFirstName_shouldReturnBadRequest() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-register-response-missing-first-name.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
         }
 
         /**
