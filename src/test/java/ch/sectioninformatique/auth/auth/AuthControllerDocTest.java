@@ -545,6 +545,26 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/register endpoint with malformed JSON to generate
+         * documentation.
+         * This test performs a registration request with malformed JSON and expects a
+         * bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_malformedJson() throws Exception {
+                // Perform the /auth/register request with malformed JSON and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.user@test.com\", \"password\":\"testPassword\""))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-malformed-json", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /auth/refresh endpoint with mocked services to generate
          * documentation.
          * This test stubs the UserService and UserAuthenticationProvider to return
