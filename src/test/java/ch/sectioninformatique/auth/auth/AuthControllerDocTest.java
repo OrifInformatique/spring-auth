@@ -526,6 +526,25 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/register endpoint with empty body to generate documentation.
+         * This test performs a registration request with empty body and expects a bad
+         * request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_emptyBody() throws Exception {
+                // Perform the /auth/register request with empty body and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(""))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-empty-body", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /auth/refresh endpoint with mocked services to generate
          * documentation.
          * This test stubs the UserService and UserAuthenticationProvider to return

@@ -1,0 +1,6 @@
+[source,json,options="nowrap"]
+----
+{
+  "message" : "Request body is missing or unreadable"
+}
+----
