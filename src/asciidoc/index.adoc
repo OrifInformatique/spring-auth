@@ -157,6 +157,17 @@ include::auth/register-missing-first-name/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the first name field is required.
 
+===== Missing Last Name
+This is an example output when the last name field is missing in the request.
+
+.request
+include::auth/register-missing-last-name/http-request.adoc[]
+
+.response
+include::auth/register-missing-last-name/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the last name field is required.
+
 === Refresh
 This is an example output for the `GET /auth/refresh` endpoint.
 

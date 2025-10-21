@@ -2,7 +2,7 @@
 ----
 GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NTIwNTgsImlhdCI6MTc2MTAzMjA1OH0.u5DP_q58s5B78esWoPLaxtqXurTN61EY57044ceVBu8
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE3NTI1ODIsImlhdCI6MTc2MTAzMjU4Mn0.01l8-zQ9pQ6RJrG5T9MZ-p0_L0WS92qHLk_A0U5kIWA
 Host: localhost:8080
 
 ----

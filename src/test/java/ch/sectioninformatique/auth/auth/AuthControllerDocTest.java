@@ -406,6 +406,14 @@ public class AuthControllerDocTest {
         }
 
 
+        /**
+         * Test the /auth/register endpoint with missing first name to generate
+         * documentation.
+         * This test performs a registration request with missing first name and
+         * expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void register_withMockedService_generatesDoc_missingFirstName() throws Exception {
                 // Perform the /auth/register request with missing first name and validate response
@@ -415,6 +423,25 @@ public class AuthControllerDocTest {
                                 .content("{\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
                                 .andExpect(status().isBadRequest())
                                 .andDo(document("auth/register-missing-first-name", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/register endpoint with missing last name to generate
+         * documentation.
+         * This test performs a registration request with missing last name and
+         * expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void register_withMockedService_generatesDoc_missingLastName() throws Exception {
+                // Perform the /auth/register request with missing last name and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"firstName\":\"Test\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/register-missing-last-name", preprocessResponse(prettyPrint())));
         }
 
         /**
