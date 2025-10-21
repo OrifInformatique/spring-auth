@@ -71,8 +71,30 @@ include::auth/login-malformed-json/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is malformed.
 
+==== SQL Injection Attempt Login
+This is an example output when the login field contains a SQL injection attempt.
+
+.request
+include::auth/login-sql-injection-attempt-login/http-request.adoc[]
+
+.response
+include::auth/login-sql-injection-attempt-login/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the email format is invalid.
+
 === Error Response - 401
 These are example outputs for the `POST /auth/login` endpoint for unauthorized access.
+
+==== SQL Injection Attempt Password
+This is an example output when the password field contains a SQL injection attempt.
+
+.request
+include::auth/login-sql-injection-attempt-password/http-request.adoc[]
+
+.response
+include::auth/login-sql-injection-attempt-password/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the credentials are invalid.
 
 ==== Wrong Password
 This is an example output when the password provided is incorrect.
@@ -96,11 +118,11 @@ include::auth/login-non-existent-user/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the credentials are invalid.
 
-=== Unsupported Media Type - 415
+=== Error Response - 415
 These are example outputs for the `POST /auth/login` endpoint for unsupported media types.
 
-==== Wrong Content Type
-This is an example output when the content type of the request is unsupported.
+==== Unsupported Media Type
+This is an example output when the media type of the request is unsupported.
 
 .request
 include::auth/login-wrong-media-type/http-request.adoc[]
@@ -108,7 +130,7 @@ include::auth/login-wrong-media-type/http-request.adoc[]
 .response
 include::auth/login-wrong-media-type/http-response.adoc[]
 
-It returns a 415 Unsupported Media Type error indicating that the content type is not supported.
+It returns a 415 Unsupported Media Type error indicating that the media type is not supported.
 
 === Register
 This is an example output for the `POST /auth/register` endpoint.

@@ -242,6 +242,49 @@ public class AuthControllerDocTest {
         }
 
         /**
+         * Test the /auth/login endpoint with SQL injection attempt in login to
+         * generate documentation.
+         * This test performs a login request with SQL injection attempt in login and
+         * expects a bad request response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc_sqlInjectionAttemptLogin() throws Exception {
+                // Perform the /auth/login request with SQL injection attempt and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"' OR '1'='1\", \"password\":\"Test1234!\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(document("auth/login-sql-injection-attempt-login", preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/login endpoint with SQL injection attempt in password to
+         * generate documentation.
+         * This test stubs the UserService to throw an AppException for SQL injection
+         * attempt,
+         * performs a login request, and generates API documentation.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_withMockedService_generatesDoc_sqlInjectionAttemptPassword() throws Exception {
+
+                when(userService.login(any()))
+                                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+
+                // Perform the /auth/login request with SQL injection attempt in password and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"' OR '1'='1\"}"))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("auth/login-sql-injection-attempt-password", preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /auth/login endpoint with wrong password to generate documentation.
          * This test stubs the UserService to throw an AppException for invalid
          * password,

@@ -84,7 +84,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with missing login.
-         * This test performs a login request with missing login and expects a bad request response.
+         * This test performs a login request with missing login and expects a bad
+         * request response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -103,7 +104,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -119,7 +121,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with missing password.
-         * This test performs a login request with missing password and expects a bad request response.
+         * This test performs a login request with missing password and expects a bad
+         * request response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -138,7 +141,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -154,7 +158,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with invalid email format.
-         * This test performs a login request with invalid email format and expects a bad request response.
+         * This test performs a login request with invalid email format and expects a
+         * bad request response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -173,7 +178,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -189,7 +195,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with empty body.
-         * This test performs a login request with empty body and expects a bad request response.
+         * This test performs a login request with empty body and expects a bad request
+         * response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -208,7 +215,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -224,7 +232,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with malformed JSON.
-         * This test performs a login request with malformed JSON and expects a bad request response.
+         * This test performs a login request with malformed JSON and expects a bad
+         * request response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -243,7 +252,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -258,8 +268,84 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
+         * Test the /auth/login endpoint with SQL injection attempt in login.
+         * This test performs a login request with SQL injection attempt in login and
+         * expects a bad request response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_sqlInjectionAttemptLogin_shouldReturnBadRequest() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"' OR '1'='1\", \"password\":\"Test1234!\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-login-sql-injection-attempt-login.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+
+        /**
+         * Test the /auth/login endpoint with SQL injection attempt in password.
+         * This test performs a login request with SQL injection attempt in password and
+         * expects an unauthorized response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_sqlInjectionAttemptPassword_shouldReturnUnauthorized() throws Exception {
+                MvcResult result = mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"login\":\"test.user@test.com\", \"password\":\"' OR '1'='1\"}"))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-login-sql-injection-attempt-password.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
          * Test the /auth/login endpoint with wrong password.
-         * This test performs a login request with wrong password and expects an unauthorized response.
+         * This test performs a login request with wrong password and expects an
+         * unauthorized response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -278,7 +364,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -294,7 +381,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with non-existent user.
-         * This test performs a login request with non-existent user and expects an unauthorized response.
+         * This test performs a login request with non-existent user and expects an
+         * unauthorized response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -313,7 +401,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
@@ -329,7 +418,8 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/login endpoint with wrong content type.
-         * This test performs a login request with wrong content type and expects an unsupported media type response.
+         * This test performs a login request with wrong content type and expects an
+         * unsupported media type response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
@@ -347,7 +437,8 @@ public class AuthControllerIntegrationTest {
 
                 // Parse original response body
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {});
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
 
                 // Add status code
                 responseMap.put("status", status);
