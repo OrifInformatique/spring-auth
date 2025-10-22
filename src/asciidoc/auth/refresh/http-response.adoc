@@ -9,7 +9,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTQ0OTI1LCJpYXQiOjE3NjExNDEzMjV9.vLfww8Ltjl4GuJk3qON_e-CO3r2mjuWWSPcVi6MFwkA",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTQ1NDczLCJpYXQiOjE3NjExNDE4NzN9.AjlkYMoXu0ak6Cv2RfMFSKPXwJt4jGfMzTglkztIXm4",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]

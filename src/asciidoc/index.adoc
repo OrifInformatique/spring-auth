@@ -483,6 +483,17 @@ include::users/promote-manager-user-already-manager/http-response.adoc[]
 
 It returns a 409 Conflict error indicating that the user is already a manager.
 
+===== 2.3.4.2 User Already Admin
+This is an example output when the user to be promoted is already an admin.
+
+.request
+include::users/promote-manager-user-already-admin/http-request.adoc[]
+
+.response
+include::users/promote-manager-user-already-admin/http-response.adoc[]
+
+It returns a 409 Conflict error indicating that the user is already an admin.
+
 === 2.4 Revoke Manager to User
 This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.
 

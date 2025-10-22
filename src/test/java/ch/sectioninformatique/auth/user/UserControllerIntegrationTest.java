@@ -569,6 +569,44 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
+        /**
+         * Test the /users/{userId}/promote-manager endpoint with a user
+         * who is already an admin.
+         * This test retrieves a known admin user,
+         * generates an authentication token for the admin,
+         * and performs a PUT request to promote the admin to manager.
+         * It verifies that the response status is Conflict and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void promoteToManager_userAlreadyAdmin_shouldReturnConflict() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                MvcResult result = mockMvc.perform(put("/users/" + adminDto.getId().toString() + "/promote-manager")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isConflict())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-already-admin.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-user-already-admin.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
 
         /**
          * Test the /users/{userId}/revoke-manager endpoint with real data.

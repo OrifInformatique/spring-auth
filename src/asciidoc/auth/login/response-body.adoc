@@ -5,8 +5,8 @@
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTQ0OTI2LCJpYXQiOjE3NjExNDEzMjZ9.sAepEk53BXFg6Ap1YNz5ZnW0P__GlqcRDRVr7kLJdpQ",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NjEzMjYsImlhdCI6MTc2MTE0MTMyNn0.DMBgJnbkZuI_qw_gh0rFQKz_epVGsEShoovy2NAzqOc",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTQ1NDczLCJpYXQiOjE3NjExNDE4NzN9.AjlkYMoXu0ak6Cv2RfMFSKPXwJt4jGfMzTglkztIXm4",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NjE4NzMsImlhdCI6MTc2MTE0MTg3M30.4G0tJX8lgb5mKnKFG-dK_47uF2486eko5n-SOwT3J7Y",
   "mainRole" : "USER",
   "permissions" : [ ]
 }
