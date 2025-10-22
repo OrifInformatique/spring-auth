@@ -111,12 +111,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{userId}/revoke-manager")
     public ResponseEntity<?> revokeManagerRole(@PathVariable Long userId) {
-        try {
-            userService.revokeManagerRole(userId);
-            return ResponseEntity.ok().body("Manager role revoked successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        userService.revokeManagerRole(userId);
+        return ResponseEntity.ok().body("Manager role revoked successfully");
     }
 
     /**

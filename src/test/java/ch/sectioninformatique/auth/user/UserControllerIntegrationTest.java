@@ -1,6 +1,5 @@
 package ch.sectioninformatique.auth.user;
 
-import org.checkerframework.checker.units.qual.m;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -651,6 +650,36 @@ public class UserControllerIntegrationTest {
                 Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token.txt");
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
+        }
+
+        /**
+         * Test the /users/{userId}/revoke-manager endpoint with missing
+         * authorization header.
+         * This test retrieves a known manager user and performs a PUT request to
+         * revoke the manager role
+         * without providing an Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response to a file.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void revokeManagerRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
+                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+
+                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-missing-authorization.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
         }
 
         /**

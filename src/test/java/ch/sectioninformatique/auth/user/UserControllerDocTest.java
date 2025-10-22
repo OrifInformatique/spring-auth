@@ -748,6 +748,16 @@ class UserControllerDocTest {
                                                 preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /users/{userId}/promote-manager endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToManager call to throw conflict exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         void promoteToManager_withMockedService_generatesDoc_userAlreadyAdmin() throws Exception {
 
@@ -850,6 +860,35 @@ class UserControllerDocTest {
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(revokeResponse))
                                 .andDo(document("users/revoke-manager", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        @Test
+        void revokeManagerRole_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeManagerRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String revokeResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
+
+                when(userService.revokeManagerRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
+
+                // Perform the PUT request to revoke the user to manager
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-manager")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/revoke-manager-missing-authorization",
+                                                preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
