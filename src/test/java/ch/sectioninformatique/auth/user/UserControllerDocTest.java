@@ -338,6 +338,39 @@ class UserControllerDocTest {
         }
 
         /**
+         * Test for retrieving  all users that is missing it's
+         * Authorization header.
+         * This test verifies that an unauthorized response is returned
+         * when the Authorization header is missing,
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
+        @Test
+        void all_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-all-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required all response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+
+                meResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(meResponseJson);
+
+                when(userService.allUsers()).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                this.mockMvc.perform(get("/users/all")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/all-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /users/{userId}/promote-manager endpoint using mocked service and
          * security.
          * This test loads saved response and token files, mocks the
