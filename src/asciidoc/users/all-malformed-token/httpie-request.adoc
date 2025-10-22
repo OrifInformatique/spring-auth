@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ http GET 'http://localhost:8080/users/all' \
+    'Accept:application/json' \
+    'Authorization:Bearer this.is.not.a.valid.token'
+----

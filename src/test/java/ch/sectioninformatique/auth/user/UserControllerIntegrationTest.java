@@ -252,6 +252,7 @@ public class UserControllerIntegrationTest {
          * without providing an Authorization header.
          * It verifies that the response status is Unauthorized and
          * saves the response to a file.
+         * 
          * @throws Exception if an error occurs during the test
          */
         @Test
@@ -264,12 +265,44 @@ public class UserControllerIntegrationTest {
 
                 String responseBody = result.getResponse().getContentAsString();
 
-
                 // Save response to file for later tests
                 Path path = Paths.get("target/test-data/users-all-response-missing-authorization.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, responseBody);
 
+        }
+
+        /**
+         * Test the /users/all endpoint with a malformed token.
+         * This test performs a GET request to the /users/all endpoint
+         * with an invalid JWT token in the Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response and token to files.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void all_withMalformedToken_shouldReturnUnauthorized() throws Exception {
+                String token = "this.is.not.a.valid.token";
+
+                MvcResult result = mockMvc.perform(get("/users/all")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-all-response-malformed-token.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-all-token-malformed-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
         }
 
         /**

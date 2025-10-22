@@ -2,9 +2,9 @@
 ----
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
-Content-Length: 66
+Content-Length: 72
 
 {
-  "message" : "The Token has expired on 2025-10-22T08:18:32Z."
+  "message" : "The token was expected to have 3 parts, but got > 3."
 }
 ----
