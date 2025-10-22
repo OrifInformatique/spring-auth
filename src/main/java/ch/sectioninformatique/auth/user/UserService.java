@@ -163,17 +163,17 @@ public class UserService {
      */
     public UserDto promoteToManager(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already a manager");
+            throw new AppException("The user is already a manager", HttpStatus.CONFLICT);
         }
         if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already an admin");
+            throw new AppException("The user is already an admin", HttpStatus.CONFLICT);
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
-                .orElseThrow(() -> new RuntimeException("Manager role not found"));
+                .orElseThrow(() -> new AppException("Manager role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(managerRole);
         userRepository.save(user);

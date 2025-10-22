@@ -511,6 +511,20 @@ include::users/promote-manager-non-admin/http-response.adoc[]
 
 It returns a 403 Forbidden error indicating that access is denied.
 
+==== Error Response - 404 - Promote User to Manager
+These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for not found errors.
+
+===== User Not Found - Promote User to Manager
+This is an example output when the user to be promoted is not found.    
+
+.request
+include::users/promote-manager-user-not-found/http-request.adoc[]
+
+.response
+include::users/promote-manager-user-not-found/http-response.adoc[]
+
+It returns a 404 Not Found error indicating that the user was not found.
+
 === Revoke Manager to User
 This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.
 

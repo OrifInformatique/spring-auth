@@ -653,6 +653,54 @@ class UserControllerDocTest {
         }
 
         /**
+         * Test the /users/{userId}/promote-manager endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToManager call to throw not found exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void promoteToManager_withMockedService_generatesDoc_userNotFound() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-not-found.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToManager response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+
+                String promoteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-promoteToManager-token-user-not-found.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToManager token data. Run promoteToManager_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToManager(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
+
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
+
+                // Perform the PUT request to promote the user to manager
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-manager")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isNotFound())
+                                .andDo(document("users/promote-manager-user-not-found",
+                                                preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /users/{userId}/revoke-manager endpoint using mocked service and
          * security.
          * This test loads saved response and token files, mocks the
