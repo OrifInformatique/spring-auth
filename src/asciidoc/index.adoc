@@ -47,6 +47,9 @@
 .... <<Malformed Token - All>>
 .... <<Expired Token - All>>
 ..  <<Promote User to Manager>>
+... <<Error Response - 401 - Promote User to Manager>>
+..... <<Missing Authorization Header - Promote User to Manager>>
+..... <<Malformed Token - Promote User to Manager>>
 ..  <<Revoke Manager to User>>
 ..  <<Promote to Admin>>
 ..  <<Revoke Admin to User>>
@@ -480,6 +483,17 @@ include::users/promote-manager-missing-authorization/http-request.adoc[]
 include::users/promote-manager-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
+
+===== Malformed Token - Promote User to Manager
+This is an example output when the token provided is malformed.
+
+.request
+include::users/promote-manager-malformed-token/http-request.adoc[]
+
+.response
+include::users/promote-manager-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
 
 === Revoke Manager to User
 This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.

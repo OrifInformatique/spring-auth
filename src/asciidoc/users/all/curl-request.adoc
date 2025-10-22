@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/users/all' -i -X GET \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTM2Nzg0LCJpYXQiOjE3NjExMzMxODR9.zvwLrI13x2fX0LwYVn_HF2lq3q6hEBo-JqgiHIbZGY4'
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTM3NTgxLCJpYXQiOjE3NjExMzM5ODF9.i3er2QukU46Xb3R0QjtUZW3PyxwP8wP7rAiR45_2fB8'
 ----
