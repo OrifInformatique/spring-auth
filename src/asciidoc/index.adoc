@@ -50,6 +50,8 @@
 ... <<Error Response - 401 - Promote User to Manager>>
 ..... <<Missing Authorization Header - Promote User to Manager>>
 ..... <<Malformed Token - Promote User to Manager>>
+... <<Error Response - 403 - Promote User to Manager>>
+..... <<Non-Admin User - Promote User to Manager>>
 ..  <<Revoke Manager to User>>
 ..  <<Promote to Admin>>
 ..  <<Revoke Admin to User>>
@@ -494,6 +496,20 @@ include::users/promote-manager-malformed-token/http-request.adoc[]
 include::users/promote-manager-malformed-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
+
+==== Error Response - 403 - Promote User to Manager
+These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for forbidden access.
+
+===== Non-Admin User - Promote User to Manager
+This is an example output when a non-admin user attempts to promote a user to manager.
+
+.request
+include::users/promote-manager-non-admin/http-request.adoc[]
+
+.response
+include::users/promote-manager-non-admin/http-response.adoc[]
+
+It returns a 403 Forbidden error indicating that access is denied.
 
 === Revoke Manager to User
 This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.

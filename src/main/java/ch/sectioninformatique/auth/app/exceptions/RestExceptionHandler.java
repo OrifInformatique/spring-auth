@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.security.access.AccessDeniedException;
 
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 
@@ -91,6 +92,20 @@ public class RestExceptionHandler {
                 .body(new ErrorDto(message));
     }
 
+    /**
+     * Handles HTTP media type not supported exceptions and converts them to error
+     * responses.
+     * This method:
+     * - Is annotated with @ExceptionHandler to catch
+     * HttpMediaTypeNotSupportedException instances
+     * - Returns a ResponseEntity with HTTP 415 Unsupported Media Type status and
+     * error message
+     * - Wraps the error message in an ErrorDto object
+     * - Is used for all REST endpoints in the application
+     *
+     * @param ex The HttpMediaTypeNotSupportedException that was thrown
+     * @return ResponseEntity containing the error details and HTTP 415 status
+     */
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseBody
     public ResponseEntity<ErrorDto> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex) {
@@ -98,5 +113,25 @@ public class RestExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                 .body(new ErrorDto(message));
+    }
+
+    /**
+     * Handles access denied exceptions and converts them to error responses.
+     * This method:
+     * - Is annotated with @ExceptionHandler to catch AccessDeniedException
+     * instances
+     * - Returns a ResponseEntity with HTTP 403 Forbidden status and error message
+     * - Wraps the error message in an ErrorDto object
+     * - Is used for all REST endpoints in the application
+     *
+     * @param ex The AccessDeniedException that was thrown
+     * @return ResponseEntity containing the error details and HTTP 403 status
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorDto> handleAccessDeniedException(AccessDeniedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorDto("Access is denied"));
     }
 }

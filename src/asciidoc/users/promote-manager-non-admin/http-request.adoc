@@ -1,8 +1,9 @@
 [source,http,options="nowrap"]
 ----
-GET /users/me HTTP/1.1
+PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTM4NzQ4LCJpYXQiOjE3NjExMzUxNDh9.c3znTA_Db-SAgNYLbTLuuvrhKq9EWd55bCa7alzwsUU
 Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded
 
 ----

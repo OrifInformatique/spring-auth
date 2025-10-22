@@ -1,6 +1,6 @@
 [source,bash]
 ----
-$ curl 'http://localhost:8080/users/me' -i -X GET \
+$ curl 'http://localhost:8080/users/100/promote-manager' -i -X PUT \
     -H 'Accept: application/json' \
     -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTM4NzQ4LCJpYXQiOjE3NjExMzUxNDh9.c3znTA_Db-SAgNYLbTLuuvrhKq9EWd55bCa7alzwsUU'
 ----
