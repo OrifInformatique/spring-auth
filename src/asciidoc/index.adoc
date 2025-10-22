@@ -467,6 +467,20 @@ include::users/promote-manager/http-response.adoc[]
 
 It promotes a user to the "MANAGER" role.
 
+==== Error Response - 401 - Promote User to Manager
+These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for unauthorized access.
+
+===== Missing Authorization Header - Promote User to Manager
+This is an example output when the Authorization header is missing in the request.
+
+.request
+include::users/promote-manager-missing-authorization/http-request.adoc[]
+
+.response
+include::users/promote-manager-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
 === Revoke Manager to User
 This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.
 

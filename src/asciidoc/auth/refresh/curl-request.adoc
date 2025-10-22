@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/auth/refresh' -i -X GET \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NDUxNDgsImlhdCI6MTc2MTEyNTE0OH0.4_WO79PBsYBcBk85EH3y5EE2Q-KIdQqcmuHUB6B660s'
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NTMxNzQsImlhdCI6MTc2MTEzMzE3NH0.Kvn9Tl__Gnxiy-QYFCPDelBqEvhuaD1aFqA2U3suPaI'
 ----

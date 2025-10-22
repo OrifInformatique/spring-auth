@@ -387,6 +387,37 @@ public class UserControllerIntegrationTest {
         }
 
         /**
+         * Test the /users/{userId}/promote-manager endpoint with missing
+         * authorization header.
+         * This test retrieves a known user and performs a PUT request to
+         * promote the user to manager
+         * without providing an Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response to a file.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void promoteToManager_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                MvcResult result = mockMvc.perform(put("/users/" + userDto.getId().toString() + "/promote-manager")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-promoteToManager-response-missing-authorization.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+        }
+
+
+        /**
          * Test the /users/{userId}/revoke-manager endpoint with real data.
          * This test retrieves a known manager user and an admin user,
          * generates an authentication token for the admin,
