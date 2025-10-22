@@ -183,12 +183,55 @@ class UserControllerDocTest {
                 when(securityContext.getAuthentication()).thenThrow(
                                 new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
-                SecurityContextHolder.setContext(securityContext);
-
                 this.mockMvc.perform(get("/users/me")
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("users/me-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test for retrieving the authenticated user's information with malformed
+         * token.
+         * This test verifies that an unauthorized response is returned
+         * when the token is malformed,
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
+        @Test
+        void me_withMockedService_generatesDoc_withMalformedToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-me-response-malformed-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required me response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meResponseJson = Files.readString(path);
+
+                Path pathToken = Paths.get("target/test-data/users-me-token-malformed-token.txt");
+                if (!Files.exists(pathToken)) {
+                        throw new IllegalStateException(
+                                        "Missing required token data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meToken = Files.readString(pathToken);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(meResponseJson);
+
+                // Mock Spring Security context and authentication
+                when(authentication.getPrincipal()).thenReturn(null);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContextHolder.setContext(securityContext);
+
+                when(securityContext.getAuthentication()).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                this.mockMvc.perform(get("/users/me")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + meToken))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/me-malformed-token", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 

@@ -336,6 +336,17 @@ include::users/me-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
+===== Malformed Token
+This is an example output when the token provided is malformed.
+
+.request
+include::users/me-malformed-token/http-request.adoc[]
+
+.response
+include::users/me-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
+
 === Get All Users
 This is an example output for the `GET /users/all` endpoint.
 

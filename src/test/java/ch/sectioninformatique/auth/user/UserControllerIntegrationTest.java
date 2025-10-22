@@ -116,6 +116,39 @@ public class UserControllerIntegrationTest {
         }
 
         /**
+         * Test the /users/me endpoint with a malformed token.
+         * This test performs a GET request to the /users/me endpoint
+         * with an invalid JWT token in the Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response and token to files.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void me_withMalformedToken_shouldReturnUnauthorized() throws Exception {
+                String token = "this.is.not.a.valid.token";
+
+                MvcResult result = mockMvc.perform(get("/users/me")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-me-response-malformed-token.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-me-token-malformed-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
+        /**
          * Test the /users/all endpoint with real data.
          * This test retrieves a known user, generates an authentication token,
          * and performs a GET request to the /users/all endpoint.

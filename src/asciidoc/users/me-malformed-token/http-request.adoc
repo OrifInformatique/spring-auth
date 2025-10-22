@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+GET /users/me HTTP/1.1
+Accept: application/json
+Authorization: Bearer this.is.not.a.valid.token
+Host: localhost:8080
+
+----
