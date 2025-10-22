@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,6 +27,7 @@ import java.io.IOException;
  * - GET requests use standard token validation
  * - Other methods use strong token validation
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -78,7 +81,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(
                                 userAuthenticationProvider.validateTokenStrongly(authElements[1]));
                     }
+                } catch (JWTVerificationException e) {
+                    SecurityContextHolder.clearContext();
+                    log.debug("Invalid JWT token: {}", e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"message\":\"Invalid token\"}");
+                    response.getWriter().flush();
+                    return;
                 } catch (RuntimeException e) {
+                    // Preserve behavior for other runtime exceptions
                     SecurityContextHolder.clearContext();
                     throw e;
                 }

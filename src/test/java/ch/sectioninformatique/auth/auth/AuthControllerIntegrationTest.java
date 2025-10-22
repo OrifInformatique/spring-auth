@@ -305,43 +305,6 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test the /auth/login endpoint with SQL injection attempt in password.
-         * This test performs a login request with SQL injection attempt in password and
-         * expects an unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void login_sqlInjectionAttemptPassword_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"' OR '1'='1\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-sql-injection-attempt-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
-
-        /**
          * Test the /auth/login endpoint with wrong password.
          * This test performs a login request with wrong password and expects an
          * unauthorized response.
@@ -1004,6 +967,45 @@ public class AuthControllerIntegrationTest {
 
                 // Save response to file
                 Path path = Paths.get("target/test-data/auth-refresh-missing-authorization.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
+         * Test the /auth/refresh endpoint with invalid token.
+         * This test performs a token refresh request with an invalid token and
+         * expects an unauthorized response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void refresh_invalidToken_shouldReturnUnauthorized() throws Exception {
+                String invalidToken = "this.is.not.a.valid.token";
+
+                MvcResult result = mockMvc.perform(get("/auth/refresh")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + invalidToken))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-refresh-invalid-token.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
         }

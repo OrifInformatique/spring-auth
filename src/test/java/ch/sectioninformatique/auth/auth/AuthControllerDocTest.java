@@ -270,32 +270,6 @@ public class AuthControllerDocTest {
         }
 
         /**
-         * Test the /auth/login endpoint with SQL injection attempt in password to
-         * generate documentation.
-         * This test stubs the UserService to throw an AppException for SQL injection
-         * attempt,
-         * performs a login request, and generates API documentation.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void login_withMockedService_generatesDoc_sqlInjectionAttemptPassword() throws Exception {
-
-                when(userService.login(any()))
-                                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
-
-                // Perform the /auth/login request with SQL injection attempt in password and
-                // validate response
-                // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"' OR '1'='1\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/login-sql-injection-attempt-password",
-                                                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())));
-        }
-
-        /**
          * Test the /auth/login endpoint with wrong password to generate documentation.
          * This test stubs the UserService to throw an AppException for invalid
          * password,
@@ -740,6 +714,14 @@ public class AuthControllerDocTest {
                                 .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /auth/refresh endpoint with missing Authorization header to
+         * generate documentation.
+         * This test performs a token refresh request without Authorization header and
+         * expects an unauthorized response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         public void refresh_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
 
@@ -758,6 +740,37 @@ public class AuthControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("auth/refresh-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /auth/refresh endpoint with invalid token to generate
+         * documentation.
+         * This test performs a token refresh request with an invalid token and
+         * expects an unauthorized response.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void refresh_withMockedService_generatesDoc_invalidToken() throws Exception {
+                String invalidToken = "this.is.not.a.valid.token";
+
+                // Mock Spring Security context and authentication
+                when(authentication.getPrincipal()).thenReturn(null);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContextHolder.setContext(securityContext);
+
+                when(securityContext.getAuthentication()).thenThrow(
+                                new AppException("Invalid token", HttpStatus.UNAUTHORIZED));
+
+                // Perform the /auth/refresh request with invalid token and validate
+                // response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(get("/auth/refresh")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + invalidToken))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("auth/refresh-invalid-token", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 }

@@ -2,5 +2,5 @@
 ----
 $ http DELETE 'http://localhost:8080/users/100' \
     'Content-Type:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMDU3NjkyLCJpYXQiOjE3NjEwNTQwOTJ9.ZXpN9rU7XsgmMI3ehKuiUajjwH2J6pwzdrilFQuWS6I'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTE4MjUxLCJpYXQiOjE3NjExMTQ2NTF9.KRwmicgpzbIfOOk1RdryDGxWYmOYnbm7GLF5Jp3ZqEo'
 ----
