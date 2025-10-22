@@ -412,6 +412,47 @@ class UserControllerDocTest {
         }
 
         /**
+         * Test for retrieving all users with expired
+         * token.
+         * This test verifies that an unauthorized response is returned
+         * when the token is expired,
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
+        @Test
+        void all_withMockedService_generatesDoc_withExpiredToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-all-response-expired-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required all response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+
+                meResponseJson = Files.readString(path);
+
+                Path pathToken = Paths.get("target/test-data/users-all-token-expired-token.txt");
+                if (!Files.exists(pathToken)) {
+                        throw new IllegalStateException(
+                                        "Missing required token data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meToken = Files.readString(pathToken);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(meResponseJson);
+
+                when(userService.allUsers()).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                this.mockMvc.perform(get("/users/all")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + meToken))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/all-expired-token", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /users/{userId}/promote-manager endpoint using mocked service and
          * security.
          * This test loads saved response and token files, mocks the

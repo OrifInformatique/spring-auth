@@ -1,6 +1,6 @@
 [source,http,options="nowrap"]
 ----
-GET /users/me HTTP/1.1
+GET /users/all HTTP/1.1
 Accept: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTIxNTU3LCJpYXQiOjE3NjExMTc5NTd9.kppyY8qvgYgCjzINm5_2JIIeWLPtWViAz0xja_KVaxk
 Host: localhost:8080

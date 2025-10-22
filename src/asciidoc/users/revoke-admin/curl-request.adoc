@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/users/100/revoke-admin' -i -X PUT \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI4MzEyLCJpYXQiOjE3NjExMjQ3MTJ9.ZUR4WQzYcAMajr_CfGIvh_YAvdafmW2S42JGQ-89vsI'
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI4NzU4LCJpYXQiOjE3NjExMjUxNTh9.gCId6L_t-g8_0A65G3qPnjeIOcPS_L2NTHeDB7vcRUo'
 ----

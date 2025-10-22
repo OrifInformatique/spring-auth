@@ -367,6 +367,40 @@ include::users/all/http-response.adoc[]
 
 It gives informations about all users.
 
+==== Error Response - 401
+===== Missing Authorization Header
+This is an example output when the Authorization header is missing in the request.
+
+.request
+include::users/all-missing-authorization/http-request.adoc[]
+
+.response
+include::users/all-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
+===== Malformed Token
+This is an example output when the token provided is malformed.
+
+.request
+include::users/all-malformed-token/http-request.adoc[]
+
+.response
+include::users/all-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
+
+===== Expired Token
+This is an example output when the token provided is expired.
+
+.request
+include::users/all-expired-token/http-request.adoc[]
+
+.response
+include::users/all-expired-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token has expired.
+
 === Promote User to Manager
 This is an example output for the `PUT /users/{userId}/promote-manager` endpoint.
 

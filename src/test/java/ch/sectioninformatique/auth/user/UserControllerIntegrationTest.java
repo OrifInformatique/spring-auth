@@ -306,6 +306,42 @@ public class UserControllerIntegrationTest {
         }
 
         /**
+         * Test the /users/all endpoint with an expired token.
+         * This test performs a GET request to the /users/all endpoint
+         * with an expired token
+         * It verifies that the response status is Unauthorized and
+         * saves the response and token to files.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void all_withExpiredToken_shouldReturnUnauthorized() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                String token = userAuthenticationProvider.createToken(userDto, Date.from(
+                                Instant.now().minus(2, ChronoUnit.HOURS)));
+
+                MvcResult result = mockMvc.perform(get("/users/all")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-all-response-expired-token.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-all-token-expired-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
+        /**
          * Test the /users/{userId}/promote-manager endpoint with real data.
          * This test retrieves a known user and an admin user, generates an
          * authentication token for the admin,
