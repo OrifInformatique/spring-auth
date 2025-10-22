@@ -1,6 +1,6 @@
 [source,json,options="nowrap"]
 ----
 {
-  "message" : "Invalid token"
+  "message" : "The token was expected to have 3 parts, but got > 3."
 }
 ----

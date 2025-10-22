@@ -236,6 +236,50 @@ class UserControllerDocTest {
         }
 
         /**
+         * Test for retrieving the authenticated user's information with expired token.
+         * This test verifies that an unauthorized response is returned
+         * when the token is expired,
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
+        @Test
+        void me_withMockedService_generatesDoc_withExpiredToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-me-response-expired-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required me response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meResponseJson = Files.readString(path);
+
+                Path pathToken = Paths.get("target/test-data/users-me-token-expired-token.txt");
+                if (!Files.exists(pathToken)) {
+                        throw new IllegalStateException(
+                                        "Missing required token data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                meToken = Files.readString(pathToken);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(meResponseJson);
+
+                // Mock Spring Security context and authentication
+                when(authentication.getPrincipal()).thenReturn(null);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContextHolder.setContext(securityContext);
+
+                when(securityContext.getAuthentication()).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                this.mockMvc.perform(get("/users/me")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + meToken))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/me-expired-token", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test for retrieving all users.
          * This test verifies that the list of all users is returned
          * and generates API documentation using Spring REST Docs.

@@ -347,6 +347,15 @@ include::users/me-malformed-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
+=== Expired Token
+This is an example output when the token provided is expired.
+
+.request
+include::users/me-expired-token/http-request.adoc[]
+
+.response
+include::users/me-expired-token/http-response.adoc[]
+
 === Get All Users
 This is an example output for the `GET /users/all` endpoint.
 

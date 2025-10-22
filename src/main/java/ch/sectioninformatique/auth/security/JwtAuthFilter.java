@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.lang.NonNull;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * JWT Authentication Filter for processing JWT tokens in incoming requests.
@@ -23,7 +26,8 @@ import java.io.IOException;
  * - Validates JWT tokens in the Authorization header
  * - Sets up Spring Security context with authenticated user information
  * 
- * The filter implements different validation strategies based on the HTTP method:
+ * The filter implements different validation strategies based on the HTTP
+ * method:
  * - GET requests use standard token validation
  * - Other methods use strong token validation
  */
@@ -41,6 +45,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     private final UserAuthenticationProvider userAuthenticationProvider;
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     /**
      * Processes each incoming request to validate JWT tokens.
      * This method:
@@ -50,18 +56,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * - Applies different validation strategies based on HTTP method
      * - Clears security context if validation fails
      *
-     * @param request The incoming HTTP request
-     * @param response The HTTP response
+     * @param request     The incoming HTTP request
+     * @param response    The HTTP response
      * @param filterChain The filter chain for request processing
      * @throws ServletException If there's a servlet-related error
-     * @throws IOException If there's an I/O error
+     * @throws IOException      If there's an I/O error
      */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-                
+
         if (request == null || response == null || filterChain == null) {
             throw new IllegalArgumentException("Request, response and filterChain cannot be null");
         }
@@ -84,9 +90,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 } catch (JWTVerificationException e) {
                     SecurityContextHolder.clearContext();
                     log.debug("Invalid JWT token: {}", e.getMessage());
+
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write("{\"message\":\"Invalid token\"}");
+
+                    Map<String, String> errorBody = Map.of("message", e.getMessage());
+                    mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
                     response.getWriter().flush();
                     return;
                 } catch (RuntimeException e) {
@@ -100,4 +109,3 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

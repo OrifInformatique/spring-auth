@@ -19,6 +19,9 @@ import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -144,6 +147,43 @@ public class UserControllerIntegrationTest {
 
                 // Save token to file for later tests
                 Path pathToken = Paths.get("target/test-data/users-me-token-malformed-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
+        /**
+         * Test the /users/me endpoint with an expired token.
+         * This test retrieves a known user, generates an expired
+         * authentication token,
+         * and performs a GET request to the /users/me endpoint.
+         * It verifies that the response status is Unauthorized and
+         * saves the response and token to files.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void me_withExpiredToken_shouldReturnUnauthorized() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                String token = userAuthenticationProvider.createToken(userDto, Date.from(
+                                Instant.now().minus(2, ChronoUnit.HOURS)));
+
+                MvcResult result = mockMvc.perform(get("/users/me")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-me-response-expired-token.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-me-token-expired-token.txt");
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
