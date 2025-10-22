@@ -682,6 +682,32 @@ public class UserControllerIntegrationTest {
                 Files.writeString(path, responseBody);
         }
 
+        @Test
+        @Transactional
+        public void revokeManagerRole_withMalformedToken_shouldReturnUnauthorized() throws Exception {
+                String token = "this.is.not.a.valid.token";
+                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+
+                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-malformed-token.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-malformed-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
         /**
          * Test the /users/{userId}/promote-admin endpoint with real data.
          * This test retrieves a known manager user and an admin user,

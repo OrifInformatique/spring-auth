@@ -519,6 +519,17 @@ include::users/revoke-manager-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
+===== 2.4.1.2 Malformed Token
+This is an example output when the token provided is malformed.
+
+.request
+include::users/revoke-manager-malformed-token/http-request.adoc[]
+
+.response
+include::users/revoke-manager-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
+
 === 2.5 Promote to Admin
 This is an example output for the `PUT /users/{userId}/promote-admin` endpoint.
 

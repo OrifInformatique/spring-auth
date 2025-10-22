@@ -863,6 +863,16 @@ class UserControllerDocTest {
                                                 preprocessResponse(prettyPrint())));
         }
 
+        /**
+         * Test the /users/{userId}/revoke-manager endpoint using mocked service and
+         * security.
+         * This test loads saved response file, mocks the
+         * userService.revokeManagerRole call to throw unauthorized exception,
+         * performs PUT request without Authorization header,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         void revokeManagerRole_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
 
@@ -888,6 +898,43 @@ class UserControllerDocTest {
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("users/revoke-manager-missing-authorization",
+                                                preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        @Test
+        void revokeManagerRole_withMockedService_generatesDoc_withMalformedToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-malformed-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeManagerRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String revokeResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-revokeManagerRole-token-malformed-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeManagerRole token data. Run revokeManagerRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
+
+                when(userService.revokeManagerRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
+
+                // Perform the PUT request to revoke the user manager role
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-manager")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/revoke-manager-malformed-token",
                                                 preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
