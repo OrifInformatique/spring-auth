@@ -1,5 +1,58 @@
 = Spring Auth API Documentation
 
+== Index
+. <<Auth Endpoints>>
+..  <<Login>>
+... <<Error Response - 400 - Login>>
+.... <<Missing Login - Login>>
+.... <<Missing Password - Login>>
+.... <<Invalid Email Format - Login>>
+.... <<Empty Body - Login>>
+.... <<Malformed JSON - Login>>
+.... <<SQL Injection Attempt Login - Login>>
+... <<Error Response - 401 - Login>>
+.... <<Wrong Password - Login>>
+.... <<Non-Existent User - Login>>
+... <<Error Response - 415 - Login>>
+.... <<Unsupported Media Type - Login>>
+..  <<Register>>
+... <<Error Response - 400 - Register>>
+.... <<Missing First Name - Register>>
+.... <<Missing Last Name - Register>>
+.... <<Missing Login - Register>>
+.... <<Missing Password - Register>>
+.... <<Invalid Email Format - Register>>
+.... <<Empty Body - Register>>
+.... <<Malformed JSON - Register>>
+.... <<SQL Injection Attempt First Name - Register>>
+.... <<SQL Injection Attempt Last Name - Register>>
+.... <<SQL Injection Attempt Login - Register>>
+... <<Error Response - 409 - Register>>
+.... <<Duplicate Login - Register>>
+... <<Error Response - 415 - Register>>
+.... <<Unsupported Media Type - Register>>
+..  <<Refresh>>
+... <<Error Response - 401 - Refresh>>
+.... <<Missing Authorization Header - Refresh>>
+.... <<Invalid Token - Refresh>>
+. <<User Endpoints>>
+..  <<Get Authenticated User>>
+... <<Error Response - 401 - Me>>
+.... <<Missing Authorization Header - Me>>
+.... <<Malformed Token - Me>>
+.... <<Expired Token - Me>>
+..  <<Get All Users>>
+... <<Error Response - 401 - All>>
+.... <<Missing Authorization Header - All>>
+.... <<Malformed Token - All>>
+.... <<Expired Token - All>>
+..  <<Promote User to Manager>>
+..  <<Revoke Manager to User>>
+..  <<Promote to Admin>>
+..  <<Revoke Admin to User>>
+..  <<Downgrade Admin to Manager>>
+..  <<Delete User>>
+
 == Auth Endpoints
 
 === Login
@@ -13,10 +66,10 @@ include::auth/login/http-response.adoc[]
 
 It gives informations about the authenticated user along with a JWT token.
 
-==== Error Response - 400
+==== Error Response - 400 - Login
 These are example outputs for the `POST /auth/login` endpoint for bad request.
 
-===== Missing Login
+===== Missing Login - Login
 This is an example output when the login field is missing in the request.
 
 .request
@@ -27,7 +80,7 @@ include::auth/login-missing-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the login field is required.
 
-===== Missing Password
+===== Missing Password - Login
 This is an example output when the password field is missing in the request.
 
 .request
@@ -38,7 +91,7 @@ include::auth/login-missing-password/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the password field is required.
 
-===== Invalid Email Format
+===== Invalid Email Format - Login
 This is an example output when the email format is invalid in the request.
 
 .request
@@ -49,7 +102,7 @@ include::auth/login-invalid-email-format/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the email format is invalid.
 
-===== Empty Body
+===== Empty Body - Login
 This is an example output when the request body is empty.
 
 .request
@@ -60,7 +113,7 @@ include::auth/login-empty-body/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is missing.
 
-===== Malformed JSON
+===== Malformed JSON - Login
 This is an example output when the request body contains malformed JSON.
 
 .request
@@ -71,7 +124,7 @@ include::auth/login-malformed-json/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is malformed.
 
-===== SQL Injection Attempt Login
+===== SQL Injection Attempt Login - Login
 This is an example output when the login field contains a SQL injection attempt.
 
 .request
@@ -82,10 +135,10 @@ include::auth/login-sql-injection-attempt-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the email format is invalid.
 
-==== Error Response - 401
+==== Error Response - 401 - Login
 These are example outputs for the `POST /auth/login` endpoint for unauthorized access.
 
-===== Wrong Password
+===== Wrong Password - Login
 This is an example output when the password provided is incorrect.
 
 .request
@@ -96,7 +149,7 @@ include::auth/login-wrong-password/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the password is invalid.
 
-===== Non-Existent User
+===== Non-Existent User - Login
 This is an example output when the user does not exist.
 
 .request
@@ -107,10 +160,10 @@ include::auth/login-non-existent-user/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the credentials are invalid.
 
-==== Error Response - 415
+==== Error Response - 415 - Login
 These are example outputs for the `POST /auth/login` endpoint for unsupported media types.
 
-===== Unsupported Media Type
+===== Unsupported Media Type - Login
 This is an example output when the media type of the request is unsupported.
 
 .request
@@ -132,10 +185,10 @@ include::auth/register/http-response.adoc[]
 
 It registers a new user and gives informations about the created user along with a JWT token.
 
-==== Error Response - 400
+==== Error Response - 400 - Register
 These are example outputs for the `POST /auth/register` endpoint for bad request.
 
-===== Missing First Name
+===== Missing First Name - Register
 This is an example output when the first name field is missing in the request.
 
 .request
@@ -146,7 +199,7 @@ include::auth/register-missing-first-name/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the first name field is required.
 
-===== Missing Last Name
+===== Missing Last Name - Register
 This is an example output when the last name field is missing in the request.
 
 .request
@@ -157,7 +210,7 @@ include::auth/register-missing-last-name/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the last name field is required.
 
-===== Missing Login
+===== Missing Login - Register
 This is an example output when the login field is missing in the request.
 
 .request
@@ -168,7 +221,7 @@ include::auth/register-missing-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the login field is required.
 
-===== Missing Password
+===== Missing Password - Register
 This is an example output when the password field is missing in the request.
 
 .request
@@ -179,7 +232,7 @@ include::auth/register-missing-password/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the password field is required.
 
-===== Invalid Email Format
+===== Invalid Email Format - Register
 This is an example output when the email format is invalid in the request.
 
 .request
@@ -190,7 +243,7 @@ include::auth/register-invalid-email-format/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the email format is invalid.
 
-===== Empty Body
+===== Empty Body - Register
 This is an example output when the request body is empty.
 
 .request
@@ -201,7 +254,7 @@ include::auth/register-empty-body/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is missing.
 
-===== Malformed JSON
+===== Malformed JSON - Register
 This is an example output when the request body contains malformed JSON.
 
 .request
@@ -212,7 +265,7 @@ include::auth/register-malformed-json/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the request body is malformed.
 
-===== SQL Injection Attempt First Name
+===== SQL Injection Attempt First Name - Register
 This is an example output when the first name field contains a SQL injection attempt.
 
 .request
@@ -223,7 +276,7 @@ include::auth/register-sql-injection-attempt-first-name/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the first name field is invalid.
 
-===== SQL Injection Attempt Last Name
+===== SQL Injection Attempt Last Name - Register
 This is an example output when the last name field contains a SQL injection attempt.
 
 .request
@@ -234,7 +287,7 @@ include::auth/register-sql-injection-attempt-last-name/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the last name field is invalid.
 
-===== SQL Injection Attempt Login
+===== SQL Injection Attempt Login - Register
 This is an example output when the login field contains a SQL injection attempt.
 
 .request
@@ -245,10 +298,10 @@ include::auth/register-sql-injection-attempt-login/http-response.adoc[]
 
 It returns a 400 Bad Request error indicating that the email format is invalid.
 
-==== Error Response - 409
+==== Error Response - 409 - Register
 These are example outputs for the `POST /auth/register` endpoint for conflict errors.
 
-===== Duplicate Login
+===== Duplicate Login - Register
 This is an example output when the login provided already exists.
 
 .request
@@ -259,10 +312,10 @@ include::auth/register-duplicate-login/http-response.adoc[]
 
 It returns a 409 Conflict error indicating that the login already exists.
 
-===== Error Response - 415
+===== Error Response - 415 - Register
 These are example outputs for the `POST /auth/register` endpoint for unsupported media types.
 
-===== Unsupported Media Type
+===== Unsupported Media Type - Register
 This is an example output when the media type of the request is unsupported.
 
 .request
@@ -284,10 +337,10 @@ include::auth/refresh/http-response.adoc[]
 
 It refreshes the JWT token for the authenticated user.
 
-==== Error Response - 401
+==== Error Response - 401 - Refresh
 These are example outputs for the `GET /auth/refresh` endpoint for unauthorized access.
 
-===== Missing Authorization Header
+===== Missing Authorization Header - Refresh
 This is an example output when the Authorization header is missing in the request.
 
 .request
@@ -298,7 +351,7 @@ include::auth/refresh-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
-===== Invalid Token
+===== Invalid Token - Refresh
 This is an example output when the token provided is invalid.
 
 .request
@@ -322,10 +375,10 @@ include::users/me/http-response.adoc[]
 
 It gives informations about the authenticated user.
 
-==== Error Response - 401
+==== Error Response - 401 - Me
 These are example outputs for the `GET /users/me` endpoint for unauthorized access.
 
-===== Missing Authorization Header
+===== Missing Authorization Header - Me
 This is an example output when the Authorization header is missing in the request.
 
 .request
@@ -336,7 +389,7 @@ include::users/me-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
-===== Malformed Token
+===== Malformed Token - Me
 This is an example output when the token provided is malformed.
 
 .request
@@ -347,7 +400,7 @@ include::users/me-malformed-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
-=== Expired Token
+===== Expired Token - Me
 This is an example output when the token provided is expired.
 
 .request
@@ -367,8 +420,10 @@ include::users/all/http-response.adoc[]
 
 It gives informations about all users.
 
-==== Error Response - 401
-===== Missing Authorization Header
+==== Error Response - 401 - All
+These are example outputs for the `GET /users/all` endpoint for unauthorized access.
+
+===== Missing Authorization Header - All
 This is an example output when the Authorization header is missing in the request.
 
 .request
@@ -379,7 +434,7 @@ include::users/all-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
-===== Malformed Token
+===== Malformed Token - All
 This is an example output when the token provided is malformed.
 
 .request
@@ -390,7 +445,7 @@ include::users/all-malformed-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
-===== Expired Token
+===== Expired Token - All
 This is an example output when the token provided is expired.
 
 .request
