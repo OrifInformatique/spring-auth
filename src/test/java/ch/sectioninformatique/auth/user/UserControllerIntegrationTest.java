@@ -606,7 +606,6 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
-
         /**
          * Test the /users/{userId}/revoke-manager endpoint with real data.
          * This test retrieves a known manager user and an admin user,
@@ -682,6 +681,16 @@ public class UserControllerIntegrationTest {
                 Files.writeString(path, responseBody);
         }
 
+        /**
+         * Test the /users/{userId}/revoke-manager endpoint with a malformed token.
+         * This test retrieves a known manager user and performs a PUT request to
+         * revoke the manager role
+         * with an invalid JWT token in the Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response and token to files.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void revokeManagerRole_withMalformedToken_shouldReturnUnauthorized() throws Exception {
@@ -704,6 +713,45 @@ public class UserControllerIntegrationTest {
 
                 // Save token to file for later tests
                 Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-malformed-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
+        /**
+         * Test the /users/{userId}/revoke-manager endpoint with real data
+         * as a non-admin user.
+         * This test retrieves a known manager user, generates an authentication
+         * token for a non-admin user,
+         * and performs a PUT request to revoke the manager role from the user.
+         * It verifies that the response status is Forbidden and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void revokeManagerRole_asNonAdmin_shouldReturnForbidden() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+
+                String token = userAuthenticationProvider.createToken(userDto);
+
+                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isForbidden())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-non-admin.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-non-admin.txt");
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
