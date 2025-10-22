@@ -1,5 +1,6 @@
 package ch.sectioninformatique.auth.user;
 
+import org.checkerframework.checker.units.qual.m;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -490,6 +491,16 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
+        /**
+         * Test the /users/{userId}/promote-manager endpoint with a non-existing user.
+         * This test retrieves a known admin user, generates an authentication token
+         * for the admin,
+         * and performs a PUT request to promote a non-existing user to manager.
+         * It verifies that the response status is Not Found and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void promoteToManager_userNotFound_shouldReturnNotFound() throws Exception {
@@ -515,6 +526,45 @@ public class UserControllerIntegrationTest {
 
                 // Save token to file for later tests
                 Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-user-not-found.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
+        }
+
+        /**
+         * Test the /users/{userId}/promote-manager endpoint with a user
+         * who is already a manager.
+         * This test retrieves a known manager user and an admin user,
+         * generates an authentication token for the admin,
+         * and performs a PUT request to promote the manager to manager again.
+         * It verifies that the response status is Conflict and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void promoteToManager_userAlreadyManager_shouldReturnConflict() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-manager")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isConflict())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-already-manager.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-user-already-manager.txt");
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }

@@ -700,6 +700,44 @@ class UserControllerDocTest {
                                                 preprocessResponse(prettyPrint())));
         }
 
+        @Test
+        void promoteToManager_withMockedService_generatesDoc_userAlreadyManager() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-already-manager.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToManager response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+
+                String promoteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-promoteToManager-token-user-already-manager.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToManager token data. Run promoteToManager_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToManager(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.CONFLICT));
+
+                // Use an example userId - ideally read from your saved data or hardcoded if
+                // stable
+                Long exampleUserId = 100L;
+
+                // Perform the PUT request to promote the user to manager
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-manager")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isConflict())
+                                .andDo(document("users/promote-manager-user-already-manager",
+                                                preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
         /**
          * Test the /users/{userId}/revoke-manager endpoint using mocked service and
          * security.

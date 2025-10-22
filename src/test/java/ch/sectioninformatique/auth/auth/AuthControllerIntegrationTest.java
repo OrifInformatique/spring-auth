@@ -71,8 +71,7 @@ public class AuthControllerIntegrationTest {
                                 .andExpect(jsonPath("$.login").value("test.user@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
-                                                                                    // not empty
+                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
