@@ -322,6 +322,20 @@ include::users/me/http-response.adoc[]
 
 It gives informations about the authenticated user.
 
+==== Error Response - 401
+These are example outputs for the `GET /users/me` endpoint for unauthorized access.
+
+===== Missing Authorization Header
+This is an example output when the Authorization header is missing in the request.
+
+.request
+include::users/me-missing-authorization/http-request.adoc[]
+
+.response
+include::users/me-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
 === Get All Users
 This is an example output for the `GET /users/all` endpoint.
 

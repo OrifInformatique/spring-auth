@@ -5,9 +5,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -147,6 +149,46 @@ class UserControllerDocTest {
                                 .header("Authorization", "Bearer " + meToken))
                                 .andExpect(status().isOk())
                                 .andDo(document("users/me", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test for retrieving the authenticated user's information with missing
+         * Authorization header.
+         * This test verifies that an unauthorized response is returned
+         * when the Authorization header is missing,
+         * and generates API documentation using Spring REST Docs.
+         * 
+         * @throws Exception
+         */
+        @Test
+        void me_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-me-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required me response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+
+                meResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(meResponseJson);
+
+                // Mock Spring Security context and authentication
+                when(authentication.getPrincipal()).thenReturn(null);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContextHolder.setContext(securityContext);
+
+                when(securityContext.getAuthentication()).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                SecurityContextHolder.setContext(securityContext);
+
+                this.mockMvc.perform(get("/users/me")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/me-missing-authorization", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 

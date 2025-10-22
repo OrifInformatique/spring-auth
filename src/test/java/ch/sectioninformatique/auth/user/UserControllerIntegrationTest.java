@@ -90,6 +90,32 @@ public class UserControllerIntegrationTest {
         }
 
         /**
+         * Test the /users/me endpoint without Authorization header.
+         * This test performs a GET request to the /users/me endpoint
+         * without providing an Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response to a file.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void me_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
+
+                MvcResult result = mockMvc.perform(get("/users/me")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                // Save response to file for later tests
+                Path path = Paths.get("target/test-data/users-me-response-missing-authorization.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
+        }
+
+        /**
          * Test the /users/all endpoint with real data.
          * This test retrieves a known user, generates an authentication token,
          * and performs a GET request to the /users/all endpoint.
