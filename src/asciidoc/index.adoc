@@ -533,7 +533,7 @@ It returns a 401 Unauthorized error indicating that the token is invalid.
 ==== 2.4.2 Error Response - 403 - Forbidden
 These are example outputs for the `PUT /users/{userId}/revoke-manager` endpoint for forbidden access.
 
-===== 2.4.2.1 Non-Admin User - Revoke Manager Role
+===== 2.4.2.1 Non-Admin User
 This is an example output when a non-admin user tries to revoke a manager role.
 
 .request
@@ -543,6 +543,20 @@ include::users/revoke-manager-non-admin/http-request.adoc[]
 include::users/revoke-manager-non-admin/http-response.adoc[]
 
 It returns a 403 Forbidden error indicating that access is denied.
+
+==== 2.4.3 Error Response - 404 - Not Found
+These are example outputs for the `PUT /users/{userId}/revoke-manager` endpoint
+
+===== 2.4.3.1 User Not Found
+This is an example output when the user to be revoked is not found.
+
+.request
+include::users/revoke-manager-user-not-found/http-request.adoc[]
+
+.response
+include::users/revoke-manager-user-not-found/http-response.adoc[]
+
+It returns a 404 Not Found error indicating that the user was not found.
 
 === 2.5 Promote to Admin
 This is an example output for the `PUT /users/{userId}/promote-admin` endpoint.

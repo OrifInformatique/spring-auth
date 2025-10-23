@@ -193,7 +193,7 @@ public class UserService {
      */
     public UserDto revokeManagerRole(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new RuntimeException("The user is already a user");
