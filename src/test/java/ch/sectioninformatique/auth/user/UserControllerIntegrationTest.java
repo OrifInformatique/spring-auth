@@ -840,6 +840,17 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
+        /**
+         * Test the /users/{userId}/promote-admin endpoint with missing
+         * authorization header.
+         * This test retrieves a known manager user and performs a PUT request to
+         * promote the manager to admin
+         * without providing an Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response to a file.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void promoteToAdmin_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
@@ -858,6 +869,16 @@ public class UserControllerIntegrationTest {
                 Files.writeString(path, responseBody);
         }
 
+        /**
+         * Test the /users/{userId}/promote-admin endpoint with a malformed token.
+         * This test retrieves a known manager user and performs a PUT request to
+         * promote the manager to admin
+         * with an invalid JWT token in the Authorization header.
+         * It verifies that the response status is Unauthorized and
+         * saves the response and token to files.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void promoteToAdmin_withMalformedToken_shouldReturnUnauthorized() throws Exception {
@@ -881,6 +902,17 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
+        /**
+         * Test the /users/{userId}/promote-admin endpoint with real data
+         * as a non-admin user.
+         * This test retrieves a known manager user, generates an authentication
+         * token for a non-admin user,
+         * and performs a PUT request to promote the manager to admin.
+         * It verifies that the response status is Forbidden and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void promoteToAdmin_asNonAdmin_shouldReturnForbidden() throws Exception {
@@ -906,6 +938,16 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
+        /**
+         * Test the /users/{userId}/promote-admin endpoint with a non-existing user.
+         * This test retrieves a known admin user, generates an authentication token
+         * for the admin,
+         * and performs a PUT request to promote a non-existing user to admin.
+         * It verifies that the response status is Not Found and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void promoteToAdmin_userNotFound_shouldReturnNotFound() throws Exception {
@@ -932,6 +974,17 @@ public class UserControllerIntegrationTest {
                 Files.writeString(pathToken, token);
         }
 
+        /**
+         * Test the /users/{userId}/promote-admin endpoint with a user
+         * who is already an admin.
+         * This test retrieves a known admin user,
+         * generates an authentication token for the admin,
+         * and performs a PUT request to promote the admin to admin.
+         * It verifies that the response status is Conflict and saves the response
+         * and token to files for later use.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void promoteToAdmin_userAlreadyAdmin_shouldReturnConflict() throws Exception {
