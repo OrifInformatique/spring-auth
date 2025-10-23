@@ -37,6 +37,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+/**
+ * Integration tests for the UserController.
+ * 
+ * These tests cover various scenarios for the user management endpoints,
+ * including authentication, authorization, and role management.
+ * 
+ * The tests use MockMvc to perform HTTP requests and verify responses.
+ */
 @Tag("integration")
 @SpringBootTest(classes = AuthApplication.class)
 @AutoConfigureMockMvc
