@@ -574,6 +574,7 @@ It promotes a user or manager to "ADMIN" role.
 These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for unauthorized access.
 
 ===== 2.5.1.1 Missing Authorization Header
+This is an example output when the Authorization header is missing in the request.
 .request
 include::users/promote-admin-missing-authorization/http-request.adoc[]
 
@@ -595,6 +596,7 @@ It returns a 401 Unauthorized error indicating that the token is invalid.
 These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for forbidden access.
 
 ===== 2.5.2.1 Non-Admin User
+This is an example output when a non-admin user tries to promote a user to admin.
 .request
 include::users/promote-admin-non-admin/http-request.adoc[]
 
@@ -607,6 +609,7 @@ It returns a 403 Forbidden error indicating that access is denied.
 These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for not found errors.
 
 ===== 2.5.3.1 User Not Found
+This is an example output when the user to be promoted is not found.
 .request
 include::users/promote-admin-user-not-found/http-request.adoc[]
 
@@ -619,6 +622,7 @@ It returns a 404 Not Found error indicating that the user was not found.
 These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for conflict errors.
 
 ===== 2.5.4.1 User Already Admin
+This is an example output when the user to be promoted is already an admin.
 .request
 include::users/promote-admin-user-already-admin/http-request.adoc[]
 
@@ -651,6 +655,7 @@ include::users/revoke-admin-missing-authorization/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
 ===== 2.6.1.2 Malformed Token
+This is an example output when the token provided is malformed.
 .request
 include::users/revoke-admin-malformed-token/http-request.adoc[]
 
@@ -702,6 +707,8 @@ It downgrades a admin to "MANAGER" role.
 These are example outputs for the `PUT /users/{userId}/downgrade-admin` endpoint for unauthorized access.
 
 ===== 2.7.1.1 Missing Authorization Header
+This is an example output when the Authorization header is missing in the request.
+
 .request
 include::users/downgrade-admin-missing-authorization/http-request.adoc[]
 
@@ -711,6 +718,8 @@ include::users/downgrade-admin-missing-authorization/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
 ===== 2.7.1.2 Malformed Token
+This is an example output when the token provided is malformed.
+
 .request
 include::users/downgrade-admin-malformed-token/http-request.adoc[]
 
@@ -734,6 +743,8 @@ It deletes a user.
 These are example outputs for the `DELETE /users/{userId}` endpoint for unauthorized access.
 
 ===== 2.8.1.1 Missing Authorization Header
+This is an example output when the Authorization header is missing in the request.
+
 .request
 include::users/delete-missing-authorization/http-request.adoc[]
 
@@ -743,6 +754,8 @@ include::users/delete-missing-authorization/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
 ===== 2.8.1.2 Malformed Token
+This is an example output when the token provided is malformed.
+
 .request
 include::users/delete-malformed-token/http-request.adoc[]
 
