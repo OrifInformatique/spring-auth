@@ -1,0 +1,9 @@
+[source,http,options="nowrap"]
+----
+PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer this.is.not.a.valid.token
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded
+
+----

@@ -578,10 +578,61 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 </ul>
 </li>
-<li><a href="#_2_5_promote_to_admin">2.5 Promote to Admin</a></li>
-<li><a href="#_2_6_revoke_admin_to_user">2.6 Revoke Admin to User</a></li>
-<li><a href="#_2_7_downgrade_admin_to_manager">2.7 Downgrade Admin to Manager</a></li>
-<li><a href="#_2_8_delete_user">2.8 Delete User</a></li>
+<li><a href="#_2_5_promote_to_admin">2.5 Promote to Admin</a>
+<ul class="sectlevel3">
+<li><a href="#_2_5_1_error_response_401_unauthorized">2.5.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_5_1_1_missing_authorization_header">2.5.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_5_1_2_malformed_token">2.5.1.2 Malformed Token</a></li>
+</ul>
+</li>
+<li><a href="#_2_5_2_error_response_403_forbidden">2.5.2 Error Response - 403 - Forbidden</a>
+<ul class="sectlevel4">
+<li><a href="#_2_5_2_1_non_admin_user">2.5.2.1 Non-Admin User</a></li>
+</ul>
+</li>
+<li><a href="#_2_5_3_error_response_404_not_found">2.5.3 Error Response - 404 - Not Found</a>
+<ul class="sectlevel4">
+<li><a href="#_2_5_3_1_user_not_found">2.5.3.1 User Not Found</a></li>
+</ul>
+</li>
+<li><a href="#_2_5_4_error_response_409_conflict">2.5.4 Error Response - 409 - Conflict</a>
+<ul class="sectlevel4">
+<li><a href="#_2_5_4_1_user_already_admin">2.5.4.1 User Already Admin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_6_revoke_admin_to_user">2.6 Revoke Admin to User</a>
+<ul class="sectlevel3">
+<li><a href="#_2_6_1_error_response_401_unauthorized">2.6.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_6_1_1_missing_authorization_header">2.6.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_6_1_2_malformed_token">2.6.1.2 Malformed Token</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_7_downgrade_admin_to_manager">2.7 Downgrade Admin to Manager</a>
+<ul class="sectlevel3">
+<li><a href="#_2_7_1_error_response_401_unauthorized">2.7.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_7_1_1_missing_authorization_header">2.7.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_7_1_2_malformed_token">2.7.1.2 Malformed Token</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_8_delete_user">2.8 Delete User</a>
+<ul class="sectlevel3">
+<li><a href="#_2_8_1_error_response_401_unauthorized">2.8.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_8_1_1_missing_authorization_header">2.8.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_8_1_2_malformed_token">2.8.1.2 Malformed Token</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -622,8 +673,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODM1LCJpYXQiOjE3NjEyMDYyMzV9.GcZ3qDaF9oKAV-3gnRWn4srgKK2k3F4XFeb82KQDsAc",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MjYyMzUsImlhdCI6MTc2MTIwNjIzNX0.Pp4D2UF_96wH9e-vrpjx9vzdicbQqXDX_l0j9sMxTDI",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzQxLCJpYXQiOjE3NjEyMTAxNDF9.Nsk5ZYWDeEjidTJOc3nah5Q-3gOCWPwCEkdxgOshZTQ",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MzAxNDEsImlhdCI6MTc2MTIxMDE0MX0.LP-tAn5EAlwClbD4Q1Q1Ar6tLEOALLAq7u5OoMCD-UM",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -988,8 +1039,8 @@ Content-Length: 599
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODM1LCJpYXQiOjE3NjEyMDYyMzV9._AjhCdAnL9FWvqzPnbehcqPdk7EcjzzI97Am0UuP2Tg",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MjYyMzUsImlhdCI6MTc2MTIwNjIzNX0.OHnv4DTk6mKO5VaSIgOEjp2ZDXlp59Fx4H1s2IaMtJA",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzQxLCJpYXQiOjE3NjEyMTAxNDF9.0gohtw7IW9cZQzElB7oo-DLr9_y5ZKRlLHLxhkaGEDA",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MzAxNDEsImlhdCI6MTc2MTIxMDE0MX0.Sa2uNo7uk0VgEYxAd5ZyiVaBX3c0UmtP-HnTZV6uNE0",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -1453,7 +1504,7 @@ Content-Length: 70
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MjYyMzUsImlhdCI6MTc2MTIwNjIzNX0.Pp4D2UF_96wH9e-vrpjx9vzdicbQqXDX_l0j9sMxTDI
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MzAxNDAsImlhdCI6MTc2MTIxMDE0MH0.2kdtnxH0qNiIgytRQBAtoq8Jj8kO68syYPY0cq661dQ
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1469,7 +1520,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODM1LCJpYXQiOjE3NjEyMDYyMzV9.GcZ3qDaF9oKAV-3gnRWn4srgKK2k3F4XFeb82KQDsAc",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzQwLCJpYXQiOjE3NjEyMTAxNDB9.yIeOBgx_cZVMxd1eWzY8eHIFImaJtwgVnqIGey-tU0o",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -1560,7 +1611,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9.up1pTTajjbvj7jt1xPNclYPzd82oCkgTpC2otqQtiYs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1660,7 +1711,7 @@ Content-Length: 72
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjAyNjQ1LCJpYXQiOjE3NjExOTkwNDV9.HnSccbpF2RGsXiX0736m2kH1T91C7IKy3lKE4u03-gg
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA2NTUzLCJpYXQiOjE3NjEyMDI5NTN9.tAyyH0jy59DLct1t1WWT2vdvIajcf75QKElkNtoSQTg
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1672,7 +1723,7 @@ Content-Type: application/json
 Content-Length: 66
 
 {
-  "message" : "The Token has expired on 2025-10-23T06:57:25Z."
+  "message" : "The Token has expired on 2025-10-23T08:02:33Z."
 }</code></pre>
 </div>
 </div>
@@ -1689,7 +1740,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9.up1pTTajjbvj7jt1xPNclYPzd82oCkgTpC2otqQtiYs
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1705,18 +1756,18 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$pbp7DG0g6JDIFUTNzPgpkOuBX/a4STq34jy7C8xaiTHIaT6qYr9oi",
-  "createdAt" : "2025-10-23T07:57:22.766+00:00",
-  "updatedAt" : "2025-10-23T07:57:22.766+00:00",
+  "password" : "$2a$10$yDp66/sX73JU1t0oQNs5deNCN9SqHBIb9bcg6/kG6XUK4ESLSnDru",
+  "createdAt" : "2025-10-23T09:02:29.786+00:00",
+  "updatedAt" : "2025-10-23T09:02:29.786+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-10-23T07:57:22.501+00:00",
-    "updatedAt" : "2025-10-23T07:57:22.501+00:00"
+    "createdAt" : "2025-10-23T09:02:29.499+00:00",
+    "updatedAt" : "2025-10-23T09:02:29.499+00:00"
   },
-  "username" : "test.user@test.com",
   "authorities" : [ ],
+  "username" : "test.user@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1726,18 +1777,18 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$MZ2NPN6JWX0OqUMDjo6dbeYfGbl4UlJl3lWcSTPQu2rQ.3ns.EnjG",
-  "createdAt" : "2025-10-23T07:57:22.767+00:00",
-  "updatedAt" : "2025-10-23T07:57:22.767+00:00",
+  "password" : "$2a$10$FYVNfid4n6iP0zntYusOjO4kOy3UQTpSq8uP1WZpKAPOVarSS.fLe",
+  "createdAt" : "2025-10-23T09:02:29.787+00:00",
+  "updatedAt" : "2025-10-23T09:02:29.787+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-10-23T07:57:22.514+00:00",
-    "updatedAt" : "2025-10-23T07:57:22.514+00:00"
+    "createdAt" : "2025-10-23T09:02:29.505+00:00",
+    "updatedAt" : "2025-10-23T09:02:29.505+00:00"
   },
-  "username" : "test.manager@test.com",
   "authorities" : [ ],
+  "username" : "test.manager@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1747,18 +1798,18 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$bkS.j0453OUaF67VnbK5zeSCuaulsg5FyMs0LPfr8U7NJ4nRQE0qm",
-  "createdAt" : "2025-10-23T07:57:22.769+00:00",
-  "updatedAt" : "2025-10-23T07:57:22.769+00:00",
+  "password" : "$2a$10$eKMp2vO4koezQyce.RHvJ.wJZqnhPCNMkKAohKm4uXpOfZ0wP1cB6",
+  "createdAt" : "2025-10-23T09:02:29.789+00:00",
+  "updatedAt" : "2025-10-23T09:02:29.789+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-23T07:57:22.518+00:00",
-    "updatedAt" : "2025-10-23T07:57:22.518+00:00"
+    "createdAt" : "2025-10-23T09:02:29.513+00:00",
+    "updatedAt" : "2025-10-23T09:02:29.513+00:00"
   },
-  "username" : "test.admin@test.com",
   "authorities" : [ ],
+  "username" : "test.admin@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1768,18 +1819,18 @@ Content-Length: 2607
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$gKj3QkH8QsaWnaY869mPM.h66TRI6iVpCoiKXnI.cGGwpMF4LW9YG",
-  "createdAt" : "2025-10-23T07:57:22.769+00:00",
-  "updatedAt" : "2025-10-23T07:57:22.769+00:00",
+  "password" : "$2a$10$Ew8W4BA8tqv1hpdpJyfJZ.o4QvhMlQHBJqJcUeK7L35ibL.6xjOF2",
+  "createdAt" : "2025-10-23T09:02:29.790+00:00",
+  "updatedAt" : "2025-10-23T09:02:29.790+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-23T07:57:22.518+00:00",
-    "updatedAt" : "2025-10-23T07:57:22.518+00:00"
+    "createdAt" : "2025-10-23T09:02:29.513+00:00",
+    "updatedAt" : "2025-10-23T09:02:29.513+00:00"
   },
-  "username" : "test.admin2@test.com",
   "authorities" : [ ],
+  "username" : "test.admin2@test.com",
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1864,7 +1915,7 @@ Content-Length: 72
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjAyNjQ1LCJpYXQiOjE3NjExOTkwNDV9.HnSccbpF2RGsXiX0736m2kH1T91C7IKy3lKE4u03-gg
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA2NTUzLCJpYXQiOjE3NjEyMDI5NTN9.tAyyH0jy59DLct1t1WWT2vdvIajcf75QKElkNtoSQTg
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1876,7 +1927,7 @@ Content-Type: application/json
 Content-Length: 66
 
 {
-  "message" : "The Token has expired on 2025-10-23T06:57:25Z."
+  "message" : "The Token has expired on 2025-10-23T08:02:33Z."
 }</code></pre>
 </div>
 </div>
@@ -1896,7 +1947,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1995,7 +2046,7 @@ Content-Length: 72
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9.up1pTTajjbvj7jt1xPNclYPzd82oCkgTpC2otqQtiYs
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2032,7 +2083,7 @@ Content-Length: 36
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2069,7 +2120,7 @@ Content-Length: 34
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2100,7 +2151,7 @@ Content-Length: 49
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2133,7 +2184,7 @@ Content-Length: 48
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ0LCJpYXQiOjE3NjEyMDYyNDR9.C5hg8tEKruUAclrxOMFEA9auq5tePGY9SapislbROkw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2232,7 +2283,7 @@ Content-Length: 72
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9.up1pTTajjbvj7jt1xPNclYPzd82oCkgTpC2otqQtiYs
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2269,7 +2320,7 @@ Content-Length: 36
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2302,7 +2353,7 @@ Content-Length: 34
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ0LCJpYXQiOjE3NjEyMDYyNDR9.C5hg8tEKruUAclrxOMFEA9auq5tePGY9SapislbROkw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUyLCJpYXQiOjE3NjEyMTAxNTJ9.Bb-aJ3Kn6l3oDmVhcfCh3pOF7SXZO8Z5mr_KSmSGcIU
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2319,6 +2370,141 @@ Admin role assigned successfully</code></pre>
 <div class="paragraph">
 <p>It promotes a user or manager to "ADMIN" role.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_5_1_error_response_401_unauthorized">2.5.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-admin</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_5_1_1_missing_authorization_header">2.5.1.1 Missing Authorization Header</h5>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 75
+
+{
+  "message" : "Full authentication is required to access this resource"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_5_1_2_malformed_token">2.5.1.2 Malformed Token</h5>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer this.is.not.a.valid.token
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 72
+
+{
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_5_2_error_response_403_forbidden">2.5.2 Error Response - 403 - Forbidden</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-admin</code> endpoint for forbidden access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_5_2_1_non_admin_user">2.5.2.1 Non-Admin User</h5>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9.up1pTTajjbvj7jt1xPNclYPzd82oCkgTpC2otqQtiYs
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json
+Content-Length: 36
+
+{
+  "message" : "Access is denied"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 403 Forbidden error indicating that access is denied.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_5_3_error_response_404_not_found">2.5.3 Error Response - 404 - Not Found</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-admin</code> endpoint for not found errors.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_5_3_1_user_not_found">2.5.3.1 User Not Found</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/promote-admin-user-not-found/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/promote-admin-user-not-found/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 404 Not Found error indicating that the user was not found.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_5_4_error_response_409_conflict">2.5.4 Error Response - 409 - Conflict</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-admin</code> endpoint for conflict errors.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_5_4_1_user_already_admin">2.5.4.1 User Already Admin</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/promote-admin-user-already-admin/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/promote-admin-user-already-admin/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 409 Conflict error indicating that the user is already an admin.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_2_6_revoke_admin_to_user">2.6 Revoke Admin to User</h3>
@@ -2330,7 +2516,7 @@ Admin role assigned successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2347,6 +2533,40 @@ Admin role revoked successfully</code></pre>
 <div class="paragraph">
 <p>It revokes a admin to "USER" role.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_6_1_error_response_401_unauthorized">2.6.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/revoke-admin</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_6_1_1_missing_authorization_header">2.6.1.1 Missing Authorization Header</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/revoke-admin-missing-authorization/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/revoke-admin-missing-authorization/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_6_1_2_malformed_token">2.6.1.2 Malformed Token</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/revoke-admin-malformed-token/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/revoke-admin-malformed-token/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_2_7_downgrade_admin_to_manager">2.7 Downgrade Admin to Manager</h3>
@@ -2358,7 +2578,7 @@ Admin role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2375,6 +2595,40 @@ Admin role downgraded successfully</code></pre>
 <div class="paragraph">
 <p>It downgrades a admin to "MANAGER" role.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_7_1_error_response_401_unauthorized">2.7.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/downgrade-admin</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_7_1_1_missing_authorization_header">2.7.1.1 Missing Authorization Header</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/downgrade-admin-missing-authorization/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/downgrade-admin-missing-authorization/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_7_1_2_malformed_token">2.7.1.2 Malformed Token</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/downgrade-admin-malformed-token/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/downgrade-admin-malformed-token/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_2_8_delete_user">2.8 Delete User</h3>
@@ -2386,7 +2640,7 @@ Admin role downgraded successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjEzNzUzLCJpYXQiOjE3NjEyMTAxNTN9._heMhJBQ1OMNYc-vGUfuTRY5cNeN46WwYJDoiRpWSUo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2403,13 +2657,47 @@ User deleted successfully</code></pre>
 <div class="paragraph">
 <p>It deletes a user.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_8_1_error_response_401_unauthorized">2.8.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>DELETE /users/{userId}</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_8_1_1_missing_authorization_header">2.8.1.1 Missing Authorization Header</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/delete-missing-authorization/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/delete-missing-authorization/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_8_1_2_malformed_token">2.8.1.2 Malformed Token</h5>
+<div class="paragraph">
+<div class="title">request</div>
+<p>Unresolved directive in index.adoc - include::users/delete-malformed-token/http-request.adoc[]</p>
+</div>
+<div class="paragraph">
+<div class="title">response</div>
+<p>Unresolved directive in index.adoc - include::users/delete-malformed-token/http-response.adoc[]</p>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-23 07:58:59 UTC
+Last updated 2025-10-23 08:54:58 UTC
 </div>
 </div>
 </body>

@@ -1112,6 +1112,208 @@ class UserControllerDocTest {
         }
 
         /**
+         * Test the /users/{userId}/promote-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response file, mocks the
+         * userService.promoteToAdmin call to throw unauthorized exception,
+         * performs PUT request without Authorization header,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void promoteToAdmin_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String promoteResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToAdmin(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/promote-admin-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/promote-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToAdmin call to throw unauthorized exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void promoteToAdmin_withMockedService_generatesDoc_withMalformedToken() throws Exception {
+                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-malformed-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String promoteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-promoteToAdmin-token-malformed-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin token data. Run promoteToAdmin_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToAdmin(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/promote-admin-malformed-token", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/promote-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToAdmin call to throw forbidden exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void promoteToAdmin_withMockedService_generatesDoc_asNonAdmin() throws Exception {
+                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-non-admin.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String promoteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-promoteToAdmin-token-non-admin.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin token data. Run promoteToAdmin_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToAdmin(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isForbidden())
+                                .andDo(document("users/promote-admin-non-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/promote-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToAdmin call to throw not found exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void promoteToAdmin_withMockedService_generatesDoc_userNotFound() throws Exception {
+                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-user-not-found.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String promoteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-promoteToAdmin-token-user-not-found.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin token data. Run promoteToAdmin_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToAdmin(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isNotFound())
+                                .andDo(document("users/promote-admin-user-not-found", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/promote-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.promoteToAdmin call to throw conflict exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void promoteToAdmin_withMockedService_generatesDoc_userAlreadyAdmin() throws Exception {
+                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-user-already-admin.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String promoteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-promoteToAdmin-token-user-already-admin.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required promoteToAdmin token data. Run promoteToAdmin_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
+
+                when(userService.promoteToAdmin(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.CONFLICT));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isConflict())
+                                .andDo(document("users/promote-admin-user-already-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /users/{userId}/revoke-admin endpoint using mocked service and
          * security.
          * This test loads saved response and token files, mocks the
@@ -1175,6 +1377,170 @@ class UserControllerDocTest {
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(revokeResponse))
                                 .andDo(document("users/revoke-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/revoke-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response file, mocks the
+         * userService.revokeAdminRole call to throw unauthorized exception,
+         * performs PUT request without Authorization header,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void revokeAdminRole_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String revokeResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
+
+                when(userService.revokeAdminRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-admin")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/revoke-admin-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/revoke-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.revokeAdminRole call to throw unauthorized exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void revokeAdminRole_withMockedService_generatesDoc_withMalformedToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-malformed-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String revokeResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-revokeAdminRole-token-malformed-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole token data. Run revokeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
+
+                when(userService.revokeAdminRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/revoke-admin-malformed-token", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/revoke-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.revokeAdminRole call to throw forbidden exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void revokeAdminRole_withMockedService_generatesDoc_asNonAdmin() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-non-admin.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String revokeResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-revokeAdminRole-token-non-admin.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole token data. Run revokeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
+
+                when(userService.revokeAdminRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isForbidden())
+                                .andDo(document("users/revoke-admin-non-admin", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/revoke-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.revokeAdminRole call to throw not found exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void revokeAdminRole_withMockedService_generatesDoc_userNotFound() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-user-not-found.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String revokeResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-revokeAdminRole-token-user-not-found.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required revokeAdminRole token data. Run revokeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
+
+                when(userService.revokeAdminRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isNotFound())
+                                .andDo(document("users/revoke-admin-user-not-found", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
@@ -1246,6 +1612,84 @@ class UserControllerDocTest {
         }
 
         /**
+         * Test the /users/{userId}/downgrade-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response file, mocks the
+         * userService.downgradeAdminRole call to throw unauthorized exception,
+         * performs PUT request without Authorization header,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void downgradeAdminRole_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required downgradeAdminRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String downgradeResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(downgradeResponseJson);
+
+                when(userService.downgradeAdminRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/downgrade-admin")
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/downgrade-admin-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId}/downgrade-admin endpoint using mocked service and
+         * security.
+         * This test loads saved response and token files, mocks the
+         * userService.downgradeAdminRole call to throw unauthorized exception,
+         * performs PUT request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void downgradeAdminRole_withMockedService_generatesDoc_withMalformedToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response-malformed-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required downgradeAdminRole response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String downgradeResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-downgradeAdminRole-token-malformed-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required downgradeAdminRole token data. Run downgradeAdminRole_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(downgradeResponseJson);
+
+                when(userService.downgradeAdminRole(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(put("/users/" + exampleUserId + "/downgrade-admin")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/downgrade-admin-malformed-token", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
          * Test the /users/{userId} DELETE endpoint using mocked service and security.
          * This test loads saved response and token files, mocks the
          * userService.deleteUser
@@ -1309,6 +1753,82 @@ class UserControllerDocTest {
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(deleteResponse))
                                 .andDo(document("users/delete", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId} DELETE endpoint using mocked service and security.
+         * This test loads saved response file, mocks the
+         * userService.deleteUser call to throw unauthorized exception,
+         * performs DELETE request without Authorization header,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void deleteUser_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-deleteUser-response-missing-authorization.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required deleteUser response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String deleteResponseJson = Files.readString(path);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(deleteResponseJson);
+
+                when(userService.deleteUser(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(delete("/users/" + exampleUserId)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/delete-missing-authorization", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        /**
+         * Test the /users/{userId} DELETE endpoint using mocked service and security.
+         * This test loads saved response and token files, mocks the
+         * userService.deleteUser call to throw unauthorized exception,
+         * performs DELETE request,
+         * verifies response, and generates API documentation using Spring REST Docs.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        void deleteUser_withMockedService_generatesDoc_withMalformedToken() throws Exception {
+
+                Path path = Paths.get("target/test-data/users-deleteUser-response-malformed-token.json");
+                if (!Files.exists(path)) {
+                        throw new IllegalStateException(
+                                        "Missing required deleteUser response data. Make sure UserControllerIntegrationTest ran first.");
+                }
+                String deleteResponseJson = Files.readString(path);
+
+                Path tokenPath = Paths.get("target/test-data/users-deleteUser-token-malformed-token.txt");
+                if (!Files.exists(tokenPath)) {
+                        throw new IllegalStateException(
+                                        "Missing required deleteUser token data. Run deleteUser_withRealData_shouldReturnSuccess first.");
+                }
+                String token = Files.readString(tokenPath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(deleteResponseJson);
+
+                when(userService.deleteUser(anyLong())).thenThrow(
+                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+
+                Long exampleUserId = 100L;
+
+                this.mockMvc.perform(delete("/users/" + exampleUserId)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isUnauthorized())
+                                .andDo(document("users/delete-malformed-token", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 

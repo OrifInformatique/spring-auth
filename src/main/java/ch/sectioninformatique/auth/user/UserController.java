@@ -129,12 +129,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/promote-admin")
     public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
-        try {
-            userService.promoteToAdmin(userId);
-            return ResponseEntity.ok().body("Admin role assigned successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.promoteToAdmin(userId);
+        return ResponseEntity.ok().body("Admin role assigned successfully");
     }
 
     /**
@@ -150,12 +146,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
-        try {
-            userService.revokeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role revoked successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.revokeAdminRole(userId);
+        return ResponseEntity.ok().body("Admin role revoked successfully");
     }
 
     /**
@@ -171,12 +163,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/downgrade-admin")
     public ResponseEntity<?> downgradeAdminRole(@PathVariable Long userId) {
-        try {
-            userService.downgradeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role downgraded successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.downgradeAdminRole(userId);
+        return ResponseEntity.ok().body("Admin role downgraded successfully");
     }
 
     /**
@@ -192,11 +180,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        try {
-            userService.deleteUser(userId);
-            return ResponseEntity.ok().body("User deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.deleteUser(userId);
+        return ResponseEntity.ok().body("User deleted successfully");
     }
 }

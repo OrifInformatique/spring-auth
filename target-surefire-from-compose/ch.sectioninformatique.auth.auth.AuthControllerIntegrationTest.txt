@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: ch.sectioninformatique.auth.auth.AuthControllerIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.61 s -- in ch.sectioninformatique.auth.auth.AuthControllerIntegrationTest

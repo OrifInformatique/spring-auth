@@ -570,6 +570,63 @@ include::users/promote-admin/http-response.adoc[]
 
 It promotes a user or manager to "ADMIN" role.
 
+==== 2.5.1 Error Response - 401 - Unauthorized
+These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for unauthorized access.
+
+===== 2.5.1.1 Missing Authorization Header
+.request
+include::users/promote-admin-missing-authorization/http-request.adoc[]
+
+.response
+include::users/promote-admin-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
+===== 2.5.1.2 Malformed Token
+.request
+include::users/promote-admin-malformed-token/http-request.adoc[]
+
+.response
+include::users/promote-admin-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
+
+==== 2.5.2 Error Response - 403 - Forbidden
+These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for forbidden access.
+
+===== 2.5.2.1 Non-Admin User
+.request
+include::users/promote-admin-non-admin/http-request.adoc[]
+
+.response
+include::users/promote-admin-non-admin/http-response.adoc[]
+
+It returns a 403 Forbidden error indicating that access is denied.
+
+==== 2.5.3 Error Response - 404 - Not Found
+These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for not found errors.
+
+===== 2.5.3.1 User Not Found
+.request
+include::users/promote-admin-user-not-found/http-request.adoc[]
+
+.response
+include::users/promote-admin-user-not-found/http-response.adoc[]
+
+It returns a 404 Not Found error indicating that the user was not found.
+
+==== 2.5.4 Error Response - 409 - Conflict
+These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for conflict errors.
+
+===== 2.5.4.1 User Already Admin
+.request
+include::users/promote-admin-user-already-admin/http-request.adoc[]
+
+.response
+include::users/promote-admin-user-already-admin/http-response.adoc[]
+
+It returns a 409 Conflict error indicating that the user is already an admin.
+
 === 2.6 Revoke Admin to User
 This is an example output for the `PUT /users/{userId}/revoke-admin` endpoint.
 
@@ -580,6 +637,55 @@ include::users/revoke-admin/http-request.adoc[]
 include::users/revoke-admin/http-response.adoc[]
 
 It revokes a admin to "USER" role.
+
+==== 2.6.1 Error Response - 401 - Unauthorized
+These are example outputs for the `PUT /users/{userId}/revoke-admin` endpoint for unauthorized access.
+
+===== 2.6.1.1 Missing Authorization Header
+.request
+include::users/revoke-admin-missing-authorization/http-request.adoc[]
+
+.response
+include::users/revoke-admin-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
+===== 2.6.1.2 Malformed Token
+.request
+include::users/revoke-admin-malformed-token/http-request.adoc[]
+
+.response
+include::users/revoke-admin-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
+
+==== 2.6.2 Error Response - 403 - Forbidden
+These are example outputs for the `PUT /users/{userId}/revoke-admin` endpoint for forbidden access.
+
+===== 2.6.2.1 Non-Admin User
+This is an example output when a non-admin user tries to revoke an admin role.
+
+.request
+include::users/revoke-admin-non-admin/http-request.adoc[]
+
+.response
+include::users/revoke-admin-non-admin/http-response.adoc[]
+
+It returns a 403 Forbidden error indicating that access is denied.
+
+==== 2.6.3 Error Response - 404 - Not Found
+These are example outputs for the `PUT /users/{userId}/revoke-admin` endpoint for not found errors.
+
+===== 2.6.3.1 User Not Found
+This is an example output when the user to be revoked is not found.
+
+.request
+include::users/revoke-admin-user-not-found/http-request.adoc[]
+
+.response
+include::users/revoke-admin-user-not-found/http-response.adoc[]
+
+It returns a 404 Not Found error indicating that the user was not found.
 
 === 2.7 Downgrade Admin to Manager
 This is an example output for the `PUT /users/{userId}/downgrade-admin` endpoint.
@@ -592,6 +698,27 @@ include::users/downgrade-admin/http-response.adoc[]
 
 It downgrades a admin to "MANAGER" role.
 
+==== 2.7.1 Error Response - 401 - Unauthorized
+These are example outputs for the `PUT /users/{userId}/downgrade-admin` endpoint for unauthorized access.
+
+===== 2.7.1.1 Missing Authorization Header
+.request
+include::users/downgrade-admin-missing-authorization/http-request.adoc[]
+
+.response
+include::users/downgrade-admin-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
+===== 2.7.1.2 Malformed Token
+.request
+include::users/downgrade-admin-malformed-token/http-request.adoc[]
+
+.response
+include::users/downgrade-admin-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
+
 === 2.8 Delete User
 This is an example output for the `DELETE /users/{userId}` endpoint.
 
@@ -602,4 +729,25 @@ include::users/delete/http-request.adoc[]
 include::users/delete/http-response.adoc[]
 
 It deletes a user.
+
+==== 2.8.1 Error Response - 401 - Unauthorized
+These are example outputs for the `DELETE /users/{userId}` endpoint for unauthorized access.
+
+===== 2.8.1.1 Missing Authorization Header
+.request
+include::users/delete-missing-authorization/http-request.adoc[]
+
+.response
+include::users/delete-missing-authorization/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
+===== 2.8.1.2 Malformed Token
+.request
+include::users/delete-malformed-token/http-request.adoc[]
+
+.response
+include::users/delete-malformed-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that the token is invalid.
 

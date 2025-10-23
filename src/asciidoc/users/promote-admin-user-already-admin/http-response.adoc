@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+Content-Length: 48
+
+{
+  "message" : "The user is already an admin"
+}
+----
