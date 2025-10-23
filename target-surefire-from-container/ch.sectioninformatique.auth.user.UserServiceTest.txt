@@ -1,0 +1,163 @@
+-------------------------------------------------------------------------------
+Test set: ch.sectioninformatique.auth.user.UserServiceTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 10, Skipped: 0, Time elapsed: 0.210 s <<< FAILURE! -- in ch.sectioninformatique.auth.user.UserServiceTest
+ch.sectioninformatique.auth.user.UserServiceTest.deleteUser_Unauthorized_ThrowsRuntimeException -- Time elapsed: 0.180 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class ch.sectioninformatique.auth.user.UserMapper$MockitoMock$qtU70o4X
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at org.objenesis.instantiator.sun.SunReflectionFactoryInstantiator.newInstance(SunReflectionFactoryInstantiator.java:48)
+	at org.objenesis.ObjenesisBase.newInstance(ObjenesisBase.java:73)
+	at org.mockito.internal.creation.instance.ObjenesisInstantiator.newInstance(ObjenesisInstantiator.java:22)
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.doCreateMock(InlineDelegateByteBuddyMockMaker.java:394)
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.createMock(InlineDelegateByteBuddyMockMaker.java:352)
+	at org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker.createMock(InlineByteBuddyMockMaker.java:56)
+	at org.mockito.internal.util.MockUtil.createMock(MockUtil.java:99)
+	at org.mockito.internal.MockitoCore.mock(MockitoCore.java:84)
+	at org.mockito.Mockito.mock(Mockito.java:2104)
+	at org.mockito.internal.configuration.MockAnnotationProcessor.processAnnotationForMock(MockAnnotationProcessor.java:79)
+	at org.mockito.internal.configuration.MockAnnotationProcessor.process(MockAnnotationProcessor.java:28)
+	at org.mockito.internal.configuration.MockAnnotationProcessor.process(MockAnnotationProcessor.java:25)
+	at org.mockito.internal.configuration.IndependentAnnotationEngine.createMockFor(IndependentAnnotationEngine.java:44)
+	at org.mockito.internal.configuration.IndependentAnnotationEngine.process(IndependentAnnotationEngine.java:72)
+	at org.mockito.internal.configuration.InjectingAnnotationEngine.processIndependentAnnotations(InjectingAnnotationEngine.java:62)
+	at org.mockito.internal.configuration.InjectingAnnotationEngine.process(InjectingAnnotationEngine.java:47)
+	at org.mockito.MockitoAnnotations.openMocks(MockitoAnnotations.java:81)
+	at org.mockito.internal.framework.DefaultMockitoSession.<init>(DefaultMockitoSession.java:43)
+	at org.mockito.internal.session.DefaultMockitoSessionBuilder.startMocking(DefaultMockitoSessionBuilder.java:83)
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.NoClassDefFoundError: Could not initialize class ch.sectioninformatique.auth.user.UserMapper [in thread "main"]
+	at java.base/jdk.internal.misc.Unsafe.allocateInstance(Native Method)
+	at java.base/java.lang.invoke.DirectMethodHandle.allocateInstance(DirectMethodHandle.java:501)
+	at java.base/java.lang.invoke.MethodHandle.invokeWithArguments(MethodHandle.java:733)
+	at org.mockito.internal.util.reflection.InstrumentationMemberAccessor$Dispatcher$ByteBuddy$ME21d0OH.invokeWithArguments(Unknown Source)
+	at org.mockito.internal.util.reflection.InstrumentationMemberAccessor.lambda$newInstance$0(InstrumentationMemberAccessor.java:199)
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.lambda$newInstance$4(InlineDelegateByteBuddyMockMaker.java:662)
+	at org.mockito.internal.util.reflection.InstrumentationMemberAccessor.newInstance(InstrumentationMemberAccessor.java:188)
+	at org.mockito.internal.util.reflection.ModuleMemberAccessor.newInstance(ModuleMemberAccessor.java:49)
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.newInstance(InlineDelegateByteBuddyMockMaker.java:657)
+	at org.mockito.internal.creation.bytebuddy.InlineDelegateByteBuddyMockMaker.doCreateMock(InlineDelegateByteBuddyMockMaker.java:387)
+	... 18 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.deleteUser_Successful_DeletesUser -- Time elapsed: 0.021 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.login_InvalidPassword_ThrowsAppException -- Time elapsed: 0 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.promoteToManager_UserNotFound_ThrowsRuntimeException -- Time elapsed: 0 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.register_Successful_ReturnsUserDto -- Time elapsed: 0.001 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.register_LoginExists_ThrowsAppException -- Time elapsed: 0.001 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.login_UserNotFound_ThrowsAppException -- Time elapsed: 0 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.login_Successful_ReturnsUserDto -- Time elapsed: 0 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.promoteToManager_Successful_ReturnsUserDto -- Time elapsed: 0.001 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+
+ch.sectioninformatique.auth.user.UserServiceTest.promoteToManager_AlreadyManager_ThrowsRuntimeException -- Time elapsed: 0 s <<< ERROR!
+org.mockito.exceptions.misusing.UnfinishedMockingSessionException: 
+
+Unfinished mocking session detected.
+Previous MockitoSession was not concluded with 'finishMocking()'.
+For examples of correct usage see javadoc for MockitoSession class.
+	at org.mockito.junit.jupiter.MockitoExtension.beforeEach(MockitoExtension.java:160)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.util.Set.forEach(java.util.function.Consumer)" because the return value of "org.junit.jupiter.api.extension.ExtensionContext$Store.remove(Object, java.lang.Class)" is null
+		at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:194)
+		... 2 more
+

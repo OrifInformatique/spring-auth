@@ -435,16 +435,164 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 </head>
-<body class="book">
+<body class="book toc2 toc-right">
 <div id="header">
 <h1>Spring Auth API Documentation</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_1_auth_endpoints">1 Auth Endpoints</a>
+<ul class="sectlevel2">
+<li><a href="#_1_1_login">1.1 Login</a>
+<ul class="sectlevel3">
+<li><a href="#_1_1_1_error_response_400_bad_request">1.1.1 Error Response - 400 - Bad Request</a>
+<ul class="sectlevel4">
+<li><a href="#_1_1_1_1_missing_login">1.1.1.1 Missing Login</a></li>
+<li><a href="#_1_1_1_2_missing_password">1.1.1.2 Missing Password</a></li>
+<li><a href="#_1_1_1_3_invalid_email_format">1.1.1.3 Invalid Email Format</a></li>
+<li><a href="#_1_1_1_4_empty_body">1.1.1.4 Empty Body</a></li>
+<li><a href="#_1_1_1_5_malformed_json">1.1.1.5 Malformed JSON</a></li>
+<li><a href="#_1_1_1_6_sql_injection_attempt_login">1.1.1.6 SQL Injection Attempt Login</a></li>
+</ul>
+</li>
+<li><a href="#_1_1_2_error_response_401_unauthorized">1.1.2 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_1_1_2_1_wrong_password">1.1.2.1 Wrong Password</a></li>
+<li><a href="#_1_1_2_2_non_existent_user">1.1.2.2 Non-Existent User</a></li>
+</ul>
+</li>
+<li><a href="#_1_1_3_error_response_415_unsupported_media_type">1.1.3 Error Response - 415 - Unsupported Media Type</a>
+<ul class="sectlevel4">
+<li><a href="#_1_1_3_1_unsupported_media_type">1.1.3.1 Unsupported Media Type</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_1_2_register">1.2 Register</a>
+<ul class="sectlevel3">
+<li><a href="#_1_2_1_error_response_400_bad_request">1.2.1 Error Response - 400 - Bad Request</a>
+<ul class="sectlevel4">
+<li><a href="#_1_2_1_1_missing_first_name">1.2.1.1 Missing First Name</a></li>
+<li><a href="#_1_2_1_2_missing_last_name">1.2.1.2 Missing Last Name</a></li>
+<li><a href="#_1_2_1_3_missing_login">1.2.1.3 Missing Login</a></li>
+<li><a href="#_1_2_1_4_missing_password">1.2.1.4 Missing Password</a></li>
+<li><a href="#_1_2_1_5_invalid_email_format">1.2.1.5 Invalid Email Format</a></li>
+<li><a href="#_1_2_1_6_empty_body">1.2.1.6 Empty Body</a></li>
+<li><a href="#_1_2_1_7_malformed_json">1.2.1.7 Malformed JSON</a></li>
+<li><a href="#_1_2_1_8_sql_injection_attempt_first_name">1.2.1.8 SQL Injection Attempt First Name</a></li>
+<li><a href="#_1_2_1_9_sql_injection_attempt_last_name">1.2.1.9 SQL Injection Attempt Last Name</a></li>
+<li><a href="#_1_2_1_10_sql_injection_attempt_login">1.2.1.10 SQL Injection Attempt Login</a></li>
+</ul>
+</li>
+<li><a href="#_1_2_2_error_response_409_conflict">1.2.2 Error Response - 409 - Conflict</a>
+<ul class="sectlevel4">
+<li><a href="#_1_2_2_1_duplicate_login">1.2.2.1 Duplicate Login</a></li>
+</ul>
+</li>
+<li><a href="#_1_2_3_error_response_415_unsupported_media_type">1.2.3 Error Response - 415 - Unsupported Media Type</a>
+<ul class="sectlevel4">
+<li><a href="#_1_2_3_1_unsupported_media_type">1.2.3.1 Unsupported Media Type</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_1_3_refresh">1.3 Refresh</a>
+<ul class="sectlevel3">
+<li><a href="#_1_3_1_error_response_401_unauthorized">1.3.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_1_3_1_1_missing_authorization_header">1.3.1.1 Missing Authorization Header</a></li>
+<li><a href="#_1_3_1_2_invalid_token">1.3.1.2 Invalid Token</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_user_endpoints">2 User Endpoints</a>
+<ul class="sectlevel2">
+<li><a href="#_2_1_get_authenticated_user">2.1 Get Authenticated User</a>
+<ul class="sectlevel3">
+<li><a href="#_2_1_1_error_response_401_unauthorized">2.1.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_1_1_1_missing_authorization_header">2.1.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_1_1_2_malformed_token">2.1.1.2 Malformed Token</a></li>
+<li><a href="#_2_1_1_3_expired_token">2.1.1.3 Expired Token</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_2_get_all_users">2.2 Get All Users</a>
+<ul class="sectlevel3">
+<li><a href="#_2_2_1_error_response_401_unauthorized">2.2.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_2_1_1_missing_authorization_header">2.2.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_2_1_2_malformed_token">2.2.1.2 Malformed Token</a></li>
+<li><a href="#_2_2_1_3_expired_token">2.2.1.3 Expired Token</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_3_promote_user_to_manager">2.3 Promote User to Manager</a>
+<ul class="sectlevel3">
+<li><a href="#_2_3_1_error_response_401_unauthorized">2.3.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_3_1_1_missing_authorization_header">2.3.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_3_1_2_malformed_token">2.3.1.2 Malformed Token</a></li>
+</ul>
+</li>
+<li><a href="#_2_3_2_error_response_403_forbidden">2.3.2 Error Response - 403 - Forbidden</a>
+<ul class="sectlevel4">
+<li><a href="#_2_3_2_1_non_admin_user_promote_user_to_manager">2.3.2.1 Non-Admin User - Promote User to Manager</a></li>
+</ul>
+</li>
+<li><a href="#_2_3_3_error_response_404_not_found">2.3.3 Error Response - 404 - Not Found</a>
+<ul class="sectlevel4">
+<li><a href="#_2_3_3_1_user_not_found">2.3.3.1 User Not Found</a></li>
+</ul>
+</li>
+<li><a href="#_2_3_4_error_response_409_conflict">2.3.4 Error Response - 409 - Conflict</a>
+<ul class="sectlevel4">
+<li><a href="#_2_3_4_1_user_already_manager">2.3.4.1 User Already Manager</a></li>
+<li><a href="#_2_3_4_2_user_already_admin">2.3.4.2 User Already Admin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_4_revoke_manager_to_user">2.4 Revoke Manager to User</a>
+<ul class="sectlevel3">
+<li><a href="#_2_4_1_error_response_401_unauthorized">2.4.1 Error Response - 401 - Unauthorized</a>
+<ul class="sectlevel4">
+<li><a href="#_2_4_1_1_missing_authorization_header">2.4.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_4_1_2_malformed_token">2.4.1.2 Malformed Token</a></li>
+</ul>
+</li>
+<li><a href="#_2_4_2_error_response_403_forbidden">2.4.2 Error Response - 403 - Forbidden</a>
+<ul class="sectlevel4">
+<li><a href="#_2_4_2_1_non_admin_user">2.4.2.1 Non-Admin User</a></li>
+</ul>
+</li>
+<li><a href="#_2_4_3_error_response_404_not_found">2.4.3 Error Response - 404 - Not Found</a>
+<ul class="sectlevel4">
+<li><a href="#_2_4_3_1_user_not_found">2.4.3.1 User Not Found</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_2_5_promote_to_admin">2.5 Promote to Admin</a></li>
+<li><a href="#_2_6_revoke_admin_to_user">2.6 Revoke Admin to User</a></li>
+<li><a href="#_2_7_downgrade_admin_to_manager">2.7 Downgrade Admin to Manager</a></li>
+<li><a href="#_2_8_delete_user">2.8 Delete User</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_auth_endpoints">Auth Endpoints</h2>
+<h2 id="_1_auth_endpoints">1 Auth Endpoints</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_login">Login</h3>
+<h3 id="_1_1_login">1.1 Login</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>POST /auth/login</code> endpoint.</p>
 </div>
@@ -474,8 +622,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTI0MTQ0LCJpYXQiOjE3NjExMjA1NDR9.QcsZrK37x5CLVOCFrwkOIindxc593prDodwvvqCVPm8",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NDA1NDQsImlhdCI6MTc2MTEyMDU0NH0.92wLWPC-UP9ExRnxqrLOTAYRzTil3TvpkhMu81LEBdk",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODM1LCJpYXQiOjE3NjEyMDYyMzV9.GcZ3qDaF9oKAV-3gnRWn4srgKK2k3F4XFeb82KQDsAc",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MjYyMzUsImlhdCI6MTc2MTIwNjIzNX0.Pp4D2UF_96wH9e-vrpjx9vzdicbQqXDX_l0j9sMxTDI",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -485,12 +633,12 @@ Content-Length: 581
 <p>It gives informations about the authenticated user along with a JWT token.</p>
 </div>
 <div class="sect3">
-<h4 id="_error_response_400">Error Response - 400</h4>
+<h4 id="_1_1_1_error_response_400_bad_request">1.1.1 Error Response - 400 - Bad Request</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/login</code> endpoint for bad request.</p>
 </div>
 <div class="sect4">
-<h5 id="_missing_login">Missing Login</h5>
+<h5 id="_1_1_1_1_missing_login">1.1.1.1 Missing Login</h5>
 <div class="paragraph">
 <p>This is an example output when the login field is missing in the request.</p>
 </div>
@@ -524,7 +672,7 @@ Content-Length: 37
 </div>
 </div>
 <div class="sect4">
-<h5 id="_missing_password">Missing Password</h5>
+<h5 id="_1_1_1_2_missing_password">1.1.1.2 Missing Password</h5>
 <div class="paragraph">
 <p>This is an example output when the password field is missing in the request.</p>
 </div>
@@ -558,7 +706,7 @@ Content-Length: 40
 </div>
 </div>
 <div class="sect4">
-<h5 id="_invalid_email_format">Invalid Email Format</h5>
+<h5 id="_1_1_1_3_invalid_email_format">1.1.1.3 Invalid Email Format</h5>
 <div class="paragraph">
 <p>This is an example output when the email format is invalid in the request.</p>
 </div>
@@ -593,7 +741,7 @@ Content-Length: 40
 </div>
 </div>
 <div class="sect4">
-<h5 id="_empty_body">Empty Body</h5>
+<h5 id="_1_1_1_4_empty_body">1.1.1.4 Empty Body</h5>
 <div class="paragraph">
 <p>This is an example output when the request body is empty.</p>
 </div>
@@ -622,7 +770,7 @@ Content-Length: 57
 </div>
 </div>
 <div class="sect4">
-<h5 id="_malformed_json">Malformed JSON</h5>
+<h5 id="_1_1_1_5_malformed_json">1.1.1.5 Malformed JSON</h5>
 <div class="paragraph">
 <p>This is an example output when the request body contains malformed JSON.</p>
 </div>
@@ -654,7 +802,7 @@ Content-Length: 57
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sql_injection_attempt_login">SQL Injection Attempt Login</h5>
+<h5 id="_1_1_1_6_sql_injection_attempt_login">1.1.1.6 SQL Injection Attempt Login</h5>
 <div class="paragraph">
 <p>This is an example output when the login field contains a SQL injection attempt.</p>
 </div>
@@ -690,12 +838,12 @@ Content-Length: 40
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response_401">Error Response - 401</h4>
+<h4 id="_1_1_2_error_response_401_unauthorized">1.1.2 Error Response - 401 - Unauthorized</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/login</code> endpoint for unauthorized access.</p>
 </div>
 <div class="sect4">
-<h5 id="_wrong_password">Wrong Password</h5>
+<h5 id="_1_1_2_1_wrong_password">1.1.2.1 Wrong Password</h5>
 <div class="paragraph">
 <p>This is an example output when the password provided is incorrect.</p>
 </div>
@@ -730,7 +878,7 @@ Content-Length: 39
 </div>
 </div>
 <div class="sect4">
-<h5 id="_non_existent_user">Non-Existent User</h5>
+<h5 id="_1_1_2_2_non_existent_user">1.1.2.2 Non-Existent User</h5>
 <div class="paragraph">
 <p>This is an example output when the user does not exist.</p>
 </div>
@@ -766,12 +914,12 @@ Content-Length: 39
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response_415">Error Response - 415</h4>
+<h4 id="_1_1_3_error_response_415_unsupported_media_type">1.1.3 Error Response - 415 - Unsupported Media Type</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/login</code> endpoint for unsupported media types.</p>
 </div>
 <div class="sect4">
-<h5 id="_unsupported_media_type">Unsupported Media Type</h5>
+<h5 id="_1_1_3_1_unsupported_media_type">1.1.3.1 Unsupported Media Type</h5>
 <div class="paragraph">
 <p>This is an example output when the media type of the request is unsupported.</p>
 </div>
@@ -807,7 +955,7 @@ Content-Length: 70
 </div>
 </div>
 <div class="sect2">
-<h3 id="_register">Register</h3>
+<h3 id="_1_2_register">1.2 Register</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>POST /auth/register</code> endpoint.</p>
 </div>
@@ -840,8 +988,8 @@ Content-Length: 599
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTI0MTQ1LCJpYXQiOjE3NjExMjA1NDV9.o6e7enCFBEVT0y22Bl0IKkPh5vC2kd-rFOjrHmRRtkc",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NDA1NDUsImlhdCI6MTc2MTEyMDU0NX0.RLeRs1vBBVdbWPN_TQeZDxrRE3QJ9InXJJdGjlDymvQ",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODM1LCJpYXQiOjE3NjEyMDYyMzV9._AjhCdAnL9FWvqzPnbehcqPdk7EcjzzI97Am0UuP2Tg",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MjYyMzUsImlhdCI6MTc2MTIwNjIzNX0.OHnv4DTk6mKO5VaSIgOEjp2ZDXlp59Fx4H1s2IaMtJA",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -851,12 +999,12 @@ Content-Length: 599
 <p>It registers a new user and gives informations about the created user along with a JWT token.</p>
 </div>
 <div class="sect3">
-<h4 id="_error_response_400_2">Error Response - 400</h4>
+<h4 id="_1_2_1_error_response_400_bad_request">1.2.1 Error Response - 400 - Bad Request</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/register</code> endpoint for bad request.</p>
 </div>
 <div class="sect4">
-<h5 id="_missing_first_name">Missing First Name</h5>
+<h5 id="_1_2_1_1_missing_first_name">1.2.1.1 Missing First Name</h5>
 <div class="paragraph">
 <p>This is an example output when the first name field is missing in the request.</p>
 </div>
@@ -892,7 +1040,7 @@ Content-Length: 42
 </div>
 </div>
 <div class="sect4">
-<h5 id="_missing_last_name">Missing Last Name</h5>
+<h5 id="_1_2_1_2_missing_last_name">1.2.1.2 Missing Last Name</h5>
 <div class="paragraph">
 <p>This is an example output when the last name field is missing in the request.</p>
 </div>
@@ -928,7 +1076,7 @@ Content-Length: 41
 </div>
 </div>
 <div class="sect4">
-<h5 id="_missing_login_2">Missing Login</h5>
+<h5 id="_1_2_1_3_missing_login">1.2.1.3 Missing Login</h5>
 <div class="paragraph">
 <p>This is an example output when the login field is missing in the request.</p>
 </div>
@@ -964,7 +1112,7 @@ Content-Length: 37
 </div>
 </div>
 <div class="sect4">
-<h5 id="_missing_password_2">Missing Password</h5>
+<h5 id="_1_2_1_4_missing_password">1.2.1.4 Missing Password</h5>
 <div class="paragraph">
 <p>This is an example output when the password field is missing in the request.</p>
 </div>
@@ -1000,7 +1148,7 @@ Content-Length: 40
 </div>
 </div>
 <div class="sect4">
-<h5 id="_invalid_email_format_2">Invalid Email Format</h5>
+<h5 id="_1_2_1_5_invalid_email_format">1.2.1.5 Invalid Email Format</h5>
 <div class="paragraph">
 <p>This is an example output when the email format is invalid in the request.</p>
 </div>
@@ -1037,7 +1185,7 @@ Content-Length: 47
 </div>
 </div>
 <div class="sect4">
-<h5 id="_empty_body_2">Empty Body</h5>
+<h5 id="_1_2_1_6_empty_body">1.2.1.6 Empty Body</h5>
 <div class="paragraph">
 <p>This is an example output when the request body is empty.</p>
 </div>
@@ -1066,7 +1214,7 @@ Content-Length: 57
 </div>
 </div>
 <div class="sect4">
-<h5 id="_malformed_json_2">Malformed JSON</h5>
+<h5 id="_1_2_1_7_malformed_json">1.2.1.7 Malformed JSON</h5>
 <div class="paragraph">
 <p>This is an example output when the request body contains malformed JSON.</p>
 </div>
@@ -1098,7 +1246,7 @@ Content-Length: 57
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sql_injection_attempt_first_name">SQL Injection Attempt First Name</h5>
+<h5 id="_1_2_1_8_sql_injection_attempt_first_name">1.2.1.8 SQL Injection Attempt First Name</h5>
 <div class="paragraph">
 <p>This is an example output when the first name field contains a SQL injection attempt.</p>
 </div>
@@ -1135,7 +1283,7 @@ Content-Length: 58
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sql_injection_attempt_last_name">SQL Injection Attempt Last Name</h5>
+<h5 id="_1_2_1_9_sql_injection_attempt_last_name">1.2.1.9 SQL Injection Attempt Last Name</h5>
 <div class="paragraph">
 <p>This is an example output when the last name field contains a SQL injection attempt.</p>
 </div>
@@ -1172,7 +1320,7 @@ Content-Length: 57
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sql_injection_attempt_login_2">SQL Injection Attempt Login</h5>
+<h5 id="_1_2_1_10_sql_injection_attempt_login">1.2.1.10 SQL Injection Attempt Login</h5>
 <div class="paragraph">
 <p>This is an example output when the login field contains a SQL injection attempt.</p>
 </div>
@@ -1210,12 +1358,12 @@ Content-Length: 47
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response_409">Error Response - 409</h4>
+<h4 id="_1_2_2_error_response_409_conflict">1.2.2 Error Response - 409 - Conflict</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/register</code> endpoint for conflict errors.</p>
 </div>
 <div class="sect4">
-<h5 id="_duplicate_login">Duplicate Login</h5>
+<h5 id="_1_2_2_1_duplicate_login">1.2.2.1 Duplicate Login</h5>
 <div class="paragraph">
 <p>This is an example output when the login provided already exists.</p>
 </div>
@@ -1251,14 +1399,14 @@ Content-Length: 40
 <p>It returns a 409 Conflict error indicating that the login already exists.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_error_response_415_2">Error Response - 415</h5>
+</div>
+<div class="sect3">
+<h4 id="_1_2_3_error_response_415_unsupported_media_type">1.2.3 Error Response - 415 - Unsupported Media Type</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>POST /auth/register</code> endpoint for unsupported media types.</p>
 </div>
-</div>
 <div class="sect4">
-<h5 id="_unsupported_media_type_2">Unsupported Media Type</h5>
+<h5 id="_1_2_3_1_unsupported_media_type">1.2.3.1 Unsupported Media Type</h5>
 <div class="paragraph">
 <p>This is an example output when the media type of the request is unsupported.</p>
 </div>
@@ -1296,7 +1444,7 @@ Content-Length: 70
 </div>
 </div>
 <div class="sect2">
-<h3 id="_refresh">Refresh</h3>
+<h3 id="_1_3_refresh">1.3 Refresh</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>GET /auth/refresh</code> endpoint.</p>
 </div>
@@ -1305,7 +1453,7 @@ Content-Length: 70
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE4NDA1NDQsImlhdCI6MTc2MTEyMDU0NH0.92wLWPC-UP9ExRnxqrLOTAYRzTil3TvpkhMu81LEBdk
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjE5MjYyMzUsImlhdCI6MTc2MTIwNjIzNX0.Pp4D2UF_96wH9e-vrpjx9vzdicbQqXDX_l0j9sMxTDI
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1321,7 +1469,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTI0MTQ0LCJpYXQiOjE3NjExMjA1NDR9.QcsZrK37x5CLVOCFrwkOIindxc593prDodwvvqCVPm8",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODM1LCJpYXQiOjE3NjEyMDYyMzV9.GcZ3qDaF9oKAV-3gnRWn4srgKK2k3F4XFeb82KQDsAc",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -1332,12 +1480,12 @@ Content-Length: 419
 <p>It refreshes the JWT token for the authenticated user.</p>
 </div>
 <div class="sect3">
-<h4 id="_error_response_401_2">Error Response - 401</h4>
+<h4 id="_1_3_1_error_response_401_unauthorized">1.3.1 Error Response - 401 - Unauthorized</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>GET /auth/refresh</code> endpoint for unauthorized access.</p>
 </div>
 <div class="sect4">
-<h5 id="_missing_authorization_header">Missing Authorization Header</h5>
+<h5 id="_1_3_1_1_missing_authorization_header">1.3.1.1 Missing Authorization Header</h5>
 <div class="paragraph">
 <p>This is an example output when the Authorization header is missing in the request.</p>
 </div>
@@ -1366,7 +1514,7 @@ Content-Length: 75
 </div>
 </div>
 <div class="sect4">
-<h5 id="_invalid_token">Invalid Token</h5>
+<h5 id="_1_3_1_2_invalid_token">1.3.1.2 Invalid Token</h5>
 <div class="paragraph">
 <p>This is an example output when the token provided is invalid.</p>
 </div>
@@ -1400,10 +1548,10 @@ Content-Length: 33
 </div>
 </div>
 <div class="sect1">
-<h2 id="_user_endpoints">User Endpoints</h2>
+<h2 id="_2_user_endpoints">2 User Endpoints</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_get_authenticated_user">Get Authenticated User</h3>
+<h3 id="_2_1_get_authenticated_user">2.1 Get Authenticated User</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>GET /users/me</code> endpoint.</p>
 </div>
@@ -1412,7 +1560,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.RVr2krTPRq7pDAJw3oP8iBlcbutX1YV0TaJt69OL7Iw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1439,12 +1587,12 @@ Content-Length: 184
 <p>It gives informations about the authenticated user.</p>
 </div>
 <div class="sect3">
-<h4 id="_error_response_401_3">Error Response - 401</h4>
+<h4 id="_2_1_1_error_response_401_unauthorized">2.1.1 Error Response - 401 - Unauthorized</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>GET /users/me</code> endpoint for unauthorized access.</p>
 </div>
 <div class="sect4">
-<h5 id="_missing_authorization_header_2">Missing Authorization Header</h5>
+<h5 id="_2_1_1_1_missing_authorization_header">2.1.1.1 Missing Authorization Header</h5>
 <div class="paragraph">
 <p>This is an example output when the Authorization header is missing in the request.</p>
 </div>
@@ -1473,7 +1621,7 @@ Content-Length: 75
 </div>
 </div>
 <div class="sect4">
-<h5 id="_malformed_token">Malformed Token</h5>
+<h5 id="_2_1_1_2_malformed_token">2.1.1.2 Malformed Token</h5>
 <div class="paragraph">
 <p>This is an example output when the token provided is malformed.</p>
 </div>
@@ -1491,10 +1639,10 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
 Content-Type: application/json
-Content-Length: 33
+Content-Length: 72
 
 {
-  "message" : "Invalid token"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -1502,10 +1650,8 @@ Content-Length: 33
 <p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
 </div>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_expired_token">Expired Token</h3>
+<div class="sect4">
+<h5 id="_2_1_1_3_expired_token">2.1.1.3 Expired Token</h5>
 <div class="paragraph">
 <p>This is an example output when the token provided is expired.</p>
 </div>
@@ -1514,7 +1660,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTE2OTUzLCJpYXQiOjE3NjExMTMzNTN9.9C0EtzVAYccA-MUu1-JsUHAWXuJfdGM9hoiePGV2I4I
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjAyNjQ1LCJpYXQiOjE3NjExOTkwNDV9.HnSccbpF2RGsXiX0736m2kH1T91C7IKy3lKE4u03-gg
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1523,16 +1669,18 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
 Content-Type: application/json
-Content-Length: 33
+Content-Length: 66
 
 {
-  "message" : "Invalid token"
+  "message" : "The Token has expired on 2025-10-23T06:57:25Z."
 }</code></pre>
 </div>
 </div>
 </div>
+</div>
+</div>
 <div class="sect2">
-<h3 id="_get_all_users">Get All Users</h3>
+<h3 id="_2_2_get_all_users">2.2 Get All Users</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>GET /users/all</code> endpoint.</p>
 </div>
@@ -1541,7 +1689,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.RVr2krTPRq7pDAJw3oP8iBlcbutX1YV0TaJt69OL7Iw
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1557,18 +1705,18 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$AqlM3DFm4H4ifJ5sJNyeKOrZdYSTZbGB4/5PIV8Exc3WzFaajfvjy",
-  "createdAt" : "2025-10-22T08:09:11.714+00:00",
-  "updatedAt" : "2025-10-22T08:09:11.714+00:00",
+  "password" : "$2a$10$pbp7DG0g6JDIFUTNzPgpkOuBX/a4STq34jy7C8xaiTHIaT6qYr9oi",
+  "createdAt" : "2025-10-23T07:57:22.766+00:00",
+  "updatedAt" : "2025-10-23T07:57:22.766+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-10-22T08:09:11.424+00:00",
-    "updatedAt" : "2025-10-22T08:09:11.424+00:00"
+    "createdAt" : "2025-10-23T07:57:22.501+00:00",
+    "updatedAt" : "2025-10-23T07:57:22.501+00:00"
   },
-  "authorities" : [ ],
   "username" : "test.user@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1578,18 +1726,18 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$dEBFIIWcX0hCWl/ttzDhz.kvDbh9Fl08WGVBO4dLa2dQI9CaZqRXC",
-  "createdAt" : "2025-10-22T08:09:11.715+00:00",
-  "updatedAt" : "2025-10-22T08:09:11.715+00:00",
+  "password" : "$2a$10$MZ2NPN6JWX0OqUMDjo6dbeYfGbl4UlJl3lWcSTPQu2rQ.3ns.EnjG",
+  "createdAt" : "2025-10-23T07:57:22.767+00:00",
+  "updatedAt" : "2025-10-23T07:57:22.767+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-10-22T08:09:11.434+00:00",
-    "updatedAt" : "2025-10-22T08:09:11.434+00:00"
+    "createdAt" : "2025-10-23T07:57:22.514+00:00",
+    "updatedAt" : "2025-10-23T07:57:22.514+00:00"
   },
-  "authorities" : [ ],
   "username" : "test.manager@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1599,18 +1747,18 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$kiugluxfE8wltx7JJGlV0e8MrEqjLLRseEm47nETRLt0PRpE4Vt8K",
-  "createdAt" : "2025-10-22T08:09:11.716+00:00",
-  "updatedAt" : "2025-10-22T08:09:11.716+00:00",
+  "password" : "$2a$10$bkS.j0453OUaF67VnbK5zeSCuaulsg5FyMs0LPfr8U7NJ4nRQE0qm",
+  "createdAt" : "2025-10-23T07:57:22.769+00:00",
+  "updatedAt" : "2025-10-23T07:57:22.769+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-22T08:09:11.438+00:00",
-    "updatedAt" : "2025-10-22T08:09:11.438+00:00"
+    "createdAt" : "2025-10-23T07:57:22.518+00:00",
+    "updatedAt" : "2025-10-23T07:57:22.518+00:00"
   },
-  "authorities" : [ ],
   "username" : "test.admin@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1620,18 +1768,18 @@ Content-Length: 2607
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$4Cc7Af2HvGS8gDmkvJMeu.H5r.vRW8ZnCPj0lDn3ZXL4mw4M20v4y",
-  "createdAt" : "2025-10-22T08:09:11.717+00:00",
-  "updatedAt" : "2025-10-22T08:09:11.717+00:00",
+  "password" : "$2a$10$gKj3QkH8QsaWnaY869mPM.h66TRI6iVpCoiKXnI.cGGwpMF4LW9YG",
+  "createdAt" : "2025-10-23T07:57:22.769+00:00",
+  "updatedAt" : "2025-10-23T07:57:22.769+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-10-22T08:09:11.438+00:00",
-    "updatedAt" : "2025-10-22T08:09:11.438+00:00"
+    "createdAt" : "2025-10-23T07:57:22.518+00:00",
+    "updatedAt" : "2025-10-23T07:57:22.518+00:00"
   },
-  "authorities" : [ ],
   "username" : "test.admin2@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
@@ -1642,9 +1790,104 @@ Content-Length: 2607
 <div class="paragraph">
 <p>It gives informations about all users.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_2_1_error_response_401_unauthorized">2.2.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>GET /users/all</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_2_1_1_missing_authorization_header">2.2.1.1 Missing Authorization Header</h5>
+<div class="paragraph">
+<p>This is an example output when the Authorization header is missing in the request.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 75
+
+{
+  "message" : "Full authentication is required to access this resource"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_2_1_2_malformed_token">2.2.1.2 Malformed Token</h5>
+<div class="paragraph">
+<p>This is an example output when the token provided is malformed.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
+Accept: application/json
+Authorization: Bearer this.is.not.a.valid.token
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 72
+
+{
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_2_1_3_expired_token">2.2.1.3 Expired Token</h5>
+<div class="paragraph">
+<p>This is an example output when the token provided is expired.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjAyNjQ1LCJpYXQiOjE3NjExOTkwNDV9.HnSccbpF2RGsXiX0736m2kH1T91C7IKy3lKE4u03-gg
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 66
+
+{
+  "message" : "The Token has expired on 2025-10-23T06:57:25Z."
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token has expired.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_promote_user_to_manager">Promote User to Manager</h3>
+<h3 id="_2_3_promote_user_to_manager">2.3 Promote User to Manager</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>PUT /users/{userId}/promote-manager</code> endpoint.</p>
 </div>
@@ -1653,7 +1896,7 @@ Content-Length: 2607
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.HBd66-hZyfFILLsBx9NA31mfKQUR6SA4WXrKVYarmY4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1670,9 +1913,218 @@ User promoted to manager successfully</code></pre>
 <div class="paragraph">
 <p>It promotes a user to the "MANAGER" role.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_3_1_error_response_401_unauthorized">2.3.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_3_1_1_missing_authorization_header">2.3.1.1 Missing Authorization Header</h5>
+<div class="paragraph">
+<p>This is an example output when the Authorization header is missing in the request.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 75
+
+{
+  "message" : "Full authentication is required to access this resource"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_3_1_2_malformed_token">2.3.1.2 Malformed Token</h5>
+<div class="paragraph">
+<p>This is an example output when the token provided is malformed.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer this.is.not.a.valid.token
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 72
+
+{
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_3_2_error_response_403_forbidden">2.3.2 Error Response - 403 - Forbidden</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for forbidden access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_3_2_1_non_admin_user_promote_user_to_manager">2.3.2.1 Non-Admin User - Promote User to Manager</h5>
+<div class="paragraph">
+<p>This is an example output when a non-admin user attempts to promote a user to manager.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json
+Content-Length: 36
+
+{
+  "message" : "Access is denied"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 403 Forbidden error indicating that access is denied.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_3_3_error_response_404_not_found">2.3.3 Error Response - 404 - Not Found</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for not found errors.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_3_3_1_user_not_found">2.3.3.1 User Not Found</h5>
+<div class="paragraph">
+<p>This is an example output when the user to be promoted is not found.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 34
+
+{
+  "message" : "User not found"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 404 Not Found error indicating that the user was not found.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_3_4_error_response_409_conflict">2.3.4 Error Response - 409 - Conflict</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for conflict errors.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_3_4_1_user_already_manager">2.3.4.1 User Already Manager</h5>
+<div class="paragraph">
+<p>This is an example output when the user to be promoted is already a manager.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
+Content-Type: application/json
+Content-Length: 49
+
+{
+  "message" : "The user is already a manager"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 409 Conflict error indicating that the user is already a manager.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_3_4_2_user_already_admin">2.3.4.2 User Already Admin</h5>
+<div class="paragraph">
+<p>This is an example output when the user to be promoted is already an admin.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
+Content-Type: application/json
+Content-Length: 48
+
+{
+  "message" : "The user is already an admin"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 409 Conflict error indicating that the user is already an admin.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_revoke_manager_to_user">Revoke Manager to User</h3>
+<h3 id="_2_4_revoke_manager_to_user">2.4 Revoke Manager to User</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>PUT /users/{userId}/revoke-manager</code> endpoint.</p>
 </div>
@@ -1681,7 +2133,7 @@ User promoted to manager successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.HBd66-hZyfFILLsBx9NA31mfKQUR6SA4WXrKVYarmY4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ0LCJpYXQiOjE3NjEyMDYyNDR9.C5hg8tEKruUAclrxOMFEA9auq5tePGY9SapislbROkw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1698,9 +2150,150 @@ Manager role revoked successfully</code></pre>
 <div class="paragraph">
 <p>It revokes a manager to "USER" role.</p>
 </div>
+<div class="sect3">
+<h4 id="_2_4_1_error_response_401_unauthorized">2.4.1 Error Response - 401 - Unauthorized</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/revoke-manager</code> endpoint for unauthorized access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_4_1_1_missing_authorization_header">2.4.1.1 Missing Authorization Header</h5>
+<div class="paragraph">
+<p>This is an example output when the Authorization header is missing in the request.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 75
+
+{
+  "message" : "Full authentication is required to access this resource"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_2_4_1_2_malformed_token">2.4.1.2 Malformed Token</h5>
+<div class="paragraph">
+<p>This is an example output when the token provided is malformed.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer this.is.not.a.valid.token
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 72
+
+{
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_4_2_error_response_403_forbidden">2.4.2 Error Response - 403 - Forbidden</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/revoke-manager</code> endpoint for forbidden access.</p>
+</div>
+<div class="sect4">
+<h5 id="_2_4_2_1_non_admin_user">2.4.2.1 Non-Admin User</h5>
+<div class="paragraph">
+<p>This is an example output when a non-admin user tries to revoke a manager role.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.1Tn5IhcwUAizqYzox5heWxZj6lrqqEvSbTdxuAc-pYQ
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
+Content-Type: application/json
+Content-Length: 36
+
+{
+  "message" : "Access is denied"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 403 Forbidden error indicating that access is denied.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_4_3_error_response_404_not_found">2.4.3 Error Response - 404 - Not Found</h4>
+<div class="paragraph">
+<p>These are example outputs for the <code>PUT /users/{userId}/revoke-manager</code> endpoint</p>
+</div>
+<div class="sect4">
+<h5 id="_2_4_3_1_user_not_found">2.4.3.1 User Not Found</h5>
+<div class="paragraph">
+<p>This is an example output when the user to be revoked is not found.</p>
+</div>
+<div class="listingblock">
+<div class="title">request</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">response</div>
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 34
+
+{
+  "message" : "User not found"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It returns a 404 Not Found error indicating that the user was not found.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_promote_to_admin">Promote to Admin</h3>
+<h3 id="_2_5_promote_to_admin">2.5 Promote to Admin</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>PUT /users/{userId}/promote-admin</code> endpoint.</p>
 </div>
@@ -1709,7 +2302,7 @@ Manager role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.HBd66-hZyfFILLsBx9NA31mfKQUR6SA4WXrKVYarmY4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ0LCJpYXQiOjE3NjEyMDYyNDR9.C5hg8tEKruUAclrxOMFEA9auq5tePGY9SapislbROkw
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1728,7 +2321,7 @@ Admin role assigned successfully</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_revoke_admin_to_user">Revoke Admin to User</h3>
+<h3 id="_2_6_revoke_admin_to_user">2.6 Revoke Admin to User</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>PUT /users/{userId}/revoke-admin</code> endpoint.</p>
 </div>
@@ -1737,7 +2330,7 @@ Admin role assigned successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.HBd66-hZyfFILLsBx9NA31mfKQUR6SA4WXrKVYarmY4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1756,7 +2349,7 @@ Admin role revoked successfully</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_downgrade_admin_to_manager">Downgrade Admin to Manager</h3>
+<h3 id="_2_7_downgrade_admin_to_manager">2.7 Downgrade Admin to Manager</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>PUT /users/{userId}/downgrade-admin</code> endpoint.</p>
 </div>
@@ -1765,7 +2358,7 @@ Admin role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.HBd66-hZyfFILLsBx9NA31mfKQUR6SA4WXrKVYarmY4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1784,7 +2377,7 @@ Admin role downgraded successfully</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_delete_user">Delete User</h3>
+<h3 id="_2_8_delete_user">2.8 Delete User</h3>
 <div class="paragraph">
 <p>This is an example output for the <code>DELETE /users/{userId}</code> endpoint.</p>
 </div>
@@ -1793,7 +2386,7 @@ Admin role downgraded successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMTI0MTUzLCJpYXQiOjE3NjExMjA1NTN9.HBd66-hZyfFILLsBx9NA31mfKQUR6SA4WXrKVYarmY4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxMjA5ODQ1LCJpYXQiOjE3NjEyMDYyNDV9.m0IriKqMG7bWPkH_drnJgpmUe26weCS0DXuIk7hJK3g
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1816,7 +2409,7 @@ User deleted successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-22 08:16:53 UTC
+Last updated 2025-10-23 07:58:59 UTC
 </div>
 </div>
 </body>

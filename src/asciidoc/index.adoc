@@ -1,6 +1,7 @@
 = Spring Auth API Documentation
-:toc:
+:toc: right
 :toclevels: 4 
+:toc-title: Table of Contents
 
 == 1 Auth Endpoints
 
