@@ -1,11 +1,11 @@
 [source,json,options="nowrap"]
 ----
 {
-  "id" : 0,
+  "id" : 1,
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : null,
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxNjQxOTQxLCJpYXQiOjE3NjE2MzgzNDF9.iEfUJH3GkdbE2H7x4Z9it2tA65xZs6nAhPcmipF1BIs",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
