@@ -198,9 +198,6 @@ public class UserService {
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new AppException("The user is already a user", HttpStatus.CONFLICT);
         }
-        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new AppException("You don't have the necessary rights to delete an admin", HttpStatus.FORBIDDEN);
-        }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
                 .orElseThrow(() -> new AppException("User role not found", HttpStatus.INTERNAL_SERVER_ERROR));
