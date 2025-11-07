@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
+import ch.sectioninformatique.auth.auth.NewPasswordDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
@@ -67,7 +69,7 @@ public class UserService {
      *
      * @param login The user's login
      * @return UserDto containing the authenticated user's information
-     * @throws AppException if the user is not found 
+     * @throws AppException if the user is not found
      */
     public UserDto refreshLogin(String login) {
         User user = userRepository.findByLogin(login)
@@ -108,6 +110,27 @@ public class UserService {
     }
 
     /**
+     * Update the User Password
+     * 
+     * @param login The user email
+     * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
+     */
+    @Transactional
+    public void updatePassword(String login, NewPasswordDto newPassword) {
+
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+
+        if (!passwordEncoder.matches(CharBuffer.wrap(newPassword.oldPassword()), user.getPassword())) {
+            throw new AppException("Invalide Password", HttpStatus.UNAUTHORIZED);
+        }
+
+        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(newPassword.newPassword()));
+
+        userRepository.updatePasswordByLogin(login, encodedPassword);
+    }
+
+    /**
      * Finds a user by their login.
      * This method includes detailed logging for debugging purposes.
      *
@@ -126,11 +149,11 @@ public class UserService {
                     log.error("User not found with login: {}", login);
                     return new AppException("Unknown user", HttpStatus.NOT_FOUND);
                 });
-                
-        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}", 
-            user.getId(), user.getFirstName(), user.getLastName(), 
-            user.getMainRole());
-            
+
+        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}",
+                user.getId(), user.getFirstName(), user.getLastName(),
+                user.getMainRole());
+
         UserDto userDto = userMapper.toUserDto(user);
         log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}",
                 userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
@@ -221,15 +244,15 @@ public class UserService {
      *                          admin role is not found
      */
     public UserDto promoteToAdmin(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-    if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-        throw new AppException("The user is already an admin", HttpStatus.CONFLICT);
-    }
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new AppException("The user is already an admin", HttpStatus.CONFLICT);
+        }
 
-    Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-        .orElseThrow(() -> new AppException("Admin role not found", HttpStatus.INTERNAL_SERVER_ERROR));
+        Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
+                .orElseThrow(() -> new AppException("Admin role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(adminRole);
         userRepository.save(user);
@@ -279,15 +302,15 @@ public class UserService {
      *                          user role is not found
      */
     public UserDto revokeAdminRole(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-    if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-        throw new AppException("The user is already a user", HttpStatus.CONFLICT);
-    }
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
+            throw new AppException("The user is already a user", HttpStatus.CONFLICT);
+        }
 
-    Role userRole = roleRepository.findByName(RoleEnum.USER)
-        .orElseThrow(() -> new AppException("User role not found", HttpStatus.INTERNAL_SERVER_ERROR));
+        Role userRole = roleRepository.findByName(RoleEnum.USER)
+                .orElseThrow(() -> new AppException("User role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(userRole);
         userRepository.save(user);
@@ -336,16 +359,16 @@ public class UserService {
      */
     public UserDto deleteUser(Long userId) {
         // Get the user to delete
-    User userToDelete = userRepository.findById(userId)
-        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         // Get the authenticated user (the actor)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
 
         // Get the full user entity for the authenticated user
-    User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
-        .orElseThrow(() -> new AppException("Authenticated user not found", HttpStatus.NOT_FOUND));
+        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
+                .orElseThrow(() -> new AppException("Authenticated user not found", HttpStatus.NOT_FOUND));
 
         // Check if the action is authorized
         if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {

@@ -1,15 +1,19 @@
 package ch.sectioninformatique.auth.auth;
 
 import java.net.URI;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -79,5 +83,29 @@ public class AuthController {
         createdUser.setToken(userAuthenticationProvider.createToken(createdUser));
         createdUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(createdUser));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+    }
+
+    /**
+     * Change the password of the User
+     * 
+     * @param password A password Dto who contain bothe the old password for verification and the new for update
+     * @return ResponseEntity containing a confirmation message
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/set-password")
+    public ResponseEntity<?> setPassword(@RequestBody @Valid NewPasswordDto password) {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        UserDto currentUser = (UserDto) authentication.getPrincipal();
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        userService.updatePassword(currentUser.getLogin(), password); // store securely (hashed!)
+
+        return ResponseEntity.ok(Map.of("message", "Password set successfully"));
     }
 }
