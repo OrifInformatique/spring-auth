@@ -2,9 +2,9 @@
 ----
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
-Content-Length: 66
+Content-Length: 75
 
 {
-  "message" : "The Token has expired on 2025-11-10T07:38:18Z."
+  "message" : "Full authentication is required to access this resource"
 }
 ----

@@ -1021,7 +1021,7 @@ public class AuthControllerIntegrationTest {
          */
         @Test
         @Transactional
-        public void setPassword_invalidToken_shouldReturnSuccess() throws Exception {
+        public void setPassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
@@ -1097,6 +1097,44 @@ public class AuthControllerIntegrationTest {
 
                 // Save response to file
                 Path path = Paths.get("target/test-data/auth-set-password-response-missing-body.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+        }
+
+        /**
+         * Test the /auth/set-password endpoint with missing token.
+         * This test performs a set password request with missing token and
+         * expects a unauthorized response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void setPassword_missingToken_shouldReturnUnauthorized() throws Exception {
+
+                MvcResult result = mockMvc.perform(put("/auth/set-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                 .content("{\"newPassword\":\"TestNewPassword\"}"))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-set-password-response-missing-token.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
         }

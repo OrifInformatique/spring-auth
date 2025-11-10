@@ -2,5 +2,5 @@
 ----
 $ http GET 'http://localhost:8080/users/all' \
     'Accept:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYyNzY2NTA3LCJpYXQiOjE3NjI3NjI5MDd9.PsghzeNk-iiN-DrUj1ACt76-Bkl15qa1Jt9TKeuXS0Q'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYyNzY3NDk5LCJpYXQiOjE3NjI3NjM4OTl9.7KH0kfExMQFqWS49s_nQQeQQA8MXymF9qY7CwFATfLg'
 ----
