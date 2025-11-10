@@ -1049,7 +1049,7 @@ public class AuthControllerIntegrationTest {
                 String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
 
                 // Save response to file
-                Path path = Paths.get("target/test-data/auth-set-password-success.json");
+                Path path = Paths.get("target/test-data/auth-set-password-response.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
 
@@ -1057,5 +1057,47 @@ public class AuthControllerIntegrationTest {
                 Path pathToken = Paths.get("target/test-data/auth-set-password-token.txt");
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
+        }
+
+
+        /**
+         * Test the /auth/set-password endpoint with missing body.
+         * This test performs a set password request with missing body and
+         * expects a bad request response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void setPassword_missingBody_shouldReturnBadRequest() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                String token = userAuthenticationProvider.createToken(userDto);
+
+                MvcResult result = mockMvc.perform(put("/auth/set-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-set-password-response-missing-body.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
         }
 }

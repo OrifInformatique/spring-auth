@@ -323,6 +323,20 @@ include::auth/set-password/http-response.adoc[]
 
 It sets a new password for the authenticated user.
 
+==== 1.4.1 Error Response - 400 - Bad Request
+These are example outputs for the `PUT /auth/set-password` endpoint for bad request.
+
+===== 1.4.1.1 Missing Body
+This is an example output when the request body is missing.
+
+.request
+include::auth/set-password-missing-body/http-request.adoc[]
+
+.response
+include::auth/set-password-missing-body/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the request body is missing.
+
 == 2 User Endpoints
 
 === 2.1 Get Authenticated User

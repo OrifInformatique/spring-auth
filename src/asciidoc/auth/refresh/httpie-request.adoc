@@ -2,5 +2,5 @@
 ----
 $ http GET 'http://localhost:8080/auth/refresh' \
     'Content-Type:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjM0ODE2OTMsImlhdCI6MTc2Mjc2MTY5M30.9NLDPd5Rf4RRLaAKvdnIFnBGfiw0HU6m-Q7mc8apFZ0'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjM0ODI4OTYsImlhdCI6MTc2Mjc2Mjg5Nn0.ykjk3MFE0YtNNyb08pGYOtKgUEkZw8sve7Ikpk3-LFQ'
 ----

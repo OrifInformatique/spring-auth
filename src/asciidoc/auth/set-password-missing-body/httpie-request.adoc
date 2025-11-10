@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ http PUT 'http://localhost:8080/auth/set-password' \
+    'Content-Type:application/json'
+----
