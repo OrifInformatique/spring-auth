@@ -1012,6 +1012,13 @@ public class AuthControllerIntegrationTest {
                 Files.writeString(path, wrappedResponse);
         }
 
+        /**
+         * Test the /auth/set-password endpoint with real data.
+         * This test performs a set password request and expects a successful response.
+         * The response is saved to a file for use in other tests.
+         *
+         * @throws Exception if an error occurs during the test
+         */
         @Test
         @Transactional
         public void setPassword_invalidToken_shouldReturnSuccess() throws Exception {

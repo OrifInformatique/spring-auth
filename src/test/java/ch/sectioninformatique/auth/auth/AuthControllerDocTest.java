@@ -33,9 +33,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
@@ -731,7 +733,8 @@ public class AuthControllerDocTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 when(securityContext.getAuthentication()).thenThrow(
-                                new AppException("Full authentication is required to access this resource", HttpStatus.UNAUTHORIZED));
+                                new AppException("Full authentication is required to access this resource",
+                                                HttpStatus.UNAUTHORIZED));
 
                 // Perform the /auth/refresh request without Authorization header and validate
                 // response
@@ -771,6 +774,32 @@ public class AuthControllerDocTest {
                                 .header("Authorization", "Bearer " + invalidToken))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("auth/refresh-invalid-token", preprocessRequest(prettyPrint()),
+                                                preprocessResponse(prettyPrint())));
+        }
+
+        @Test
+        public void setPassword_withMockedService_generatesDoc() throws Exception {
+        UserDto mockedUserDto = UserDto.builder()
+                                .id(1L)
+                                .login("test.user@test.com")
+                                .firstName("Test")
+                                .lastName("User")
+                                .mainRole("USER")
+                                .permissions(new ArrayList<>())
+                                .build();
+
+                when(authentication.getPrincipal()).thenReturn(mockedUserDto);
+                when(authentication.isAuthenticated()).thenReturn(true);
+                when(securityContext.getAuthentication()).thenReturn(authentication);
+                SecurityContextHolder.setContext(securityContext);
+
+                // Perform the /auth/set-password request with expected input and validate response
+                // Spring REST Docs will capture the interaction and generate documentation
+                mockMvc.perform(put("/auth/set-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"newPassword\":\"TestNewPassword\"}"))
+                                .andExpect(status().isOk())
+                                .andDo(document("auth/set-password", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 }

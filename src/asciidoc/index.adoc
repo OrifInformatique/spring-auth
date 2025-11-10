@@ -312,6 +312,17 @@ include::auth/refresh-invalid-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
+=== 1.4 Set Password
+This is an example output for the `PUT /auth/set-password` endpoint.
+
+.request
+include::auth/set-password/http-request.adoc[]
+
+.response
+include::auth/set-password/http-response.adoc[]
+
+It sets a new password for the authenticated user.
+
 == 2 User Endpoints
 
 === 2.1 Get Authenticated User
