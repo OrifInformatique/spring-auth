@@ -92,7 +92,7 @@ public class AuthController {
      * @return ResponseEntity containing a confirmation message
      */
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/reset-password")
+    @PutMapping("/set-password")
     public ResponseEntity<?> setPassword(@RequestBody @Valid NewPasswordDto password) {
         Authentication authentication = SecurityContextHolder
                 .getContext()

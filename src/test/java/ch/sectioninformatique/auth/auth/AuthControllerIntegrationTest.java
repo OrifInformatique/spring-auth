@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -71,7 +73,8 @@ public class AuthControllerIntegrationTest {
                                 .andExpect(jsonPath("$.login").value("test.user@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and not empty
+                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
+                                                                                    // not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
@@ -1007,5 +1010,45 @@ public class AuthControllerIntegrationTest {
                 Path path = Paths.get("target/test-data/auth-refresh-invalid-token.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
+        }
+
+        @Test
+        @Transactional
+        public void setPassword_invalidToken_shouldReturnSuccess() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                String token = userAuthenticationProvider.createToken(userDto);
+
+                MvcResult result = mockMvc.perform(put("/auth/set-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                 .content("{\"newPassword\":\"TestNewPassword\"}")
+                                .header("Authorization", "Bearer " + token))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                String responseBody = result.getResponse().getContentAsString();
+                int status = result.getResponse().getStatus();
+
+                // Parse original response body
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
+                });
+
+                // Add status code
+                responseMap.put("status", status);
+
+                // Serialize updated map to JSON
+                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
+
+                // Save response to file
+                Path path = Paths.get("target/test-data/auth-set-password-success.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, wrappedResponse);
+
+                // Save token to file for later tests
+                Path pathToken = Paths.get("target/test-data/auth-set-password-token.txt");
+                Files.createDirectories(pathToken.getParent());
+                Files.writeString(pathToken, token);
         }
 }
