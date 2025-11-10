@@ -12,4 +12,4 @@ import jakarta.validation.constraints.NotNull;
  * Validation:
  * - `@NotNull` ensures that a password must be provided in the request body.
  */
-public record NewPasswordDto (@NotNull char[] oldPassword,@NotNull char[] newPassword) {}
+public record NewPasswordDto (@NotNull char[] newPassword) {}

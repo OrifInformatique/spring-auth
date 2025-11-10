@@ -2,5 +2,5 @@
 ----
 $ http PUT 'http://localhost:8080/users/100/revoke-admin' \
     'Accept:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYxOTAwNTUyLCJpYXQiOjE3NjE4OTY5NTJ9.eIMsPbUQxKDtHZK4hByisAvHVW3FZspDbRfOoSvAMpk'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYyNzYzMzAwLCJpYXQiOjE3NjI3NTk3MDB9.xHHlY2ctEM0J8QxRb9c0nm6F1Tc8CJBEVPnosuXFWHU'
 ----

@@ -2,5 +2,5 @@
 ----
 $ curl 'http://localhost:8080/users/100' -i -X DELETE \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYxOTAwNTUyLCJpYXQiOjE3NjE4OTY5NTJ9.VRt8Elt6eHNYtbBKQY42koFcLSgTNofn54oIlMtrLEE'
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYyNzYzMzAxLCJpYXQiOjE3NjI3NTk3MDF9.WL9DmZ4xDJ839QwfPMenKdZhNRBZWrEeIoxXiSpvE-M'
 ----

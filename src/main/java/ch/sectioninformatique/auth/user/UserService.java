@@ -121,13 +121,9 @@ public class UserService {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
-        if (!passwordEncoder.matches(CharBuffer.wrap(newPassword.oldPassword()), user.getPassword())) {
-            throw new AppException("Invalide Password", HttpStatus.UNAUTHORIZED);
-        }
-
         String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(newPassword.newPassword()));
 
-        userRepository.updatePasswordByLogin(login, encodedPassword);
+        userRepository.updatePasswordByLogin(user.getLogin(), encodedPassword);
     }
 
     /**
