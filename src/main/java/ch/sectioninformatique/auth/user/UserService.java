@@ -2,6 +2,8 @@ package ch.sectioninformatique.auth.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,12 +16,16 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
+import jakarta.persistence.EntityManager;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.Session;
 
 /**
  * Service class for managing user-related operations.
@@ -35,7 +41,12 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
+    /** EntityManager for database operations */
+    @Autowired
+    private EntityManager entityManager;
+
     /** Repository for user data access */
+    @Autowired
     private final UserRepository userRepository;
 
     /** Encoder for password hashing */
@@ -164,8 +175,34 @@ public class UserService {
      * @return List of all User entities
      */
     public List<User> allUsers() {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedFilter").setParameter("isDeleted", false);
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(users::add);
+        return users;
+    }
+
+    /**
+     * Retrieves all users including soft-deleted ones.
+     *
+     * @return List of all User entities including deleted
+     */
+    public List<User> allDeletedUsers() {
+        List<User> users = new ArrayList<>();
+        userRepository.findAllIncludingDeleted().forEach(users::add);
+        return users;
+    }
+
+    /**
+     * Retrieves only soft-deleted users.
+     *
+     * @return List of soft-deleted User entities
+     */
+    public List<User> deletedUsers() {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedFilter").setParameter("isDeleted", true);
+        List<User> users = new ArrayList<>();
+        userRepository.findAllDeleted().forEach(users::add);
         return users;
     }
 
@@ -373,7 +410,7 @@ public class UserService {
         }
 
         // Delete the user
-        userRepository.deleteById(userId);
+        userRepository.delete(userToDelete);
         return userMapper.toUserDto(userToDelete);
     }
 
