@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Optional;
  * - Checking user existence
  * - Standard CRUD operations inherited from JpaRepository
  */
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryHardDelete {
 
     /**
      * Finds a user by their login username.
@@ -29,6 +30,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return Optional containing the user if found, empty Optional otherwise
      */
     Optional<User> findByLogin(String login);
+
+    /**
+     * Returns all users including those that are soft-deleted.
+     */
+    @Query("SELECT u FROM User u")
+    List<User> findAllIncludingDeleted();
+
+    /**
+     * Returns only soft-deleted users.
+     */
+    @Query("SELECT u FROM User u WHERE u.deleted = true")
+    List<User> findAllDeleted();
+
 
     /**
      * Checks if a user with the given login username exists.

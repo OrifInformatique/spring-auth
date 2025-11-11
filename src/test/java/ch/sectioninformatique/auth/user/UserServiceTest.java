@@ -59,7 +59,7 @@ public class UserServiceTest {
         // Arrange
         String login = "john@test.com";
         String password = "password123";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, null);
+        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, false, null);
         UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, null, "USER", null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
@@ -95,7 +95,7 @@ public class UserServiceTest {
         // Arrange
         String login = "john@test.com";
         String password = "wrongpassword";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null,null);
+        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null,false, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(false);
@@ -152,7 +152,7 @@ public class UserServiceTest {
         String password = "password123";
         SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray());
         
-        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, null);
+        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, false, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(existingUser));
 
