@@ -184,4 +184,21 @@ public class UserController {
         UserDto deletedUser = userService.deleteUser(userId);
         return ResponseEntity.ok(Map.of("message", "User deleted successfully", "deletedUserLogin", deletedUser.getLogin()));
     }
+
+    /**
+     * Permanently deletes a user from the system.
+     * This endpoint:
+     * - Requires the 'user:delete' authority
+     * - Validates the authenticated user has sufficient permissions
+     * - Returns success/error message
+     *
+     * @param userId The ID of the user to permanently delete
+     * @return ResponseEntity with success message or error details
+     */
+    @PreAuthorize("hasAuthority('user:delete')")
+    @DeleteMapping("/{userId}/permanent")
+    public ResponseEntity<?> hardDeleteUser(@PathVariable Long userId) {
+        UserDto deletedUser = userService.hardDeleteUser(userId);
+        return ResponseEntity.ok(Map.of("message", "User deleted permanently", "deletedUserLogin", deletedUser.getLogin()));
+    }
 }

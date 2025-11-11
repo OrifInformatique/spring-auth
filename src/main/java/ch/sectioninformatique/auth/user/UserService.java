@@ -112,8 +112,9 @@ public class UserService {
     /**
      * Update the User Password
      * 
-     * @param login The user email
-     * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
+     * @param login       The user email
+     * @param newPassword A password Dto who contain bothe the old password for
+     *                    verification and the new for update
      */
     @Transactional
     public void updatePassword(String login, NewPasswordDto newPassword) {
@@ -373,6 +374,41 @@ public class UserService {
 
         // Delete the user
         userRepository.deleteById(userId);
+        return userMapper.toUserDto(userToDelete);
+    }
+
+    /**
+     * Permanently deletes a user from the system.
+     * This operation:
+     * - Verifies the user exists
+     * - Checks if the authenticated user has sufficient permissions
+     * - Permanently deletes the user
+     *
+     * @param userId The ID of the user to permanently delete
+     * @return The deleted User entity, or null if deletion was successful
+     * @throws RuntimeException if the user is not found or the authenticated user
+     *                          lacks permissions
+     */
+    public UserDto hardDeleteUser(Long userId) {
+        // Get the user to delete
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+
+        // Get the authenticated user (the actor)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
+
+        // Get the full user entity for the authenticated user
+        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
+                .orElseThrow(() -> new AppException("Authenticated user not found", HttpStatus.NOT_FOUND));
+
+        // Check if the action is authorized
+        if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
+            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.FORBIDDEN);
+        }
+
+        // Delete the user
+        userRepository.deletePermanentlyById(userId);
         return userMapper.toUserDto(userToDelete);
     }
 
