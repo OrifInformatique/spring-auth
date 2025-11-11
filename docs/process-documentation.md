@@ -16,6 +16,10 @@
     - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
     - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
     - [1.10 Error and Exception Managment (`main/java/app`)](#110-error-and-exception-managment-mainjavaapp)
+    - [1.11 Main Test Modules (`main/test`)](#111-main-test-modules-maintest)
+    - [1.12 Security Tests (`main/test/security`)](#112-security-tests-maintestsecurity)
+    - [1.13 Authentication Tests (`main/test/auth`)](#113-authentication-tests-maintestauth)
+    - [1.14 User Tests (`main/test/user`)](#114-user-tests-maintestuser)
 ---
 
 ## Documentation Tools
