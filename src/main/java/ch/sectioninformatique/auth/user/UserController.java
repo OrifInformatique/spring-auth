@@ -1,6 +1,7 @@
 package ch.sectioninformatique.auth.user;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -180,7 +181,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.ok().body("User deleted successfully");
+        UserDto deletedUser = userService.deleteUser(userId);
+        return ResponseEntity.ok(Map.of("message", "User deleted successfully", "deletedUserLogin", deletedUser.getLogin()));
     }
 }

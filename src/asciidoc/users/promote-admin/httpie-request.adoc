@@ -2,5 +2,5 @@
 ----
 $ http PUT 'http://localhost:8080/users/100/promote-admin' \
     'Content-Type:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYyNzY3NDk4LCJpYXQiOjE3NjI3NjM4OTh9.e1HNQLMISGGTX_lhbT609UylUVC3jioIoNmZe6ZZc6U'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYyODU5NzEzLCJpYXQiOjE3NjI4NTYxMTN9.ryC2CsnD9Tyk1qaxazg0jRRiKx8EepSHnDLjNTgJLxM'
 ----

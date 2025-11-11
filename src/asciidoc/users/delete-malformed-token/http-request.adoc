@@ -1,6 +1,6 @@
 [source,http,options="nowrap"]
 ----
-DELETE /users/100 HTTP/1.1
+DELETE /users/test.user@test.com HTTP/1.1
 Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
 Host: localhost:8080

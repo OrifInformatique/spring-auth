@@ -1,6 +1,6 @@
 [source,bash]
 ----
-$ http DELETE 'http://localhost:8080/users/100' \
+$ http DELETE 'http://localhost:8080/users/test.user@test.com' \
     'Accept:application/json' \
     'Authorization:Bearer this.is.not.a.valid.token'
 ----

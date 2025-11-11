@@ -1,6 +1,6 @@
 [source,bash]
 ----
-$ http DELETE 'http://localhost:8080/users/100' \
+$ http DELETE 'http://localhost:8080/users/test.user@test.com' \
     'Content-Type:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYyNzY3NDk5LCJpYXQiOjE3NjI3NjM4OTl9.avePgNMaSDx7sOFbmkyeCLQ5ZXRvZSB2NjlprPAXP-g'
+    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYyODU5NzE0LCJpYXQiOjE3NjI4NTYxMTR9.EY-tpLSh-5zRw5FKXJyRyMx-Y81cKrUNEtBkfU5JUQ4'
 ----
