@@ -1875,10 +1875,40 @@ Host: localhost:8080</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 Content-Length: 75
-
 {
   "message" : "Full authentication is required to access this resource"
 }</code></pre>
+[ {
+  "id" : 1,
+  "firstName" : "John",
+  "lastName" : "Doe",
+  "login" : "john@test.com",
+  "password" : "pass",
+  "createdAt" : null,
+  "updatedAt" : null,
+  "mainRole" : null,
+  "authorities" : [ ],
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "credentialsNonExpired" : true,
+  "username" : "john@test.com",
+  "enabled" : true
+}, {
+  "id" : 2,
+  "firstName" : "Jane",
+  "lastName" : "Smith",
+  "login" : "jane@test.com",
+  "password" : "pass",
+  "createdAt" : null,
+  "updatedAt" : null,
+  "mainRole" : null,
+  "authorities" : [ ],
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "credentialsNonExpired" : true,
+  "username" : "jane@test.com",
+  "enabled" : true
+} ]</code></pre>
 </div>
 </div>
 <div class="paragraph">
