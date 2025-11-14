@@ -9,84 +9,84 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$od6S1vnjyu2.Ucu7zAkaHe5./WOkXCk/RglfaxS50N1CS8GjK6e2i",
-  "createdAt" : "2025-11-14T07:26:36.339+00:00",
-  "updatedAt" : "2025-11-14T07:26:36.339+00:00",
+  "password" : "$2a$10$lOKAmbGkZVmBc25/OuxeOuLy2gIZDMwBABRlbAZRzebAZfog743Xq",
+  "createdAt" : "2025-11-14T07:32:49.788+00:00",
+  "updatedAt" : "2025-11-14T07:32:49.788+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-11-14T07:26:36.077+00:00",
-    "updatedAt" : "2025-11-14T07:26:36.077+00:00"
+    "createdAt" : "2025-11-14T07:32:49.523+00:00",
+    "updatedAt" : "2025-11-14T07:32:49.523+00:00"
   },
-  "username" : "test.user@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "authorities" : [ ],
+  "username" : "test.user@test.com",
   "enabled" : true
 }, {
   "id" : 2,
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$Yj8aBTDwLN74vKVw28Tk7.IzZN9euJoUwGacuu4kcxl3KFONoN9RO",
-  "createdAt" : "2025-11-14T07:26:36.341+00:00",
-  "updatedAt" : "2025-11-14T07:26:36.341+00:00",
+  "password" : "$2a$10$0mhq4uMbtwZtagnTermxQONKk4XufaYzYd9lLWE.GzhdsmSKZKK6O",
+  "createdAt" : "2025-11-14T07:32:49.790+00:00",
+  "updatedAt" : "2025-11-14T07:32:49.790+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-11-14T07:26:36.088+00:00",
-    "updatedAt" : "2025-11-14T07:26:36.088+00:00"
+    "createdAt" : "2025-11-14T07:32:49.528+00:00",
+    "updatedAt" : "2025-11-14T07:32:49.529+00:00"
   },
-  "username" : "test.manager@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "authorities" : [ ],
+  "username" : "test.manager@test.com",
   "enabled" : true
 }, {
   "id" : 3,
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$hj85B/e3qTPsBcwd9m3GjOuUYMGy5BfVkfYWwzg.NHs0018PABGgC",
-  "createdAt" : "2025-11-14T07:26:36.342+00:00",
-  "updatedAt" : "2025-11-14T07:26:36.342+00:00",
+  "password" : "$2a$10$5jbYeYgvlqOiSzhPFZKaDumLG0hWcd1/jmD/EFIzXTfUdtq4dgMWW",
+  "createdAt" : "2025-11-14T07:32:49.790+00:00",
+  "updatedAt" : "2025-11-14T07:32:49.790+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-11-14T07:26:36.093+00:00",
-    "updatedAt" : "2025-11-14T07:26:36.093+00:00"
+    "createdAt" : "2025-11-14T07:32:49.533+00:00",
+    "updatedAt" : "2025-11-14T07:32:49.533+00:00"
   },
-  "username" : "test.admin@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "authorities" : [ ],
+  "username" : "test.admin@test.com",
   "enabled" : true
 }, {
   "id" : 4,
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$8p6Lmf8r5H2HbAR1eza2iuq0.4CHNaW6bLd5KJH6tzcZeHZca4zRG",
-  "createdAt" : "2025-11-14T07:26:36.342+00:00",
-  "updatedAt" : "2025-11-14T07:26:36.342+00:00",
+  "password" : "$2a$10$Bcdnbfw0/YqR5ZH7mDXqwu1HzDvUBcF4Sb1SSsstm/gnu4hl13rvi",
+  "createdAt" : "2025-11-14T07:32:49.791+00:00",
+  "updatedAt" : "2025-11-14T07:32:49.791+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-11-14T07:26:36.093+00:00",
-    "updatedAt" : "2025-11-14T07:26:36.093+00:00"
+    "createdAt" : "2025-11-14T07:32:49.533+00:00",
+    "updatedAt" : "2025-11-14T07:32:49.533+00:00"
   },
-  "username" : "test.admin2@test.com",
+  "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "authorities" : [ ],
+  "username" : "test.admin2@test.com",
   "enabled" : true
 } ]
 ----
