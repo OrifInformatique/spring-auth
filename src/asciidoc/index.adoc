@@ -802,4 +802,3 @@ include::users/delete-malformed-token/http-request.adoc[]
 include::users/delete-malformed-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
-

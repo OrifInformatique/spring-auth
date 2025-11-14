@@ -1,5 +1,0 @@
-[source,bash]
-----
-$ http DELETE 'http://localhost:8080/users/100' \
-    'Accept:application/json'
-----

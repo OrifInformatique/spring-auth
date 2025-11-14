@@ -69,10 +69,11 @@ public class UserAuthenticationProvider {
      * - Issue time and expiration time (1 hour validity)
      *
      * @param user The user to create a token for
+     * @param expirationDate Optional expiration date for the token
      * @return A JWT token string containing the user's information and permissions
      */
-    public String createToken(UserDto user, Date... testDate) {
-        Date now = testDate.length > 0 ? testDate[0] : new Date();
+    public String createToken(UserDto user, Date... expirationDate) {
+        Date now = expirationDate.length > 0 ? expirationDate[0] : new Date();
         Date validity = new Date(now.getTime() + 3600000); // 1 hour
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
