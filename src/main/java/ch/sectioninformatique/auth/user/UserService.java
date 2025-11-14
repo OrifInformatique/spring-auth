@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
-import ch.sectioninformatique.auth.auth.NewPasswordDto;
+import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
@@ -116,7 +116,7 @@ public class UserService {
      * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
      */
     @Transactional
-    public void updatePassword(String login, NewPasswordDto newPassword) {
+    public void updatePassword(String login, PasswordUpdateDto newPassword) {
 
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
