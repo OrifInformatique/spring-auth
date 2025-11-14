@@ -23,7 +23,7 @@ import java.util.Arrays;
  */
 @Component
 @Order(2)
-@Profile({"dev","build"})
+@Profile({"dev"})
 public class UserSeeder implements CommandLineRunner {
 
 	/** Repository for user data access */
