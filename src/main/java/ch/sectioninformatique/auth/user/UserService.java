@@ -252,7 +252,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new AppException("The user has lower rights than desired", HttpStatus.CONFLICT);
+            throw new AppException("The user has lower rights than desired", HttpStatus.FORBIDDEN);
         }
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
             throw new AppException("The user is already a manager", HttpStatus.CONFLICT);
