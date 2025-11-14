@@ -21,9 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
  * - User deletion
  * - User listing and retrieval
  * 
- * All endpoints are secured with appropriate authorization checks using Spring Security's
- * @PreAuthorize annotations. The controller follows RESTful conventions and returns
- * appropriate HTTP responses with success/error messages.
+ * All endpoints are secured with appropriate authorization checks using Spring
+ * Security's
+ * 
+ * @PreAuthorize annotations. The controller follows RESTful conventions and
+ *               returns
+ *               appropriate HTTP responses with success/error messages.
  */
 @RequestMapping("/users")
 @RestController
@@ -36,8 +39,7 @@ public class UserController {
      *
      * @param userService Service for handling user-related operations
      */
-    public UserController(UserService userService)
-    {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -56,7 +58,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
-        
+
         UserDto currentUser = (UserDto) authentication.getPrincipal();
         return ResponseEntity.ok(currentUser);
     }
@@ -73,7 +75,7 @@ public class UserController {
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<List<User>> allUsers() {
-        List <User> users = userService.allUsers();
+        List<User> users = userService.allUsers();
         return ResponseEntity.ok(users);
     }
 
@@ -90,12 +92,10 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{userId}/promote-manager")
     public ResponseEntity<?> promoteToManager(@PathVariable Long userId) {
-        try {
-            userService.promoteToManager(userId);
-            return ResponseEntity.ok().body("User promoted to manager successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        userService.promoteToManager(userId);
+        return ResponseEntity.ok().body("User promoted to manager successfully");
+
     }
 
     /**
@@ -111,12 +111,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{userId}/revoke-manager")
     public ResponseEntity<?> revokeManagerRole(@PathVariable Long userId) {
-        try {
-            userService.revokeManagerRole(userId);
-            return ResponseEntity.ok().body("Manager role revoked successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        userService.revokeManagerRole(userId);
+        return ResponseEntity.ok().body("Manager role revoked successfully");
     }
 
     /**
@@ -132,12 +129,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/promote-admin")
     public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
-        try {
-            userService.promoteToAdmin(userId);
-            return ResponseEntity.ok().body("Admin role assigned successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.promoteToAdmin(userId);
+        return ResponseEntity.ok().body("Admin role assigned successfully");
     }
 
     /**
@@ -153,12 +146,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
-        try {
-            userService.revokeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role revoked successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.revokeAdminRole(userId);
+        return ResponseEntity.ok().body("Admin role revoked successfully");
     }
 
     /**
@@ -174,12 +163,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/downgrade-admin")
     public ResponseEntity<?> downgradeAdminRole(@PathVariable Long userId) {
-        try {
-            userService.downgradeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role downgraded successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.downgradeAdminRole(userId);
+        return ResponseEntity.ok().body("Admin role downgraded successfully");
     }
 
     /**
@@ -195,11 +180,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        try {
-            userService.deleteUser(userId);
-            return ResponseEntity.ok().body("User deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.deleteUser(userId);
+        return ResponseEntity.ok().body("User deleted successfully");
     }
 }

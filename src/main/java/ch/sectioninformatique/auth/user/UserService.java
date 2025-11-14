@@ -54,12 +54,12 @@ public class UserService {
      */
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByLogin(credentialsDto.login())
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
-        throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
+        throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -71,7 +71,7 @@ public class UserService {
      */
     public UserDto refreshLogin(String login) {
         User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
         return userMapper.toUserDto(user);
     }
 
@@ -92,7 +92,7 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
 
         if (optionalUser.isPresent()) {
-            throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+            throw new AppException("Login already exists", HttpStatus.CONFLICT);
         }
 
         User user = userMapper.signUpToUser(userDto);
@@ -163,17 +163,17 @@ public class UserService {
      */
     public UserDto promoteToManager(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already a manager");
+            throw new AppException("The user is already a manager", HttpStatus.CONFLICT);
         }
         if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already an admin");
+            throw new AppException("The user is already an admin", HttpStatus.CONFLICT);
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
-                .orElseThrow(() -> new RuntimeException("Manager role not found"));
+                .orElseThrow(() -> new AppException("Manager role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(managerRole);
         userRepository.save(user);
@@ -191,22 +191,21 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a user, or the
      *                          user role is not found
      */
-    public void revokeManagerRole(Long userId) {
+    public UserDto revokeManagerRole(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new RuntimeException("The user is already a user");
-        }
-        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("You don't have the necessary rights to delete an admin");
+            throw new AppException("The user is already a user", HttpStatus.CONFLICT);
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new RuntimeException("User role not found"));
+                .orElseThrow(() -> new AppException("User role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(userRole);
         userRepository.save(user);
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -222,15 +221,15 @@ public class UserService {
      *                          admin role is not found
      */
     public UserDto promoteToAdmin(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new RuntimeException("The user is already an admin");
-        }
+    if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
+        throw new AppException("The user is already an admin", HttpStatus.CONFLICT);
+    }
 
-        Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-                .orElseThrow(() -> new RuntimeException("Admin role not found"));
+    Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
+        .orElseThrow(() -> new AppException("Admin role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(adminRole);
         userRepository.save(user);
@@ -248,22 +247,24 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already an manager, or the
      *                          manager role is not found
      */
-    public void downgradeAdminRole(Long userId) {
+    public UserDto downgradeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new RuntimeException("The user has lower rights than desired");
+            throw new AppException("The user has lower rights than desired", HttpStatus.FORBIDDEN);
         }
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new RuntimeException("The user is already a manager");
+            throw new AppException("The user is already a manager", HttpStatus.CONFLICT);
         }
 
         Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
-                .orElseThrow(() -> new RuntimeException("Manager role not found"));
+                .orElseThrow(() -> new AppException("Manager role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(managerRole);
         userRepository.save(user);
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -277,19 +278,21 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a user, or the
      *                          user role is not found
      */
-    public void revokeAdminRole(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public UserDto revokeAdminRole(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new RuntimeException("The user is already a user");
-        }
+    if (user.getMainRole().getName().equals(RoleEnum.USER)) {
+        throw new AppException("The user is already a user", HttpStatus.CONFLICT);
+    }
 
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new RuntimeException("User role not found"));
+    Role userRole = roleRepository.findByName(RoleEnum.USER)
+        .orElseThrow(() -> new AppException("User role not found", HttpStatus.INTERNAL_SERVER_ERROR));
 
         user.setMainRole(userRole);
         userRepository.save(user);
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -327,29 +330,31 @@ public class UserService {
      * - Deletes the user
      *
      * @param userId The ID of the user to delete
+     * @return The deleted User entity, or null if deletion was successful
      * @throws RuntimeException if the user is not found or the authenticated user
      *                          lacks permissions
      */
-    public void deleteUser(Long userId) {
+    public UserDto deleteUser(Long userId) {
         // Get the user to delete
-        User userToDelete = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User userToDelete = userRepository.findById(userId)
+        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         // Get the authenticated user (the actor)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
 
         // Get the full user entity for the authenticated user
-        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
-                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+    User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
+        .orElseThrow(() -> new AppException("Authenticated user not found", HttpStatus.NOT_FOUND));
 
         // Check if the action is authorized
         if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
-            throw new RuntimeException("You don't have the necessary rights to perform this action");
+            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.UNAUTHORIZED);
         }
 
         // Delete the user
         userRepository.deleteById(userId);
+        return userMapper.toUserDto(userToDelete);
     }
 
     /**
