@@ -349,7 +349,7 @@ public class UserService {
 
         // Check if the action is authorized
         if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
-            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.FORBIDDEN);
+            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.UNAUTHORIZED);
         }
 
         // Delete the user
