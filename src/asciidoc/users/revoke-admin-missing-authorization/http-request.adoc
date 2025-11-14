@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-PUT /users/100/revoke-admin HTTP/1.1
-Accept: application/json
-Host: localhost:8080
-Content-Type: application/x-www-form-urlencoded
-
-----

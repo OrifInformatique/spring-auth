@@ -1,9 +1,0 @@
-[source,http,options="nowrap"]
-----
-PUT /users/100/revoke-admin HTTP/1.1
-Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzMTA5ODE3LCJpYXQiOjE3NjMxMDYyMTd9.9cJg2Hr4BLUmFPWzVxLKpW2naEIMa05w1-6nK7PYBpc
-Host: localhost:8080
-Content-Type: application/x-www-form-urlencoded
-
-----

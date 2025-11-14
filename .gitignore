@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 surefire-reports/
 target-surefire*/
+src/asciidoc/
 
 ### STS ###
 .apt_generated

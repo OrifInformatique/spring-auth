@@ -1,6 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/users/100/promote-admin' -i -X PUT \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzMTA5ODE2LCJpYXQiOjE3NjMxMDYyMTZ9.yoouM2SeJfo13zKwU7A55JQKmrfcUX5XDT9daSVBBzQ'
-----

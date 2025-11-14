@@ -1,9 +1,0 @@
-[source,http,options="nowrap"]
-----
-PUT /users/100/promote-admin HTTP/1.1
-Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzMTA5ODE3LCJpYXQiOjE3NjMxMDYyMTd9.3SozQUgGE5XeGoJl7N780tNYyawlz3Q4hs_DmkuSoec
-Host: localhost:8080
-Content-Type: application/x-www-form-urlencoded
-
-----
