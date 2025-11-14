@@ -309,7 +309,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new AppException("The user has lower rights than desired", HttpStatus.CONFLICT);
+            throw new AppException("The user has lower rights than desired", HttpStatus.FORBIDDEN);
         }
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
             throw new AppException("The user is already a manager", HttpStatus.CONFLICT);
@@ -406,7 +406,7 @@ public class UserService {
 
         // Check if the action is authorized
         if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
-            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.FORBIDDEN);
+            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.UNAUTHORIZED);
         }
 
         // Delete the user

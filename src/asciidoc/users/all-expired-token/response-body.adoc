@@ -1,6 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "message" : "The Token has expired on 2025-11-11T09:15:14Z."
-}
-----

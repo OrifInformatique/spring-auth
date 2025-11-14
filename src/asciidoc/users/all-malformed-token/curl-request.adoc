@@ -1,6 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/users/all' -i -X GET \
-    -H 'Accept: application/json' \
-    -H 'Authorization: Bearer this.is.not.a.valid.token'
-----

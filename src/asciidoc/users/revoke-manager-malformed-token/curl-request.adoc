@@ -1,6 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/users/100/revoke-manager' -i -X PUT \
-    -H 'Accept: application/json' \
-    -H 'Authorization: Bearer this.is.not.a.valid.token'
-----

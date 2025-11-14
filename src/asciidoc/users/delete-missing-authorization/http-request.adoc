@@ -1,7 +1,0 @@
-[source,http,options="nowrap"]
-----
-DELETE /users/test.user@test.com HTTP/1.1
-Accept: application/json
-Host: localhost:8080
-
-----

@@ -1,6 +1,0 @@
-[source,bash]
-----
-$ http PUT 'http://localhost:8080/users/100/revoke-manager' \
-    'Accept:application/json' \
-    'Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYyODU5NzE0LCJpYXQiOjE3NjI4NTYxMTR9.EY-tpLSh-5zRw5FKXJyRyMx-Y81cKrUNEtBkfU5JUQ4'
-----

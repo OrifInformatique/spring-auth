@@ -1,6 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/users/test.user@test.com' -i -X DELETE \
-    -H 'Accept: application/json' \
-    -H 'Authorization: Bearer this.is.not.a.valid.token'
-----
