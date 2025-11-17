@@ -805,7 +805,7 @@ public class AuthControllerDocTest {
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(put("/auth/set-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"newPassword\":\"TestNewPassword\"}"))
+                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/set-password", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
@@ -870,7 +870,7 @@ public class AuthControllerDocTest {
                 // Spring REST Docs will capture the interaction and generate documentation
                 mockMvc.perform(put("/auth/set-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"newPassword\":\"TestNewPassword\"}"))
+                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andDo(document("auth/set-password-missing-token", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));

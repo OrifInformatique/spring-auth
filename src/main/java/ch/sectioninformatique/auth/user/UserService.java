@@ -116,12 +116,16 @@ public class UserService {
      * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
      */
     @Transactional
-    public void updatePassword(String login, PasswordUpdateDto newPassword) {
+    public void updatePassword(String login, PasswordUpdateDto passwords) {
 
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
-        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(newPassword.newPassword()));
+                if(passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword())== false){
+                    throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);
+                }
+
+        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(passwords.newPassword()));
 
         userRepository.updatePasswordByLogin(user.getLogin(), encodedPassword);
     }

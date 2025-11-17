@@ -1028,7 +1028,7 @@ public class AuthControllerIntegrationTest {
 
                 MvcResult result = mockMvc.perform(put("/auth/set-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"newPassword\":\"TestNewPassword\"}")
+                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.message").exists())
@@ -1114,7 +1114,7 @@ public class AuthControllerIntegrationTest {
 
                 MvcResult result = mockMvc.perform(put("/auth/set-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"newPassword\":\"TestNewPassword\"}"))
+                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
