@@ -87,7 +87,7 @@ public class AuthController {
     /**
      * Change the password of the User
      * 
-     * @param passwords A password Dto who contain bothe the old password for verification and the new for update
+     * @param passwords A password Dto who contain both the old password for verification and the new for update
      * @return ResponseEntity containing a confirmation message
      */
     @PreAuthorize("isAuthenticated()")
