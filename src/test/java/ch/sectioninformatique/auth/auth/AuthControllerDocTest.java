@@ -777,7 +777,7 @@ public class AuthControllerDocTest {
         }
 
         /**
-         * Test the /auth/set-password endpoint with mocked services to generate
+         * Test the /auth/update-password endpoint with mocked services to generate
          * documentation.
          * This test stubs the SecurityContext to simulate an authenticated user,
          * performs a set password request, and generates API documentation.
@@ -800,19 +800,19 @@ public class AuthControllerDocTest {
                 when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Perform the /auth/set-password request with expected input and validate
+                // Perform the /auth/update-password request with expected input and validate
                 // response
                 // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(put("/auth/set-password")
+                mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isOk())
-                                .andDo(document("auth/set-password", preprocessRequest(prettyPrint()),
+                                .andDo(document("auth/update-password", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
         /**
-         * Test the /auth/set-password endpoint with missing password to generate
+         * Test the /auth/update-password endpoint with missing password to generate
          * documentation.
          * This test performs a set password request with missing password and
          * expects a bad request response.
@@ -835,18 +835,18 @@ public class AuthControllerDocTest {
                 when(securityContext.getAuthentication()).thenReturn(authentication);
                 SecurityContextHolder.setContext(securityContext);
 
-                // Perform the /auth/set-password request with expected input and validate
+                // Perform the /auth/update-password request with expected input and validate
                 // response
                 // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(put("/auth/set-password")
+                mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isBadRequest())
-                                .andDo(document("auth/set-password-missing-body", preprocessRequest(prettyPrint()),
+                                .andDo(document("auth/update-password-missing-body", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
         /**
-         * Test the /auth/set-password endpoint with missing token to generate
+         * Test the /auth/update-password endpoint with missing token to generate
          * documentation.
          * This test performs a set password request with missing token and
          * expects a unauthorized response.
@@ -865,14 +865,14 @@ public class AuthControllerDocTest {
                                 new AppException("Full authentication is required to access this resource",
                                                 HttpStatus.UNAUTHORIZED));
 
-                // Perform the /auth/set-password request with expected input and validate
+                // Perform the /auth/update-password request with expected input and validate
                 // response
                 // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(put("/auth/set-password")
+                mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/set-password-missing-token", preprocessRequest(prettyPrint()),
+                                .andDo(document("auth/update-password-missing-token", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 }
