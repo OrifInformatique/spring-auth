@@ -92,7 +92,7 @@ public class AuthController {
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/update-password")
-    public ResponseEntity<?> setPassword(@RequestBody @Valid PasswordUpdateDto passwords) {
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid PasswordUpdateDto passwords) {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
