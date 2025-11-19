@@ -312,6 +312,45 @@ include::auth/refresh-invalid-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
+=== 1.4 Set Password
+This is an example output for the `PUT /auth/update-password` endpoint.
+
+.request
+include::auth/update-password/http-request.adoc[]
+
+.response
+include::auth/update-password/http-response.adoc[]
+
+It sets a new password for the authenticated user.
+
+==== 1.4.1 Error Response - 400 - Bad Request
+These are example outputs for the `PUT /auth/update-password` endpoint for bad request.
+
+===== 1.4.1.1 Missing Body
+This is an example output when the request body is missing.
+
+.request
+include::auth/update-password-missing-body/http-request.adoc[]
+
+.response
+include::auth/update-password-missing-body/http-response.adoc[]
+
+It returns a 400 Bad Request error indicating that the request body is missing.
+
+==== 1.4.2 Error Response - 401 - Unauthorised
+These are example outputs for the `PUT /auth/update-password` endpoint for unauthorized access.
+
+===== 1.4.2.1 Missing Token
+This is an example output when the request token is missing.
+
+.request
+include::auth/update-password-missing-token/http-request.adoc[]
+
+.response
+include::auth/update-password-missing-token/http-response.adoc[]
+
+It returns a 401 Unauthorized error indicating that full authentication is required.
+
 == 2 User Endpoints
 
 === 2.1 Get Authenticated User

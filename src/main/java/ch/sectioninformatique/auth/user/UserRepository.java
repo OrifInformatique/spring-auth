@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return Optional containing the user if found, empty Optional otherwise
      */
     Optional<User> findByLogin(String login);
-    
+
     /**
      * Checks if a user with the given login username exists.
      * This method is used for:
@@ -39,4 +39,3 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     boolean existsByLogin(String login);
 }
-
