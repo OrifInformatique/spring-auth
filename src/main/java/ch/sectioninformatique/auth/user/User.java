@@ -187,7 +187,7 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
-        if(deleted) {
+        if(this.deleted) {
             return false;
         }
         return true;
@@ -201,7 +201,7 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        if(deleted) {
+        if(this.deleted) {
             return false;
         }
         return true;
@@ -215,7 +215,7 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        if(deleted) {
+        if(this.deleted) {
             return false;
         }
         return true;
@@ -229,7 +229,7 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
-        if(deleted) {
+        if(this.deleted) {
             return false;
         }
         return true;
