@@ -91,7 +91,7 @@ public class SecurityConfig {
             })
             .sessionManagement(customizer -> {
                 log.debug("Setting session creation policy to ALWAYS");
-                customizer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+                customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
             })
             .cors(cors -> {
                 log.debug("Configuring CORS");
