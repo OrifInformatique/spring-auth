@@ -205,25 +205,4 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    /**
-     * Returns the Main role assigned to the user.
-     * This method assumes the user has at least one role.
-     *
-     * @return The main role 
-     */
-    public Role getMainRole() {
-        return mainRole;
-    }
-    
-
-    /**
-     * Adds a new main role to the user.
-     *
-     * @param role The main role to set for the user
-     */
-    public void setMainRole(Role role) {
-        mainRole = role;
-    } 
-    
 }
