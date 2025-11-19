@@ -87,12 +87,12 @@ public class AuthController {
     /**
      * Change the password of the User
      * 
-     * @param password A password Dto who contain bothe the old password for verification and the new for update
+     * @param passwords A password Dto who contain both the old password for verification and the new for update
      * @return ResponseEntity containing a confirmation message
      */
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/set-password")
-    public ResponseEntity<?> setPassword(@RequestBody @Valid NewPasswordDto password) {
+    @PutMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid PasswordUpdateDto passwords) {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
@@ -103,8 +103,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
 
-        userService.updatePassword(currentUser.getLogin(), password); // store securely (hashed!)
+        userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
 
-        return ResponseEntity.ok(Map.of("message", "Password set successfully"));
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
 }

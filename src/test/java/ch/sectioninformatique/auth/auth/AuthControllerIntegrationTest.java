@@ -1013,7 +1013,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test the /auth/set-password endpoint with real data.
+         * Test the /auth/update-password endpoint with real data.
          * This test performs a set password request and expects a successful response.
          * The response is saved to a file for use in other tests.
          *
@@ -1026,9 +1026,9 @@ public class AuthControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(put("/auth/set-password")
+                MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"newPassword\":\"TestNewPassword\"}")
+                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.message").exists())
@@ -1049,19 +1049,19 @@ public class AuthControllerIntegrationTest {
                 String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
 
                 // Save response to file
-                Path path = Paths.get("target/test-data/auth-set-password-response.json");
+                Path path = Paths.get("target/test-data/auth-update-password-response.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
 
                 // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/auth-set-password-token.txt");
+                Path pathToken = Paths.get("target/test-data/auth-update-password-token.txt");
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
 
 
         /**
-         * Test the /auth/set-password endpoint with missing body.
+         * Test the /auth/update-password endpoint with missing body.
          * This test performs a set password request with missing body and
          * expects a bad request response.
          * The response is saved to a file.
@@ -1074,7 +1074,7 @@ public class AuthControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(put("/auth/set-password")
+                MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isBadRequest())
@@ -1096,13 +1096,13 @@ public class AuthControllerIntegrationTest {
                 String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
 
                 // Save response to file
-                Path path = Paths.get("target/test-data/auth-set-password-response-missing-body.json");
+                Path path = Paths.get("target/test-data/auth-update-password-response-missing-body.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
         }
 
         /**
-         * Test the /auth/set-password endpoint with missing token.
+         * Test the /auth/update-password endpoint with missing token.
          * This test performs a set password request with missing token and
          * expects a unauthorized response.
          * The response is saved to a file.
@@ -1112,9 +1112,9 @@ public class AuthControllerIntegrationTest {
         @Test
         public void setPassword_missingToken_shouldReturnUnauthorized() throws Exception {
 
-                MvcResult result = mockMvc.perform(put("/auth/set-password")
+                MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"newPassword\":\"TestNewPassword\"}"))
+                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -1134,7 +1134,7 @@ public class AuthControllerIntegrationTest {
                 String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
 
                 // Save response to file
-                Path path = Paths.get("target/test-data/auth-set-password-response-missing-token.json");
+                Path path = Paths.get("target/test-data/auth-update-password-response-missing-token.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
         }

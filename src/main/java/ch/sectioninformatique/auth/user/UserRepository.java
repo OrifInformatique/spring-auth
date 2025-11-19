@@ -1,9 +1,6 @@
 package ch.sectioninformatique.auth.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,14 +52,4 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
      * @return true if a user with the given login exists, false otherwise
      */
     boolean existsByLogin(String login);
-
-    /**
-     * Modify the User password
-     * 
-     * @param login The login username to check (case-sensitive)
-     * @param password The new password
-     */
-    @Modifying
-    @Query("UPDATE User u SET u.password = :password WHERE u.login = :login")
-    void updatePasswordByLogin(@Param("login") String login, @Param("password") String password);
 }

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
-import ch.sectioninformatique.auth.auth.NewPasswordDto;
+import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
@@ -128,14 +128,17 @@ public class UserService {
      *                    verification and the new for update
      */
     @Transactional
-    public void updatePassword(String login, NewPasswordDto newPassword) {
+    public void updatePassword(String login, PasswordUpdateDto passwords) {
 
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
-        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(newPassword.newPassword()));
+                if(passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword())== false){
+                    throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);
+                }
 
-        userRepository.updatePasswordByLogin(user.getLogin(), encodedPassword);
+        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(passwords.newPassword()));
+        user.setPassword(encodedPassword);
     }
 
     /**
