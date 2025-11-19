@@ -126,8 +126,7 @@ public class UserService {
                 }
 
         String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(passwords.newPassword()));
-
-        userRepository.updatePasswordByLogin(user.getLogin(), encodedPassword);
+        user.setPassword(encodedPassword);
     }
 
     /**

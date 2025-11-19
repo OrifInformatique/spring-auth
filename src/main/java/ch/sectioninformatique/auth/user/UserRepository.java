@@ -41,14 +41,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if a user with the given login exists, false otherwise
      */
     boolean existsByLogin(String login);
-
-    /**
-     * Modify the User password
-     * 
-     * @param login The login username to check (case-sensitive)
-     * @param password The new password
-     */
-    @Modifying
-    @Query("UPDATE User u SET u.password = :password WHERE u.login = :login")
-    void updatePasswordByLogin(@Param("login") String login, @Param("password") String password);
 }
