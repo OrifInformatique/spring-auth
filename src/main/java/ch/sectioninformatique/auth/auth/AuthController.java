@@ -105,6 +105,6 @@ public class AuthController {
 
         userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
 
-        return ResponseEntity.ok(Map.of("message", "Password set successfully"));
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
 }
