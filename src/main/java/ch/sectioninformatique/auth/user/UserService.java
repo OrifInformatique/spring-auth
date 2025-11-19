@@ -173,9 +173,9 @@ public class UserService {
     }
 
     /**
-     * Retrieves all users in the system.
+     * Retrieves all users who are not soft-deleted in the system.
      *
-     * @return List of all User entities
+     * @return List of all User entities, excluding soft-deleted
      */
     public List<User> allUsers() {
         Session session = entityManager.unwrap(Session.class);
@@ -188,7 +188,7 @@ public class UserService {
     /**
      * Retrieves all users including soft-deleted ones.
      *
-     * @return List of all User entities including deleted
+     * @return List of all User entities including soft-deleted
      */
     public List<User> allDeletedUsers() {
         List<User> users = new ArrayList<>();
