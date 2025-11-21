@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * TODO: Change HTTP errors to remove them from the service layer and put them in controller, throwing custom errors here instead
+ */
+
+/**
  * Service class for managing user-related operations.
  * This class provides functionality for:
  * - User authentication and registration
