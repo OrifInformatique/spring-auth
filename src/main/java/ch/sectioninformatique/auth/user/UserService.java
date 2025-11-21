@@ -397,11 +397,11 @@ public class UserService {
     }
 
     /**
-     * Deletes a user from the system.
+     * Soft-deletes a user from the system.
      * This operation:
      * - Verifies the user exists
      * - Checks if the authenticated user has sufficient permissions
-     * - Deletes the user
+     * - Soft-deletes the user
      *
      * @param userId The ID of the user to delete
      * @return The deleted User entity, or null if deletion was successful
