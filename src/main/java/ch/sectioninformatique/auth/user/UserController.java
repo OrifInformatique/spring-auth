@@ -242,7 +242,7 @@ public class UserController {
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{userId}/delete-permanent")
+    @DeleteMapping("/{userId}/permanent")
     public ResponseEntity<?> deletePermanent(@PathVariable Long userId) {
         UserDto deletedUser = userService.deletePermanentUser(userId);
         return ResponseEntity
