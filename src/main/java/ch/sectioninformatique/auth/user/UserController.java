@@ -225,7 +225,7 @@ public class UserController {
      */
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<?> delete(@PathVariable Long userId) {
         UserDto deletedUser = userService.deleteUser(userId);
         return ResponseEntity
                 .ok(Map.of("message", "User deleted successfully", "deletedUserLogin", deletedUser.getLogin()));
@@ -242,9 +242,9 @@ public class UserController {
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{userId}/permanent")
-    public ResponseEntity<?> hardDeleteUser(@PathVariable Long userId) {
-        UserDto deletedUser = userService.hardDeleteUser(userId);
+    @DeleteMapping("/{userId}/delete-permanent")
+    public ResponseEntity<?> deletePermanent(@PathVariable Long userId) {
+        UserDto deletedUser = userService.deletePermanentUser(userId);
         return ResponseEntity
                 .ok(Map.of("message", "User deleted permanently", "deletedUserLogin", deletedUser.getLogin()));
     }

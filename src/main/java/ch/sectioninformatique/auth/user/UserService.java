@@ -444,7 +444,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found or the authenticated user
      *                          lacks permissions
      */
-    public UserDto hardDeleteUser(Long userId) {
+    public UserDto deletePermanentUser(Long userId) {
         // Get the user to delete
         User userToDelete = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
