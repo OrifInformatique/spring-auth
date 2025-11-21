@@ -1014,14 +1014,14 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/update-password endpoint with real data.
-         * This test performs a set password request and expects a successful response.
+         * This test performs an update password request and expects a successful response.
          * The response is saved to a file for use in other tests.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
         @Transactional
-        public void setPassword_withRealData_shouldReturnSuccess() throws Exception {
+        public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
@@ -1062,14 +1062,14 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/update-password endpoint with missing body.
-         * This test performs a set password request with missing body and
+         * This test performs an update password request with missing body and
          * expects a bad request response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
-        public void setPassword_missingBody_shouldReturnBadRequest() throws Exception {
+        public void updatePassword_missingBody_shouldReturnBadRequest() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
@@ -1103,14 +1103,14 @@ public class AuthControllerIntegrationTest {
 
         /**
          * Test the /auth/update-password endpoint with missing token.
-         * This test performs a set password request with missing token and
+         * This test performs an update password request with missing token and
          * expects a unauthorized response.
          * The response is saved to a file.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
-        public void setPassword_missingToken_shouldReturnUnauthorized() throws Exception {
+        public void updatePassword_missingToken_shouldReturnUnauthorized() throws Exception {
 
                 MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)

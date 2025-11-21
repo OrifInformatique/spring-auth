@@ -312,7 +312,7 @@ include::auth/refresh-invalid-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
-=== 1.4 Set Password
+=== 1.4 Update Password
 This is an example output for the `PUT /auth/update-password` endpoint.
 
 .request
