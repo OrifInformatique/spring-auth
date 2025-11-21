@@ -192,7 +192,7 @@ public class UserService {
      */
     public List<User> allWithDeletedUsers() {
         List<User> users = new ArrayList<>();
-        userRepository.findAllIncludingDeleted().forEach(users::add);
+        userRepository.findAllWithDeleted().forEach(users::add);
         return users;
     }
 
