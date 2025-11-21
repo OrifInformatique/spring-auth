@@ -59,8 +59,8 @@ public class UserServiceTest {
         // Arrange
         String login = "john@test.com";
         String password = "password123";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, null);
-        UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, null, "USER", null);
+        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, false, null);
+        UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, false, null, "USER", null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(true);
@@ -95,7 +95,7 @@ public class UserServiceTest {
         // Arrange
         String login = "john@test.com";
         String password = "wrongpassword";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null,null);
+        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null,false, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(false);
@@ -122,7 +122,7 @@ public class UserServiceTest {
         user.setPassword("hashedPassword");
         user.setMainRole(new Role());
         
-        UserDto expectedDto = new UserDto(1L, "New", "User", login, null, null, "USER", null);
+        UserDto expectedDto = new UserDto(1L, "New", "User", login, null, false, null, "USER", null);
         Role userRole = new Role();
         userRole.setId(1L);
         userRole.setName(RoleEnum.USER);
@@ -152,7 +152,7 @@ public class UserServiceTest {
         String password = "password123";
         SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray());
         
-        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, null);
+        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, false, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(existingUser));
 
@@ -183,7 +183,7 @@ public class UserServiceTest {
         managerRole.setName(RoleEnum.MANAGER);
         user.setMainRole(userRole);
         
-        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, null, "ROLE_MANAGER", null);
+        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, false, null, "ROLE_MANAGER", null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(roleRepository.findByName(RoleEnum.MANAGER)).thenReturn(Optional.of(managerRole));
@@ -265,7 +265,7 @@ public class UserServiceTest {
         managerRole.setName(RoleEnum.MANAGER);
         authenticatedUser.setMainRole(managerRole);
         
-        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, null, "ROLE_MANAGER", null);
+        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, false, null, "ROLE_MANAGER", null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -278,7 +278,7 @@ public class UserServiceTest {
         // Assert
         verify(userRepository).findById(userId);
         verify(userRepository).findByLogin("manager@test.com");
-        verify(userRepository).deleteById(userId);
+        verify(userRepository).delete(userToDelete);
     }
 
     @Test
@@ -309,7 +309,7 @@ public class UserServiceTest {
         userRole.setName(RoleEnum.USER);
         authenticatedUser.setMainRole(userRole);
         
-        UserDto authenticatedUserDto = new UserDto(3L, "Regular", "User", "user@test.com", null, null, "USER", null);
+        UserDto authenticatedUserDto = new UserDto(3L, "Regular", "User", "user@test.com", null, false, null, "USER", null);
         
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
