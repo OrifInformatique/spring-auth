@@ -113,6 +113,19 @@ public class UserController {
     }
 
     /**
+     * Restore a user that was soft deleted
+     * 
+     * @param userId The ID of the user to restore
+     * @return ResponseEntity with success message or error details
+     */
+    @PutMapping("/restore/{userId}")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<?> restoreDeletedUser(@PathVariable Long userId) {
+        userService.restoreDeletedUser(userId);
+        return ResponseEntity.ok().body("User restored successfully");
+    }
+
+    /**
      * Promotes a user to the manager role.
      * This endpoint:
      * - Requires the 'user:update' authority

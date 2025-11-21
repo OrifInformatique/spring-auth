@@ -133,9 +133,9 @@ public class UserService {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
-                if(passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword())== false){
-                    throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);
-                }
+        if (passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword()) == false) {
+            throw new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        }
 
         String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(passwords.newPassword()));
         user.setPassword(encodedPassword);
@@ -207,6 +207,20 @@ public class UserService {
         List<User> users = new ArrayList<>();
         userRepository.findAllDeleted().forEach(users::add);
         return users;
+    }
+
+    /**
+     * Restore a soft deleted user
+     * 
+     * @param userId
+     * @return
+     */
+    public UserDto restoreDeletedUser(Long userId) {
+        User user = userRepository.findByIdDeleted(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setDeleted(false);
+        userRepository.save(user);
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -409,7 +423,8 @@ public class UserService {
 
         // Check if the action is authorized
         if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
-            throw new AppException("You don't have the necessary rights to perform this action", HttpStatus.UNAUTHORIZED);
+            throw new AppException("You don't have the necessary rights to perform this action",
+                    HttpStatus.UNAUTHORIZED);
         }
 
         // Delete the user

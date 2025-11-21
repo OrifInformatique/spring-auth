@@ -3,6 +3,7 @@ package ch.sectioninformatique.auth.user;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -42,6 +43,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT u FROM User u WHERE u.deleted = true")
     List<User> findAllDeleted();
+
+    /**
+     * Returne a deleted user from his id
+     */
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.deleted = true")
+    Optional<User> findByIdDeleted(@Param("id") Long id);
 
     /*
     * Permanently delete a user
