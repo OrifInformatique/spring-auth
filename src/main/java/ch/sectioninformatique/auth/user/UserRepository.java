@@ -1,6 +1,9 @@
 package ch.sectioninformatique.auth.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +17,7 @@ import java.util.Optional;
  * - Checking user existence
  * - Standard CRUD operations inherited from JpaRepository
  */
-public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryHardDelete {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Finds a user by their login username.
@@ -40,6 +43,14 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     @Query("SELECT u FROM User u WHERE u.deleted = true")
     List<User> findAllDeleted();
 
+    /*
+    * Permanently delete a user
+    * from the database, bypassing any soft delete mechanisms.
+    */
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM users WHERE id = :id", nativeQuery = true)
+    void deletePermanentlyById(Long id);
 
     /**
      * Checks if a user with the given login username exists.
