@@ -190,7 +190,7 @@ public class UserService {
      *
      * @return List of all User entities including soft-deleted
      */
-    public List<User> allDeletedUsers() {
+    public List<User> allWithDeletedUsers() {
         List<User> users = new ArrayList<>();
         userRepository.findAllIncludingDeleted().forEach(users::add);
         return users;

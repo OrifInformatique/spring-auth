@@ -65,13 +65,13 @@ public class UserController {
     }
 
     /**
-     * Retrieves all users in the system.
+     * Retrieves all users in the system excluding soft-deleted ones.
      * This endpoint:
      * - Requires the 'user:read' authority
      * - Returns a list of all users
      * - Is typically used by administrators
      *
-     * @return ResponseEntity containing a list of all users
+     * @return ResponseEntity containing a list of all users, without soft-deleted ones
      */
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('user:read')")
@@ -87,12 +87,12 @@ public class UserController {
      * - Returns a list of all users
      * - Is typically used by administrators
      *
-     * @return ResponseEntity containing a list of all deleted users
+     * @return ResponseEntity containing a list of all users, including soft-deleted ones
      */
-    @GetMapping("/all/deleted")
+    @GetMapping("/all-with-deleted")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<User>> allDeletedUsers() {
-        List<User> users = userService.allDeletedUsers();
+    public ResponseEntity<List<User>> allWithDeletedUsers() {
+        List<User> users = userService.allWithDeletedUsers();
         return ResponseEntity.ok(users); 
     }
 

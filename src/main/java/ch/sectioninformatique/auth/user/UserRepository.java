@@ -36,7 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Returns all users including those that are soft-deleted.
      */
     @Query("SELECT u FROM User u")
-    List<User> findAllIncludingDeleted();
+    List<User> findAllWithDeleted();
 
     /**
      * Returns only soft-deleted users.
