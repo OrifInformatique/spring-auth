@@ -118,7 +118,7 @@ public class UserController {
      * @param userId The ID of the user to restore
      * @return ResponseEntity with success message or error details
      */
-    @PutMapping("/restore/{userId}")
+    @PutMapping("/{userId}/restore")
     @PreAuthorize("hasAuthority('user:update')")
     public ResponseEntity<?> restoreDeletedUser(@PathVariable Long userId) {
         userService.restoreDeletedUser(userId);
