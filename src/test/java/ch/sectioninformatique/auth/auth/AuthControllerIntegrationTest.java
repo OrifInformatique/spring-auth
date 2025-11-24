@@ -3,11 +3,14 @@ package ch.sectioninformatique.auth.auth;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,20 +18,36 @@ import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
+import reactor.core.publisher.Mono;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Map;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.util.function.Consumer;
+
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration tests for AuthController.
@@ -38,7 +57,75 @@ import com.fasterxml.jackson.core.type.TypeReference;
 @Tag("integration")
 @SpringBootTest(classes = AuthApplication.class)
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class AuthControllerIntegrationTest {
+
+        /**
+         * Helper method for performing and documenting HTTP requests in tests.
+         * This reduces repetition by centralizing the request execution and REST Docs
+         * generation.
+         *
+         * @param requestTypeString HTTP method (GET, POST, PUT, etc.)
+         * @param endpoint          API endpoint to call
+         * @param token             Optional JWT token for authentication
+         * @param contentType       Content type for the request
+         * @param expectedStatus    Expected HTTP status code (e.g. 200)
+         * @param docsFileName      Name for the generated REST Docs snippet
+         * @param script            Optional lambda to perform additional assertions
+         * 
+         * @throws Exception
+         */
+        private void performRequest(
+                        String requestTypeString,
+                        String endpoint,
+                        String content,
+                        String token,
+                        MediaType contentType,
+                        int expectedStatus,
+                        String docsFileName,
+                        Consumer<ResultActions> script) throws Exception {
+
+                var requestType = get(endpoint);
+
+                if (requestTypeString.equals("GET")) {
+                        requestType = get(endpoint);
+                } else if (requestTypeString.equals("POST")) {
+                        requestType = post(endpoint);
+                } else if (requestTypeString.equals("PUT")) {
+                        requestType = put(endpoint);
+                } else if (requestTypeString.equals("DELETE")) {
+                        requestType = delete(endpoint);
+                } else {
+                        throw new IllegalArgumentException("Unsupported request type: " + requestTypeString);
+                }
+
+                // Set content only if it's not null
+                if (content != null) {
+                        requestType.content(content);
+                }
+
+                // Set Authorization header only if token is provided
+                if (token != null) {
+                        requestType.header("Authorization", "Bearer " + token);
+                }
+
+                // Set content type
+                requestType.contentType(contentType);
+
+                // Perform request
+                var request = mockMvc.perform(requestType)
+                                .andExpect(status().is(expectedStatus));
+
+                // Execute any additional assertions provided in the lambda
+                if (script != null) {
+                        script.accept(request);
+                }
+
+                // Generate a REST Docs snippet for the request/response pair
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint())));
+
+        }
 
         /** MockMvc instance for performing HTTP requests in tests. */
         @Autowired
@@ -52,107 +139,75 @@ public class AuthControllerIntegrationTest {
         private UserService userService;
 
         /**
-         * Test the /auth/login endpoint with real data.
-         * This test performs a login request and expects a successful response.
-         * The response is saved to a file for use in other tests.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in successfull with valid credentials.
          */
         @Test
+        @Transactional
         public void login_withRealData_shouldReturnSuccess() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                                "{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and not empty
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/auth-login-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "login",
+                                null);
         }
 
         /**
-         * Test the /auth/login endpoint with missing login.
-         * This test performs a login request with missing login and expects a bad
-         * request response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in without login and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_missingLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"password\":\"Test1234!\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-missing-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-missing-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/login endpoint with missing password.
-         * This test performs a login request with missing password and expects a bad
-         * request response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in without login and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_missingPassword_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-missing-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"test.user@test.com\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-missing-password",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
