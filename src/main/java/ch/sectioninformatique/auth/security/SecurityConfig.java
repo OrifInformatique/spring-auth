@@ -53,6 +53,11 @@ public class SecurityConfig {
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
 
     /**
+     * Entry point for denied access failures
+     */
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+
+    /**
      * Filter for JWT token authentication.
      * This component:
      * - Validates JWT tokens in requests
@@ -82,7 +87,9 @@ public class SecurityConfig {
         http
                 .exceptionHandling(customizer -> {
                     log.debug("Configuring exception handling with UserAuthenticationEntryPoint");
-                    customizer.authenticationEntryPoint(userAuthenticationEntryPoint);
+                    customizer
+                            .authenticationEntryPoint(userAuthenticationEntryPoint)
+                            .accessDeniedHandler(accessDeniedHandler);
                 })
                 .addFilterBefore(jwtAuthFilter, BasicAuthenticationFilter.class)
                 .csrf(csrf -> {

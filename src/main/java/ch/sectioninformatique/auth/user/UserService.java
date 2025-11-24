@@ -206,7 +206,7 @@ public class UserService {
      */
     public UserDto revokeManagerRole(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException(userId.toString()));
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new UserAlreadyRegularException(user.getLogin());

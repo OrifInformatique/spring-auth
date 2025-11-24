@@ -18,8 +18,6 @@ import ch.sectioninformatique.auth.security.RoleRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.http.HttpStatus;
-
 import java.nio.CharBuffer;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,7 +85,6 @@ public class UserServiceTest {
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
         assertEquals("Invalid credentials", exception.getMessage());
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
@@ -104,7 +101,6 @@ public class UserServiceTest {
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
         assertEquals("Invalid credentials", exception.getMessage());
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
@@ -159,8 +155,7 @@ public class UserServiceTest {
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
             () -> userService.register(signUpDto));
-        assertEquals("Login already exists", exception.getMessage());
-        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("User already exists: existing@test.com", exception.getMessage());
     }
 
     @Test
@@ -209,7 +204,7 @@ public class UserServiceTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.promoteToManager(userId));
-        assertEquals("User not found", exception.getMessage());
+        assertEquals("User not found: 1", exception.getMessage());
     }
 
     @Test
@@ -234,7 +229,7 @@ public class UserServiceTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.promoteToManager(userId));
-        assertEquals("The user is already a manager", exception.getMessage());
+        assertEquals("The user is already a manager: john@test.com", exception.getMessage());
     }
 
     @Test
@@ -319,6 +314,6 @@ public class UserServiceTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.deleteUser(userId));
-        assertEquals("You don't have the necessary rights to perform this action", exception.getMessage());
+        assertEquals("The user has lower rights than desired: user@test.com", exception.getMessage());
     }
 }

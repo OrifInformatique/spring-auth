@@ -3,7 +3,9 @@ package ch.sectioninformatique.auth.auth;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.sectioninformatique.auth.app.exceptions.AppException;
+import ch.sectioninformatique.auth.app.exceptions.CustomException;
+import ch.sectioninformatique.auth.app.exceptions.InvalidCredentialsException;
+import ch.sectioninformatique.auth.app.exceptions.UserAlreadyExistsException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
@@ -281,7 +283,7 @@ public class AuthControllerDocTest {
         public void login_withMockedService_generatesDoc_wrongPassword() throws Exception {
 
                 when(userService.login(any()))
-                                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+                                .thenThrow(new InvalidCredentialsException());
 
                 // Perform the /auth/login request with wrong password and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
@@ -305,7 +307,7 @@ public class AuthControllerDocTest {
         @Test
         public void login_withMockedService_generatesDoc_nonExistentUser() throws Exception {
                 when(userService.login(any()))
-                                .thenThrow(new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+                                .thenThrow(new InvalidCredentialsException());
 
                 // Perform the /auth/login request with non-existent user and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
@@ -614,7 +616,7 @@ public class AuthControllerDocTest {
         public void register_withMockedService_generatesDoc_duplicateLogin() throws Exception {
 
                 when(userService.register(any()))
-                                .thenThrow(new AppException("Login already exists", HttpStatus.CONFLICT));
+                                .thenThrow(new UserAlreadyExistsException("test.user@test.com"));
 
                 // Perform the /auth/register request with duplicate login and validate
                 // response
@@ -731,7 +733,7 @@ public class AuthControllerDocTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 when(securityContext.getAuthentication()).thenThrow(
-                                new AppException("Full authentication is required to access this resource", HttpStatus.UNAUTHORIZED));
+                                new CustomException("Full authentication is required to access this resource", HttpStatus.UNAUTHORIZED));
 
                 // Perform the /auth/refresh request without Authorization header and validate
                 // response
@@ -761,7 +763,7 @@ public class AuthControllerDocTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 when(securityContext.getAuthentication()).thenThrow(
-                                new AppException("Invalid token", HttpStatus.UNAUTHORIZED));
+                                new CustomException("Invalid token", HttpStatus.UNAUTHORIZED));
 
                 // Perform the /auth/refresh request with invalid token and validate
                 // response

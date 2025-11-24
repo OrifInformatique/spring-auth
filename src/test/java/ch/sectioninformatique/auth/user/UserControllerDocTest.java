@@ -5,7 +5,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import ch.sectioninformatique.auth.app.exceptions.AppException;
+import ch.sectioninformatique.auth.app.exceptions.CustomException;
+import ch.sectioninformatique.auth.app.exceptions.UserAlreadyAdminException;
+import ch.sectioninformatique.auth.app.exceptions.UserAlreadyManagerException;
+import ch.sectioninformatique.auth.app.exceptions.UserNotFoundException;
 import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
@@ -181,7 +184,7 @@ class UserControllerDocTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 when(securityContext.getAuthentication()).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 this.mockMvc.perform(get("/users/me")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -225,7 +228,7 @@ class UserControllerDocTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 when(securityContext.getAuthentication()).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 this.mockMvc.perform(get("/users/me")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -269,7 +272,7 @@ class UserControllerDocTest {
                 SecurityContextHolder.setContext(securityContext);
 
                 when(securityContext.getAuthentication()).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 this.mockMvc.perform(get("/users/me")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -361,7 +364,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(meResponseJson);
 
                 when(userService.allUsers()).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 this.mockMvc.perform(get("/users/all")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -401,7 +404,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(meResponseJson);
 
                 when(userService.allUsers()).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 this.mockMvc.perform(get("/users/all")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -442,7 +445,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(meResponseJson);
 
                 when(userService.allUsers()).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 this.mockMvc.perform(get("/users/all")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -543,7 +546,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToManager(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
@@ -589,7 +592,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToManager(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
@@ -636,7 +639,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToManager(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
 
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
@@ -683,12 +686,12 @@ class UserControllerDocTest {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
-                when(userService.promoteToManager(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
-
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
                 Long exampleUserId = 100L;
+
+                when(userService.promoteToManager(anyLong())).thenThrow(
+                                new UserNotFoundException(exampleUserId.toString()));
 
                 // Perform the PUT request to promote the user to manager
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-manager")
@@ -731,12 +734,12 @@ class UserControllerDocTest {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
-                when(userService.promoteToManager(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.CONFLICT));
-
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
                 Long exampleUserId = 100L;
+
+                when(userService.promoteToManager(anyLong())).thenThrow(
+                                new UserAlreadyManagerException(exampleUserId.toString()));
 
                 // Perform the PUT request to promote the user to manager
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-manager")
@@ -779,12 +782,12 @@ class UserControllerDocTest {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
-                when(userService.promoteToManager(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.CONFLICT));
-
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
                 Long exampleUserId = 100L;
+
+                when(userService.promoteToManager(anyLong())).thenThrow(
+                                new UserAlreadyAdminException(exampleUserId.toString()));
 
                 // Perform the PUT request to promote the user to manager
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-manager")
@@ -887,7 +890,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeManagerRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
@@ -933,7 +936,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeManagerRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
@@ -980,7 +983,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeManagerRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
 
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
@@ -1027,12 +1030,14 @@ class UserControllerDocTest {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
-                when(userService.revokeManagerRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
-
+                
                 // Use an example userId - ideally read from your saved data or hardcoded if
                 // stable
                 Long exampleUserId = 100L;
+
+                when(userService.revokeManagerRole(anyLong())).thenThrow(
+                                new UserNotFoundException(exampleUserId.toString()));
+
 
                 // Perform the PUT request to promote the user to manager
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-manager")
@@ -1134,14 +1139,15 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToAdmin(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/promote-admin")
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("users/promote-admin-missing-authorization", preprocessRequest(prettyPrint()),
+                                .andDo(document("users/promote-admin-missing-authorization",
+                                                preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
@@ -1175,7 +1181,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToAdmin(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
@@ -1217,7 +1223,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToAdmin(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
 
                 Long exampleUserId = 100L;
 
@@ -1259,7 +1265,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToAdmin(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
 
                 Long exampleUserId = 100L;
 
@@ -1301,7 +1307,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(promoteResponseJson);
 
                 when(userService.promoteToAdmin(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.CONFLICT));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.CONFLICT));
 
                 Long exampleUserId = 100L;
 
@@ -1309,7 +1315,8 @@ class UserControllerDocTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isConflict())
-                                .andDo(document("users/promote-admin-user-already-admin", preprocessRequest(prettyPrint()),
+                                .andDo(document("users/promote-admin-user-already-admin",
+                                                preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
@@ -1404,14 +1411,15 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeAdminRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/revoke-admin")
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("users/revoke-admin-missing-authorization", preprocessRequest(prettyPrint()),
+                                .andDo(document("users/revoke-admin-missing-authorization",
+                                                preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
@@ -1446,7 +1454,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeAdminRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
@@ -1489,7 +1497,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeAdminRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.FORBIDDEN));
 
                 Long exampleUserId = 100L;
 
@@ -1532,7 +1540,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(revokeResponseJson);
 
                 when(userService.revokeAdminRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.NOT_FOUND));
 
                 Long exampleUserId = 100L;
 
@@ -1635,14 +1643,15 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(downgradeResponseJson);
 
                 when(userService.downgradeAdminRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
                 this.mockMvc.perform(put("/users/" + exampleUserId + "/downgrade-admin")
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("users/downgrade-admin-missing-authorization", preprocessRequest(prettyPrint()),
+                                .andDo(document("users/downgrade-admin-missing-authorization",
+                                                preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
@@ -1677,7 +1686,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(downgradeResponseJson);
 
                 when(userService.downgradeAdminRole(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
@@ -1685,7 +1694,8 @@ class UserControllerDocTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isUnauthorized())
-                                .andDo(document("users/downgrade-admin-malformed-token", preprocessRequest(prettyPrint()),
+                                .andDo(document("users/downgrade-admin-malformed-token",
+                                                preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }
 
@@ -1779,7 +1789,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(deleteResponseJson);
 
                 when(userService.deleteUser(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
@@ -1820,7 +1830,7 @@ class UserControllerDocTest {
                 JsonNode jsonNode = objectMapper.readTree(deleteResponseJson);
 
                 when(userService.deleteUser(anyLong())).thenThrow(
-                                new AppException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
+                                new CustomException(jsonNode.get("message").asText(), HttpStatus.UNAUTHORIZED));
 
                 Long exampleUserId = 100L;
 
