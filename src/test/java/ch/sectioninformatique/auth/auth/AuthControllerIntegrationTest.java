@@ -187,7 +187,7 @@ public class AuthControllerIntegrationTest {
         /**
          * Test: POST /tests/login
          *
-         * Mock a user log in without login and test the excetpion.
+         * Mock a user log in without password and test the excetpion.
          */
         @Test
         @Transactional
@@ -211,40 +211,29 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test the /auth/login endpoint with invalid email format.
-         * This test performs a login request with invalid email format and expects a
-         * bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in with invalid email format and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_invalidEmailFormat_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"invalid-email-format\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-invalid-email-format.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"invalid-email-format\", \"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-invalid-email-format",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**

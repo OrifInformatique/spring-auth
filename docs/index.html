@@ -692,8 +692,8 @@ Content-Length: 581
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTM2LCJpYXQiOjE3NjM5NzgzMzZ9.kDl9jxyg05NVtGcCCaTOIQSKmspFz-HmHmtsE7SpxV4",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjQ2OTgzMzYsImlhdCI6MTc2Mzk3ODMzNn0.PuBD9gBkAlLORxtx7Q71ZEIncBrMohz-kA3yCaiexFs",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODM1LCJpYXQiOjE3NjM5NzkyMzV9.4YoZVZ-gwf6Qvua-Fhztdm7G4M2HzQamo_jMpS5Zfxc",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjQ2OTkyMzUsImlhdCI6MTc2Mzk3OTIzNX0.rgpy54tvpFzDWzNL_paf51lS5pdxEt6KXsyBWkvwxkE",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -742,10 +742,10 @@ X-Frame-Options: DENY
 Content-Length: 138
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2025-11-24T10:13:55.682661855",
   "message" : "login: Login is required",
-  "timestamp" : "2025-11-24T09:58:56.052871605"
+  "error" : "Bad Request",
+  "status" : 400
 }</code></pre>
 </div>
 </div>
@@ -762,7 +762,7 @@ Content-Length: 138
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Content-Length: 36
 Host: localhost:8080
 
@@ -775,11 +775,20 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
 Content-Length: 144
 
 {
-  "timestamp" : "2025-11-24T09:59:26.077847869",
+  "timestamp" : "2025-11-24T10:13:55.941098014",
   "message" : "password: Password is required",
   "error" : "Bad Request",
   "status" : 400
@@ -817,10 +826,10 @@ Content-Type: application/json
 Content-Length: 141
 
 {
-  "timestamp" : "2025-11-24T09:59:25.559592650",
-  "message" : "login: Invalid email format",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "login: Invalid email format",
+  "timestamp" : "2025-11-24T10:14:26.002239979"
 }</code></pre>
 </div>
 </div>
@@ -849,10 +858,10 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : "2025-11-24T09:59:26.158973257",
-  "message" : "Malformed or missing JSON request body",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "Malformed or missing JSON request body",
+  "timestamp" : "2025-11-24T10:14:26.496592298"
 }</code></pre>
 </div>
 </div>
@@ -884,10 +893,10 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : "2025-11-24T09:59:24.947392549",
-  "message" : "Malformed or missing JSON request body",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "Malformed or missing JSON request body",
+  "timestamp" : "2025-11-24T10:14:25.439996121"
 }</code></pre>
 </div>
 </div>
@@ -922,10 +931,10 @@ Content-Type: application/json
 Content-Length: 141
 
 {
-  "timestamp" : "2025-11-24T09:59:25.368345895",
-  "message" : "login: Invalid email format",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "login: Invalid email format",
+  "timestamp" : "2025-11-24T10:14:25.833752922"
 }</code></pre>
 </div>
 </div>
@@ -966,10 +975,10 @@ Content-Type: application/json
 Content-Length: 134
 
 {
-  "timestamp" : "2025-11-24T09:59:25.752421987",
-  "message" : "Invalid credentials",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Invalid credentials",
+  "timestamp" : "2025-11-24T10:14:26.187849751"
 }</code></pre>
 </div>
 </div>
@@ -1004,10 +1013,10 @@ Content-Type: application/json
 Content-Length: 134
 
 {
-  "timestamp" : "2025-11-24T09:59:25.883854020",
-  "message" : "Invalid credentials",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Invalid credentials",
+  "timestamp" : "2025-11-24T10:14:26.320729788"
 }</code></pre>
 </div>
 </div>
@@ -1047,10 +1056,10 @@ Content-Type: application/json
 Content-Length: 181
 
 {
-  "timestamp" : "2025-11-24T09:59:26.121457771",
-  "message" : "Content-Type 'application/octet-stream' is not supported",
+  "status" : 415,
   "error" : "Unsupported Media Type",
-  "status" : 415
+  "message" : "Content-Type 'application/octet-stream' is not supported",
+  "timestamp" : "2025-11-24T10:14:26.452520900"
 }</code></pre>
 </div>
 </div>
@@ -1094,8 +1103,8 @@ Content-Length: 599
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTM2LCJpYXQiOjE3NjM5NzgzMzZ9.pMWtWV_Xg2h8nYDjPYhttUYJ1pdHI9kd6dVsxtDEcsE",
-  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjQ2OTgzMzYsImlhdCI6MTc2Mzk3ODMzNn0.p3zkmxAEuXdMIb3agY92UiIsFqx4TtgqQ2dIheV-1_Q",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJOZXdVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODM2LCJpYXQiOjE3NjM5NzkyMzZ9.mM2DpbQ6I-7YZN9m0F8KPeivbtSzjbskP9G0hU4lSIM",
+  "refreshToken" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJleHAiOjE3NjQ2OTkyMzYsImlhdCI6MTc2Mzk3OTIzNn0.IEQP9EsZN_yLKf4M4lLW5dh9MKCy2bdRCZc56yfkiWI",
   "mainRole" : "USER",
   "permissions" : [ ]
 }</code></pre>
@@ -1137,10 +1146,10 @@ Content-Type: application/json
 Content-Length: 147
 
 {
-  "timestamp" : "2025-11-24T09:59:25.795991963",
-  "message" : "firstName: First name is required",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "firstName: First name is required",
+  "timestamp" : "2025-11-24T10:14:26.230189935"
 }</code></pre>
 </div>
 </div>
@@ -1176,10 +1185,10 @@ Content-Type: application/json
 Content-Length: 145
 
 {
-  "timestamp" : "2025-11-24T09:59:25.423447313",
-  "message" : "lastName: Last name is required",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "lastName: Last name is required",
+  "timestamp" : "2025-11-24T10:14:25.875516040"
 }</code></pre>
 </div>
 </div>
@@ -1215,10 +1224,10 @@ Content-Type: application/json
 Content-Length: 138
 
 {
-  "timestamp" : "2025-11-24T09:59:24.753256511",
-  "message" : "login: Login is required",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "login: Login is required",
+  "timestamp" : "2025-11-24T10:14:25.246521473"
 }</code></pre>
 </div>
 </div>
@@ -1254,10 +1263,10 @@ Content-Type: application/json
 Content-Length: 144
 
 {
-  "timestamp" : "2025-11-24T09:59:26.237792545",
-  "message" : "password: Password is required",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "password: Password is required",
+  "timestamp" : "2025-11-24T10:14:26.577116232"
 }</code></pre>
 </div>
 </div>
@@ -1294,10 +1303,10 @@ Content-Type: application/json
 Content-Length: 148
 
 {
-  "timestamp" : "2025-11-24T09:59:26.197353052",
-  "message" : "login: Login must be a valid email",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "login: Login must be a valid email",
+  "timestamp" : "2025-11-24T10:14:26.539572818"
 }</code></pre>
 </div>
 </div>
@@ -1326,10 +1335,10 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : "2025-11-24T09:59:25.654024991",
-  "message" : "Malformed or missing JSON request body",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "Malformed or missing JSON request body",
+  "timestamp" : "2025-11-24T10:14:26.092299999"
 }</code></pre>
 </div>
 </div>
@@ -1361,10 +1370,10 @@ Content-Type: application/json
 Content-Length: 152
 
 {
-  "timestamp" : "2025-11-24T09:59:25.604180351",
-  "message" : "Malformed or missing JSON request body",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "Malformed or missing JSON request body",
+  "timestamp" : "2025-11-24T10:14:26.047511039"
 }</code></pre>
 </div>
 </div>
@@ -1401,10 +1410,10 @@ Content-Type: application/json
 Content-Length: 163
 
 {
-  "timestamp" : "2025-11-24T09:59:25.324427735",
-  "message" : "firstName: First name contains invalid characters",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "firstName: First name contains invalid characters",
+  "timestamp" : "2025-11-24T10:14:25.789239735"
 }</code></pre>
 </div>
 </div>
@@ -1441,10 +1450,10 @@ Content-Type: application/json
 Content-Length: 161
 
 {
-  "timestamp" : "2025-11-24T09:59:25.466701763",
-  "message" : "lastName: Last name contains invalid characters",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "lastName: Last name contains invalid characters",
+  "timestamp" : "2025-11-24T10:14:25.918575907"
 }</code></pre>
 </div>
 </div>
@@ -1481,10 +1490,10 @@ Content-Type: application/json
 Content-Length: 148
 
 {
-  "timestamp" : "2025-11-24T09:59:25.510469278",
-  "message" : "login: Login must be a valid email",
+  "status" : 400,
   "error" : "Bad Request",
-  "status" : 400
+  "message" : "login: Login must be a valid email",
+  "timestamp" : "2025-11-24T10:14:25.958415446"
 }</code></pre>
 </div>
 </div>
@@ -1527,10 +1536,10 @@ Content-Type: application/json
 Content-Length: 150
 
 {
-  "timestamp" : "2025-11-24T09:59:25.931927522",
-  "message" : "User already exists: test.user@test.com",
+  "status" : 409,
   "error" : "Conflict",
-  "status" : 409
+  "message" : "User already exists: test.user@test.com",
+  "timestamp" : "2025-11-24T10:14:26.363461254"
 }</code></pre>
 </div>
 </div>
@@ -1572,10 +1581,10 @@ Content-Type: application/json
 Content-Length: 181
 
 {
-  "timestamp" : "2025-11-24T09:59:25.707559048",
-  "message" : "Content-Type 'application/octet-stream' is not supported",
+  "status" : 415,
   "error" : "Unsupported Media Type",
-  "status" : 415
+  "message" : "Content-Type 'application/octet-stream' is not supported",
+  "timestamp" : "2025-11-24T10:14:26.144736355"
 }</code></pre>
 </div>
 </div>
@@ -1595,7 +1604,7 @@ Content-Length: 181
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjQ2OTgzMzUsImlhdCI6MTc2Mzk3ODMzNX0.bLvZYEvhAiBWMLvTTKk9FgDYPoa0Tik74k8rqwi1YKA
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJleHAiOjE3NjQ2OTkyMzUsImlhdCI6MTc2Mzk3OTIzNX0.rgpy54tvpFzDWzNL_paf51lS5pdxEt6KXsyBWkvwxkE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1611,7 +1620,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTM1LCJpYXQiOjE3NjM5NzgzMzV9.oQyjGJQJPx9SABDstAOY5-DRntCc01Qfw7le-P-wvMo",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODM1LCJpYXQiOjE3NjM5NzkyMzV9.4YoZVZ-gwf6Qvua-Fhztdm7G4M2HzQamo_jMpS5Zfxc",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -1647,10 +1656,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:25.278767556",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:25.741057974"
 }</code></pre>
 </div>
 </div>
@@ -1680,10 +1689,10 @@ Content-Type: application/json
 Content-Length: 128
 
 {
-  "timestamp" : "2025-11-24T09:59:25.841589178",
-  "message" : "Invalid token",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Invalid token",
+  "timestamp" : "2025-11-24T10:14:26.277523010"
 }</code></pre>
 </div>
 </div>
@@ -1708,7 +1717,7 @@ Content-Length: 128
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.TdlmxkSJxms71Z4jtW0mwwLXkUbRS5pII8VasaaVSFQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.MfTGWOVlzjAYAvPBmbSHOZTYSG8dpNOMMTojP_YteGg
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1724,7 +1733,7 @@ Content-Length: 419
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.TdlmxkSJxms71Z4jtW0mwwLXkUbRS5pII8VasaaVSFQ",
+  "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.MfTGWOVlzjAYAvPBmbSHOZTYSG8dpNOMMTojP_YteGg",
   "refreshToken" : null,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -1760,10 +1769,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:28.895304971",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:29.251851362"
 }</code></pre>
 </div>
 </div>
@@ -1793,10 +1802,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:28.940577929",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:29.298609914"
 }</code></pre>
 </div>
 </div>
@@ -1814,7 +1823,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTc0NzQ5LCJpYXQiOjE3NjM5NzExNDl9.KVtueUuDYObnJEgPj9GUf14GMBIZ_EQwN6qMRr_fqxo
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTc1NjQ5LCJpYXQiOjE3NjM5NzIwNDl9.jPVnbo-DTZqSyIzPXMe9jMgGu72dC8GgrIDBoFEajac
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1826,10 +1835,10 @@ Content-Type: application/json
 Content-Length: 161
 
 {
-  "timestamp" : "2025-11-24T09:59:28.510755847",
-  "message" : "The Token has expired on 2025-11-24T08:59:09Z.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The Token has expired on 2025-11-24T09:14:09Z.",
+  "timestamp" : "2025-11-24T10:14:28.926964634"
 }</code></pre>
 </div>
 </div>
@@ -1846,7 +1855,7 @@ Content-Length: 161
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.MbG-I7iI2iZxIxjUaTG5oLfWo2R4UVlmTyDzVzk9nY0
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODUwLCJpYXQiOjE3NjM5NzkyNTB9.ZnxHn1taIi5GYqTSgcoXEgwyawZjwDeLcRETVdiDmBc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1862,84 +1871,84 @@ Content-Length: 2607
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "password" : "$2a$10$ePES9nFLzQ6yaVEkg4XEHuwd5i5Nef5Oha.Ss59usMgUDnrnAKPyO",
-  "createdAt" : "2025-11-24T09:59:09.445+00:00",
-  "updatedAt" : "2025-11-24T09:59:09.445+00:00",
+  "password" : "$2a$10$pJ5Jr.SK5eVd1FwK/jjrkeLr8G.7BfIgwTsxR6fttZg5uBh3CnbfC",
+  "createdAt" : "2025-11-24T10:14:09.259+00:00",
+  "updatedAt" : "2025-11-24T10:14:09.259+00:00",
   "mainRole" : {
     "id" : 1,
     "name" : "USER",
     "description" : "Default user role",
-    "createdAt" : "2025-11-24T09:59:09.182+00:00",
-    "updatedAt" : "2025-11-24T09:59:09.182+00:00"
+    "createdAt" : "2025-11-24T10:14:09.004+00:00",
+    "updatedAt" : "2025-11-24T10:14:09.004+00:00"
   },
+  "username" : "test.user@test.com",
   "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "test.user@test.com",
   "enabled" : true
 }, {
   "id" : 2,
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "password" : "$2a$10$Lt5J20oqMg0w4yWM/Q/K3.ghRrO5zmyBfOvrZqMiPey.vcU3C9jtm",
-  "createdAt" : "2025-11-24T09:59:09.446+00:00",
-  "updatedAt" : "2025-11-24T09:59:09.446+00:00",
+  "password" : "$2a$10$N4dTQry.mZM1pkD31P6Vq.oUonjrDpWJEw6rR1oHEXKEMC3/6ZB66",
+  "createdAt" : "2025-11-24T10:14:09.260+00:00",
+  "updatedAt" : "2025-11-24T10:14:09.260+00:00",
   "mainRole" : {
     "id" : 2,
     "name" : "MANAGER",
     "description" : "Manager role",
-    "createdAt" : "2025-11-24T09:59:09.193+00:00",
-    "updatedAt" : "2025-11-24T09:59:09.193+00:00"
+    "createdAt" : "2025-11-24T10:14:09.010+00:00",
+    "updatedAt" : "2025-11-24T10:14:09.010+00:00"
   },
+  "username" : "test.manager@test.com",
   "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "test.manager@test.com",
   "enabled" : true
 }, {
   "id" : 3,
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "password" : "$2a$10$IbNbyKj7HuQ3W.bxVSsxxe98MjulEO3XFrwKuxdHjDYczStgSaDwe",
-  "createdAt" : "2025-11-24T09:59:09.447+00:00",
-  "updatedAt" : "2025-11-24T09:59:09.447+00:00",
+  "password" : "$2a$10$zVMvBsJtC4UMwkSbJHD1Ve7GrQe2n/ucz4RZTqz2KB/xdfgEgL1DW",
+  "createdAt" : "2025-11-24T10:14:09.261+00:00",
+  "updatedAt" : "2025-11-24T10:14:09.261+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-11-24T09:59:09.196+00:00",
-    "updatedAt" : "2025-11-24T09:59:09.196+00:00"
+    "createdAt" : "2025-11-24T10:14:09.014+00:00",
+    "updatedAt" : "2025-11-24T10:14:09.014+00:00"
   },
+  "username" : "test.admin@test.com",
   "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "test.admin@test.com",
   "enabled" : true
 }, {
   "id" : 4,
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "password" : "$2a$10$eoYHpvRAvVl.2Bd2kfZsuOymylbi1E4aE.91LOniAgwpNpGVZwFZK",
-  "createdAt" : "2025-11-24T09:59:09.447+00:00",
-  "updatedAt" : "2025-11-24T09:59:09.447+00:00",
+  "password" : "$2a$10$YtcvyrA5TD.GjzwDoue.keyj1h0RRolLS2KxCU0FP9VwN8ufSJh9O",
+  "createdAt" : "2025-11-24T10:14:09.262+00:00",
+  "updatedAt" : "2025-11-24T10:14:09.262+00:00",
   "mainRole" : {
     "id" : 3,
     "name" : "ADMIN",
     "description" : "Administrator role",
-    "createdAt" : "2025-11-24T09:59:09.196+00:00",
-    "updatedAt" : "2025-11-24T09:59:09.196+00:00"
+    "createdAt" : "2025-11-24T10:14:09.014+00:00",
+    "updatedAt" : "2025-11-24T10:14:09.014+00:00"
   },
+  "username" : "test.admin2@test.com",
   "authorities" : [ ],
   "credentialsNonExpired" : true,
   "accountNonExpired" : true,
   "accountNonLocked" : true,
-  "username" : "test.admin2@test.com",
   "enabled" : true
 } ]</code></pre>
 </div>
@@ -1973,10 +1982,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:29.159008551",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:29.546819998"
 }</code></pre>
 </div>
 </div>
@@ -2006,10 +2015,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:29.340602713",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:29.725509431"
 }</code></pre>
 </div>
 </div>
@@ -2027,7 +2036,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTc0NzQ5LCJpYXQiOjE3NjM5NzExNDl9.KVtueUuDYObnJEgPj9GUf14GMBIZ_EQwN6qMRr_fqxo
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTc1NjQ5LCJpYXQiOjE3NjM5NzIwNDl9.jPVnbo-DTZqSyIzPXMe9jMgGu72dC8GgrIDBoFEajac
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2039,10 +2048,10 @@ Content-Type: application/json
 Content-Length: 161
 
 {
-  "timestamp" : "2025-11-24T09:59:28.001105855",
-  "message" : "The Token has expired on 2025-11-24T08:59:09Z.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The Token has expired on 2025-11-24T09:14:09Z.",
+  "timestamp" : "2025-11-24T10:14:28.441115497"
 }</code></pre>
 </div>
 </div>
@@ -2062,7 +2071,7 @@ Content-Length: 161
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2106,10 +2115,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:29.120843157",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:29.506731313"
 }</code></pre>
 </div>
 </div>
@@ -2140,10 +2149,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:28.458956429",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:28.879818073"
 }</code></pre>
 </div>
 </div>
@@ -2167,7 +2176,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.MbG-I7iI2iZxIxjUaTG5oLfWo2R4UVlmTyDzVzk9nY0
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODUwLCJpYXQiOjE3NjM5NzkyNTB9.ZnxHn1taIi5GYqTSgcoXEgwyawZjwDeLcRETVdiDmBc
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2180,10 +2189,10 @@ Content-Type: application/json
 Content-Length: 125
 
 {
-  "timestamp" : "2025-11-24T09:59:28.193588047",
-  "message" : "Access Denied",
+  "status" : 403,
   "error" : "Forbidden",
-  "status" : 403
+  "message" : "Access Denied",
+  "timestamp" : "2025-11-24T10:14:28.589169979"
 }</code></pre>
 </div>
 </div>
@@ -2207,7 +2216,7 @@ Content-Length: 125
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.z8ho9MLen9cDiY3c11654yKdXN0ImQv7XMykn10_f-A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODUwLCJpYXQiOjE3NjM5NzkyNTB9.ApfVz3HZyd5ek0exgfqAqs3Ff7RvzfwylmhTwvvDrDY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2220,10 +2229,10 @@ Content-Type: application/json
 Content-Length: 131
 
 {
-  "timestamp" : "2025-11-24T09:59:27.686908901",
-  "message" : "User not found: 100",
+  "status" : 404,
   "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found: 100",
+  "timestamp" : "2025-11-24T10:14:28.146786597"
 }</code></pre>
 </div>
 </div>
@@ -2247,7 +2256,7 @@ Content-Length: 131
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.z8ho9MLen9cDiY3c11654yKdXN0ImQv7XMykn10_f-A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2260,10 +2269,10 @@ Content-Type: application/json
 Content-Length: 145
 
 {
-  "timestamp" : "2025-11-24T09:59:29.258444544",
-  "message" : "The user is already a manager: 100",
+  "status" : 409,
   "error" : "Conflict",
-  "status" : 409
+  "message" : "The user is already a manager: 100",
+  "timestamp" : "2025-11-24T10:14:29.639483845"
 }</code></pre>
 </div>
 </div>
@@ -2281,7 +2290,7 @@ Content-Length: 145
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2294,10 +2303,10 @@ Content-Type: application/json
 Content-Length: 144
 
 {
-  "timestamp" : "2025-11-24T09:59:29.203799414",
-  "message" : "The user is already an admin: 100",
+  "status" : 409,
   "error" : "Conflict",
-  "status" : 409
+  "message" : "The user is already an admin: 100",
+  "timestamp" : "2025-11-24T10:14:29.588047678"
 }</code></pre>
 </div>
 </div>
@@ -2317,7 +2326,7 @@ Content-Length: 144
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2361,10 +2370,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:28.281254819",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:28.697956614"
 }</code></pre>
 </div>
 </div>
@@ -2395,10 +2404,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:29.078816349",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:29.452860851"
 }</code></pre>
 </div>
 </div>
@@ -2422,7 +2431,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.TdlmxkSJxms71Z4jtW0mwwLXkUbRS5pII8VasaaVSFQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.MfTGWOVlzjAYAvPBmbSHOZTYSG8dpNOMMTojP_YteGg
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2435,10 +2444,10 @@ Content-Type: application/json
 Content-Length: 125
 
 {
-  "timestamp" : "2025-11-24T09:59:28.683028938",
-  "message" : "Access Denied",
+  "status" : 403,
   "error" : "Forbidden",
-  "status" : 403
+  "message" : "Access Denied",
+  "timestamp" : "2025-11-24T10:14:29.072204324"
 }</code></pre>
 </div>
 </div>
@@ -2462,7 +2471,7 @@ Content-Length: 125
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2475,10 +2484,10 @@ Content-Type: application/json
 Content-Length: 131
 
 {
-  "timestamp" : "2025-11-24T09:59:29.464379771",
-  "message" : "User not found: 100",
+  "status" : 404,
   "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found: 100",
+  "timestamp" : "2025-11-24T10:14:29.858590046"
 }</code></pre>
 </div>
 </div>
@@ -2498,7 +2507,7 @@ Content-Length: 131
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2542,10 +2551,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:28.623944622",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:29.025478347"
 }</code></pre>
 </div>
 </div>
@@ -2573,10 +2582,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:28.410312504",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:28.839952151"
 }</code></pre>
 </div>
 </div>
@@ -2600,7 +2609,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.TdlmxkSJxms71Z4jtW0mwwLXkUbRS5pII8VasaaVSFQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.MfTGWOVlzjAYAvPBmbSHOZTYSG8dpNOMMTojP_YteGg
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2613,10 +2622,10 @@ Content-Type: application/json
 Content-Length: 125
 
 {
-  "timestamp" : "2025-11-24T09:59:28.366886221",
-  "message" : "Access Denied",
+  "status" : 403,
   "error" : "Forbidden",
-  "status" : 403
+  "message" : "Access Denied",
+  "timestamp" : "2025-11-24T10:14:28.796969232"
 }</code></pre>
 </div>
 </div>
@@ -2640,7 +2649,7 @@ Content-Length: 125
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.z8ho9MLen9cDiY3c11654yKdXN0ImQv7XMykn10_f-A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2653,10 +2662,10 @@ Content-Type: application/json
 Content-Length: 132
 
 {
-  "timestamp" : "2025-11-24T09:59:27.792881200",
-  "message" : "User not found: 9999",
+  "status" : 404,
   "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found: 9999",
+  "timestamp" : "2025-11-24T10:14:28.241413582"
 }</code></pre>
 </div>
 </div>
@@ -2680,7 +2689,7 @@ Content-Length: 132
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2693,10 +2702,10 @@ Content-Type: application/json
 Content-Length: 160
 
 {
-  "timestamp" : "2025-11-24T09:59:28.847199137",
-  "message" : "The user is already an admin: test.admin@test.com",
+  "status" : 409,
   "error" : "Conflict",
-  "status" : 409
+  "message" : "The user is already an admin: test.admin@test.com",
+  "timestamp" : "2025-11-24T10:14:29.208992643"
 }</code></pre>
 </div>
 </div>
@@ -2716,7 +2725,7 @@ Content-Length: 160
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2757,10 +2766,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:29.299613223",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:29.683841978"
 }</code></pre>
 </div>
 </div>
@@ -2791,10 +2800,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:27.909444642",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:28.337002739"
 }</code></pre>
 </div>
 </div>
@@ -2818,7 +2827,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.MbG-I7iI2iZxIxjUaTG5oLfWo2R4UVlmTyDzVzk9nY0
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0IiwibGFzdE5hbWUiOiJVc2VyIiwibWFpblJvbGUiOiJVU0VSIiwiZXhwIjoxNzYzOTgyODUwLCJpYXQiOjE3NjM5NzkyNTB9.ZnxHn1taIi5GYqTSgcoXEgwyawZjwDeLcRETVdiDmBc
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2831,10 +2840,10 @@ Content-Type: application/json
 Content-Length: 125
 
 {
-  "timestamp" : "2025-11-24T09:59:29.420000808",
-  "message" : "Access Denied",
+  "status" : 403,
   "error" : "Forbidden",
-  "status" : 403
+  "message" : "Access Denied",
+  "timestamp" : "2025-11-24T10:14:29.815719882"
 }</code></pre>
 </div>
 </div>
@@ -2858,7 +2867,7 @@ Content-Length: 125
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTQ5LCJpYXQiOjE3NjM5NzgzNDl9.WNTCHu6_3qD7VLEdt5r_3MmPAsqFSjN-cKSregaTEHY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODQ5LCJpYXQiOjE3NjM5NzkyNDl9.0R29Xv4na6EvxHIzsBh18Y_a_fWidDD6hJ9YIIiYoPY
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
@@ -2871,10 +2880,10 @@ Content-Type: application/json
 Content-Length: 132
 
 {
-  "timestamp" : "2025-11-24T09:59:29.038334095",
-  "message" : "User not found: 9999",
+  "status" : 404,
   "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found: 9999",
+  "timestamp" : "2025-11-24T10:14:29.390602661"
 }</code></pre>
 </div>
 </div>
@@ -2894,7 +2903,7 @@ Content-Length: 132
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.z8ho9MLen9cDiY3c11654yKdXN0ImQv7XMykn10_f-A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODUwLCJpYXQiOjE3NjM5NzkyNTB9.ApfVz3HZyd5ek0exgfqAqs3Ff7RvzfwylmhTwvvDrDY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2938,10 +2947,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:27.958270127",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:28.387162518"
 }</code></pre>
 </div>
 </div>
@@ -2972,10 +2981,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:28.749379835",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:29.118869284"
 }</code></pre>
 </div>
 </div>
@@ -2995,7 +3004,7 @@ Content-Length: 167
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgxOTUwLCJpYXQiOjE3NjM5NzgzNTB9.z8ho9MLen9cDiY3c11654yKdXN0ImQv7XMykn10_f-A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwiZXhwIjoxNzYzOTgyODUwLCJpYXQiOjE3NjM5NzkyNTB9.ApfVz3HZyd5ek0exgfqAqs3Ff7RvzfwylmhTwvvDrDY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3038,10 +3047,10 @@ Content-Type: application/json
 Content-Length: 170
 
 {
-  "timestamp" : "2025-11-24T09:59:27.737448710",
-  "message" : "Full authentication is required to access this resource",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Full authentication is required to access this resource",
+  "timestamp" : "2025-11-24T10:14:28.199621229"
 }</code></pre>
 </div>
 </div>
@@ -3071,10 +3080,10 @@ Content-Type: application/json
 Content-Length: 167
 
 {
-  "timestamp" : "2025-11-24T09:59:29.380918302",
-  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "status" : 401,
   "error" : "Unauthorized",
-  "status" : 401
+  "message" : "The token was expected to have 3 parts, but got &gt; 3.",
+  "timestamp" : "2025-11-24T10:14:29.770840009"
 }</code></pre>
 </div>
 </div>
