@@ -66,7 +66,7 @@ public class UserService {
      * @throws AppException if the user is not found or the password is invalid
      */
     public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByLogin(credentialsDto.login())
+        User user = userRepository.findByLoginAndDeletedFalse(credentialsDto.login())
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
@@ -83,7 +83,7 @@ public class UserService {
      * @throws AppException if the user is not found
      */
     public UserDto refreshLogin(String login) {
-        User user = userRepository.findByLogin(login)
+        User user = userRepository.findByLoginAndDeletedFalse(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
         return userMapper.toUserDto(user);
     }
@@ -130,7 +130,7 @@ public class UserService {
     @Transactional
     public void updatePassword(String login, PasswordUpdateDto passwords) {
 
-        User user = userRepository.findByLogin(login)
+        User user = userRepository.findByLoginAndDeletedFalse(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
         if (passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword()) == false) {
@@ -152,7 +152,7 @@ public class UserService {
     public UserDto findByLogin(String login) {
         log.debug("Searching for user with login: {}", login);
 
-        Optional<User> userOptional = userRepository.findByLogin(login);
+        Optional<User> userOptional = userRepository.findByLoginAndDeletedFalse(login);
         log.debug("User found in database: {}", userOptional.isPresent());
 
         User user = userOptional

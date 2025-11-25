@@ -14,12 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
+import ch.sectioninformatique.auth.user.User;
 import ch.sectioninformatique.auth.user.UserDto;
+import ch.sectioninformatique.auth.user.UserRepository;
 import ch.sectioninformatique.auth.user.UserService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,6 +55,9 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private UserService userService;
+
+        @Autowired
+        private UserRepository userRepository;
 
         /**
          * Test the /auth/login endpoint with real data.
@@ -378,6 +384,44 @@ public class AuthControllerIntegrationTest {
                 Path path = Paths.get("target/test-data/auth-login-response-non-existent-user.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, wrappedResponse);
+        }
+
+        /**
+         * Test that a soft-deleted user cannot log in.
+         * Retrieves a known user, marks them as deleted,
+         * and tries to authenticate with valid credentials.
+         * Expects an Unauthorized (401) response.
+         * 
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        @Transactional
+        public void login_softDeletedUser_shouldReturnUnauthorized() throws Exception {
+                // Fetch the user to delete
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                // Soft delete the user
+                User user = userRepository.findById(userDto.getId()).orElseThrow();
+                user.setDeleted(true);
+                userRepository.save(user);
+
+                // Prepare login request
+                Map<String, String> loginRequest = new HashMap<>();
+                loginRequest.put("login", userDto.getLogin());
+                loginRequest.put("password", "Test1234!"); 
+
+                MvcResult result = mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(loginRequest)))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.message").exists())
+                                .andReturn();
+
+                // Save response for later analysis
+                String responseBody = result.getResponse().getContentAsString();
+                Path path = Paths.get("target/test-data/login-softDeletedUser-response.json");
+                Files.createDirectories(path.getParent());
+                Files.writeString(path, responseBody);
         }
 
         /**
@@ -976,6 +1020,8 @@ public class AuthControllerIntegrationTest {
         /**
          * Test the /auth/refresh endpoint with invalid token.
          * This test performs a token refresh request with an invalid token and
+         * 
+         * 
          * expects an unauthorized response.
          * The response is saved to a file.
          *
@@ -1016,11 +1062,9 @@ public class AuthControllerIntegrationTest {
          * Test the /auth/update-password endpoint with real data.
          * This test performs an update password request and expects a successful response.
          * The response is saved to a file for use in other tests.
-         *
-         * @throws Exception if an error occurs during the test
          */
-        @Test
-        @Transactional
+         
+
         public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
@@ -1114,7 +1158,7 @@ public class AuthControllerIntegrationTest {
 
                 MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
+                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
