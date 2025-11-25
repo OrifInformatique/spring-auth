@@ -1,13 +1,16 @@
 package ch.sectioninformatique.auth.auth;
 
 import java.net.URI;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,5 +82,29 @@ public class AuthController {
         createdUser.setToken(userAuthenticationProvider.createToken(createdUser));
         createdUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(createdUser));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+    }
+
+    /**
+     * Change the password of the User
+     * 
+     * @param passwords A password Dto who contain both the old password for verification and the new for update
+     * @return ResponseEntity containing a confirmation message
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid PasswordUpdateDto passwords) {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        UserDto currentUser = (UserDto) authentication.getPrincipal();
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
+
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
 }

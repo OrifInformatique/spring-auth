@@ -1,6 +1,7 @@
 package ch.sectioninformatique.auth.user;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
  * - User deletion
  * - User listing and retrieval
  * 
- * All endpoints are secured with appropriate authorization checks using Spring Security's
- * @PreAuthorize annotations. The controller follows RESTful conventions and returns
- * appropriate HTTP responses with success/error messages.
+ * All endpoints are secured with appropriate authorization checks using Spring
+ * Security's
+ * 
+ * @PreAuthorize annotations. The controller follows RESTful conventions and
+ *               returns
+ *               appropriate HTTP responses with success/error messages.
  */
 @RequestMapping("/users")
 @RestController
@@ -36,8 +40,7 @@ public class UserController {
      *
      * @param userService Service for handling user-related operations
      */
-    public UserController(UserService userService)
-    {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -56,25 +59,70 @@ public class UserController {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
-        
+
         UserDto currentUser = (UserDto) authentication.getPrincipal();
         return ResponseEntity.ok(currentUser);
     }
 
     /**
-     * Retrieves all users in the system.
+     * Retrieves all users in the system excluding soft-deleted ones.
      * This endpoint:
      * - Requires the 'user:read' authority
      * - Returns a list of all users
      * - Is typically used by administrators
      *
-     * @return ResponseEntity containing a list of all users
+     * @return ResponseEntity containing a list of all users, without soft-deleted ones
      */
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<List<User>> allUsers() {
-        List <User> users = userService.allUsers();
+        List<User> users = userService.allUsers();
         return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Retrieves all users in the system including soft-deleted ones.
+     * This endpoint:
+     * - Requires the 'user:read' authority
+     * - Returns a list of all users
+     * - Is typically used by administrators
+     *
+     * @return ResponseEntity containing a list of all users, including soft-deleted ones
+     */
+    @GetMapping("/all-with-deleted")
+    @PreAuthorize("hasAuthority('user:read')")
+    public ResponseEntity<List<User>> allWithDeletedUsers() {
+        List<User> users = userService.allWithDeletedUsers();
+        return ResponseEntity.ok(users); 
+    }
+
+    /**
+     * Retrieves all soft-deleted users in the system.
+     * This endpoint:
+     * - Requires the 'user:read' authority
+     * - Returns a list of all soft-deleted users
+     * - Is typically used by administrators
+     *
+     * @return ResponseEntity containing a list of all soft-deleted users
+     */
+    @GetMapping("/deleted")
+    @PreAuthorize("hasAuthority('user:read')")
+    public ResponseEntity<List<User>> deletedUsers() {
+        List<User> users = userService.deletedUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Restore a user that was soft deleted
+     * 
+     * @param userId The ID of the user to restore
+     * @return ResponseEntity with success message or error details
+     */
+    @PutMapping("/{userId}/restore")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<?> restoreDeletedUser(@PathVariable Long userId) {
+        userService.restoreDeletedUser(userId);
+        return ResponseEntity.ok().body("User restored successfully");
     }
 
     /**
@@ -90,12 +138,10 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{userId}/promote-manager")
     public ResponseEntity<?> promoteToManager(@PathVariable Long userId) {
-        try {
-            userService.promoteToManager(userId);
-            return ResponseEntity.ok().body("User promoted to manager successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        userService.promoteToManager(userId);
+        return ResponseEntity.ok().body("User promoted to manager successfully");
+
     }
 
     /**
@@ -111,12 +157,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{userId}/revoke-manager")
     public ResponseEntity<?> revokeManagerRole(@PathVariable Long userId) {
-        try {
-            userService.revokeManagerRole(userId);
-            return ResponseEntity.ok().body("Manager role revoked successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        userService.revokeManagerRole(userId);
+        return ResponseEntity.ok().body("Manager role revoked successfully");
     }
 
     /**
@@ -132,12 +175,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/promote-admin")
     public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
-        try {
-            userService.promoteToAdmin(userId);
-            return ResponseEntity.ok().body("Admin role assigned successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.promoteToAdmin(userId);
+        return ResponseEntity.ok().body("Admin role assigned successfully");
     }
 
     /**
@@ -153,12 +192,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
-        try {
-            userService.revokeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role revoked successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.revokeAdminRole(userId);
+        return ResponseEntity.ok().body("Admin role revoked successfully");
     }
 
     /**
@@ -174,32 +209,43 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{userId}/downgrade-admin")
     public ResponseEntity<?> downgradeAdminRole(@PathVariable Long userId) {
-        try {
-            userService.downgradeAdminRole(userId);
-            return ResponseEntity.ok().body("Admin role downgraded successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.downgradeAdminRole(userId);
+        return ResponseEntity.ok().body("Admin role downgraded successfully");
     }
 
     /**
-     * Deletes a user from the system.
+     * Soft-deletes a user from the system.
      * This endpoint:
      * - Requires the 'user:delete' authority
      * - Validates the authenticated user has sufficient permissions
      * - Returns success/error message
      *
-     * @param userId The ID of the user to delete
+     * @param userId The ID of the user to soft-delete
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        try {
-            userService.deleteUser(userId);
-            return ResponseEntity.ok().body("User deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> delete(@PathVariable Long userId) {
+        UserDto deletedUser = userService.deleteUser(userId);
+        return ResponseEntity
+                .ok(Map.of("message", "User deleted successfully", "deletedUserLogin", deletedUser.getLogin()));
+    }
+
+    /**
+     * Permanently deletes a user from the system.
+     * This endpoint:
+     * - Requires the 'user:delete' authority
+     * - Validates the authenticated user has sufficient permissions
+     * - Returns success/error message
+     *
+     * @param userId The ID of the user to permanently delete
+     * @return ResponseEntity with success message or error details
+     */
+    @PreAuthorize("hasAuthority('user:delete')")
+    @DeleteMapping("/{userId}/permanent")
+    public ResponseEntity<?> deletePermanent(@PathVariable Long userId) {
+        UserDto deletedUser = userService.deletePermanentUser(userId);
+        return ResponseEntity
+                .ok(Map.of("message", "User deleted permanently", "deletedUserLogin", deletedUser.getLogin()));
     }
 }

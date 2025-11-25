@@ -9,6 +9,10 @@ services:
       context: .
       dockerfile: Dockerfile
       target: "${ENVIRONMENT}" # Use the environment variable to target the desired stage
+    volumes:
+      - ./src/asciidoc:/app/target/generated-snippets
+      - ./docs:/app/target/generated-snippets-html
+      - ./target:/app/target
     environment:
       # Pass environment variables to the container and the Spring Boot app
       SPRING_PROFILES_ACTIVE: "${ENVIRONMENT}"
@@ -32,11 +36,11 @@ services:
       MARIADB_ROOT_PASSWORD: "${DB_PASSWORD}"
       MARIADB_DATABASE: "${ENVIRONMENT}_db"
     volumes:
-    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - spring_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
       retries: 5
