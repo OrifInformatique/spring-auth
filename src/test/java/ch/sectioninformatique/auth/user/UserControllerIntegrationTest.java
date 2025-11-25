@@ -764,14 +764,9 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test the /users/{userId}/promote-admin endpoint with real data.
-         * This test retrieves a known manager user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to promote the manager to admin.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/promote-admin
+         *
+         * Mock a request to Promote a user or manager into an admin
          */
         @Test
         @Transactional
@@ -782,70 +777,64 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role assigned successfully"))
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/promote-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "promote-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(content().string("Admin role assigned successfully"));
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch manager again and verify role changed to ADMIN
-                UserDto updatedManager = userService.findByLogin("test.manager@test.com");
-                assertNotNull(updatedManager.getMainRole(), "Manager role should not be null after promotion");
-                assertEquals("ADMIN", updatedManager.getMainRole(),
-                                "Manager role should be ADMIN after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                                // Assert: fetch manager again and verify role changed to ADMIN
+                                                UserDto updatedManager = userService
+                                                                .findByLogin("test.manager@test.com");
+                                                assertNotNull(updatedManager.getMainRole(),
+                                                                "Manager role should not be null after promotion");
+                                                assertEquals("ADMIN", updatedManager.getMainRole(),
+                                                                "Manager role should be ADMIN after promotion");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/promote-admin endpoint with missing
-         * authorization header.
-         * This test retrieves a known manager user and performs a PUT request to
-         * promote the manager to admin
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/promote-admin
+         *
+         * Mock a request to Promote a user or manager into an admin with missing
+         * authorization header
          */
         @Test
         @Transactional
         public void promoteToAdmin_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto managerDto = userService.findByLogin("test.manager@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/promote-admin",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "promote-admin-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/promote-admin endpoint with a malformed token.
-         * This test retrieves a known manager user and performs a PUT request to
-         * promote the manager to admin
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/promote-admin
+         *
+         * Mock a request to Promote a user or manager into an admin with a malformed
+         * token
          */
         @Test
         @Transactional
@@ -853,33 +842,27 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto managerDto = userService.findByLogin("test.manager@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/promote-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "promote-admin-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/promote-admin endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known manager user, generates an authentication
-         * token for a non-admin user,
-         * and performs a PUT request to promote the manager to admin.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/promote-admin
+         *
+         * Mock a request to Promote a user or manager into an admin as a non-admin
          */
         @Test
         @Transactional
@@ -889,32 +872,28 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/promote-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                403,
+                                "promote-admin-non-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/promote-admin endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to promote a non-existing user to admin.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/promote-admin
+         *
+         * Mock a request to Promote a user or manager into an admin with a non-existing
+         * user
          */
         @Test
         @Transactional
@@ -925,33 +904,28 @@ public class UserControllerIntegrationTest {
 
                 String fakeUserId = "9999";
 
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + fakeUserId + "/promote-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                404,
+                                "promote-admin-user-not-found",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/promote-admin endpoint with a user
+         * Test: PUT /users/{userId}/promote-admin
+         *
+         * Mock a request to Promote a user or manager into an admin with a user
          * who is already an admin.
-         * This test retrieves a known admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to promote the admin to admin.
-         * It verifies that the response status is Conflict and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
          */
         @Test
         @Transactional
@@ -960,22 +934,24 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isConflict())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-user-already-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-user-already-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + adminDto.getId() + "/promote-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                409,
+                                "promote-admin-user-already-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
+
 
         /**
          * Test the /users/{userId}/revoke-admin endpoint with real data.
