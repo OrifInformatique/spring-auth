@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,8 +41,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Builder
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
+@FilterDef(name = "deletedFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedFilter", condition = "deleted = :isDeleted")
 public class User implements UserDetails {
-    
+
     /**
      * Unique identifier for the user.
      */
@@ -87,6 +94,14 @@ public class User implements UserDetails {
     private Date updatedAt;
 
     /**
+     * Indicates whether the user account is soft-deleted.
+     * A value of true means the account is deleted, false means active.
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
+
+    /**
      * Retrieves the authorities granted to the user.
      * This method is required by the UserDetails interface and converts
      * the user's roles into Spring Security GrantedAuthority objects.
@@ -107,28 +122,29 @@ public class User implements UserDetails {
     @ManyToOne(fetch = FetchType.EAGER)
     @Builder.Default
     private Role mainRole = new Role();
-    
 
     /**
      * Constructs a new User with all required fields.
      *
-     * @param id The unique identifier for the user
+     * @param id        The unique identifier for the user
      * @param firstName The user's first name
-     * @param lastName The user's last name
-     * @param login The user's unique login identifier
-     * @param password The user's hashed password
+     * @param lastName  The user's last name
+     * @param login     The user's unique login identifier
+     * @param password  The user's hashed password
      * @param createdAt The timestamp when the user was created
      * @param updatedAt The timestamp when the user was last updated
-     * @param mainRole The Main role assigned to the user
+     * @param deleted   The deletion status of the user
+     * @param mainRole  The Main role assigned to the user
      */
     public User(long id,
-                String firstName, 
-                String lastName, 
-                String login,
-                String password, 
-                Date createdAt, 
-                Date updatedAt,
-                Role mainRole) {
+            String firstName,
+            String lastName,
+            String login,
+            String password,
+            Date createdAt,
+            Date updatedAt,
+            boolean deleted,
+            Role mainRole) {
         super();
         this.id = id;
         this.firstName = firstName;
@@ -137,6 +153,7 @@ public class User implements UserDetails {
         this.password = password;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.deleted = deleted;
         this.mainRole = mainRole;
     }
 
@@ -170,6 +187,9 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
+        if(this.deleted) {
+            return false;
+        }
         return true;
     }
 
@@ -181,6 +201,9 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
+        if(this.deleted) {
+            return false;
+        }
         return true;
     }
 
@@ -192,6 +215,9 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
+        if(this.deleted) {
+            return false;
+        }
         return true;
     }
 
@@ -203,6 +229,9 @@ public class User implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
+        if(this.deleted) {
+            return false;
+        }
         return true;
     }
 }

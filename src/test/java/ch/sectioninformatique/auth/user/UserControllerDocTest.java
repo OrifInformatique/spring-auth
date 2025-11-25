@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,6 +51,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+
+
+
+
 
 /**
  * Test class for {@link UserController}.
@@ -1712,12 +1717,15 @@ class UserControllerDocTest {
         @Test
         void deleteUser_withMockedService_generatesDoc() throws Exception {
                 // Paths to saved response and token files
-                Path responsePath = Paths.get("target/test-data/users-deleteUser-response.txt");
+                Path responsePath = Paths.get("target/test-data/users-deleteUser-response.json");
                 if (!Files.exists(responsePath)) {
                         throw new IllegalStateException(
                                         "Missing users-deleteUser-response.txt. Run deleteUser_withRealData_shouldReturnSuccess first.");
                 }
                 String deleteResponse = Files.readString(responsePath);
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(deleteResponse);
 
                 Path tokenPath = Paths.get("target/test-data/users-deleteUser-token.txt");
                 if (!Files.exists(tokenPath)) {
@@ -1761,7 +1769,7 @@ class UserControllerDocTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string(deleteResponse))
+                                .andExpect(jsonPath("$.message").value(jsonNode.get("message").asText()))
                                 .andDo(document("users/delete", preprocessRequest(prettyPrint()),
                                                 preprocessResponse(prettyPrint())));
         }

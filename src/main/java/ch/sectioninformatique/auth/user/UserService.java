@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.sectioninformatique.auth.app.exceptions.InvalidCredentialsException;
 import ch.sectioninformatique.auth.app.exceptions.UserAlreadyExistsException;
@@ -14,10 +15,14 @@ import ch.sectioninformatique.auth.app.exceptions.UserNotFoundException;
 import ch.sectioninformatique.auth.app.exceptions.RoleNotFoundException;
 import ch.sectioninformatique.auth.app.exceptions.UserAlreadyAdminException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
+import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
+import jakarta.persistence.EntityManager;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +32,8 @@ import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.Session;
 
 /**
  * Service class for managing user-related operations.
@@ -42,7 +49,12 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
+    /** EntityManager for database operations */
+    @Autowired
+    private EntityManager entityManager;
+
     /** Repository for user data access */
+    @Autowired
     private final UserRepository userRepository;
 
     /** Encoder for password hashing */
@@ -118,6 +130,27 @@ public class UserService {
     }
 
     /**
+     * Update the User Password
+     * 
+     * @param login       The user email
+     * @param newPassword A password Dto who contain bothe the old password for
+     *                    verification and the new for update
+     */
+    @Transactional
+    public void updatePassword(String login, PasswordUpdateDto passwords) {
+
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new InvalidCredentialsException());
+
+        if (passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword()) == false) {
+            throw new InvalidCredentialsException();
+        }
+
+        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(passwords.newPassword()));
+        user.setPassword(encodedPassword);
+    }
+
+    /**
      * Finds a user by their login.
      * This method includes detailed logging for debugging purposes.
      *
@@ -136,11 +169,11 @@ public class UserService {
                     log.error("User not found with login: {}", login);
                     return new UserNotFoundException(login);
                 });
-                
-        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}", 
-            user.getId(), user.getFirstName(), user.getLastName(), 
-            user.getMainRole());
-            
+
+        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}",
+                user.getId(), user.getFirstName(), user.getLastName(),
+                user.getMainRole());
+
         UserDto userDto = userMapper.toUserDto(user);
         log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}",
                 userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
@@ -149,14 +182,54 @@ public class UserService {
     }
 
     /**
-     * Retrieves all users in the system.
+     * Retrieves all users who are not soft-deleted in the system.
      *
-     * @return List of all User entities
+     * @return List of all User entities, excluding soft-deleted
      */
     public List<User> allUsers() {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedFilter").setParameter("isDeleted", false);
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(users::add);
         return users;
+    }
+
+    /**
+     * Retrieves all users including soft-deleted ones.
+     *
+     * @return List of all User entities including soft-deleted
+     */
+    public List<User> allWithDeletedUsers() {
+        List<User> users = new ArrayList<>();
+        userRepository.findAllWithDeleted().forEach(users::add);
+        return users;
+    }
+
+    /**
+     * Retrieves only soft-deleted users.
+     *
+     * @return List of soft-deleted User entities
+     */
+    public List<User> deletedUsers() {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedFilter").setParameter("isDeleted", true);
+        List<User> users = new ArrayList<>();
+        userRepository.findAllDeleted().forEach(users::add);
+        return users;
+    }
+
+    /**
+     * Restore a soft deleted user
+     * 
+     * @param userId
+     * @return
+     */
+    public UserDto restoreDeletedUser(Long userId) {
+        User user = userRepository.findByIdDeleted(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setDeleted(false);
+        userRepository.save(user);
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -336,11 +409,11 @@ public class UserService {
     }
 
     /**
-     * Deletes a user from the system.
+     * Soft-deletes a user from the system.
      * This operation:
      * - Verifies the user exists
      * - Checks if the authenticated user has sufficient permissions
-     * - Deletes the user
+     * - Soft-deletes the user
      *
      * @param userId The ID of the user to delete
      * @return The deleted User entity, or null if deletion was successful
@@ -366,7 +439,42 @@ public class UserService {
         }
 
         // Delete the user
-        userRepository.deleteById(userId);
+        userRepository.delete(userToDelete);
+        return userMapper.toUserDto(userToDelete);
+    }
+
+    /**
+     * Permanently deletes a user from the system.
+     * This operation:
+     * - Verifies the user exists
+     * - Checks if the authenticated user has sufficient permissions
+     * - Permanently deletes the user
+     *
+     * @param userId The ID of the user to permanently delete
+     * @return The deleted User entity, or null if deletion was successful
+     * @throws RuntimeException if the user is not found or the authenticated user
+     *                          lacks permissions
+     */
+    public UserDto deletePermanentUser(Long userId) {
+        // Get the user to delete
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+
+        // Get the authenticated user (the actor)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
+
+        // Get the full user entity for the authenticated user
+        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
+                .orElseThrow(() -> new UserNotFoundException(authenticatedUser.getLogin()));
+
+        // Check if the action is authorized
+        if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
+            throw new UserHasLowerRightsException(authenticatedUser.getLogin());
+        }
+
+        // Delete the user
+        userRepository.deletePermanentlyById(userId);
         return userMapper.toUserDto(userToDelete);
     }
 
