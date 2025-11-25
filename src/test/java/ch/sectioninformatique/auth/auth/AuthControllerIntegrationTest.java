@@ -285,7 +285,8 @@ public class AuthControllerIntegrationTest {
         /**
          * Test: POST /tests/login
          *
-         * Mock a user log in with SQL injection attempt in login and test the excetpion.
+         * Mock a user log in with SQL injection attempt in login and test the
+         * excetpion.
          */
         @Test
         @Transactional
@@ -361,487 +362,335 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test the /auth/register endpoint with real data.
-         * This test performs a registration request and expects a successful response.
-         * The response is saved to a file for use in other tests.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with valid credentials.
          */
         @Test
+        @Transactional
         public void register_withRealData_shouldReturnSuccess() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isCreated())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("NewUser"))
-                                .andExpect(jsonPath("$.login").value("test.newuser@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
-                                                                                    // not empty
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                201,
+                                "register",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.id").isNotEmpty())
+                                                                .andExpect(jsonPath("$.firstName").value("Test"))
+                                                                .andExpect(jsonPath("$.lastName").value("NewUser"))
+                                                                .andExpect(jsonPath("$.login")
+                                                                                .value("test.newuser@test.com"))
+                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
+                                                                .andExpect(jsonPath("$.token").isNotEmpty())
+                                                                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
 
-                // Assert: fetch user again and verify user created
-                UserDto updatedUser = userService.findByLogin("test.newuser@test.com");
-                assertNotNull(updatedUser, "User should not be null after registration");
-                assertEquals("Test", updatedUser.getFirstName(), "User first name should match");
-                assertEquals("NewUser", updatedUser.getLastName(), "User last name should match");
-                assertEquals("test.newuser@test.com", updatedUser.getLogin(), "User login should match");
-                assertEquals("USER", updatedUser.getMainRole(), "User role should be USER");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/auth-register-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                                                // Assert: fetch user again and verify user created
+                                                UserDto updatedUser = userService.findByLogin("test.newuser@test.com");
+                                                assertNotNull(updatedUser,
+                                                                "User should not be null after registration");
+                                                assertEquals("Test", updatedUser.getFirstName(),
+                                                                "User first name should match");
+                                                assertEquals("NewUser", updatedUser.getLastName(),
+                                                                "User last name should match");
+                                                assertEquals("test.newuser@test.com", updatedUser.getLogin(),
+                                                                "User login should match");
+                                                assertEquals("USER", updatedUser.getMainRole(),
+                                                                "User role should be USER");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with missing first name.
-         * This test performs a registration request with missing first name and
-         * expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with missing firstname.
          */
         @Test
+        @Transactional
         public void register_missingFirstName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-first-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-missing-first-name",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with missing last name.
-         * This test performs a registration request with missing last name and
-         * expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with missing lastname.
          */
         @Test
+        @Transactional
         public void register_missingLastName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-last-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-missing-last-name",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with missing login.
-         * This test performs a registration request with missing login and
-         * expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with missing login.
          */
         @Test
+        @Transactional
         public void register_missingLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-missing-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with missing password.
-         * This test performs a registration request with missing password and
-         * expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with missing password.
          */
         @Test
+        @Transactional
         public void register_missingPassword_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.newuser@test.com\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.newuser@test.com\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-missing-password",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with invalid email format.
-         * This test performs a registration request with invalid email format and
-         * expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with invalid email format.
          */
         @Test
+        @Transactional
         public void register_invalidEmailFormat_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"invalid-email-format\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-invalid-email-format.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"invalid-email-format\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-invalid-email-format",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with empty body.
-         * This test performs a registration request with empty body and expects a bad
-         * request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with empty body.
          */
         @Test
+        @Transactional
         public void register_emptyBody_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-empty-body.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-empty-body",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with malformed JSON.
-         * This test performs a registration request with malformed JSON and expects a
-         * bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register with malformed JSON.
          */
         @Test
+        @Transactional
         public void register_malformedJson_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-malformed-json.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-malformed-json",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with SQL injection attempt in first name.
-         * This test performs a registration request with SQL injection attempt in
-         * first name and expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register SQL with injection attempt in first name.
          */
         @Test
+        @Transactional
         public void register_sqlInjectionAttemptFirstName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"' OR '1'='1\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-first-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"' OR '1'='1\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-sql-injection-attempt-first-name",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with SQL injection attempt in last name.
-         * This test performs a registration request with SQL injection attempt in
-         * last name and expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register SQL with injection attempt in last name.
          */
         @Test
+        @Transactional
         public void register_sqlInjectionAttemptLastName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"' OR '1'='1\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-last-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\", \"lastName\":\"' OR '1'='1\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-sql-injection-attempt-last-name",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with SQL injection attempt in login.
-         * This test performs a registration request with SQL injection attempt in
-         * login and expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register SQL with injection attempt in login.
          */
         @Test
+        @Transactional
         public void register_sqlInjectionAttemptLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"' OR '1'='1\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"' OR '1'='1\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "register-sql-injection-attempt-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/register endpoint with duplicate login.
-         * This test performs a registration request with duplicate login and
-         * expects a conflict response.
-         * The response is saved to a file.
+         * Test: POST /tests/register
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a successfull user register SQL with duplicate login.
          */
         @Test
+        @Transactional
         public void register_duplicateLogin_shouldReturnConflict() throws Exception {
 
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"User\",\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isConflict()) // or isBadRequest(), depending on API
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-duplicate-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
-
-        /**
-         * Test the /auth/register endpoint with wrong content type.
-         * This test performs a registration request with wrong content type and
-         * expects an unsupported media type response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void register_wrongContentType_shouldReturnUnsupportedMediaType() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isUnsupportedMediaType())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-wrong-content-type.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"lastName\":\"User\",\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                409,
+                                "register-duplicate-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
@@ -972,7 +821,7 @@ public class AuthControllerIntegrationTest {
 
                 MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
+                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.message").exists())
@@ -1002,7 +851,6 @@ public class AuthControllerIntegrationTest {
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
-
 
         /**
          * Test the /auth/update-password endpoint with missing body.
@@ -1058,7 +906,7 @@ public class AuthControllerIntegrationTest {
 
                 MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
+                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();

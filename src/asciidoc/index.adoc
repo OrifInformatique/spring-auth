@@ -248,20 +248,6 @@ include::auth/register-duplicate-login/http-response.adoc[]
 
 It returns a 409 Conflict error indicating that the login already exists.
 
-==== 1.2.3 Error Response - 415 - Unsupported Media Type
-These are example outputs for the `POST /auth/register` endpoint for unsupported media types.
-
-===== 1.2.3.1 Unsupported Media Type
-This is an example output when the media type of the request is unsupported.
-
-.request
-include::auth/register-wrong-media-type/http-request.adoc[]
-
-.response
-include::auth/register-wrong-media-type/http-response.adoc[]
-
-It returns a 415 Unsupported Media Type error indicating that the media type is not supported.
-
 === 1.3 Refresh
 This is an example output for the `GET /auth/refresh` endpoint.
 
