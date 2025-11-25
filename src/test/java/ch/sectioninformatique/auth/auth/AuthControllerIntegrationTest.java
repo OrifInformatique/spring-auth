@@ -133,7 +133,7 @@ public class AuthControllerIntegrationTest {
         private UserService userService;
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in successfull with valid credentials.
          */
@@ -149,11 +149,24 @@ public class AuthControllerIntegrationTest {
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "login",
-                                null);
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.id").isNotEmpty())
+                                                                .andExpect(jsonPath("$.firstName").value("Test"))
+                                                                .andExpect(jsonPath("$.lastName").value("User"))
+                                                                .andExpect(jsonPath("$.login")
+                                                                                .value("test.user@test.com"))
+                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
+                                                                .andExpect(jsonPath("$.token").isNotEmpty())
+                                                                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in without login and test the excetpion.
          */
@@ -179,7 +192,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in without password and test the excetpion.
          */
@@ -205,7 +218,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in with invalid email format and test the excetpion.
          */
@@ -231,7 +244,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in with empty body and test the excetpion.
          */
@@ -257,7 +270,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in with malformed JSON and test the excetpion.
          */
@@ -283,7 +296,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in with SQL injection attempt in login and test the
          * excetpion.
@@ -310,7 +323,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in with wrong password and test the excetpion.
          */
@@ -336,7 +349,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/login
+         * Test: POST /auth/login
          *
          * Mock a user log in with non-existent user and test the excetpion.
          */
@@ -362,7 +375,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
          * Mock a successfull user register with valid credentials.
          */
@@ -408,9 +421,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with missing firstname.
+         * Mock a failed user register with missing firstname.
          */
         @Test
         @Transactional
@@ -434,9 +447,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with missing lastname.
+         * Mock a failed user register with missing lastname.
          */
         @Test
         @Transactional
@@ -460,9 +473,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with missing login.
+         * Mock a failed user register with missing login.
          */
         @Test
         @Transactional
@@ -486,9 +499,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with missing password.
+         * Mock a failed user register with missing password.
          */
         @Test
         @Transactional
@@ -512,9 +525,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with invalid email format.
+         * Mock a failed user register with invalid email format.
          */
         @Test
         @Transactional
@@ -538,9 +551,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with empty body.
+         * Mock a failed user register with empty body.
          */
         @Test
         @Transactional
@@ -564,9 +577,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register with malformed JSON.
+         * Mock a failed user register with malformed JSON.
          */
         @Test
         @Transactional
@@ -590,9 +603,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register SQL with injection attempt in first name.
+         * Mock a failed user register SQL with injection attempt in first name.
          */
         @Test
         @Transactional
@@ -616,9 +629,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register SQL with injection attempt in last name.
+         * Mock a failed user register SQL with injection attempt in last name.
          */
         @Test
         @Transactional
@@ -642,9 +655,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register SQL with injection attempt in login.
+         * Mock a failed user register SQL with injection attempt in login.
          */
         @Test
         @Transactional
@@ -668,9 +681,9 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: POST /tests/register
+         * Test: POST /auth/register
          *
-         * Mock a successfull user register SQL with duplicate login.
+         * Mock a failed user register SQL with duplicate login.
          */
         @Test
         @Transactional
@@ -694,162 +707,119 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test the /auth/refresh endpoint with real data.
-         * This test performs a token refresh request and expects a successful response.
-         * The response is saved to a file for use in other tests.
+         * Test: GET /auth/refresh
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user successfull refresh token with valid credentials.
          */
         @Test
+        @Transactional
         public void refresh_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
 
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + refreshToken))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/auth-refresh-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, refreshToken);
+                performRequest(
+                                "GET",
+                                "/auth/refresh",
+                                null,
+                                refreshToken,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "refresh",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.firstName").value("Test"))
+                                                                .andExpect(jsonPath("$.lastName").value("User"))
+                                                                .andExpect(jsonPath("$.login")
+                                                                                .value("test.user@test.com"))
+                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
+                                                                .andExpect(jsonPath("$.token").isNotEmpty());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/refresh endpoint with missing Authorization header.
-         * This test performs a token refresh request without Authorization header and
-         * expects an unauthorized response.
-         * The response is saved to a file.
+         * Test: GET /auth/refresh
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user failed user refresh token with missing token.
          */
         @Test
-        public void refresh_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        @Transactional
+        public void refresh_missingToken_shouldReturnUnauthorized() throws Exception {
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-refresh-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "GET",
+                                "/auth/refresh",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "refresh-missing-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/refresh endpoint with invalid token.
-         * This test performs a token refresh request with an invalid token and
-         * expects an unauthorized response.
-         * The response is saved to a file.
+         * Test: GET /auth/refresh
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user failed user refresh token with invalid token.
          */
         @Test
+        @Transactional
         public void refresh_invalidToken_shouldReturnUnauthorized() throws Exception {
                 String invalidToken = "this.is.not.a.valid.token";
 
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + invalidToken))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-refresh-invalid-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "GET",
+                                "/auth/refresh",
+                                null,
+                                invalidToken,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "refresh-invalid-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
-        /**
-         * Test the /auth/update-password endpoint with real data.
-         * This test performs a set password request and expects a successful response.
-         * The response is saved to a file for use in other tests.
+                /**
+         * Test: GET /auth/refresh
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user successfull refresh token with valid credentials.
          */
         @Test
         @Transactional
         public void setPassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                String token = userAuthenticationProvider.createToken(userDto);
+                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
 
-                MvcResult result = mockMvc.perform(put("/auth/update-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-update-password-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/auth-update-password-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/auth/update-password",
+                                "{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}",
+                                refreshToken,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "update-password",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
