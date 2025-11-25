@@ -365,13 +365,9 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test the /users/all endpoint with an expired token.
-         * This test performs a GET request to the /users/all endpoint
-         * with an expired token
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/all
+         *
+         * Mock a user request for all users with a expired token.
          */
         @Test
         @Transactional
@@ -381,34 +377,27 @@ public class UserControllerIntegrationTest {
                 String token = userAuthenticationProvider.createToken(userDto, Date.from(
                                 Instant.now().minus(2, ChronoUnit.HOURS)));
 
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response-expired-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-all-token-expired-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "GET",
+                                "/users/all",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "all-expired-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/promote-manager endpoint with real data.
-         * This test retrieves a known user and an admin user, generates an
-         * authentication token for the admin,
-         * and performs a PUT request to promote the user to manager.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/promote-manager
+         *
+         * Mock a request to promote a user into a manager
          */
         @Test
         @Transactional
@@ -419,30 +408,30 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + userDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("User promoted to manager successfully"))
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + userDto.getId() + "/promote-manager",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "all",
+                                request -> {
+                                        try {
+                                                request.andExpect(content()
+                                                                .string("User promoted to manager successfully"));
+                                                MvcResult result = request.andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch user again and verify role changed to MANAGER
-                UserDto updatedUser = userService.findByLogin("test.user@test.com");
-                assertNotNull(updatedUser.getMainRole(), "User role should not be null after promotion");
-                assertEquals("MANAGER", updatedUser.getMainRole(),
-                                "User role should be MANAGER after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                                // Assert: fetch user again and verify role changed to MANAGER
+                                                UserDto updatedUser = userService.findByLogin("test.user@test.com");
+                                                assertNotNull(updatedUser.getMainRole(),
+                                                                "User role should not be null after promotion");
+                                                assertEquals("MANAGER", updatedUser.getMainRole(),
+                                                                "User role should be MANAGER after promotion");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
