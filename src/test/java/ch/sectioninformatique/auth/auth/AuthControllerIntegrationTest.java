@@ -8,20 +8,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,8 +28,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.function.Consumer;
 
@@ -794,7 +784,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /auth/update-password
+         * Test: PUT /auth/update-password
          *
          * Mock a user successfull update his password.
          */
@@ -823,7 +813,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /auth/update-password
+         * Test: PUT /auth/update-password
          *
          * Mock a user failing at updating his password without a body in his request.
          */
@@ -852,7 +842,7 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /auth/update-password
+         * Test: PUT /auth/update-password
          *
          * Mock a user failing at updating his password with missing token.
          */

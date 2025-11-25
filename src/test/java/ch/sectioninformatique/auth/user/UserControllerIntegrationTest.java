@@ -3,18 +3,19 @@ package ch.sectioninformatique.auth.user;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.sectioninformatique.auth.AuthApplication;
-import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,18 +25,25 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 /**
  * Integration tests for the UserController.
@@ -48,7 +56,75 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @SpringBootTest(classes = AuthApplication.class)
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class UserControllerIntegrationTest {
+
+        /**
+         * Helper method for performing and documenting HTTP requests in tests.
+         * This reduces repetition by centralizing the request execution and REST Docs
+         * generation.
+         *
+         * @param requestTypeString HTTP method (GET, POST, PUT, etc.)
+         * @param endpoint          API endpoint to call
+         * @param token             Optional JWT token for authentication
+         * @param contentType       Content type for the request
+         * @param expectedStatus    Expected HTTP status code (e.g. 200)
+         * @param docsFileName      Name for the generated REST Docs snippet
+         * @param script            Optional lambda to perform additional assertions
+         * 
+         * @throws Exception
+         */
+        private void performRequest(
+                        String requestTypeString,
+                        String endpoint,
+                        String content,
+                        String token,
+                        MediaType contentType,
+                        int expectedStatus,
+                        String docsFileName,
+                        Consumer<ResultActions> script) throws Exception {
+
+                var requestType = get(endpoint);
+
+                if (requestTypeString.equals("GET")) {
+                        requestType = get(endpoint);
+                } else if (requestTypeString.equals("POST")) {
+                        requestType = post(endpoint);
+                } else if (requestTypeString.equals("PUT")) {
+                        requestType = put(endpoint);
+                } else if (requestTypeString.equals("DELETE")) {
+                        requestType = delete(endpoint);
+                } else {
+                        throw new IllegalArgumentException("Unsupported request type: " + requestTypeString);
+                }
+
+                // Set content only if it's not null
+                if (content != null) {
+                        requestType.content(content);
+                }
+
+                // Set Authorization header only if token is provided
+                if (token != null) {
+                        requestType.header("Authorization", "Bearer " + token);
+                }
+
+                // Set content type
+                requestType.contentType(contentType);
+
+                // Perform request
+                var request = mockMvc.perform(requestType)
+                                .andExpect(status().is(expectedStatus));
+
+                // Execute any additional assertions provided in the lambda
+                if (script != null) {
+                        script.accept(request);
+                }
+
+                // Generate a REST Docs snippet for the request/response pair
+                request.andDo(document("users/" + docsFileName, preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint())));
+
+        }
 
         /** MockMvc instance for performing HTTP requests in tests. */
         @Autowired
@@ -63,111 +139,98 @@ public class UserControllerIntegrationTest {
         private UserService userService;
 
         /**
-         * Test the /users/me endpoint with real data.
-         * This test retrieves a known user, generates an authentication token,
-         * and performs a GET request to the /users/me endpoint.
-         * It verifies that the response contains the expected user information
-         * and saves the response and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/me
+         *
+         * Mock a user request for it's own informations.
          */
         @Test
         @Transactional
         public void me_withRealData_shouldReturnSuccess() throws Exception {
+
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-me-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "GET",
+                                "/users/me",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "me",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.id").isNotEmpty())
+                                                                .andExpect(jsonPath("$.firstName").value("Test"))
+                                                                .andExpect(jsonPath("$.lastName").value("User"))
+                                                                .andExpect(jsonPath("$.login")
+                                                                                .value("test.user@test.com"))
+                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
+                                                                .andExpect(jsonPath("$.token").isNotEmpty());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/me endpoint without Authorization header.
-         * This test performs a GET request to the /users/me endpoint
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/me
+         *
+         * Mock a user request for it's own informations without authorisation header.
          */
         @Test
         @Transactional
         public void me_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
 
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                performRequest(
+                                "GET",
+                                "/users/me",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "me-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/me endpoint with a malformed token.
-         * This test performs a GET request to the /users/me endpoint
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/me
+         *
+         * Mock a user request for it's own informations with a malformed token.
          */
         @Test
         @Transactional
         public void me_withMalformedToken_shouldReturnUnauthorized() throws Exception {
                 String token = "this.is.not.a.valid.token";
 
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-me-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "GET",
+                                "/users/me",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "me-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/me endpoint with an expired token.
-         * This test retrieves a known user, generates an expired
-         * authentication token,
-         * and performs a GET request to the /users/me endpoint.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/me
+         *
+         * Mock a user request for it's own informations with a malformed token.
          */
         @Test
         @Transactional
@@ -177,23 +240,21 @@ public class UserControllerIntegrationTest {
                 String token = userAuthenticationProvider.createToken(userDto, Date.from(
                                 Instant.now().minus(2, ChronoUnit.HOURS)));
 
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response-expired-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-me-token-expired-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "GET",
+                                "/users/me",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "me-expired-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
