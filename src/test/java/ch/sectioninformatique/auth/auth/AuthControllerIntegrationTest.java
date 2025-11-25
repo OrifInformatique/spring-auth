@@ -231,224 +231,133 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-         * Test the /auth/login endpoint with empty body.
-         * This test performs a login request with empty body and expects a bad request
-         * response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in with empty body and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_emptyBody_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-empty-body.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-empty-body",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/login endpoint with malformed JSON.
-         * This test performs a login request with malformed JSON and expects a bad
-         * request response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in with malformed JSON and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_malformedJson_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-malformed-json.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-malformed-json",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/login endpoint with SQL injection attempt in login.
-         * This test performs a login request with SQL injection attempt in login and
-         * expects a bad request response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in with SQL injection attempt in login and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_sqlInjectionAttemptLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"' OR '1'='1\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-sql-injection-attempt-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"' OR '1'='1\", \"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-sql-injection-attempt-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/login endpoint with wrong password.
-         * This test performs a login request with wrong password and expects an
-         * unauthorized response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in with wrong password and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_wrongPassword_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-wrong-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "login-wrong-password",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /auth/login endpoint with non-existent user.
-         * This test performs a login request with non-existent user and expects an
-         * unauthorized response.
-         * The response is saved to a file.
+         * Test: POST /tests/login
          *
-         * @throws Exception if an error occurs during the test
+         * Mock a user log in with non-existent user and test the excetpion.
          */
         @Test
+        @Transactional
         public void login_nonExistentUser_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"non.existent@test.com\", \"password\":\"WrongPassword!\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-non-existent-user.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
-
-        /**
-         * Test the /auth/login endpoint with wrong content type.
-         * This test performs a login request with wrong content type and expects an
-         * unsupported media type response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void login_wrongContentType_shouldReturnUnsupportedMediaType() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isUnsupportedMediaType())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-wrong-content-type.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"non.existent@test.com\", \"password\":\"WrongPassword!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "login-non-existent-user",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
