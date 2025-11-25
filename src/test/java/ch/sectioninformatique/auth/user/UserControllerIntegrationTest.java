@@ -608,14 +608,9 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test the /users/{userId}/revoke-manager endpoint with real data.
-         * This test retrieves a known manager user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to revoke the manager role from the user.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-manager
+         *
+         * Mock a request to revoke a manager into a user
          */
         @Test
         @Transactional
@@ -626,71 +621,63 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Manager role revoked successfully"))
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "revoke-manager",
+                                request -> {
+                                        try {
+                                                request.andExpect(
+                                                                content().string("Manager role revoked successfully"));
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch manager again and verify role changed to USER
-                UserDto updatedManager = userService.findByLogin("test.manager@test.com");
-                assertNotNull(updatedManager.getMainRole(), "Manager role should not be null after promotion");
-                assertEquals("USER", updatedManager.getMainRole(),
-                                "Manager role should be USER after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                                // Assert: fetch manager again and verify role changed to USER
+                                                UserDto updatedManager = userService
+                                                                .findByLogin("test.manager@test.com");
+                                                assertNotNull(updatedManager.getMainRole(),
+                                                                "Manager role should not be null after promotion");
+                                                assertEquals("USER", updatedManager.getMainRole(),
+                                                                "Manager role should be USER after promotion");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-manager endpoint with missing
-         * authorization header.
-         * This test retrieves a known manager user and performs a PUT request to
-         * revoke the manager role
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-manager
+         *
+         * Mock a request to revoke a manager into a user with missing header
          */
         @Test
         @Transactional
         public void revokeManagerRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto managerDto = userService.findByLogin("test.manager@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "revoke-manager-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-manager endpoint with a malformed token.
-         * This test retrieves a known manager user and performs a PUT request to
-         * revoke the manager role
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-manager
+         *
+         * Mock a request to revoke a manager into a user with malformed token
          */
         @Test
         @Transactional
@@ -698,36 +685,27 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto managerDto = userService.findByLogin("test.manager@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "revoke-manager-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-manager endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known manager user, generates an authentication
-         * token for a non-admin user,
-         * and performs a PUT request to revoke the manager role from the user.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-manager
+         *
+         * Mock a request to revoke a manager into a user as a non-admin user
          */
         @Test
         @Transactional
@@ -737,36 +715,27 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                403,
+                                "revoke-manager-non-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-manager endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to revoke the manager role from a non-existing
-         * user.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-manager
+         *
+         * Mock a request to revoke a manager into a user with a non-existing user
          */
         @Test
         @Transactional
@@ -777,24 +746,21 @@ public class UserControllerIntegrationTest {
 
                 String fakeUserId = "9999";
 
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "PUT",
+                                "/users/" + fakeUserId + "/revoke-manager",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                404,
+                                "revoke-manager-user-not-found",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
