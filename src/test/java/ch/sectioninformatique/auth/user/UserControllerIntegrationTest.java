@@ -230,7 +230,7 @@ public class UserControllerIntegrationTest {
         /**
          * Test: GET /users/me
          *
-         * Mock a user request for it's own informations with a malformed token.
+         * Mock a user request for it's own informations with a expired token.
          */
         @Test
         @Transactional
@@ -258,120 +258,110 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test the /users/all endpoint with real data.
-         * This test retrieves a known user, generates an authentication token,
-         * and performs a GET request to the /users/all endpoint.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/all
+         *
+         * Mock a user request for all users.
          */
         @Test
         @Transactional
         public void all_withRealData_shouldReturnSuccess() throws Exception {
+
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andReturn();
+                performRequest(
+                                "GET",
+                                "/users/all",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "all",
+                                request -> {
+                                        try {
+                                                MvcResult result = request.andReturn();
+                                                String responseBody = result.getResponse().getContentAsString();
 
-                String responseBody = result.getResponse().getContentAsString();
+                                                // Parse the JSON response
+                                                ObjectMapper mapper = new ObjectMapper();
+                                                List<Map<String, Object>> users = mapper.readValue(responseBody,
+                                                                new TypeReference<List<Map<String, Object>>>() {
+                                                                });
 
-                // Parse the JSON response
-                ObjectMapper mapper = new ObjectMapper();
-                List<Map<String, Object>> users = mapper.readValue(responseBody,
-                                new TypeReference<List<Map<String, Object>>>() {
+                                                // Assert the number of users is 4 (from the seeder)
+                                                assertEquals(4, users.size(), "Should return 4 users");
+
+                                                // Assert specific users are present
+                                                List<String> expectedLogins = List.of(
+                                                                "test.user@test.com",
+                                                                "test.manager@test.com",
+                                                                "test.admin@test.com",
+                                                                "test.admin2@test.com");
+
+                                                List<String> returnedLogins = users.stream()
+                                                                .map(user -> (String) user.get("login"))
+                                                                .collect(Collectors.toList());
+
+                                                assertTrue(returnedLogins.containsAll(expectedLogins),
+                                                                "Returned users should include all seeded logins");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
                                 });
-
-                // Assert the number of users is 4 (from the seeder)
-                assertEquals(4, users.size(), "Should return 4 users");
-
-                // Assert specific users are present
-                List<String> expectedLogins = List.of(
-                                "test.user@test.com",
-                                "test.manager@test.com",
-                                "test.admin@test.com",
-                                "test.admin2@test.com");
-
-                List<String> returnedLogins = users.stream()
-                                .map(user -> (String) user.get("login"))
-                                .collect(Collectors.toList());
-
-                assertTrue(returnedLogins.containsAll(expectedLogins),
-                                "Returned users should include all seeded logins");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-all-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
         }
 
         /**
-         * Test the /users/all endpoint with missing authorization header.
-         * This test performs a GET request to the /users/all endpoint
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/all
+         *
+         * Mock a user request for all users without header.
          */
         @Test
         @Transactional
         public void all_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
+                performRequest(
+                                "GET",
+                                "/users/all",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "all-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/all endpoint with a malformed token.
-         * This test performs a GET request to the /users/all endpoint
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: GET /users/all
+         *
+         * Mock a user request for all users with a malformed token.
          */
         @Test
         @Transactional
         public void all_withMalformedToken_shouldReturnUnauthorized() throws Exception {
                 String token = "this.is.not.a.valid.token";
 
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-all-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "GET",
+                                "/users/all",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "all-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
