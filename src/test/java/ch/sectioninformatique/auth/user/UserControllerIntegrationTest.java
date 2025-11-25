@@ -23,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,6 +60,10 @@ public class UserControllerIntegrationTest {
         /** UserService instance for user-related operations. */
         @Autowired
         private UserService userService;
+
+        /** UserRepository instance for user-related operations. */
+        @Autowired
+        private UserRepository userRepository;
 
         /**
          * Test the /users/me endpoint with real data.
@@ -1350,7 +1355,10 @@ public class UserControllerIntegrationTest {
 
                 String responseBody = result.getResponse().getContentAsString();
 
-                UserDto deletedUser = userService.findByLogin("test.user@test.com");
+                Optional<User> deletedUserOpt = userRepository.findByLogin("test.user@test.com");
+                assertTrue(deletedUserOpt.isPresent(), "User should exist in the database");
+
+                User deletedUser = deletedUserOpt.get(); // Extract the User
                 assertTrue(deletedUser.isDeleted(), "User should be marked as deleted");
 
                 // Save response to file for later tests
