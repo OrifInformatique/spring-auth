@@ -22,21 +22,19 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 
 /**
- * Security configuration class for the application.
- * This class configures Spring Security settings including:
- * - Authentication and authorization rules
- * - CORS configuration
- * - OAuth2 login settings
- * - JWT filter integration
- * - Session management
- * - Exception handling
+ * Spring Security configuration for the application.
+ * Configures:
+ * - JWT-based authentication and authorization
+ * - OAuth2 login with custom success/failure handling
+ * - CORS settings from application properties
+ * - Exception handling for authentication and access denied events
+ * - Session management (currently IF_REQUIRED)
  * 
- * The configuration ensures:
- * - Secure endpoints with appropriate authorization
- * - Cross-origin request handling
- * - Stateless session management
- * - Custom authentication failure handling
- * - OAuth2 integration for external authentication
+ * Ensures:
+ * - Secure endpoints with proper authorization rules
+ * - Stateless or minimal session usage
+ * - Proper handling of cross-origin requests
+ * - Logging of OAuth2 user information for debugging
  */
 @Configuration
 @EnableWebSecurity
@@ -69,28 +67,31 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     @Value("${cors.allowed-origins}")
-    private String[] allowedOrigins;
+    private String[] allowedOrigins; // Origins allowed for cross-origin requests, loaded from properties
 
     @Value("${cors.allowed-methods}")
-    private String[] allowedMethods;
+    private String[] allowedMethods; // HTTP methods allowed for CORS requests
 
     @Value("${cors.allowed-headers}")
-    private String[] allowedHeaders;
+    private String[] allowedHeaders; // HTTP headers allowed for CORS requests
 
     /**
-     * Configures the security filter chain with all necessary security settings.
-     * This method:
-     * - Sets up exception handling with custom entry point
-     * - Configures JWT authentication filter
-     * - Disables CSRF protection (not needed for stateless API)
-     * - Sets session management policy to ALWAYS
-     * - Configures CORS with allowed origins and methods
-     * - Sets up OAuth2 login with success/failure handlers
-     * - Defines HTTP request authorization rules
+     * Configures the Spring Security filter chain.
+     * 
+     * Configuration includes:
+     * - Exception handling using custom UserAuthenticationEntryPoint and
+     * AccessDeniedHandler
+     * - JWT authentication filter added before BasicAuthenticationFilter
+     * - CSRF protection disabled (suitable for stateless APIs)
+     * - Session management policy set to IF_REQUIRED
+     * - CORS configuration using allowed origins, methods, and headers from
+     * properties
+     * - OAuth2 login with custom success and failure handlers
+     * - Authorization rules for public endpoints and secured endpoints
      *
-     * @param http The HttpSecurity object to configure
-     * @return The configured SecurityFilterChain
-     * @throws Exception if security configuration fails
+     * @param http the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -164,15 +165,17 @@ public class SecurityConfig {
     }
 
     /**
-     * Creates and configures the OAuth2 user service for handling OAuth2
-     * authentication.
-     * This service:
-     * - Loads user information from the OAuth2 provider
-     * - Converts OAuth2 user data into an OAuth2User object
-     * - Logs user attributes for debugging
-     * - Uses the default OAuth2 user service implementation
+     * Configures the OAuth2UserService used by Spring Security.
+     * 
+     * Responsibilities:
+     * - Loads user details from the OAuth2 provider using DefaultOAuth2UserService
+     * - Converts provider-specific user information into a Spring Security
+     * OAuth2User
+     * - Logs user attributes for debugging purposes (avoid logging sensitive data
+     * in production)
      *
-     * @return Configured OAuth2UserService instance
+     * @return an OAuth2UserService that returns OAuth2User instances with provider
+     *         attributes
      */
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
