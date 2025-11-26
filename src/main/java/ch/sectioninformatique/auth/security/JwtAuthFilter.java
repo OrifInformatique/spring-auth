@@ -75,6 +75,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(
                             userAuthenticationProvider.validateTokenStrongly(authElements[1]));
                 } catch (JWTVerificationException e) {
+
                     SecurityContextHolder.clearContext();
                     log.debug("Invalid JWT token: {}", e.getMessage());
 
@@ -85,9 +86,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
                     response.getWriter().flush();
                     return;
+
                 } catch (RuntimeException e) {
                     // Preserve behavior for other runtime exceptions
                     SecurityContextHolder.clearContext();
+                    log.error("Unexpected error during JWT validation", e);
                     throw e;
                 }
             }
