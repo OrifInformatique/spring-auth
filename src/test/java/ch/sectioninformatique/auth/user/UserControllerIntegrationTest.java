@@ -17,9 +17,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -53,7 +50,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
  * 
  * The tests use MockMvc to perform HTTP requests and verify responses.
  */
-@Tag("integration")
 @SpringBootTest(classes = AuthApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
@@ -1208,14 +1204,9 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test the /users/{userId} DELETE endpoint with real data.
-         * This test retrieves a known user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a DELETE request to delete the user.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: DELETE /users/{userId}
+         *
+         * Mock a request to delete a user.
          */
         @Test
         @Transactional
@@ -1226,68 +1217,62 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc.perform(delete("/users/" + userDto.getId().toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message").value("User deleted successfully"))
-                                .andExpect(jsonPath("$.deletedUserLogin").value("test.user@test.com"))
-                                .andReturn();
+                performRequest(
+                                "DELETE",
+                                "/users/" + userDto.getId(),
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "delete",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value("User deleted successfully"))
+                                                                .andExpect(jsonPath("$.deletedUserLogin")
+                                                                                .value("test.user@test.com"));
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                UserDto deletedUser = userService.findByLogin("test.user@test.com");
-                assertTrue(deletedUser.isDeleted(), "User should be marked as deleted");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-deleteUser-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                                UserDto deletedUser = userService.findByLogin("test.user@test.com");
+                                                assertTrue(deletedUser.isDeleted(), "User should be marked as deleted");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId} DELETE endpoint with missing authorization
+         * Test: DELETE /users/{userId}
+         *
+         * Mock a request to delete a user with missing authorization
          * header.
-         * This test retrieves a known user and performs a DELETE request to delete
-         * the user
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
          */
         @Test
         @Transactional
         public void deleteUser_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                MvcResult result = mockMvc.perform(delete("/users/" + userDto.getId().toString())
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                performRequest(
+                                "DELETE",
+                                "/users/" + userDto.getId(),
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "delete-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId} DELETE endpoint with a malformed token.
-         * This test retrieves a known user and performs a DELETE request to delete
-         * the user
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: DELETE /users/{userId}
+         *
+         * Mock a request to delete a user with malformed authorization
+         * header.
          */
         @Test
         @Transactional
@@ -1295,22 +1280,21 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                MvcResult result = mockMvc.perform(delete("/users/" + userDto.getId().toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-deleteUser-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                performRequest(
+                                "DELETE",
+                                "/users/" + userDto.getId(),
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "delete-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 }

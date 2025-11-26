@@ -38,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
  * These tests use real data and the actual application context to verify
  * the authentication endpoints.
  */
-@Tag("integration")
 @SpringBootTest(classes = AuthApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
