@@ -97,7 +97,7 @@ public class SecurityConfig {
                     csrf.disable();
                 })
                 .sessionManagement(customizer -> {
-                    log.debug("Setting session creation policy to ALWAYS");
+                    log.debug("Setting session creation policy to IF_REQUIRED");
                     customizer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
                 })
                 .cors(cors -> {
@@ -127,7 +127,6 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> {
                     log.debug("Configuring OAuth2 login");
                     oauth2
-                            .defaultSuccessUrl("/oauth2/success", true)
                             .failureHandler((request, response, exception) -> {
                                 log.error("OAuth2 authentication failed: {}", exception.getMessage(), exception);
                                 Throwable cause = exception.getCause();

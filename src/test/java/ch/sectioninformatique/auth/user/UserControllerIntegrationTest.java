@@ -934,7 +934,6 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-
                 performRequest(
                                 "PUT",
                                 "/users/" + adminDto.getId() + "/promote-admin",
@@ -952,16 +951,10 @@ public class UserControllerIntegrationTest {
                                 });
         }
 
-
         /**
-         * Test the /users/{userId}/revoke-admin endpoint with real data.
-         * This test retrieves a known admin user and another admin user,
-         * generates an authentication token for the first admin,
-         * and performs a PUT request to revoke the admin role from the second admin.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to revoke an admin into a user.
          */
         @Test
         @Transactional
@@ -972,73 +965,63 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role revoked successfully"))
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "revoke-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(content().string("Admin role revoked successfully"));
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch admin again and verify role changed to USER
-                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
-                assertNotNull(updatedAdmin.getMainRole(), "Admin role should not be null after promotion");
-                assertEquals("USER", updatedAdmin.getMainRole(),
-                                "Admin role should be USER after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                                // Assert: fetch admin again and verify role changed to USER
+                                                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
+                                                assertNotNull(updatedAdmin.getMainRole(),
+                                                                "Admin role should not be null after promotion");
+                                                assertEquals("USER", updatedAdmin.getMainRole(),
+                                                                "Admin role should be USER after promotion");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-admin endpoint with missing
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to revoke an admin into a user with missing
          * authorization header.
-         * This test retrieves a known admin user and performs a PUT request to
-         * revoke the admin role
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
          */
         @Test
         @Transactional
         public void revokeAdminRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "revoke-admin-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-admin endpoint with a malformed token.
-         * This test retrieves a known admin user and performs a PUT request to
-         * revoke the admin role
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to revoke an admin into a user with malformed token.
          */
         @Test
         @Transactional
@@ -1046,37 +1029,28 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "revoke-admin-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-admin endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known admin user and generates an authentication
-         * token for a non-admin user,
-         * and performs a PUT request to revoke the admin role from the user.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to revoke an admin into a user as a non-admin user.
          */
         @Test
         @Transactional
@@ -1086,36 +1060,28 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                403,
+                                "revoke-admin-non-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/revoke-admin endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to revoke the admin role from a non-existing user.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to revoke an admin into a user with a non-existing user.
          */
         @Test
         @Transactional
@@ -1126,35 +1092,28 @@ public class UserControllerIntegrationTest {
 
                 String fakeUserId = "9999";
 
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/revoke-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + fakeUserId + "/revoke-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                404,
+                                "revoke-admin-user-not-found",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/downgrade-admin endpoint with real data.
-         * This test retrieves a known admin user and another admin user,
-         * generates an authentication token for the first admin,
-         * and performs a PUT request to downgrade the second admin to manager.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to downgrade an admin into a manager.
          */
         @Test
         @Transactional
@@ -1165,72 +1124,64 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role downgraded successfully"))
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToDowngradeDto.getId() + "/downgrade-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "downgrade-admin",
+                                request -> {
+                                        try {
+                                                request.andExpect(
+                                                                content().string("Admin role downgraded successfully"));
 
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response.txt");
-
-                // Assert: fetch admin again and verify role changed to MANAGER
-                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
-                assertNotNull(updatedAdmin.getMainRole(), "Admin role should not be null after promotion");
-                assertEquals("MANAGER", updatedAdmin.getMainRole(),
-                                "Admin role should be MANAGER after promotion");
-
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-downgradeAdminRole-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                                // Assert: fetch admin again and verify role changed to MANAGER
+                                                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
+                                                assertNotNull(updatedAdmin.getMainRole(),
+                                                                "Admin role should not be null after promotion");
+                                                assertEquals("MANAGER", updatedAdmin.getMainRole(),
+                                                                "Admin role should be MANAGER after promotion");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/downgrade-admin endpoint with missing
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to downgrade an admin into a manager with missing
          * authorization header.
-         * This test retrieves a known admin user and performs a PUT request to
-         * downgrade the admin role
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
          */
         @Test
         @Transactional
         public void downgradeAdminRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToDowngradeDto.getId() + "/downgrade-admin",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "downgrade-admin-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
 
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
-         * Test the /users/{userId}/downgrade-admin endpoint with a malformed token.
-         * This test retrieves a known admin user and performs a PUT request to
-         * downgrade the admin role
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
+         * Test: PUT /users/{userId}/revoke-admin
+         *
+         * Mock a request to downgrade an admin into a manager with a malformed token
          */
         @Test
         @Transactional
@@ -1238,24 +1189,22 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+                performRequest(
+                                "PUT",
+                                "/users/" + adminToDowngradeDto.getId() + "/downgrade-admin",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "downgrade-admin-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
 
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-downgradeAdminRole-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
         }
 
         /**
