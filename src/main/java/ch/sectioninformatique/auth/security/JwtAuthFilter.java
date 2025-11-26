@@ -82,7 +82,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
 
-            Map<String, String> errorBody = Map.of("message", e.getMessage());
+            Map<String, String> errorBody = Map.of("message", "Invalid or expired token");
             mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
             response.getWriter().flush();
             return;
