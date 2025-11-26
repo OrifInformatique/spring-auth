@@ -25,11 +25,6 @@ import java.util.Map;
  * - Intercepts all incoming HTTP requests
  * - Validates JWT tokens in the Authorization header
  * - Sets up Spring Security context with authenticated user information
- * 
- * The filter implements different validation strategies based on the HTTP
- * method:
- * - GET requests use standard token validation
- * - Other methods use strong token validation
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -67,10 +62,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-
-        if (request == null || response == null || filterChain == null) {
-            throw new IllegalArgumentException("Request, response and filterChain cannot be null");
-        }
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
