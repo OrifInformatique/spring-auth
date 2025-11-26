@@ -64,35 +64,37 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null || !header.toLowerCase().startsWith("bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (header != null) {
-            String[] authElements = header.split(" ");
+        String[] authElements = header.split(" ");
 
-            if (authElements.length == 2
-                    && "Bearer".equalsIgnoreCase(authElements[0])) {
-                try {
+        if (authElements.length == 2
+                && "Bearer".equalsIgnoreCase(authElements[0])) {
+            try {
 
-                    SecurityContextHolder.getContext().setAuthentication(
-                            userAuthenticationProvider.validateTokenStrongly(authElements[1]));
-                } catch (JWTVerificationException e) {
+                SecurityContextHolder.getContext().setAuthentication(
+                        userAuthenticationProvider.validateTokenStrongly(authElements[1]));
+            } catch (JWTVerificationException e) {
 
-                    SecurityContextHolder.clearContext();
-                    log.debug("Invalid JWT token: {}", e.getMessage());
+                SecurityContextHolder.clearContext();
+                log.debug("Invalid JWT token: {}", e.getMessage());
 
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
 
-                    Map<String, String> errorBody = Map.of("message", e.getMessage());
-                    mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
-                    response.getWriter().flush();
-                    return;
+                Map<String, String> errorBody = Map.of("message", e.getMessage());
+                mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
+                response.getWriter().flush();
+                return;
 
-                } catch (RuntimeException e) {
-                    // Preserve behavior for other runtime exceptions
-                    SecurityContextHolder.clearContext();
-                    log.error("Unexpected error during JWT validation", e);
-                    throw e;
-                }
+            } catch (RuntimeException e) {
+                // Preserve behavior for other runtime exceptions
+                SecurityContextHolder.clearContext();
+                log.error("Unexpected error during JWT validation", e);
+                throw e;
             }
         }
 
