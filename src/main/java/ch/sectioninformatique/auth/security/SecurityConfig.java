@@ -1,6 +1,8 @@
 package ch.sectioninformatique.auth.security;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -66,6 +68,9 @@ public class SecurityConfig {
      */
     private final JwtAuthFilter jwtAuthFilter;
 
+    @Value("${cors.allowed-origins}")
+    private String[] allowedOrigins;
+
     /**
      * Configures the security filter chain with all necessary security settings.
      * This method:
@@ -104,10 +109,7 @@ public class SecurityConfig {
                     log.debug("Configuring CORS");
                     cors.configurationSource(request -> {
                         var corsConfig = new CorsConfiguration();
-                        corsConfig.setAllowedOrigins(Arrays.asList(
-                                "http://localhost:3000",
-                                "http://localhost:4000",
-                                "http://localhost:8080"));
+                        corsConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
 
                         corsConfig.setAllowedMethods(Arrays.asList(
                                 "GET", "POST", "PUT", "DELETE", "OPTIONS"));
