@@ -71,6 +71,12 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins;
 
+    @Value("${cors.allowed-methods}")
+    private String[] allowedMethods;
+
+    @Value("${cors.allowed-headers}")
+    private String[] allowedHeaders;
+
     /**
      * Configures the security filter chain with all necessary security settings.
      * This method:
@@ -110,18 +116,8 @@ public class SecurityConfig {
                     cors.configurationSource(request -> {
                         var corsConfig = new CorsConfiguration();
                         corsConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
-
-                        corsConfig.setAllowedMethods(Arrays.asList(
-                                "GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-                        corsConfig.setAllowedHeaders(Arrays.asList(
-                                "Authorization",
-                                "Content-Type",
-                                "Accept"));
-
-                        corsConfig.setExposedHeaders(Arrays.asList(
-                                "Authorization"));
-
+                        corsConfig.setAllowedMethods(Arrays.asList(allowedMethods));
+                        corsConfig.setAllowedHeaders(Arrays.asList(allowedHeaders));
                         corsConfig.setAllowCredentials(true);
                         return corsConfig;
                     });
