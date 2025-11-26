@@ -40,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     private final UserAuthenticationProvider userAuthenticationProvider;
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
     /**
      * Processes each incoming request to validate JWT tokens.
