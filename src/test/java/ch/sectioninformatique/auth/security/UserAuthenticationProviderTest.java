@@ -78,37 +78,6 @@ class UserAuthenticationProviderTest {
     }
 
     /**
-     * Tests the basic token validation.
-     * Verifies that:
-     * - Valid token is accepted
-     * - Authentication object is created with correct user details
-     * - Authorities are properly set
-     */
-    @Test
-    void testValidateToken() {
-        // Given
-        UserDto user = UserDto.builder()
-                .login(TEST_LOGIN)
-                .firstName(TEST_FIRST_NAME)
-                .lastName(TEST_LAST_NAME)
-                .mainRole("USER")
-                .permissions(Arrays.asList("read", "write"))
-                .build();
-
-        String token = authenticationProvider.createToken(user);
-
-        // When
-        Authentication authentication = authenticationProvider.validateToken(token);
-
-        // Then
-        assertNotNull(authentication);
-        assertTrue(authentication instanceof UsernamePasswordAuthenticationToken);
-        assertEquals(TEST_LOGIN, ((UserDto) authentication.getPrincipal()).getLogin());
-        assertTrue(authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().startsWith("ROLE_")));
-    }
-
-    /**
      * Tests the strong token validation with existing user.
      * Verifies that:
      * - User is found in database

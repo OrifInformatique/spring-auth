@@ -135,40 +135,6 @@ public class UserAuthenticationProvider {
     }
 
     /**
-     * Validates a JWT token and creates an Authentication object.
-     * This method performs basic token validation without checking the database.
-     * It verifies:
-     * - Token signature using the secret key
-     * - Token expiration
-     * - Token claims (user information)
-     *
-     * @param token The JWT token to validate
-     * @return Authentication object containing the user's information and
-     *         authorities
-     */
-    public Authentication validateToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-        JWTVerifier verifier = JWT.require(algorithm)
-                .build();
-
-        DecodedJWT decoded = verifier.verify(token);
-        log.debug("Token verified for subject: {}", decoded.getSubject());
-
-        UserDto user = UserDto.builder()
-                .login(decoded.getSubject())
-                .firstName(decoded.getClaim("firstName").asString())
-                .lastName(decoded.getClaim("lastName").asString())
-                .mainRole(decoded.getClaim("mainRole").asString())
-                .permissions(decoded.getClaim("permissions").asList(String.class))
-                .build();
-        List<String> allRoles = new ArrayList<>();
-        allRoles.add(user.getMainRole());
-        List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
-        return new UsernamePasswordAuthenticationToken(user, null, authorities);
-    }
-
-    /**
      * Performs strong validation of a JWT token with database verification.
      * This method:
      * 1. Validates the token signature and claims
