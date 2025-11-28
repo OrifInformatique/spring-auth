@@ -150,7 +150,7 @@ public class UserAuthenticationProvider {
      * @return Authentication object containing the user's information and
      *         authorities
      */
-    public Authentication validateTokenStrongly(String token) {
+    public Authentication validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
         JWTVerifier verifier = JWT.require(algorithm)

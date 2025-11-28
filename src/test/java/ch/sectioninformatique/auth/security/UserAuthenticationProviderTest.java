@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -99,7 +99,7 @@ class UserAuthenticationProviderTest {
         when(userService.findByLogin(TEST_LOGIN)).thenReturn(user);
 
         // When
-        Authentication authentication = authenticationProvider.validateTokenStrongly(token);
+        Authentication authentication = authenticationProvider.validateToken(token);
 
         // Then
         assertNotNull(authentication);
@@ -130,7 +130,7 @@ class UserAuthenticationProviderTest {
         when(userService.createAzureUser(any())).thenReturn(user);
 
         // When
-        Authentication authentication = authenticationProvider.validateTokenStrongly(token);
+        Authentication authentication = authenticationProvider.validateToken(token);
 
         // Then
         assertNotNull(authentication);
