@@ -40,7 +40,7 @@ public class UserAuthenticationProvider {
      * Secret key for JWT token signing and verification, configured via application
      * properties
      */
-    @Value("${security.jwt.token.secret-key:secret-key}")
+    @Value("${security.jwt.token.secret-key}")
     private String secretKey;
 
     /**
