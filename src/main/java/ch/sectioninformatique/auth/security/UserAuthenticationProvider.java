@@ -48,6 +48,9 @@ public class UserAuthenticationProvider {
      */
     private final UserService userService;
 
+    @Value("${spring.security.oauth2.client.provider.azure.issuer-uri}")
+    private String azureUri;
+
     /**
      * Initializes the authentication provider by encoding the secret key.
      * This method is called after dependency injection to ensure the secret key
@@ -68,7 +71,7 @@ public class UserAuthenticationProvider {
      * - Role and permissions as claims
      * - Issue time and expiration time (1 hour validity)
      *
-     * @param user The user to create a token for
+     * @param user           The user to create a token for
      * @param expirationDate Optional expiration date for the token
      * @return A JWT token string containing the user's information and permissions
      */
@@ -189,11 +192,16 @@ public class UserAuthenticationProvider {
         } catch (Exception e) {
             // If user doesn't exist, create a new Azure user
             log.debug("User not found, creating new Azure user: {}", decoded.getSubject());
+            DecodedJWT decodedAzure = JWT.decode(token);
+            String issuer = decodedAzure.getIssuer();
+            if (!issuer.equals(azureUri)) {
+                throw new SecurityException("Token not from trusted Azure tenant");
+            }
 
             UserDto newUser = UserDto.builder()
-                    .login(decoded.getSubject())
-                    .firstName(decoded.getClaim("firstName").asString())
-                    .lastName(decoded.getClaim("lastName").asString())
+                    .login(decodedAzure.getSubject())
+                    .firstName(decodedAzure.getClaim("firstName").asString())
+                    .lastName(decodedAzure.getClaim("lastName").asString())
                     .mainRole("USER")
                     .build();
 
