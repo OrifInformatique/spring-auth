@@ -4,6 +4,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,13 +69,13 @@ public class UserAuthenticationProvider {
      * - Role and permissions as claims
      * - Issue time and expiration time (1 hour validity)
      *
-     * @param user The user to create a token for
+     * @param user           The user to create a token for
      * @param expirationDate Optional expiration date for the token
      * @return A JWT token string containing the user's information and permissions
      */
     public String createToken(UserDto user, Date... expirationDate) {
         Date now = expirationDate.length > 0 ? expirationDate[0] : new Date();
-        Date validity = new Date(now.getTime() + 3600000); // 1 hour
+        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(5)); // 5 minutes
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
@@ -97,7 +98,7 @@ public class UserAuthenticationProvider {
      */
     public String createRefreshToken(UserDto user) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 720000000); // 200 hours ~8 days
+        Date validity = new Date(now.getTime() + TimeUnit.DAYS.toMillis(30)); // 30 days
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
@@ -242,5 +243,30 @@ public class UserAuthenticationProvider {
                     newUser.getPermissions());
             return new UsernamePasswordAuthenticationToken(newUser, null, authorities);
         }
+    }
+
+    /**
+     * Validates a JWT refresh token and returns its decoded representation.
+     * 
+     * This method verifies the token's signature using the server's secret key.
+     * If the token is invalid, expired, or tampered with, the verifier will throw
+     * a JWTVerificationException.
+     * 
+     * Security considerations:
+     * 
+     * Always validate refresh tokens before issuing a new access token.
+     * Do not trust the token content without verification.
+     * Use a strong secret key and keep it secure.
+     * 
+     *
+     * @param token The JWT refresh token to validate.
+     * @return A {@link DecodedJWT} object representing the validated token.
+     * @throws com.auth0.jwt.exceptions.JWTVerificationException if the token is
+     *                                                           invalid or expired.
+     */
+    public DecodedJWT validateRefreshToken(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        return verifier.verify(token);
     }
 }

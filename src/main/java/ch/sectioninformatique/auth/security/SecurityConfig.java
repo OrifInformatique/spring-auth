@@ -134,6 +134,7 @@ public class SecurityConfig {
                 requests
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/oauth2/authorization/**").permitAll()
                         .requestMatchers("/oauth2/success").authenticated()

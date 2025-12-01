@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
+import ch.sectioninformatique.auth.auth.RefreshToken;
+import ch.sectioninformatique.auth.auth.RefreshTokenRepository;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
@@ -21,6 +23,8 @@ import jakarta.persistence.EntityManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +62,8 @@ public class UserService {
     /** Mapper for converting between User entities and DTOs */
     private final UserMapper userMapper;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+
     /**
      * Authenticates a user with their credentials.
      *
@@ -76,16 +82,75 @@ public class UserService {
     }
 
     /**
-     * Authenticates a user refreshing his login.
+     * Stores a refresh token for a user, optionally rotating the previous token.
+     * 
+     * The token is hashed before being saved in the database. Previous tokens
+     * are removed to enforce token rotation.
      *
-     * @param login The user's login
-     * @return UserDto containing the authenticated user's information
-     * @throws AppException if the user is not found
+     * @param userLogin    The login/username of the user.
+     * @param refreshToken The raw refresh token to store.
+     * @param expiresAt    The expiration timestamp of the refresh token.
      */
-    public UserDto refreshLogin(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
-        return userMapper.toUserDto(user);
+    @Transactional
+    public void storeRefreshToken(String userLogin, String refreshToken, Instant expiresAt) {
+        String hashed = hash(refreshToken);
+
+        // remove previous token if rotation enabled
+        refreshTokenRepository.deleteByUserLogin(userLogin);
+
+        RefreshToken token = new RefreshToken();
+        token.setUserLogin(userLogin);
+        token.setTokenHash(hashed);
+        token.setExpiresAt(expiresAt);
+
+        refreshTokenRepository.save(token);
+    }
+
+    /**
+     * Validates a refresh token for a given user.
+     * 
+     * Checks that the token exists, matches the stored hashed token, is not
+     * revoked,
+     * and has not expired.
+     *
+     * @param userLogin    The login/username of the user.
+     * @param refreshToken The raw refresh token to validate.
+     * @return {@code true} if the token is valid, {@code false} otherwise.
+     */
+    public boolean validate(String userLogin, String refreshToken) {
+        return refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
+                .filter(stored -> passwordEncoder.matches(refreshToken, stored.getTokenHash()))
+                .filter(stored -> stored.getExpiresAt().isAfter(Instant.now()))
+                .isPresent();
+    }
+
+    /**
+     * Revokes a refresh token for a given user.
+     * 
+     * Once revoked, the token cannot be used to obtain new access tokens.
+     *
+     * @param userLogin The login/username of the user whose token should be
+     *                  revoked.
+     */
+    public void revoke(String userLogin) {
+        refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
+                .ifPresent(token -> {
+                    token.setRevoked(true);
+                    refreshTokenRepository.save(token);
+                });
+    }
+
+    /**
+     * Hashes a raw token using a secure password encoder.
+     * 
+     * Storing hashed tokens prevents the raw token from being exposed in case
+     * of a database compromise.
+     *
+     * @param token The raw refresh token to hash.
+     * @return The hashed representation of the token.
+     */
+    private String hash(String token) {
+        return passwordEncoder.encode(token);
     }
 
     /**

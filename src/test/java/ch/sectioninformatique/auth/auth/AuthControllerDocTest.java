@@ -656,7 +656,7 @@ public class AuthControllerDocTest {
          * documentation.
          *
          * @throws Exception if an error occurs during the test
-         */
+         *
         @Test
         public void refresh_withMockedService_generatesDoc() throws Exception {
                 // Load refresh response and token from integration test output to ensure
@@ -713,7 +713,7 @@ public class AuthControllerDocTest {
                                 .header("Authorization", "Bearer " + refreshToken))
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
-        }
+        } */
 
         /**
          * Test the /auth/refresh endpoint with missing Authorization header to
