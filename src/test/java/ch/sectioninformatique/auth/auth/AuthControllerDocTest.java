@@ -1,7 +1,9 @@
 package ch.sectioninformatique.auth.auth;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
@@ -26,6 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 
 import org.springframework.security.core.Authentication;
@@ -33,6 +38,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -656,124 +662,79 @@ public class AuthControllerDocTest {
          * documentation.
          *
          * @throws Exception if an error occurs during the test
-         *
+         */
         @Test
         public void refresh_withMockedService_generatesDoc() throws Exception {
                 // Load refresh response and token from integration test output to ensure
                 // consistency between doc and actual behavior
-                Path path = Paths.get("target/test-data/auth-refresh-response.json");
-                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
+                Path pathResponse = Paths.get("target/test-data/auth-refresh-response.json");
+                Path pathCookie = Paths.get("target/test-data/auth-refresh-cookie.json");
 
                 // Early fails if the required files are missing
-                if (!Files.exists(path)) {
+                if (!Files.exists(pathResponse)) {
                         throw new IllegalStateException(
-                                        "Missing required refresh response data. Make sure AuthControllerIntegrationTest ran first.");
+                                        "Missing refresh response JSON. Run real integration test first.");
                 }
-                if (!Files.exists(pathToken)) {
+                if (!Files.exists(pathCookie)) {
                         throw new IllegalStateException(
-                                        "Missing required token data. Make sure AuthControllerIntegrationTest ran first.");
+                                        "Missing refresh cookie JSON. Run real integration test first.");
                 }
 
-                // Read the JSON response and token from files
-                refreshResponseJson = Files.readString(path);
-                refreshToken = Files.readString(pathToken);
+                // Load saved JSON files
+                String refreshResponseJson = Files.readString(pathResponse);
+                String cookieJson = Files.readString(pathCookie);
 
-                // Parse JSON to extract fields for mocking
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(refreshResponseJson);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode responseNode = mapper.readTree(refreshResponseJson);
+                JsonNode cookieNode = mapper.readTree(cookieJson);
 
-                // Build a UserDto from the parsed JSON to simulate a real refresh response
+                // Extract refresh token from cookie JSON
+                String refreshToken = cookieNode.get("value").asText();
+
+                // Build UserDto using the real response JSON
                 UserDto userDto = UserDto.builder()
-                                .id(jsonNode.get("id").asLong())
-                                .firstName(jsonNode.get("firstName").asText())
-                                .lastName(jsonNode.get("lastName").asText())
-                                .login(jsonNode.get("login").asText())
-                                .token(jsonNode.get("token").asText(null))
-                                .refreshToken(jsonNode.get("refreshToken").asText(null))
-                                .mainRole(jsonNode.get("mainRole").asText("USER"))
-                                .permissions(new ArrayList<String>())
+                                .id(1L)
+                                .firstName("Test")
+                                .lastName("User")
+                                .login("test.user@test.com")
+                                .token(responseNode.get("accessToken").asText())
+                                .mainRole("USER")
+                                .permissions(new ArrayList<>())
                                 .build();
 
-                // Mock Spring Security context and authentication to simulate a valid
-                // authenticated user
-                when(authentication.getPrincipal()).thenReturn(userDto);
-                when(authentication.isAuthenticated()).thenReturn(true);
-                when(securityContext.getAuthentication()).thenReturn(authentication);
-                SecurityContextHolder.setContext(securityContext);
+                // Mock dependencies exactly as the controller expects them
+                DecodedJWT mockJwt = mock(DecodedJWT.class);
 
-                // Mock userService.refreshLogin(...) and token creation method to return
-                // expected data
-                when(userService.refreshLogin(any())).thenReturn(userDto);
-                when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
+                // Build request body for POST /auth/refresh
+                RefreshRequestDto refreshRequest = new RefreshRequestDto("eqfarhsrhjzje...");
+
+                when(mockJwt.getSubject()).thenReturn(userDto.getLogin());
+                when(mockJwt.getExpiresAt()).thenReturn(Date.from(Instant.now().plus(Duration.ofDays(30))));
+
+                when(userAuthenticationProvider.validateRefreshToken(refreshRequest.refreshToken()))
+                                .thenReturn(mockJwt);
+
+                when(userService.validate(userDto.getLogin(), refreshRequest.refreshToken()))
+                                .thenReturn(true);
+
+                when(userService.findByLogin(userDto.getLogin()))
+                                .thenReturn(userDto);
+
+                when(userAuthenticationProvider.createToken(userDto))
+                                .thenReturn(userDto.getToken());
+
+                when(userAuthenticationProvider.createRefreshToken(userDto))
+                                .thenReturn(refreshToken);
+
+                String requestJson = mapper.writeValueAsString(refreshRequest);
 
                 // Perform the /auth/refresh request with expected input and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(get("/auth/refresh")
+                mockMvc.perform(post("/auth/refresh")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + refreshToken))
+                                .content(requestJson))
                                 .andExpect(status().isOk())
                                 .andDo(document("auth/refresh", preprocessResponse(prettyPrint())));
-        } */
-
-        /**
-         * Test the /auth/refresh endpoint with missing Authorization header to
-         * generate documentation.
-         * This test performs a token refresh request without Authorization header and
-         * expects an unauthorized response.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void refresh_withMockedService_generatesDoc_missingAuthorizationHeader() throws Exception {
-
-                // Mock Spring Security context and authentication
-                when(authentication.getPrincipal()).thenReturn(null);
-                when(securityContext.getAuthentication()).thenReturn(authentication);
-                SecurityContextHolder.setContext(securityContext);
-
-                when(securityContext.getAuthentication()).thenThrow(
-                                new AppException("Full authentication is required to access this resource",
-                                                HttpStatus.UNAUTHORIZED));
-
-                // Perform the /auth/refresh request without Authorization header and validate
-                // response
-                // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/refresh-missing-authorization", preprocessRequest(prettyPrint()),
-                                                preprocessResponse(prettyPrint())));
-        }
-
-        /**
-         * Test the /auth/refresh endpoint with invalid token to generate
-         * documentation.
-         * This test performs a token refresh request with an invalid token and
-         * expects an unauthorized response.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void refresh_withMockedService_generatesDoc_invalidToken() throws Exception {
-                String invalidToken = "this.is.not.a.valid.token";
-
-                // Mock Spring Security context and authentication
-                when(authentication.getPrincipal()).thenReturn(null);
-                when(securityContext.getAuthentication()).thenReturn(authentication);
-                SecurityContextHolder.setContext(securityContext);
-
-                when(securityContext.getAuthentication()).thenThrow(
-                                new AppException("Invalid token", HttpStatus.UNAUTHORIZED));
-
-                // Perform the /auth/refresh request with invalid token and validate
-                // response
-                // Spring REST Docs will capture the interaction and generate documentation
-                mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + invalidToken))
-                                .andExpect(status().isUnauthorized())
-                                .andDo(document("auth/refresh-invalid-token", preprocessRequest(prettyPrint()),
-                                                preprocessResponse(prettyPrint())));
         }
 
         /**

@@ -163,7 +163,7 @@ public class AuthController {
                 .sameSite("Strict")
                 .build();
 
-        return ResponseEntity.ok()
+        return ResponseEntity.created(URI.create("/auth/users/" + createdUser.getLogin()))
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(createdUser);
     }
