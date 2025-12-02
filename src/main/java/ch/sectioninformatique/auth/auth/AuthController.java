@@ -97,7 +97,8 @@ public class AuthController {
      * 
      * - Validates the refresh token and ensures it matches the stored token.
      * - Rotates refresh tokens to enhance security (prevents reuse).
-     * - Returns a new access token and sets the new refresh token as HTTP-only cookie.
+     * - Returns a new access token and sets the new refresh token as HTTP-only
+     * cookie.
      *
      * @param request DTO containing the refresh token.
      * @return ResponseEntity containing a new access token.
@@ -144,9 +145,27 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
         UserDto createdUser = userService.register(user);
-        createdUser.setToken(userAuthenticationProvider.createToken(createdUser));
-        createdUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(createdUser));
-        return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+
+        String accessToken = userAuthenticationProvider.createToken(createdUser);
+        String refreshToken = userAuthenticationProvider.createRefreshToken(createdUser);
+
+        createdUser.setToken(accessToken);
+
+        // Store refresh token in database with expiration
+        userService.storeRefreshToken(createdUser.getLogin(), refreshToken, Instant.now().plus(Duration.ofDays(30)));
+
+        // Create secure HTTP-only cookie for the refresh token
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh")
+                .maxAge(Duration.ofDays(30))
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(createdUser);
     }
 
     /**

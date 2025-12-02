@@ -72,7 +72,7 @@ public class UserService {
      * @throws AppException if the user is not found or the password is invalid
      */
     public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByLogin(credentialsDto.login())
+        User user = userRepository.findByLoginAndDeletedFalse(credentialsDto.login())
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
@@ -195,7 +195,7 @@ public class UserService {
     @Transactional
     public void updatePassword(String login, PasswordUpdateDto passwords) {
 
-        User user = userRepository.findByLogin(login)
+        User user = userRepository.findByLoginAndDeletedFalse(login)
                 .orElseThrow(() -> new AppException("Invalid credentials", HttpStatus.UNAUTHORIZED));
 
         if (passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword()) == false) {
@@ -217,7 +217,7 @@ public class UserService {
     public UserDto findByLogin(String login) {
         log.debug("Searching for user with login: {}", login);
 
-        Optional<User> userOptional = userRepository.findByLogin(login);
+        Optional<User> userOptional = userRepository.findByLoginAndDeletedFalse(login);
         log.debug("User found in database: {}", userOptional.isPresent());
 
         User user = userOptional
@@ -255,9 +255,9 @@ public class UserService {
      *
      * @return List of all User entities including soft-deleted
      */
-    public List<User> allDeletedUsers() {
+    public List<User> allWithDeletedUsers() {
         List<User> users = new ArrayList<>();
-        userRepository.findAllIncludingDeleted().forEach(users::add);
+        userRepository.findAllWithDeleted().forEach(users::add);
         return users;
     }
 
@@ -462,11 +462,11 @@ public class UserService {
     }
 
     /**
-     * Deletes a user from the system.
+     * Soft-deletes a user from the system.
      * This operation:
      * - Verifies the user exists
      * - Checks if the authenticated user has sufficient permissions
-     * - Deletes the user
+     * - Soft-deletes the user
      *
      * @param userId The ID of the user to delete
      * @return The deleted User entity, or null if deletion was successful
@@ -509,7 +509,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found or the authenticated user
      *                          lacks permissions
      */
-    public UserDto hardDeleteUser(Long userId) {
+    public UserDto deletePermanentUser(Long userId) {
         // Get the user to delete
         User userToDelete = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));

@@ -780,12 +780,12 @@ public class AuthControllerDocTest {
          * Test the /auth/update-password endpoint with mocked services to generate
          * documentation.
          * This test stubs the SecurityContext to simulate an authenticated user,
-         * performs a set password request, and generates API documentation.
+         * performs an update password request, and generates API documentation.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
-        public void setPassword_withMockedService_generatesDoc() throws Exception {
+        public void updatePassword_withMockedService_generatesDoc() throws Exception {
                 UserDto mockedUserDto = UserDto.builder()
                                 .id(1L)
                                 .login("test.user@test.com")
@@ -814,13 +814,13 @@ public class AuthControllerDocTest {
         /**
          * Test the /auth/update-password endpoint with missing password to generate
          * documentation.
-         * This test performs a set password request with missing password and
+         * This test performs an update password request with missing password and
          * expects a bad request response.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
-        public void setPassword_withMockedService_generatesDoc_missingBody() throws Exception {
+        public void updatePassword_withMockedService_generatesDoc_missingBody() throws Exception {
                 UserDto mockedUserDto = UserDto.builder()
                                 .id(1L)
                                 .login("test.user@test.com")
@@ -848,13 +848,13 @@ public class AuthControllerDocTest {
         /**
          * Test the /auth/update-password endpoint with missing token to generate
          * documentation.
-         * This test performs a set password request with missing token and
+         * This test performs an update password request with missing token and
          * expects a unauthorized response.
          *
          * @throws Exception if an error occurs during the test
          */
         @Test
-        public void setPassword_withMockedService_generatesDoc_missingToken() throws Exception {
+        public void updatePassword_withMockedService_generatesDoc_missingToken() throws Exception {
 
                 // Mock Spring Security context and authentication
                 when(authentication.getPrincipal()).thenReturn(null);

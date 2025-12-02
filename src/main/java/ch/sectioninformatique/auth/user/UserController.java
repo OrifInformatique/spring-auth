@@ -65,13 +65,13 @@ public class UserController {
     }
 
     /**
-     * Retrieves all users in the system.
+     * Retrieves all users in the system excluding soft-deleted ones.
      * This endpoint:
      * - Requires the 'user:read' authority
      * - Returns a list of all users
      * - Is typically used by administrators
      *
-     * @return ResponseEntity containing a list of all users
+     * @return ResponseEntity containing a list of all users, without soft-deleted ones
      */
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('user:read')")
@@ -87,12 +87,12 @@ public class UserController {
      * - Returns a list of all users
      * - Is typically used by administrators
      *
-     * @return ResponseEntity containing a list of all deleted users
+     * @return ResponseEntity containing a list of all users, including soft-deleted ones
      */
-    @GetMapping("/all/deleted")
+    @GetMapping("/all-with-deleted")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<User>> allDeletedUsers() {
-        List<User> users = userService.allDeletedUsers();
+    public ResponseEntity<List<User>> allWithDeletedUsers() {
+        List<User> users = userService.allWithDeletedUsers();
         return ResponseEntity.ok(users); 
     }
 
@@ -118,7 +118,7 @@ public class UserController {
      * @param userId The ID of the user to restore
      * @return ResponseEntity with success message or error details
      */
-    @PutMapping("/restore/{userId}")
+    @PutMapping("/{userId}/restore")
     @PreAuthorize("hasAuthority('user:update')")
     public ResponseEntity<?> restoreDeletedUser(@PathVariable Long userId) {
         userService.restoreDeletedUser(userId);
@@ -214,18 +214,18 @@ public class UserController {
     }
 
     /**
-     * Deletes a user from the system.
+     * Soft-deletes a user from the system.
      * This endpoint:
      * - Requires the 'user:delete' authority
      * - Validates the authenticated user has sufficient permissions
      * - Returns success/error message
      *
-     * @param userId The ID of the user to delete
+     * @param userId The ID of the user to soft-delete
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<?> delete(@PathVariable Long userId) {
         UserDto deletedUser = userService.deleteUser(userId);
         return ResponseEntity
                 .ok(Map.of("message", "User deleted successfully", "deletedUserLogin", deletedUser.getLogin()));
@@ -243,8 +243,8 @@ public class UserController {
      */
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}/permanent")
-    public ResponseEntity<?> hardDeleteUser(@PathVariable Long userId) {
-        UserDto deletedUser = userService.hardDeleteUser(userId);
+    public ResponseEntity<?> deletePermanent(@PathVariable Long userId) {
+        UserDto deletedUser = userService.deletePermanentUser(userId);
         return ResponseEntity
                 .ok(Map.of("message", "User deleted permanently", "deletedUserLogin", deletedUser.getLogin()));
     }
