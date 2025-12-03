@@ -138,7 +138,6 @@ class UserControllerDocTest {
                                 .lastName(jsonNode.get("lastName").asText())
                                 .login(jsonNode.get("login").asText())
                                 .token(jsonNode.get("token").asText(null))
-                                .refreshToken(jsonNode.get("refreshToken").asText(null))
                                 .mainRole(jsonNode.get("mainRole").asText("USER"))
                                 .permissions(new ArrayList<String>())
                                 .build();

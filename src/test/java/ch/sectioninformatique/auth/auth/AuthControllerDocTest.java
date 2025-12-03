@@ -40,7 +40,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,12 +77,6 @@ public class AuthControllerDocTest {
 
         /** Static variable to hold the register response JSON for use in tests. */
         private static String registerResponseJson;
-
-        /** Static variable to hold the refresh response JSON for use in tests. */
-        private static String refreshResponseJson;
-
-        /** Static variable to hold the refresh token for use in tests. */
-        private static String refreshToken;
 
         /** Mocked UserService for simulating user-related operations. */
         @MockBean
@@ -136,7 +129,6 @@ public class AuthControllerDocTest {
                                 .lastName(jsonNode.get("lastName").asText())
                                 .login(jsonNode.get("login").asText())
                                 .token(jsonNode.get("token").asText(null))
-                                .refreshToken(jsonNode.get("refreshToken").asText(null))
                                 .mainRole(jsonNode.get("mainRole").asText("USER"))
                                 .permissions(new ArrayList<String>())
                                 .build();
@@ -145,7 +137,6 @@ public class AuthControllerDocTest {
                 // data
                 when(userService.login(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
-                when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
 
                 // Perform the /auth/login request with expected input and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
@@ -381,7 +372,6 @@ public class AuthControllerDocTest {
                                 .lastName(jsonNode.get("lastName").asText())
                                 .login(jsonNode.get("login").asText())
                                 .token(jsonNode.get("token").asText(null))
-                                .refreshToken(jsonNode.get("refreshToken").asText(null))
                                 .mainRole(jsonNode.get("mainRole").asText("USER"))
                                 .permissions(new ArrayList<String>())
                                 .build();
@@ -390,7 +380,6 @@ public class AuthControllerDocTest {
                 // data
                 when(userService.register(any())).thenReturn(userDto);
                 when(userAuthenticationProvider.createToken(any())).thenReturn(userDto.getToken());
-                when(userAuthenticationProvider.createRefreshToken(any())).thenReturn(userDto.getRefreshToken());
 
                 // Perform the /auth/register request with expected input and validate response
                 // Spring REST Docs will capture the interaction and generate documentation
