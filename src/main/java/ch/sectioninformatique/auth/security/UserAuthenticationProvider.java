@@ -4,8 +4,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,11 +38,22 @@ import lombok.extern.slf4j.Slf4j;
 public class UserAuthenticationProvider {
 
     /**
-     * Secret key for JWT token signing and verification, configured via application
-     * properties
+     * Secret key for JWT token signing and verification, configured via environment variable.
      */
-    @Value("${security.jwt.token.secret-key:secret-key}")
+    @Value("${SECURITY_JWT_TOKEN_SECRET_KEY}")
     private String secretKey;
+
+    /**
+     * Access token lifetime (e.g., "5m" for 5 minutes), configured via environment variable.
+     */
+    @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME:5m}")
+    private Duration accessTokenLifetime;
+
+    /**
+     * Refresh token lifetime (e.g., "30d" for 30 days), configured via environment variable.
+     */
+    @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME:30d}")
+    private Duration refreshTokenLifetime;
 
     /**
      * Service for user-related operations, including user creation and retrieval
@@ -67,20 +78,20 @@ public class UserAuthenticationProvider {
      * - User login as subject
      * - First name and last name as claims
      * - Role and permissions as claims
-     * - Issue time and expiration time (1 hour validity)
+     * - Issue time and expiration time (based on accessTokenLifetime)
      *
      * @param user           The user to create a token for
-     * @param expirationDate Optional expiration date for the token
+     * @param creationDate Optional date to use as the token's issue time
      * @return A JWT token string containing the user's information and permissions
      */
-    public String createToken(UserDto user, Date... expirationDate) {
-        Date now = expirationDate.length > 0 ? expirationDate[0] : new Date();
-        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(5)); // 5 minutes
+    public String createToken(UserDto user, Date... creationDate) {
+        Date issueDate = creationDate.length > 0 ? creationDate[0] : new Date();
+        Date validity = new Date(issueDate.getTime() + accessTokenLifetime.toMillis());
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
                 .withSubject(user.getLogin())
-                .withIssuedAt(now)
+                .withIssuedAt(issueDate)
                 .withExpiresAt(validity)
                 .withClaim("firstName", user.getFirstName())
                 .withClaim("lastName", user.getLastName())
@@ -89,21 +100,21 @@ public class UserAuthenticationProvider {
     }
 
     /**
-     * Creates a JWT token for a user to refresh their access beyond 1h.
+     * Creates a JWT token for a user to refresh their access.
      * The token includes:
-     * - Issue time and expiration time (200 hours validity)
+     * - Issue time and expiration time
      *
      * @param user The user to create a token for
      * @return A JWT token string containing the user's information and permissions
      */
     public String createRefreshToken(UserDto user) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + TimeUnit.DAYS.toMillis(30)); // 30 days
+        Date issueDate = new Date();
+        Date validity = new Date(issueDate.getTime() + refreshTokenLifetime.toMillis());
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
                 .withSubject(user.getLogin())
-                .withIssuedAt(now)
+                .withIssuedAt(issueDate)
                 .withExpiresAt(validity)
                 .sign(algorithm);
     }
