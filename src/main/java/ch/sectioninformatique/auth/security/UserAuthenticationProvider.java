@@ -91,11 +91,13 @@ public class UserAuthenticationProvider {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
                 .withSubject(user.getLogin())
+                .withClaim("typ", "access")
                 .withIssuedAt(issueDate)
                 .withExpiresAt(validity)
                 .withClaim("firstName", user.getFirstName())
                 .withClaim("lastName", user.getLastName())
                 .withClaim("mainRole", user.getMainRole())
+                .withClaim("permissions", user.getPermissions())
                 .sign(algorithm);
     }
 
@@ -114,6 +116,7 @@ public class UserAuthenticationProvider {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
                 .withSubject(user.getLogin())
+                .withClaim("typ", "refresh")
                 .withIssuedAt(issueDate)
                 .withExpiresAt(validity)
                 .sign(algorithm);
@@ -276,8 +279,11 @@ public class UserAuthenticationProvider {
      *                                                           invalid or expired.
      */
     public DecodedJWT validateRefreshToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
-        JWTVerifier verifier = JWT.require(algorithm).build();
-        return verifier.verify(token);
+    Algorithm algorithm = Algorithm.HMAC256(secretKey);
+    JWTVerifier verifier = JWT.require(algorithm)
+            .withClaim("typ", "refresh")
+            .build();
+
+    return verifier.verify(token);
     }
 }
