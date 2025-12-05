@@ -69,7 +69,7 @@ public class User implements UserDetails {
     /**
      * User's unique login identifier (email).
      */
-    @Column(unique = true, length = 100, nullable = false)
+    @Column(unique = true, nullable = false)
     private String login;
 
     /**
