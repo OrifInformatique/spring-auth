@@ -38,10 +38,16 @@ import lombok.extern.slf4j.Slf4j;
 public class UserAuthenticationProvider {
 
     /**
-     * Secret key for JWT token signing and verification, configured via environment variable.
+     * Secret key for JWT access token signing and verification, configured via environment variable.
      */
-    @Value("${SECURITY_JWT_TOKEN_SECRET_KEY}")
-    private String secretKey;
+    @Value("${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}")
+    private String secretAccessKey;
+
+    /**
+     * Secret key for JWT refresh token verification, configured via environment variable.
+     */
+    @Value("${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}")
+    private String secretRefreshKey;
 
     /**
      * Access token lifetime (e.g., "5m" for 5 minutes), configured via environment variable.
@@ -69,7 +75,9 @@ public class UserAuthenticationProvider {
     @PostConstruct
     protected void init() {
         // this is to avoid having the raw secret key available in the JVM
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        secretAccessKey = Base64.getEncoder().encodeToString(secretAccessKey.getBytes());
+
+        secretRefreshKey = Base64.getEncoder().encodeToString(secretRefreshKey.getBytes());
     }
 
     /**
@@ -88,7 +96,7 @@ public class UserAuthenticationProvider {
         Date issueDate = creationDate.length > 0 ? creationDate[0] : new Date();
         Date validity = new Date(issueDate.getTime() + accessTokenLifetime.toMillis());
 
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        Algorithm algorithm = Algorithm.HMAC256(secretAccessKey);
         return JWT.create()
                 .withSubject(user.getLogin())
                 .withClaim("typ", "access")
@@ -113,7 +121,7 @@ public class UserAuthenticationProvider {
         Date issueDate = new Date();
         Date validity = new Date(issueDate.getTime() + refreshTokenLifetime.toMillis());
 
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        Algorithm algorithm = Algorithm.HMAC256(secretRefreshKey);
         return JWT.create()
                 .withSubject(user.getLogin())
                 .withClaim("typ", "refresh")
@@ -162,7 +170,7 @@ public class UserAuthenticationProvider {
      *         authorities
      */
     public Authentication validateToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        Algorithm algorithm = Algorithm.HMAC256(secretAccessKey);
 
         JWTVerifier verifier = JWT.require(algorithm)
                 .build();
@@ -200,7 +208,7 @@ public class UserAuthenticationProvider {
      *         authorities
      */
     public Authentication validateTokenStrongly(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        Algorithm algorithm = Algorithm.HMAC256(secretAccessKey);
 
         JWTVerifier verifier = JWT.require(algorithm)
                 .build();
@@ -279,7 +287,7 @@ public class UserAuthenticationProvider {
      *                                                           invalid or expired.
      */
     public DecodedJWT validateRefreshToken(String token) {
-    Algorithm algorithm = Algorithm.HMAC256(secretKey);
+    Algorithm algorithm = Algorithm.HMAC256(secretRefreshKey);
     JWTVerifier verifier = JWT.require(algorithm)
             .withClaim("typ", "refresh")
             .build();
