@@ -1,10 +1,25 @@
 package ch.sectioninformatique.auth.user;
 
+import java.nio.CharBuffer;
+
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import org.hibernate.Session;
 
 import ch.sectioninformatique.auth.app.exceptions.InvalidCredentialsException;
 import ch.sectioninformatique.auth.app.exceptions.UserAlreadyExistsException;
@@ -14,24 +29,14 @@ import ch.sectioninformatique.auth.app.exceptions.UserHasLowerRightsException;
 import ch.sectioninformatique.auth.app.exceptions.UserNotFoundException;
 import ch.sectioninformatique.auth.app.exceptions.RoleNotFoundException;
 import ch.sectioninformatique.auth.app.exceptions.UserAlreadyAdminException;
+
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
+
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import java.nio.CharBuffer;
-import java.util.Optional;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.Session;
 
 /**
  * Service class for managing user-related operations.
@@ -74,10 +79,10 @@ public class UserService {
         User user = userRepository.findByLogin(credentialsDto.login())
                 .orElseThrow(() -> new InvalidCredentialsException());
 
-        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
-            return userMapper.toUserDto(user);
+        if (!passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
+            throw new InvalidCredentialsException();
         }
-        throw new InvalidCredentialsException();
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -109,9 +114,9 @@ public class UserService {
     public UserDto register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
                 
-        if (optionalUser.isPresent()) {
-            throw new UserAlreadyExistsException(optionalUser.get().getLogin());
-        }
+       optionalUser.ifPresent(user -> {
+            throw new UserAlreadyExistsException(user.getLogin());
+        });
 
         User user = userMapper.signUpToUser(userDto);
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.password())));
