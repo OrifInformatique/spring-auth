@@ -87,13 +87,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             // Clear previous authentication just in case
             SecurityContextHolder.clearContext();
-            log.debug("Invalid JWT token: {}", e.getMessage());
 
             // Return a 401 Unauthorized with a JSON error message
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
 
-            Map<String, String> errorBody = Map.of("message", "Invalid or expired token");
+            String message = switch (e.getClass().getSimpleName()) {
+                case "TokenExpiredException" -> "Token has expired";
+                case "InvalidClaimException" -> "Token contains invalid claims";
+                case "SignatureVerificationException" -> "Token signature is invalid";
+                default -> "Invalid JWT token";
+            };
+
+            log.debug("JWT validation failed: {}", message, e);
+            Map<String, String> errorBody = Map.of(
+                    "message", message,
+                    "error", "INVALID_TOKEN");
+
             var writer = response.getWriter();
             mapper.writeValue(writer, errorBody);
             writer.flush();
