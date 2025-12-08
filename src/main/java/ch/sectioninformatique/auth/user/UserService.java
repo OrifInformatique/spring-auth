@@ -73,7 +73,7 @@ public class UserService {
      *
      * @param credentialsDto The user's login credentials
      * @return UserDto containing the authenticated user's information
-     * @throws InvalidCredentialsException if the user is not found or the password is invalid
+     * @throws InvalidCredentialsException if the user is not found or the password is invalid (intentionally vague to prevent identification of user mail in use)
      */
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByLogin(credentialsDto.login())
@@ -135,8 +135,8 @@ public class UserService {
      * Update the User Password
      * 
      * @param login       The user email
-     * @param newPassword A password Dto who contain bothe the old password for
-     *                    verification and the new for update
+     * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
+     * @throws InvalidCredentialsException if the user is not found or the old password is invalid
      */
     @Transactional
     public void updatePassword(String login, PasswordUpdateDto passwords) {
