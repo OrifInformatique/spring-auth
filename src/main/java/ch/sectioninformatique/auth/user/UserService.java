@@ -188,12 +188,12 @@ public class UserService {
      *
      * @return List of all User entities, excluding soft-deleted
      */
-    public List<User> allUsers() {
+    public List<UserDto> allUsers() {
         Session session = entityManager.unwrap(Session.class);
         session.enableFilter("deletedFilter").setParameter("isDeleted", false);
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(users::add);
-        return users;
+        return users.stream().map(userMapper::toUserDto).toList();
     }
 
     /**
@@ -201,10 +201,10 @@ public class UserService {
      *
      * @return List of all User entities including soft-deleted
      */
-    public List<User> allWithDeletedUsers() {
+    public List<UserDto> allWithDeletedUsers() {
         List<User> users = new ArrayList<>();
         userRepository.findAllWithDeleted().forEach(users::add);
-        return users;
+        return users.stream().map(userMapper::toUserDto).toList();
     }
 
     /**
@@ -212,12 +212,12 @@ public class UserService {
      *
      * @return List of soft-deleted User entities
      */
-    public List<User> deletedUsers() {
+    public List<UserDto> deletedUsers() {
         Session session = entityManager.unwrap(Session.class);
         session.enableFilter("deletedFilter").setParameter("isDeleted", true);
         List<User> users = new ArrayList<>();
         userRepository.findAllDeleted().forEach(users::add);
-        return users;
+        return users.stream().map(userMapper::toUserDto).toList();
     }
 
     /**
