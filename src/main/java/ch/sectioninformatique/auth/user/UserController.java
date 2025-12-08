@@ -5,8 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,16 +50,12 @@ public class UserController {
      * - Returns the user's profile information
      * - Is accessible to all authenticated users
      *
+     * @param currentUser The currently authenticated user, injected by Spring Security
      * @return ResponseEntity containing the current user's DTO
      */
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDto> authenticatedUser() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
+    public ResponseEntity<UserDto> authenticatedUser(@AuthenticationPrincipal UserDto currentUser) {
         return ResponseEntity.ok(currentUser);
     }
 
