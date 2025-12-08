@@ -21,8 +21,8 @@ import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
@@ -47,12 +47,11 @@ import org.hibernate.Session;
 @Slf4j
 public class UserService {
 
-    /** EntityManager for database operations */
-    @Autowired
+    /** EntityManager for database operations - injected via @PersistenceContext */
+    @PersistenceContext
     private EntityManager entityManager;
 
     /** Repository for user data access */
-    @Autowired
     private final UserRepository userRepository;
 
     /** Encoder for password hashing */

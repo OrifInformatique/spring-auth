@@ -194,7 +194,8 @@ public class UserAuthenticationProvider {
             log.debug("User not found, creating new Azure user: {}", decoded.getSubject());
             DecodedJWT decodedAzure = JWT.decode(token);
             String issuer = decodedAzure.getIssuer();
-            if (!issuer.equals(azureUri)) {
+            // Only verify issuer if both issuer and azureUri are present
+            if (issuer != null && azureUri != null && !issuer.equals(azureUri)) {
                 throw new SecurityException("Token not from trusted Azure tenant");
             }
 
