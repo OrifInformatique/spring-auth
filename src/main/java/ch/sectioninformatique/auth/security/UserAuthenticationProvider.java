@@ -199,6 +199,16 @@ public class UserAuthenticationProvider {
                 throw new SecurityException("Token not from trusted Azure tenant");
             }
 
+            String firstName = decodedAzure.getClaim("firstName").asString();
+            String lastName = decodedAzure.getClaim("lastName").asString();
+
+            if (firstName == null || firstName.isBlank()) {
+                throw new SecurityException("JWT missing required claim: firstName");
+            }
+            if (lastName == null || lastName.isBlank()) {
+                throw new SecurityException("JWT missing required claim: lastName");
+            }
+
             UserDto newUser = UserDto.builder()
                     .login(decodedAzure.getSubject())
                     .firstName(decodedAzure.getClaim("firstName").asString())
