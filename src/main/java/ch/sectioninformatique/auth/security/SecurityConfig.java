@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,11 +31,12 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
  * - Exception handling for authentication and access denied events
  * - Session management (currently IF_REQUIRED)
  * 
- * Ensures:
+ * Security Features:
  * - Secure endpoints with proper authorization rules
- * - Stateless or minimal session usage
+ * - Stateless session management for REST APIs
  * - Proper handling of cross-origin requests
- * - Logging of OAuth2 user information for debugging
+ * - Environment-aware logging (sensitive data only logged in dev/test)
+ * - Comprehensive OAuth2 error handling and logging
  */
 @Configuration
 @EnableWebSecurity
@@ -66,6 +68,11 @@ public class SecurityConfig {
      */
     private final JwtAuthFilter jwtAuthFilter;
 
+    /**
+     * Spring environment to check active profiles (dev, test, prod)
+     */
+    private final Environment environment;
+
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins; // Origins allowed for cross-origin requests, loaded from properties
 
@@ -76,11 +83,27 @@ public class SecurityConfig {
     private String[] allowedHeaders; // HTTP headers allowed for CORS requests
 
     /**
+     * Checks if the application is running in development or test mode.
+     * Sensitive data (user emails, attributes) is only logged in these environments.
+     *
+     * @return true if running in dev or test profile, false if in production
+     */
+    private boolean isDevelopmentOrTest() {
+        String[] activeProfiles = environment.getActiveProfiles();
+        for (String profile : activeProfiles) {
+            if (profile.equalsIgnoreCase("dev") || profile.equalsIgnoreCase("test")) {
+                return true;
+            }
+        }
+        // If no profile is set, default to development-like behavior for local development
+        return activeProfiles.length == 0;
+    }
+
+    /**
      * Configures the Spring Security filter chain.
      * 
      * Configuration includes:
-     * - Exception handling using custom UserAuthenticationEntryPoint and
-     * AccessDeniedHandler
+     * - Exception handling using custom UserAuthenticationEntryPoint and AccessDeniedHandler
      * - JWT authentication filter added before BasicAuthenticationFilter
      * - CSRF protection disabled (suitable for stateless APIs)
      * - Session management policy set to IF_REQUIRED
@@ -127,23 +150,32 @@ public class SecurityConfig {
                     log.debug("Configuring OAuth2 login");
                     oauth2
                             .failureHandler((request, response, exception) -> {
-                                log.error("OAuth2 authentication failed: {}", exception.getMessage(), exception);
-                                Throwable cause = exception.getCause();
-                                if (exception instanceof org.springframework.security.oauth2.core.OAuth2AuthenticationException) {
-                                    var oauth2Ex = (org.springframework.security.oauth2.core.OAuth2AuthenticationException) exception;
-                                    log.error("OAuth2 Error Code: {}", oauth2Ex.getError().getErrorCode());
-                                    log.error("OAuth2 Error Description: {}", oauth2Ex.getError().getDescription());
-                                    if (cause != null) {
-                                        log.error("OAuth2 Exception Cause: {}", cause.toString(), cause);
+                                log.error("OAuth2 authentication failed: {}", exception.getMessage());
+                                
+                                // Log full details only in development/test environments
+                                if (isDevelopmentOrTest()) {
+                                    log.debug("OAuth2 authentication failure details:", exception);
+                                    Throwable cause = exception.getCause();
+                                    if (exception instanceof org.springframework.security.oauth2.core.OAuth2AuthenticationException) {
+                                        var oauth2Ex = (org.springframework.security.oauth2.core.OAuth2AuthenticationException) exception;
+                                        log.debug("OAuth2 Error Code: {}", oauth2Ex.getError().getErrorCode());
+                                        log.debug("OAuth2 Error Description: {}", oauth2Ex.getError().getDescription());
+                                        if (cause != null) {
+                                            log.debug("OAuth2 Exception Cause: {}", cause.toString(), cause);
+                                        }
                                     }
                                 }
-                                // Print full stack trace for debugging
-                                log.error("Full stack trace:", exception);
+                                
                                 response.sendRedirect("/oauth2/error");
                             })
                             .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService()))
                             .successHandler((request, response, authentication) -> {
-                                log.debug("OAuth2 authentication successful: {}", authentication);
+                                // Only log authentication object in dev/test (it may contain user details)
+                                if (isDevelopmentOrTest()) {
+                                    log.debug("OAuth2 authentication successful: {}", authentication);
+                                } else {
+                                    log.info("OAuth2 authentication successful");
+                                }
                                 response.sendRedirect("/oauth2/success");
                             });
                 })
@@ -169,20 +201,28 @@ public class SecurityConfig {
      * 
      * Responsibilities:
      * - Loads user details from the OAuth2 provider using DefaultOAuth2UserService
-     * - Converts provider-specific user information into a Spring Security
-     * OAuth2User
-     * - Logs user attributes for debugging purposes (avoid logging sensitive data
-     * in production)
+     * - Converts provider-specific user information into a Spring Security OAuth2User
+     * - Logs user attributes for debugging purposes (only in development/test environments)
      *
-     * @return an OAuth2UserService that returns OAuth2User instances with provider
-     *         attributes
+     * Security Note:
+     * - User attributes (email, profile info) are ONLY logged in dev/test environments
+     * - Production logging does not include sensitive user data
+     *
+     * @return an OAuth2UserService that returns OAuth2User instances with provider attributes
      */
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
         return request -> {
             OAuth2User user = delegate.loadUser(request);
-            log.debug("OAuth2 user loaded: {}", user.getAttributes());
+            
+            // Only log user attributes in development/test environments
+            if (isDevelopmentOrTest()) {
+                log.debug("OAuth2 user loaded with attributes: {}", user.getAttributes());
+            } else {
+                log.info("OAuth2 user loaded successfully");
+            }
+            
             return user;
         };
     }
