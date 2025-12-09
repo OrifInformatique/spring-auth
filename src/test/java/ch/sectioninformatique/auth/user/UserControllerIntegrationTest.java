@@ -133,6 +133,10 @@ public class UserControllerIntegrationTest {
         @Autowired
         private UserService userService;
 
+        /** UserRepository instance for user-related operations. */
+        @Autowired
+        private UserRepository userRepository;
+
         /**
          * Test: GET /users/me
          *

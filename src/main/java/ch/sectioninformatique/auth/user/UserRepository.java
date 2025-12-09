@@ -21,16 +21,23 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Finds a user by their login username.
+     * Finds a user by his login, including those that are soft-deleted.
      * This method is used for:
-     * - User authentication
-     * - User lookup during operations
-     * - Checking user existence
+     * - User lookup during operations when soft-deleted users need to be considered
+     * - Checking user existence regardless of deletion status
      *
-     * @param login The login username to search for (case-sensitive)
-     * @return Optional containing the user if found, empty Optional otherwise
+     * @param login The login to search for (case-sensitive)
+     * @return Optional containing the user if found, empty otherwise
      */
     Optional<User> findByLogin(String login);
+
+    /**
+     * Finds a user by his login, excluding soft-deleted users.
+     * 
+     * @param login The login to search for (case-sensitive)
+     * @return Optional containing the user if found, empty otherwise
+     */
+    Optional<User> findByLoginAndDeletedFalse(String login);
 
     /**
      * Returns all users including those that are soft-deleted.

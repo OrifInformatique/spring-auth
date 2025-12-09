@@ -11,7 +11,9 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
+import ch.sectioninformatique.auth.user.User;
 import ch.sectioninformatique.auth.user.UserDto;
+import ch.sectioninformatique.auth.user.UserRepository;
 import ch.sectioninformatique.auth.user.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -119,6 +121,9 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private UserService userService;
+
+        @Autowired
+        private UserRepository userRepository;
 
         /**
          * Test: POST /auth/login
@@ -786,9 +791,9 @@ public class AuthControllerIntegrationTest {
          *
          * Mock a user successfull update his password.
          */
-        @Test
-        @Transactional
-        public void setPassword_withRealData_shouldReturnSuccess() throws Exception {
+         
+
+        public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);

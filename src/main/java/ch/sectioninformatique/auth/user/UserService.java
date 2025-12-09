@@ -165,7 +165,7 @@ public class UserService {
     public UserDto findByLogin(String login) {
         log.debug("Searching for user with login: {}", login);
 
-        Optional<User> userOptional = userRepository.findByLogin(login);
+        Optional<User> userOptional = userRepository.findByLoginAndDeletedFalse(login);
         log.debug("User found in database: {}", userOptional.isPresent());
 
         User user = userOptional
