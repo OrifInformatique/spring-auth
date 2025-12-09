@@ -3,7 +3,6 @@ package ch.sectioninformatique.auth.auth;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
