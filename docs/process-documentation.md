@@ -762,40 +762,7 @@ Users can be soft-deleted (marked as inactive) or permanently deleted:
 
 ## 6. Environment Configuration
 
-### 6.1 Required Environment Variables
 
-Key variables needed in `.env` file:
-
-```properties
-# Environment Profile (dev | test | prod)
-ENVIRONMENT=dev
-
-# Server Port
-PORT=8080
-
-# Database Configuration
-# Dev database URL (uses Docker container 'db')
-DEV_SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/dev_db
-
-# Test database URL (uses Docker container 'db')
-TEST_SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/test_db
-
-# Production database URL (set in application.properties)
-# For production, configure SPRING_DATASOURCE_URL in application.properties
-
-# Database Credentials
-DB_USERNAME=root
-DB_PASSWORD=pwd
-
-# JWT Configuration (set in application.properties)
-SECURITY_JWT_TOKEN_SECRET_KEY=your-secret-key-minimum-256-bits
-
-# Azure AD OAuth2 (optional)
-AZURE_REDIRECT_BASE_URL=http://localhost:8080
-AZURE_TENANT_ID=your-tenant-id
-AZURE_CLIENT_ID=your-client-id
-AZURE_CLIENT_SECRET=your-client-secret
-```
 
 ### 6.2 Configuration Files
 
