@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
  * This record holds the login and password used for authentication.
  *
  * Validation Rules:
- * - Login must be a valid email format, max 100 characters
+ * - Login must be a valid email format
  * - Password must be 8-72 characters long
  *
  * @param login    The user's login identifier (email)
@@ -18,7 +18,6 @@ import jakarta.validation.constraints.Size;
  */
 public record CredentialsDto(
     @NotBlank(message = "Login is required")
-    @Size(max = 100, message = "Email must not exceed 100 characters")
     @Email(message = "Login must be a valid email format")
     String login,
 
