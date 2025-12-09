@@ -139,6 +139,7 @@
         <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-mockmvc</artifactId>
+            <version>${spring-restdocs.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
