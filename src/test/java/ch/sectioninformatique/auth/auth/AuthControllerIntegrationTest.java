@@ -318,6 +318,59 @@ public class AuthControllerIntegrationTest {
         /**
          * Test: POST /auth/login
          *
+         * Mock a user log in with SQL injection attempt in password and test the
+         * excetpion.
+         */
+        @Test
+        @Transactional
+        public void login_sqlInjectionAttemptPassword_shouldReturnUnauthorized() throws Exception {
+
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"test.user@test.com\", \"password\":\"' OR '1'='1\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "login-sql-injection-attempt-password",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/login
+         *
+         * Mock a user log in with wrong media type and test the excetpion.
+         */
+        @Test
+        @Transactional
+        public void login_wrongMediaType_shouldReturnUnsupportedMediaType() throws Exception {
+
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.TEXT_PLAIN,
+                                415,
+                                "login-wrong-media-type",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/login
+         *
          * Mock a user log in with wrong password and test the excetpion.
          */
         @Test
@@ -676,6 +729,41 @@ public class AuthControllerIntegrationTest {
         /**
          * Test: POST /auth/register
          *
+         * Mock a failed user register with wrong media type.
+         */
+        @Test
+        @Transactional
+        public void register_wrongMediaType_shouldReturnUnsupportedMediaType() throws Exception {
+
+                performRequest(
+                                "POST",
+                                "/auth/register",
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                null,
+                                MediaType.TEXT_PLAIN,
+                                415,
+                                "register-wrong-media-type",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/register
+         *
          * Mock a failed user register SQL with duplicate login.
          */
         @Test
@@ -787,12 +875,64 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
+         * Test: GET /auth/refresh
+         *
+         * Mock a user failed user refresh token with missing authorization header.
+         */
+        @Test
+        @Transactional
+        public void refresh_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
+
+                performRequest(
+                                "GET",
+                                "/auth/refresh",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "refresh-missing-authorization",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: GET /auth/refresh
+         *
+         * Mock a user failed user refresh token with empty body.
+         */
+        @Test
+        @Transactional
+        public void refresh_emptyBody_shouldReturnUnauthorized() throws Exception {
+
+                performRequest(
+                                "GET",
+                                "/auth/refresh",
+                                "",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "refresh-empty-body",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
          * Test: PUT /auth/update-password
          *
          * Mock a user successfull update his password.
          */
-         
-
+        @Test
+        @Transactional
         public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 

@@ -394,6 +394,154 @@ public class UserControllerIntegrationTest {
         }
 
         /**
+         * Test: GET /users/all-with-deleted
+         *
+         * Mock a request to retrieve all users including soft-deleted ones
+         */
+        @Test
+        @Transactional
+        public void allWithDeleted_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                performRequest(
+                                "GET",
+                                "/users/all-with-deleted",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "all-with-deleted",
+                                request -> {
+                                        try {
+                                                MvcResult result = request.andReturn();
+                                                String responseBody = result.getResponse().getContentAsString();
+
+                                                ObjectMapper mapper = new ObjectMapper();
+                                                List<Map<String, Object>> users = mapper.readValue(responseBody,
+                                                                new TypeReference<List<Map<String, Object>>>() {
+                                                                });
+
+                                                assertTrue(users.size() >= 4, "Should return at least 4 users");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: GET /users/deleted
+         *
+         * Mock a request to retrieve only soft-deleted users
+         */
+        @Test
+        @Transactional
+        public void deleted_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                performRequest(
+                                "GET",
+                                "/users/deleted",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "deleted",
+                                request -> {
+                                        try {
+                                                MvcResult result = request.andReturn();
+                                                String responseBody = result.getResponse().getContentAsString();
+
+                                                ObjectMapper mapper = new ObjectMapper();
+                                                List<Map<String, Object>> users = mapper.readValue(responseBody,
+                                                                new TypeReference<List<Map<String, Object>>>() {
+                                                                });
+
+                                                assertNotNull(users, "Should return a list of users");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: PUT /users/{userId}/restore
+         *
+         * Mock a request to restore a soft-deleted user
+         */
+        @Test
+        @Transactional
+        public void restoreDeletedUser_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+                
+                String adminToken = userAuthenticationProvider.createToken(adminDto);
+                
+                // First, soft delete the user using the DELETE endpoint
+                performRequest(
+                                "DELETE",
+                                "/users/" + userDto.getId(),
+                                null,
+                                adminToken,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "delete-for-restore",
+                                null
+                );
+
+                // Then restore the user
+                performRequest(
+                                "PUT",
+                                "/users/" + userDto.getId() + "/restore",
+                                null,
+                                adminToken,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "restore",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$").value("User restored successfully"));
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: DELETE /users/{userId}/permanent
+         *
+         * Mock a request to permanently delete a user
+         */
+        @Test
+        @Transactional
+        public void deletePermanent_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                performRequest(
+                                "DELETE",
+                                "/users/" + userDto.getId() + "/permanent",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "delete-permanent",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value("User deleted permanently"))
+                                                                .andExpect(jsonPath("$.deletedUserLogin")
+                                                                                .value("test.user@test.com"));
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
          * Test: PUT /users/{userId}/promote-manager
          *
          * Mock a request to promote a user into a manager
@@ -734,7 +882,7 @@ public class UserControllerIntegrationTest {
         /**
          * Test: PUT /users/{userId}/revoke-manager
          *
-         * Mock a request to revoke a manager into a user with a non-existing user
+         * Mock a request to revoke a manager for a non-existent user
          */
         @Test
         @Transactional
@@ -743,11 +891,9 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                String fakeUserId = "9999";
-
                 performRequest(
                                 "PUT",
-                                "/users/" + fakeUserId + "/revoke-manager",
+                                "/users/9999/revoke-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1089,11 +1235,9 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                String fakeUserId = "9999";
-
                 performRequest(
                                 "PUT",
-                                "/users/" + fakeUserId + "/revoke-admin",
+                                "/users/9999/revoke-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1102,7 +1246,6 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message").exists());
-
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1235,7 +1378,9 @@ public class UserControllerIntegrationTest {
                                                                 .andExpect(jsonPath("$.deletedUserLogin")
                                                                                 .value("test.user@test.com"));
 
-                                                UserDto deletedUser = userService.findByLogin("test.user@test.com");
+                                                // Verify the user is marked as deleted in the database
+                                                User deletedUser = userRepository.findByLogin("test.user@test.com")
+                                                        .orElseThrow(() -> new AssertionError("User should still exist in database"));
                                                 assertTrue(deletedUser.isDeleted(), "User should be marked as deleted");
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
