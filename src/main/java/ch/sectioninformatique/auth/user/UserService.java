@@ -92,7 +92,7 @@ public class UserService {
      */
     @Transactional
     public void storeRefreshToken(String userLogin, String refreshToken, Instant expiresAt) {
-        String hashed = hash(refreshToken);
+        String hashed = hashRefreshToken(refreshToken);
 
         // remove previous token if rotation enabled
         refreshTokenRepository.deleteByUserLogin(userLogin);
@@ -148,7 +148,7 @@ public class UserService {
      * @param token The raw refresh token to hash.
      * @return The hashed representation of the token.
      */
-    private String hash(String token) {
+    private String hashRefreshToken(String token) {
         return passwordEncoder.encode(token);
     }
 
