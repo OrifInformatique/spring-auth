@@ -131,7 +131,7 @@ public class UserService {
      * @param userLogin The login/username of the user whose token should be
      *                  revoked.
      */
-    public void revoke(String userLogin) {
+    public void revokeRefreshToken(String userLogin) {
         refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
                 .ifPresent(token -> {
                     token.setRevoked(true);
