@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -22,16 +23,23 @@ import ch.sectioninformatique.auth.user.UserService;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -59,6 +67,8 @@ public class AuthControllerIntegrationTest {
         @Autowired
         private UserRepository userRepository;
 
+        private static final ObjectMapper mapper = new ObjectMapper();
+
         /**
          * Test the /auth/login endpoint with real data.
          * This test performs a login request and expects a successful response.
@@ -79,8 +89,6 @@ public class AuthControllerIntegrationTest {
                                 .andExpect(jsonPath("$.login").value("test.user@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
-                                                                                    // not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
@@ -408,7 +416,7 @@ public class AuthControllerIntegrationTest {
                 // Prepare login request
                 Map<String, String> loginRequest = new HashMap<>();
                 loginRequest.put("login", userDto.getLogin());
-                loginRequest.put("password", "Test1234!"); 
+                loginRequest.put("password", "Test1234!");
 
                 MvcResult result = mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -480,8 +488,6 @@ public class AuthControllerIntegrationTest {
                                 .andExpect(jsonPath("$.login").value("test.newuser@test.com"))
                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                 .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
-                                                                                    // not empty
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
@@ -955,18 +961,19 @@ public class AuthControllerIntegrationTest {
         public void refresh_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+                RefreshRequestDto refreshToken = new RefreshRequestDto(
+                                userAuthenticationProvider.createRefreshToken(userDto));
 
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
+                userService.storeRefreshToken(userDto.getLogin(), refreshToken.refreshToken(), Instant.now().plus(Duration.ofDays(30)));
+
+                String json = mapper.writeValueAsString(refreshToken);
+
+                MvcResult result = mockMvc.perform(post("/auth/refresh")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + refreshToken))
+                                .content(json))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
+                                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                                .andExpect(header().exists(HttpHeaders.SET_COOKIE)) // refresh token cookie exists
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
@@ -975,95 +982,66 @@ public class AuthControllerIntegrationTest {
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, responseBody);
 
+                // -------- Extract refresh token cookie --------
+                String setCookieHeader = result.getResponse().getHeader(HttpHeaders.SET_COOKIE);
+
+                assertNotNull(setCookieHeader);
+                assertTrue(setCookieHeader.contains("refresh_token="));
+                assertTrue(setCookieHeader.contains("HttpOnly"));
+                assertTrue(setCookieHeader.contains("Secure"));
+                assertTrue(setCookieHeader.contains("Path=/auth/refresh"));
+                assertTrue(setCookieHeader.contains("SameSite=Strict"));
+
+                // Parse the header
+                String[] parts = setCookieHeader.split(";");
+                String[] nameValue = parts[0].split("=");
+
+                String name = nameValue[0].trim();
+                String value = nameValue.length > 1 ? nameValue[1].trim() : null;
+
+                Map<String, Object> cookieJsonMap = new LinkedHashMap<>();
+                cookieJsonMap.put("name", name);
+                cookieJsonMap.put("value", value);
+
+                // Default flags
+                cookieJsonMap.put("httpOnly", false);
+                cookieJsonMap.put("secure", false);
+                cookieJsonMap.put("path", null);
+                cookieJsonMap.put("sameSite", null);
+                cookieJsonMap.put("maxAge", null);
+
+                // Parse the attributes
+                for (String part : parts) {
+                        part = part.trim();
+
+                        if (part.equalsIgnoreCase("HttpOnly"))
+                                cookieJsonMap.put("httpOnly", true);
+                        if (part.equalsIgnoreCase("Secure"))
+                                cookieJsonMap.put("secure", true);
+                        if (part.startsWith("Path="))
+                                cookieJsonMap.put("path", part.substring(5));
+                        if (part.startsWith("SameSite="))
+                                cookieJsonMap.put("sameSite", part.substring(9));
+                        if (part.startsWith("Max-Age="))
+                                cookieJsonMap.put("maxAge", Long.valueOf(part.substring(8)));
+                }
+
+                // Convert to pretty JSON
+                String cookieJson = mapper.writerWithDefaultPrettyPrinter()
+                                .writeValueAsString(cookieJsonMap);
+
                 // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
+                Path pathToken = Paths.get("target/test-data/auth-refresh-cookie.json");
                 Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, refreshToken);
-        }
-
-        /**
-         * Test the /auth/refresh endpoint with missing Authorization header.
-         * This test performs a token refresh request without Authorization header and
-         * expects an unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void refresh_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-refresh-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
-
-        /**
-         * Test the /auth/refresh endpoint with invalid token.
-         * This test performs a token refresh request with an invalid token and
-         * 
-         * 
-         * expects an unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void refresh_invalidToken_shouldReturnUnauthorized() throws Exception {
-                String invalidToken = "this.is.not.a.valid.token";
-
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + invalidToken))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-refresh-invalid-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+                Files.writeString(pathToken, cookieJson);
         }
 
         /**
          * Test the /auth/update-password endpoint with real data.
-         * This test performs an update password request and expects a successful response.
+         * This test performs an update password request and expects a successful
+         * response.
          * The response is saved to a file for use in other tests.
          */
-         
 
         public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
@@ -1072,7 +1050,7 @@ public class AuthControllerIntegrationTest {
 
                 MvcResult result = mockMvc.perform(put("/auth/update-password")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
+                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.message").exists())
@@ -1102,7 +1080,6 @@ public class AuthControllerIntegrationTest {
                 Files.createDirectories(pathToken.getParent());
                 Files.writeString(pathToken, token);
         }
-
 
         /**
          * Test the /auth/update-password endpoint with missing body.

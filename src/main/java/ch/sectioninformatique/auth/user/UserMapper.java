@@ -43,7 +43,6 @@ public interface UserMapper {
     @Mapping(target = "mainRole", expression = "java(user.getMainRole().getName().name())")
     @Mapping(target = "permissions", source = "authorities", qualifiedByName = "authoritiesToPermissions")
     @Mapping(target = "token", ignore = true)
-    @Mapping(target = "refreshToken", ignore = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
