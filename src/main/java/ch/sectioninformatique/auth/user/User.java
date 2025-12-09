@@ -69,13 +69,13 @@ public class User implements UserDetails {
     /**
      * User's unique login identifier (email).
      */
-    @Column(unique = true, length = 100, nullable = false)
+    @Column(unique = true, nullable = false)
     private String login;
 
     /**
      * User's hashed password.
      */
-    @Column(nullable = false)
+    @Column(nullable = false, length = 72)
     private String password;
 
     /**

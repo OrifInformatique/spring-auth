@@ -4,20 +4,17 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Data Transfer Object for user sign-up information.
  * This record encapsulates the data required for user registration,
  * including first name, last name, login (email), and password.
- * Validation annotations ensure that the provided data meets
- * necessary constraints.
  * 
- * | Part             | What it does                                                            |
- * | ---------------- | ----------------------------------------------------------------------- |
- * | `^[\\p{L}]`      | Starts with a **letter** (no punctuation at start)                      |
- * | `[\\p{L} '\\-]*` | Allows any number of letters, spaces, `'` or `-` in between             |
- * | `[\\p{L}]$`      | Must end with a **letter** (no punctuation at end)                      |
- * | `\\p{L}`         | Matches any **Unicode letter** (accents, international names supported) |
+ * Validation Rules:
+ * - First/Last Name: 2-50 chars, letters/spaces/hyphens/apostrophes only
+ * - Login: Valid email format
+ * - Password: 8-72 chars, must contain uppercase, lowercase, digit, and special character
  * 
  * @param firstName The user's first name
  * @param lastName  The user's last name
@@ -28,14 +25,14 @@ public record SignUpDto(
         @NotBlank(message = "First name is required") 
         @Pattern(
             regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$", 
-            message = "First name contains invalid characters"
+            message = "First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
         ) 
         String firstName,
 
         @NotBlank(message = "Last name is required") 
         @Pattern(
             regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$", 
-            message = "Last name contains invalid characters"
+            message = "Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
         ) 
         String lastName,
 
@@ -44,4 +41,6 @@ public record SignUpDto(
         String login,
 
         @NotNull(message = "Password is required") 
-        char[] password) {}
+        @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
+        char[] password
+) {}
