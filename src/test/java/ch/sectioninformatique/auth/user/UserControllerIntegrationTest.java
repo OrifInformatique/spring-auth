@@ -138,9 +138,19 @@ public class UserControllerIntegrationTest {
         private UserRepository userRepository;
 
         /**
-         * Test: GET /users/me
-         *
-         * Mock a user request for it's own informations.
+         * Test: GET /users/me - Retrieve authenticated user's information
+         * 
+         * Verifies that an authenticated user can retrieve their own user information.
+         * This is a common endpoint for checking current user session and profile data.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - Response contains user information (id, firstName, lastName, login, mainRole)
+         * - Response includes a refreshed JWT access token
+         * - Only the authenticated user's data is returned (not other users)
+         * 
+         * Test data:
+         * - User: test.user@test.com (authenticated via JWT token)
          */
         @Test
         @Transactional
@@ -174,9 +184,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/me
-         *
-         * Mock a user request for it's own informations without authorisation header.
+         * Test: GET /users/me - Authentication error without Authorization header
+         * 
+         * Verifies that the /users/me endpoint requires authentication.
+         * Requests without an Authorization header should be rejected.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing authentication
+         * - Response contains error message
+         * - No user data is returned
+         * 
+         * Test data:
+         * - Authorization header: (missing)
          */
         @Test
         @Transactional
@@ -200,9 +220,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/me
-         *
-         * Mock a user request for it's own informations with a malformed token.
+         * Test: GET /users/me - Authentication error with invalid JWT token
+         * 
+         * Verifies that the endpoint properly validates JWT tokens and rejects malformed ones.
+         * Invalid tokens (wrong format, invalid signature, corrupted data) should not grant access.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - No user data is returned
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
          */
         @Test
         @Transactional
@@ -227,9 +257,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/me
-         *
-         * Mock a user request for it's own informations with a expired token.
+         * Test: GET /users/me - Authentication error with expired JWT token
+         * 
+         * Verifies that the endpoint properly checks token expiration and rejects expired tokens.
+         * This ensures users must refresh their tokens periodically for continued access.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token expiration validation fails
+         * - Response contains error message about expired token
+         * - No user data is returned
+         * - Client should request a new token using refresh token
+         * 
+         * Test data:
+         * - User: test.user@test.com
+         * - JWT Token: Expired 2 hours ago
          */
         @Test
         @Transactional
@@ -257,9 +299,22 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/all
-         *
-         * Mock a user request for all users.
+         * Test: GET /users/all - Retrieve all active users (excluding soft-deleted)
+         * 
+         * Verifies that authenticated users can retrieve a list of all active users in the system.
+         * This endpoint excludes soft-deleted users and returns only active accounts.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - Response contains an array of user objects
+         * - Returns exactly 4 users (from test data seeder)
+         * - Soft-deleted users are excluded from the list
+         * - All expected test users are present in the response
+         * 
+         * Test data:
+         * - Authenticated as: test.user@test.com
+         * - Expected users: test.user@test.com, test.manager@test.com, 
+         *   test.admin@test.com, test.admin2@test.com
          */
         @Test
         @Transactional
@@ -311,9 +366,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/all
-         *
-         * Mock a user request for all users without header.
+         * Test: GET /users/all - Authentication error without Authorization header
+         * 
+         * Verifies that the /users/all endpoint requires authentication to protect
+         * user data from unauthorized access.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing authentication
+         * - Response contains error message
+         * - No user list is returned
+         * 
+         * Test data:
+         * - Authorization header: (missing)
          */
         @Test
         @Transactional
@@ -337,9 +402,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/all
-         *
-         * Mock a user request for all users with a malformed token.
+         * Test: GET /users/all - Authentication error with invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized access to user data.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - No user list is returned
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
          */
         @Test
         @Transactional
@@ -364,9 +439,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/all
-         *
-         * Mock a user request for all users with a expired token.
+         * Test: GET /users/all - Authentication error with expired JWT token
+         * 
+         * Verifies that the endpoint checks token expiration to ensure users
+         * cannot access protected resources with expired tokens.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token expiration validation fails
+         * - Response contains error message about expired token
+         * - No user list is returned
+         * - Client should refresh token and retry
+         * 
+         * Test data:
+         * - User: test.user@test.com
+         * - JWT Token: Expired 2 hours ago
          */
         @Test
         @Transactional
@@ -394,9 +481,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/all-with-deleted
-         *
-         * Mock a request to retrieve all users including soft-deleted ones
+         * Test: GET /users/all-with-deleted - Retrieve all users including soft-deleted
+         * 
+         * Verifies that authenticated administrators can retrieve a complete list of all users,
+         * including those that have been soft-deleted. This is useful for admin panels and
+         * audit purposes.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - Response contains an array of all user objects
+         * - Includes both active and soft-deleted users
+         * - Returns at least 4 users (may include soft-deleted ones)
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
          */
         @Test
         @Transactional
@@ -430,9 +528,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: GET /users/deleted
-         *
-         * Mock a request to retrieve only soft-deleted users
+         * Test: GET /users/deleted - Retrieve only soft-deleted users
+         * 
+         * Verifies that authenticated administrators can retrieve a filtered list
+         * of only soft-deleted users. This is useful for reviewing deleted accounts
+         * and potentially restoring them.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - Response contains an array of soft-deleted user objects
+         * - Excludes active users from the list
+         * - Returns an empty array if no users are soft-deleted
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
          */
         @Test
         @Transactional
@@ -466,9 +575,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/restore
-         *
-         * Mock a request to restore a soft-deleted user
+         * Test: PUT /users/{userId}/restore - Restore a soft-deleted user
+         * 
+         * Verifies that administrators can restore users that were previously soft-deleted.
+         * This is a two-step test: first soft-delete a user, then restore them.
+         * 
+         * Expected behavior:
+         * - Step 1: Soft-delete succeeds (HTTP 200)
+         * - Step 2: Restore succeeds (HTTP 200)
+         * - Response contains success message: "User restored successfully"
+         * - User is marked as active again in the database
+         * - User can log in after restoration
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
@@ -509,9 +630,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: DELETE /users/{userId}/permanent
-         *
-         * Mock a request to permanently delete a user
+         * Test: DELETE /users/{userId}/permanent - Permanently delete a user
+         * 
+         * Verifies that administrators can permanently remove users from the database.
+         * Unlike soft-delete, this operation cannot be undone. This should be used with caution.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User is permanently removed from the database
+         * - Response contains confirmation message: "User deleted permanently"
+         * - Response includes the deleted user's login for confirmation
+         * - User cannot be restored after permanent deletion
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
@@ -542,9 +675,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manager
-         *
-         * Mock a request to promote a user into a manager
+         * Test: PUT /users/{userId}/promote-manager - Promote user to MANAGER role
+         * 
+         * Verifies that administrators can promote regular users to the MANAGER role.
+         * This grants elevated permissions for managing other users and resources.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User's role is changed from USER to MANAGER
+         * - Response contains success message: "User promoted to manager successfully"
+         * - Database is updated with new role
+         * - User gains MANAGER permissions immediately
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.user@test.com (USER role)
          */
         @Test
         @Transactional
@@ -581,10 +726,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manage.
-         *
-         * Mock a request to promote a user into a manager with missing authorization
-         * header.
+         * Test: PUT /users/{userId}/promote-manager - Authentication required
+         * 
+         * Verifies that role promotion requires authentication to prevent unauthorized
+         * privilege escalation.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing Authorization header
+         * - Response contains error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
@@ -609,9 +764,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manage.
-         *
-         * Mock a request to promote a user into a manager with a malformed token.
+         * Test: PUT /users/{userId}/promote-manager - Reject invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized role changes.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
@@ -638,9 +804,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manage.
-         *
-         * Mock a request to promote a user into a manager as a non-admin user.
+         * Test: PUT /users/{userId}/promote-manager - Authorization check (admin only)
+         * 
+         * Verifies that only administrators can promote users to manager role.
+         * Regular users should not be able to change roles, even their own.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 403 (Forbidden)
+         * - Request is rejected due to insufficient permissions
+         * - Response contains authorization error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authenticated as: test.user@test.com (USER role - insufficient permissions)
+         * - Target user: test.user@test.com (attempting self-promotion)
          */
         @Test
         @Transactional
@@ -667,9 +844,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manage.
-         *
-         * Mock a request to promote a user into a managerwith a non-existing user.
+         * Test: PUT /users/{userId}/promote-manager - Error when user doesn't exist
+         * 
+         * Verifies that the endpoint properly handles requests to promote non-existent users.
+         * This prevents accidental or malicious attempts to promote invalid user IDs.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 404 (Not Found)
+         * - Request is rejected because user ID doesn't exist
+         * - Response contains error message about user not found
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user ID: 9999 (non-existent)
          */
         @Test
         @Transactional
@@ -698,9 +885,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manage.
-         *
-         * Mock a request to promote a user who is already a manager.
+         * Test: PUT /users/{userId}/promote-manager - Conflict when user is already manager
+         * 
+         * Verifies that attempting to promote a user who already has manager role
+         * returns an appropriate error instead of succeeding unnecessarily.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 409 (Conflict)
+         * - Request is rejected because user already has MANAGER role
+         * - Response contains error message about user already being manager
+         * - User's role remains MANAGER (unchanged)
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.manager@test.com (already MANAGER role)
          */
         @Test
         @Transactional
@@ -727,9 +925,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-manage.
-         *
-         * Mock a request to promote a user who is already an admin.
+         * Test: PUT /users/{userId}/promote-manager - Conflict when user is already admin
+         * 
+         * Verifies that attempting to "promote" an admin to manager role returns an error.
+         * This would actually be a demotion since ADMIN is higher than MANAGER.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 409 (Conflict)
+         * - Request is rejected because user has ADMIN role (higher than MANAGER)
+         * - Response contains error message about conflicting role
+         * - User's role remains ADMIN (unchanged)
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.admin@test.com (already ADMIN role - higher than MANAGER)
          */
         @Test
         @Transactional
@@ -755,9 +964,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-manager
-         *
-         * Mock a request to revoke a manager into a user
+         * Test: PUT /users/{userId}/revoke-manager - Revoke manager role, demote to USER
+         * 
+         * Verifies that administrators can revoke manager privileges, demoting them
+         * back to regular USER role. This is useful for removing elevated permissions.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User's role is changed from MANAGER to USER
+         * - Response contains success message: "Manager role revoked successfully"
+         * - Database is updated with new role
+         * - User loses manager permissions immediately
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.manager@test.com (MANAGER role to be revoked)
          */
         @Test
         @Transactional
@@ -795,9 +1016,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-manager
-         *
-         * Mock a request to revoke a manager into a user with missing header
+         * Test: PUT /users/{userId}/revoke-manager - Authentication required
+         * 
+         * Verifies that revoking manager privileges requires authentication to prevent
+         * unauthorized role modifications.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing Authorization header
+         * - Response contains error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         * - Target user: test.manager@test.com
          */
         @Test
         @Transactional
@@ -822,9 +1054,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-manager
-         *
-         * Mock a request to revoke a manager into a user with malformed token
+         * Test: PUT /users/{userId}/revoke-manager - Reject invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized manager role revocations.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
+         * - Target user: test.manager@test.com
          */
         @Test
         @Transactional
@@ -850,9 +1093,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-manager
-         *
-         * Mock a request to revoke a manager into a user as a non-admin user
+         * Test: PUT /users/{userId}/revoke-manager - Authorization check (admin only)
+         * 
+         * Verifies that only administrators can revoke manager privileges.
+         * Non-admin users should not be able to modify manager roles.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 403 (Forbidden)
+         * - Request is rejected due to insufficient permissions
+         * - Response contains authorization error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authenticated as: test.user@test.com (USER role - insufficient permissions)
+         * - Target user: test.manager@test.com
          */
         @Test
         @Transactional
@@ -880,9 +1134,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-manager
-         *
-         * Mock a request to revoke a manager for a non-existent user
+         * Test: PUT /users/{userId}/revoke-manager - Error when user doesn't exist
+         * 
+         * Verifies that the endpoint properly handles requests to revoke manager role
+         * from non-existent users.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 404 (Not Found)
+         * - Request is rejected because user ID doesn't exist
+         * - Response contains error message about user not found
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user ID: 9999 (non-existent)
          */
         @Test
         @Transactional
@@ -909,9 +1173,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-admin
-         *
-         * Mock a request to Promote a user or manager into an admin
+         * Test: PUT /users/{userId}/promote-admin - Promote user/manager to ADMIN role
+         * 
+         * Verifies that administrators can promote users or managers to the ADMIN role.
+         * This grants the highest level of permissions, allowing full system management.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User's role is changed to ADMIN
+         * - Response contains success message: "Admin role assigned successfully"
+         * - Database is updated with new role
+         * - User gains all administrative permissions immediately
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.manager@test.com (MANAGER role)
          */
         @Test
         @Transactional
@@ -948,10 +1224,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-admin
-         *
-         * Mock a request to Promote a user or manager into an admin with missing
-         * authorization header
+         * Test: PUT /users/{userId}/promote-admin - Authentication required
+         * 
+         * Verifies that promoting users to admin requires authentication to prevent
+         * unauthorized privilege escalation to the highest level.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing Authorization header
+         * - Response contains error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         * - Target user: test.manager@test.com
          */
         @Test
         @Transactional
@@ -976,10 +1262,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-admin
-         *
-         * Mock a request to Promote a user or manager into an admin with a malformed
-         * token
+         * Test: PUT /users/{userId}/promote-admin - Reject invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized admin promotions.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
+         * - Target user: test.manager@test.com
          */
         @Test
         @Transactional
@@ -1005,9 +1301,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-admin
-         *
-         * Mock a request to Promote a user or manager into an admin as a non-admin
+         * Test: PUT /users/{userId}/promote-admin - Authorization check (admin only)
+         * 
+         * Verifies that only administrators can promote users to admin role.
+         * Non-admin users (including managers) should not be able to grant admin privileges.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 403 (Forbidden)
+         * - Request is rejected due to insufficient permissions
+         * - Response contains authorization error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authenticated as: test.user@test.com (USER role - insufficient permissions)
+         * - Target user: test.manager@test.com
          */
         @Test
         @Transactional
@@ -1035,10 +1342,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-admin
-         *
-         * Mock a request to Promote a user or manager into an admin with a non-existing
-         * user
+         * Test: PUT /users/{userId}/promote-admin - Error when user doesn't exist
+         * 
+         * Verifies that the endpoint properly handles requests to promote non-existent users.
+         * This prevents accidental or malicious attempts to promote invalid user IDs.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 404 (Not Found)
+         * - Request is rejected because user ID doesn't exist
+         * - Response contains error message about user not found
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user ID: 9999 (non-existent)
          */
         @Test
         @Transactional
@@ -1067,10 +1383,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/promote-admin
-         *
-         * Mock a request to Promote a user or manager into an admin with a user
-         * who is already an admin.
+         * Test: PUT /users/{userId}/promote-admin - Conflict when user is already admin
+         * 
+         * Verifies that attempting to promote a user who already has admin role
+         * returns an appropriate error instead of succeeding unnecessarily.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 409 (Conflict)
+         * - Request is rejected because user already has ADMIN role
+         * - Response contains error message about user already being admin
+         * - User's role remains ADMIN (unchanged)
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.admin@test.com (already ADMIN role)
          */
         @Test
         @Transactional
@@ -1097,9 +1423,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to revoke an admin into a user.
+         * Test: PUT /users/{userId}/revoke-admin - Revoke admin role, demote to USER
+         * 
+         * Verifies that administrators can revoke admin privileges from other admins,
+         * demoting them back to regular USER role. This is useful for removing admin access.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User's role is changed from ADMIN to USER
+         * - Response contains success message: "Admin role revoked successfully"
+         * - Database is updated with new role
+         * - User loses admin permissions immediately
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.admin2@test.com (ADMIN role to be revoked)
          */
         @Test
         @Transactional
@@ -1135,10 +1473,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to revoke an admin into a user with missing
-         * authorization header.
+         * Test: PUT /users/{userId}/revoke-admin - Authentication required
+         * 
+         * Verifies that revoking admin privileges requires authentication to prevent
+         * unauthorized role modifications.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing Authorization header
+         * - Response contains error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         * - Target user: test.admin2@test.com
          */
         @Test
         @Transactional
@@ -1164,9 +1512,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to revoke an admin into a user with malformed token.
+         * Test: PUT /users/{userId}/revoke-admin - Reject invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized admin role revocations.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
+         * - Target user: test.admin2@test.com
          */
         @Test
         @Transactional
@@ -1193,9 +1552,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to revoke an admin into a user as a non-admin user.
+         * Test: PUT /users/{userId}/revoke-admin - Authorization check (admin only)
+         * 
+         * Verifies that only administrators can revoke admin privileges from other users.
+         * Non-admin users should not be able to modify admin roles.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 403 (Forbidden)
+         * - Request is rejected due to insufficient permissions
+         * - Response contains authorization error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authenticated as: test.user@test.com (USER role - insufficient permissions)
+         * - Target user: test.admin2@test.com
          */
         @Test
         @Transactional
@@ -1224,9 +1594,19 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to revoke an admin into a user with a non-existing user.
+         * Test: PUT /users/{userId}/revoke-admin - Error when user doesn't exist
+         * 
+         * Verifies that the endpoint properly handles requests to revoke admin role
+         * from non-existent users.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 404 (Not Found)
+         * - Request is rejected because user ID doesn't exist
+         * - Response contains error message about user not found
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user ID: 9999 (non-existent)
          */
         @Test
         @Transactional
@@ -1253,9 +1633,21 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to downgrade an admin into a manager.
+         * Test: PUT /users/{userId}/downgrade-admin - Downgrade admin to MANAGER role
+         * 
+         * Verifies that administrators can downgrade other admins to manager role.
+         * This allows partial privilege reduction while retaining some elevated permissions.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User's role is changed from ADMIN to MANAGER
+         * - Response contains success message: "Admin role downgraded successfully"
+         * - Database is updated with new role
+         * - User loses admin permissions but retains manager permissions
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.admin2@test.com (ADMIN role to be downgraded)
          */
         @Test
         @Transactional
@@ -1292,10 +1684,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to downgrade an admin into a manager with missing
-         * authorization header.
+         * Test: PUT /users/{userId}/downgrade-admin - Authentication required
+         * 
+         * Verifies that downgrading admin roles requires authentication to prevent
+         * unauthorized role modifications.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing Authorization header
+         * - Response contains error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         * - Target user: test.admin2@test.com
          */
         @Test
         @Transactional
@@ -1321,9 +1723,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: PUT /users/{userId}/revoke-admin
-         *
-         * Mock a request to downgrade an admin into a manager with a malformed token
+         * Test: PUT /users/{userId}/downgrade-admin - Reject invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized admin role downgrades.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - User's role remains unchanged
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
+         * - Target user: test.admin2@test.com
          */
         @Test
         @Transactional
@@ -1350,9 +1763,22 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: DELETE /users/{userId}
-         *
-         * Mock a request to delete a user.
+         * Test: DELETE /users/{userId} - Soft delete a user
+         * 
+         * Verifies that administrators can soft-delete users. Soft deletion marks the user
+         * as deleted without removing them from the database, allowing for potential restoration.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - User is marked as deleted in the database (isDeleted = true)
+         * - User record remains in database for audit/recovery purposes
+         * - Response contains success message: "User deleted successfully"
+         * - Response includes the deleted user's login for confirmation
+         * - User cannot log in after soft deletion
+         * 
+         * Test data:
+         * - Authenticated as: test.admin@test.com (admin user)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
@@ -1389,10 +1815,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: DELETE /users/{userId}
-         *
-         * Mock a request to delete a user with missing authorization
-         * header.
+         * Test: DELETE /users/{userId} - Authentication required
+         * 
+         * Verifies that deleting users requires authentication to prevent
+         * unauthorized account deletions.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing Authorization header
+         * - Response contains error message
+         * - User remains active (not deleted)
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
@@ -1417,10 +1853,20 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: DELETE /users/{userId}
-         *
-         * Mock a request to delete a user with malformed authorization
-         * header.
+         * Test: DELETE /users/{userId} - Reject invalid JWT token
+         * 
+         * Verifies that the endpoint validates JWT tokens and rejects malformed ones
+         * to prevent unauthorized user deletions.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - User remains active (not deleted)
+         * 
+         * Test data:
+         * - JWT Token: this.is.not.a.valid.token (malformed)
+         * - Target user: test.user@test.com
          */
         @Test
         @Transactional
