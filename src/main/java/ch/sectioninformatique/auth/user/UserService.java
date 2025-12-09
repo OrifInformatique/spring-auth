@@ -14,6 +14,7 @@ import jakarta.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -111,6 +112,7 @@ public class UserService {
      * @throws UserAlreadyExistsException if the login already exists 
      * @throws RoleNotFoundException if the role isn't found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
                 
@@ -138,7 +140,7 @@ public class UserService {
      * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
      * @throws InvalidCredentialsException if the user is not found or the old password is invalid
      */
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void updatePassword(String login, PasswordUpdateDto passwords) {
 
         User user = userRepository.findByLogin(login)
@@ -226,6 +228,7 @@ public class UserService {
      * @param userId
      * @return
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto restoreDeletedUser(Long userId) {
         User user = userRepository.findByIdDeleted(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -248,6 +251,7 @@ public class UserService {
      * @throws UserAlreadyAdminException if the user is alreydy an admin
      * @throws RoleNotFoundException if the role is not found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto promoteToManager(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -279,6 +283,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a user, or the
      *                          user role is not found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto revokeManagerRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -308,6 +313,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a admin, or the
      *                          admin role is not found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto promoteToAdmin(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -335,6 +341,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already an manager, or the
      *                          manager role is not found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto downgradeAdminRole(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -366,6 +373,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found, already a user, or the
      *                          user role is not found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto revokeAdminRole(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -422,6 +430,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found or the authenticated user
      *                          lacks permissions
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto deleteUser(Long userId) {
         // Get the user to delete
     User userToDelete = userRepository.findById(userId)
@@ -457,6 +466,7 @@ public class UserService {
      * @throws RuntimeException if the user is not found or the authenticated user
      *                          lacks permissions
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto deletePermanentUser(Long userId) {
         // Get the user to delete
         User userToDelete = userRepository.findById(userId)
@@ -492,6 +502,7 @@ public class UserService {
      * @return UserDto containing the created user's information
      * @throws RoleNotFoundException if the default role is not found
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto createAzureUser(UserDto userDto) {
         log.debug("Creating new Azure user: {}", userDto.getLogin());
 
