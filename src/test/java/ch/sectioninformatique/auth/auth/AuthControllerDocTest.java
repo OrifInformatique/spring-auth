@@ -703,7 +703,7 @@ public class AuthControllerDocTest {
                 when(userAuthenticationProvider.validateRefreshToken(refreshRequest.refreshToken()))
                                 .thenReturn(mockJwt);
 
-                when(userService.validate(userDto.getLogin(), refreshRequest.refreshToken()))
+                when(userService.validateRefreshToken(userDto.getLogin(), refreshRequest.refreshToken()))
                                 .thenReturn(true);
 
                 when(userService.findByLogin(userDto.getLogin()))

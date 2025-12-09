@@ -110,7 +110,7 @@ public class AuthController {
         DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(request.refreshToken());
         String login = jwt.getSubject();
 
-        if (!userService.validate(login, request.refreshToken())) {
+        if (!userService.validateRefreshToken(login, request.refreshToken())) {
             throw new AppException("Invalid refresh token", HttpStatus.UNAUTHORIZED);
         }
 

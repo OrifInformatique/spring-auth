@@ -116,7 +116,7 @@ public class UserService {
      * @param refreshToken The raw refresh token to validate.
      * @return {@code true} if the token is valid, {@code false} otherwise.
      */
-    public boolean validate(String userLogin, String refreshToken) {
+    public boolean validateRefreshToken(String userLogin, String refreshToken) {
         return refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
                 .filter(stored -> passwordEncoder.matches(refreshToken, stored.getTokenHash()))
                 .filter(stored -> stored.getExpiresAt().isAfter(Instant.now()))
