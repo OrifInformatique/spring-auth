@@ -2,61 +2,52 @@
 
 ## Table of Contents
 
-- [Documentation Tools](#documentation-tools)
-- [Overview](#overview)
-- [1. Spring-Auth](#1-spring-auth)
-  - [1.1 General Information](#11-general-information)
-  - [1.2 Root Files](#12-root-files)
-  - [1.3 Root Folders](#13-root-folders)
-  - [1.4 Source Structure (`src`)](#14-source-structure-src)
-    - [1.4.1 `main`](#141-main)
-    - [1.4.2 `test`](#142-test)
-  - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
-  - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
-  - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
-  - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
-  - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
-  - [1.10 Error and Exception Management (`main/java/app`)](#110-error-and-exception-management-mainjavaapp)
-  - [1.11 Test Structure (`test/java`)](#111-test-structure-testjava)
-  - [1.12 Security Tests (`test/java/security`)](#112-security-tests-testjavasecurity)
-  - [1.13 Authentication Tests (`test/java/auth`)](#113-authentication-tests-testjavaauth)
-  - [1.14 User Tests (`test/java/user`)](#114-user-tests-testjavauser)
-  - [1.15 External Integrations (Microsoft Entra ID / Azure AD)](#115-external-integrations-microsoft-entra-id--azure-ad)
-    - [1.15.1 OAuth2 Integration (Azure AD)](#1151-oauth2-integration-azure-ad)
-    - [1.15.2 OAuth2 Scopes and Claims](#1152-oauth2-scopes-and-claims)
-- [2. API Endpoints Summary](#2-api-endpoints-summary)
-  - [2.1 Authentication Endpoints (`/auth`)](#21-authentication-endpoints-auth)
-  - [2.2 OAuth2 Endpoints (`/oauth2`)](#22-oauth2-endpoints-oauth2)
-  - [2.3 User Management Endpoints (`/users`)](#23-user-management-endpoints-users)
-- [3. Testing and Documentation](#3-testing-and-documentation)
-  - [3.1 Environment Profiles](#31-environment-profiles)
-  - [3.2 Test Execution](#32-test-execution)
-  - [3.3 API Documentation Generation](#33-api-documentation-generation)
-- [4. Security Architecture](#4-security-architecture)
-  - [4.1 Authentication Flow](#41-authentication-flow)
-  - [4.2 Role-Based Access Control](#42-role-based-access-control)
-  - [4.3 Password Security](#43-password-security)
-- [5. Database Schema](#5-database-schema)
-  - [5.1 Key Tables](#51-key-tables)
-  - [5.2 Soft Delete Pattern](#52-soft-delete-pattern)
-- [6. Environment Configuration](#6-environment-configuration)
-  - [6.1 Required Environment Variables](#61-required-environment-variables)
-  - [6.2 Configuration Files](#62-configuration-files)
-- [7. Development Workflow](#7-development-workflow)
-  - [7.1 Local Development Setup](#71-local-development-setup)
-  - [7.2 Working with Different Environments](#72-working-with-different-environments)
-  - [7.3 Docker Compose Commands](#73-docker-compose-commands)
-  - [7.4 Local Development without Docker](#74-local-development-without-docker)
-- [8. Troubleshooting](#8-troubleshooting)
-  - [8.1 Common Issues](#81-common-issues)
-  - [8.2 Logs and Debugging](#82-logs-and-debugging)
-- [9. Additional Resources](#9-additional-resources)
+- [Application Documentation](#application-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Documentation Tools](#documentation-tools)
+  - [Overview](#overview)
+  - [1. Spring-Auth](#1-spring-auth)
+    - [1.1 General Information](#11-general-information)
+    - [1.2 Root Files](#12-root-files)
+    - [1.3 Root Folders](#13-root-folders)
+    - [1.4 Source Structure (`src`)](#14-source-structure-src)
+      - [1.4.1 `main`](#141-main)
+      - [1.4.2 `test`](#142-test)
+    - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
+    - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
+    - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
+    - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
+    - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
+    - [1.10 Error and Exception Management (`main/java/app`)](#110-error-and-exception-management-mainjavaapp)
+    - [1.11 Test Structure (`test/java`)](#111-test-structure-testjava)
+    - [1.12 Security Tests (`test/java/security`)](#112-security-tests-testjavasecurity)
+    - [1.13 Authentication Tests (`test/java/auth`)](#113-authentication-tests-testjavaauth)
+    - [1.14 User Tests (`test/java/user`)](#114-user-tests-testjavauser)
+    - [1.15 External Integrations (Microsoft Entra ID / Azure AD)](#115-external-integrations-microsoft-entra-id--azure-ad)
+      - [1.15.1 OAuth2 Integration (Azure AD)](#1151-oauth2-integration-azure-ad)
+      - [1.15.2 OAuth2 Scopes and Claims](#1152-oauth2-scopes-and-claims)
+  - [2. API Endpoints Summary](#2-api-endpoints-summary)
+    - [2.1 Authentication Endpoints (`/auth`)](#21-authentication-endpoints-auth)
+    - [2.2 OAuth2 Endpoints (`/oauth2`)](#22-oauth2-endpoints-oauth2)
+    - [2.3 User Management Endpoints (`/users`)](#23-user-management-endpoints-users)
+  - [3. Testing and Documentation](#3-testing-and-documentation)
+    - [3.1 Environment Profiles](#31-environment-profiles)
+    - [3.2 Test Execution](#32-test-execution)
+    - [3.3 API Documentation Generation](#33-api-documentation-generation)
+  - [4. Security Architecture](#4-security-architecture)
+    - [4.1 Authentication Flow](#41-authentication-flow)
+    - [4.2 Role-Based Access Control](#42-role-based-access-control)
+    - [4.3 Password Security](#43-password-security)
+  - [5. Database Schema](#5-database-schema)
+    - [5.1 Key Tables](#51-key-tables)
+    - [5.2 Soft Delete Pattern](#52-soft-delete-pattern)
+  - [6. Additional Resources](#6-additional-resources)
 
 ---
 
 ## Documentation Tools
 
-Recomended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid).
+Recommended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid).
 
 ---
 
@@ -123,7 +114,7 @@ graph TD
 | `.env`                   | Environment variables for local development and deployment.      |
 | `README.md`              | Project overview, setup instructions, and documentation links.   |
 
---
+---
 
 ### 1.3 Root Folders
 
@@ -459,7 +450,7 @@ _Sequence Diagram showing an example of the user management flow._
 | `UserAlreadyAdminException.java`          | Thrown when attempting to promote a user who is already an admin.        |
 | `UserAlreadyExistsException.java`         | Thrown when attempting to register with an existing login.               |
 | `UserAlreadyManagerException.java`        | Thrown when attempting to promote a user who is already a manager.       |
-| `UserAlreadyRegularException.java`        | Thrown when attempting to downgrade a user who is already a regular user.|
+| `UserAlreadyRegularException.java`        | Thrown when attempting to downgrade a user who is already a regular user. |
 | `UserHasLowerRightsException.java`        | Thrown when a user tries to modify another user with higher privileges.  |
 | `UserNotFoundException.java`              | Thrown when a requested user is not found in the database.               |
 
@@ -562,7 +553,7 @@ When users log in via Microsoft Entra ID, the process follows the standard OAuth
 
    - A local JWT is created using UserAuthenticationProvider.createToken(user).
 
-   - The app redirects the browser to the frontend (http://localhost:4000/oauth2/success) with the JWT token in the URL query parameters.
+   - The app redirects the browser to the frontend (http://localhost:{port}/oauth2/success) with the JWT token in the URL query parameters.
 
 #### 1.15.2 OAuth2 Scopes and Claims
 Azure AD provides the following standard OpenID Connect scopes in the ID token:
@@ -760,167 +751,7 @@ Users can be soft-deleted (marked as inactive) or permanently deleted:
 
 ---
 
-## 6. Environment Configuration
-
-
-
-### 6.2 Configuration Files
-
-- **`application.properties`:** Main Spring Boot configuration
-- **`application.properties-dist`:** Template for environment-specific settings
-- **`.env`:** Local environment variables (not committed to git)
-- **`env-dist`:** Template for `.env` file
-
----
-
-## 7. Development Workflow
-
-### 7.1 Local Development Setup
-
-1. **Copy environment templates:**
-   ```bash
-   cp env-dist .env
-   cp application.properties-dist application.properties
-   ```
-
-2. **Configure environment variables in `.env`:**
-   - Set `ENVIRONMENT=dev` for development
-   - Update database credentials if needed
-   - Configure Azure OAuth2 settings (optional)
-
-3. **Start the application with Docker Compose:**
-   ```bash
-   docker compose up --build
-   ```
-
-   This will:
-   - Build the Spring Boot application with Maven
-   - Start MariaDB database container
-   - Initialize the database schema from `init.sql`
-   - Run the application on the port specified in `.env` (default: 8080)
-
-4. **Access the application:**
-   - API: `http://localhost:8080`
-   - Database: MariaDB on port 3306 (internal to Docker network)
-
-### 7.2 Working with Different Environments
-
-**Development Mode (`ENVIRONMENT=dev`):**
-```bash
-# Set in .env
-ENVIRONMENT=dev
-
-# Start application
-docker compose up --build
-```
-- Uses `dev_db` database
-- Enables Spring Boot DevTools for hot reload
-- Skips tests for faster startup
-- Ideal for active development
-
-**Testing Mode (`ENVIRONMENT=test`):**
-```bash
-# Set in .env
-ENVIRONMENT=test
-
-# Run tests and generate documentation
-docker compose up --build
-```
-- Uses `test_db` database
-- Runs full test suite (`mvn verify`)
-- Generates API documentation
-- Validates all functionality
-
-**Production Mode (`ENVIRONMENT=prod`):**
-```bash
-# Set in .env
-ENVIRONMENT=prod
-
-# Build and run optimized application
-docker compose up --build
-```
-- Uses production database (configure in `application.properties`)
-- Builds optimized JAR file
-- Runs production-ready application
-- No development tools or test dependencies
-
-### 7.3 Docker Compose Commands
-
-**Start services:**
-```bash
-docker compose up --build    # Build and start all services
-docker compose up -d         # Run in detached mode (background)
-```
-
-**Stop services:**
-```bash
-docker compose down          # Stop and remove containers
-docker compose down -v       # Also remove volumes (database data)
-```
-
-**View logs:**
-```bash
-docker compose logs          # View all logs
-docker compose logs app      # View application logs only
-docker compose logs -f       # Follow logs in real-time
-```
-
-**Rebuild after changes:**
-```bash
-# Always rebuild when changing ENVIRONMENT or code
-docker compose up --build
-```
-
-### 7.4 Local Development without Docker
-
-If you prefer to run without Docker:
-
-1. **Start MariaDB locally** (or use Docker for database only)
-
-2. **Configure `application.properties`** with local database URL
-
-3. **Run with Maven:**
-   ```bash
-   mvn spring-boot:run
-   ```
-
-4. **Run tests:**
-   ```bash
-   mvn test              # Unit tests only
-   mvn verify           # Full test suite
-   ```
-
----
-
-## 8. Troubleshooting
-
-### 8.1 Common Issues
-
-**Database Connection Failed:**
-- Verify MariaDB is running: `docker ps`
-- Check database credentials in `.env`
-- Ensure port 3306 is not in use
-
-**JWT Token Invalid:**
-- Verify `JWT_SECRET` is properly set and matches across restarts
-- Check token expiration settings
-- Ensure token is sent in `Authorization: Bearer <token>` header
-
-**CORS Errors:**
-- Update `CORS_ALLOWED_ORIGINS` in `.env`
-- Restart application after configuration changes
-
-### 8.2 Logs and Debugging
-
-Enable debug logging in `application.properties`:
-```properties
-logging.level.ch.sectioninformatique.auth=DEBUG
-logging.level.org.springframework.security=DEBUG
-```
-
----
-
-## 9. Additional Resources
+## 6. Additional Resources
 
 - **Main README:** [README.md](../README.md) - Setup and installation guide
 - **API Documentation:** `target/generated-snippets-html/index.html` - Auto-generated API docs
