@@ -1,9 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "firstName" : "Test",
-  "lastName" : "NewUser",
-  "login" : "test.newuser@test.com",
-  "password" : "testPassword"
-}
-----

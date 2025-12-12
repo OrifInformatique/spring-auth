@@ -23,6 +23,7 @@ This project provides an authentication API to be used by other applications to 
   - [Microsoft Entra Azure AD oAuth2](#microsoft-entra-azure-ad-oauth2)
   - [Commands cheat-sheet](#commands-cheat-sheet)
     - [Simplified sequence diagram](#simplified-sequence-diagram)
+  - [Spring REST Docs](#spring-rest-docs)
 - [Sources](#sources)
 
 ## Getting Started
@@ -172,15 +173,12 @@ Check if the project's structure is valid
 
 ## Spring REST Docs
 
-The application work with an automated documentation from the Spring REST Docs package that is created when it run with docker and the test environment
+The application contains an automated documentation from the Spring REST Docs package. The documentation is created when running the application in test environment.
 
-It creates an .adoc file in src/asciidoc and an html page in the docs that can be consulted in github
+It creates an index.adoc file in the "src/asciidoc" folder and an index.html page in the "docs" folder.
 
-Link to the generated .adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
+Link to the generated index.adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
 
-Link to the generated .html : [src/asciidoc/index.html](docs/index.html)
+Link to the generated index.html : [docs/index.html](docs/index.html)
 
-Link to the doc : [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
-
-## Application Documentation
-[Processes documentation](/docs/process-documentation.md)
+Link to the doc on GitHub : [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)

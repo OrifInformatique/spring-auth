@@ -4,7 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,16 +21,50 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Finds a user by their login username.
+     * Finds a user by his login, including those that are soft-deleted.
      * This method is used for:
-     * - User authentication
-     * - User lookup during operations
-     * - Checking user existence
+     * - User lookup during operations when soft-deleted users need to be considered
+     * - Checking user existence regardless of deletion status
      *
-     * @param login The login username to search for (case-sensitive)
-     * @return Optional containing the user if found, empty Optional otherwise
+     * @param login The login to search for (case-sensitive)
+     * @return Optional containing the user if found, empty otherwise
      */
     Optional<User> findByLogin(String login);
+
+    /**
+     * Finds a user by his login, excluding soft-deleted users.
+     * 
+     * @param login The login to search for (case-sensitive)
+     * @return Optional containing the user if found, empty otherwise
+     */
+    Optional<User> findByLoginAndDeletedFalse(String login);
+
+    /**
+     * Returns all users including those that are soft-deleted.
+     */
+    @Query("SELECT u FROM User u")
+    List<User> findAllWithDeleted();
+
+    /**
+     * Returns only soft-deleted users.
+     */
+    @Query("SELECT u FROM User u WHERE u.deleted = true")
+    List<User> findAllDeleted();
+
+    /**
+     * Returne a deleted user from his id
+     */
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.deleted = true")
+    Optional<User> findByIdDeleted(@Param("id") Long id);
+
+    /*
+    * Permanently delete a user
+    * from the database, bypassing any soft delete mechanisms.
+    */
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM users WHERE id = :id", nativeQuery = true)
+    void deletePermanentlyById(Long id);
 
     /**
      * Checks if a user with the given login username exists.
@@ -41,14 +77,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if a user with the given login exists, false otherwise
      */
     boolean existsByLogin(String login);
-
-    /**
-     * Modify the User password
-     * 
-     * @param login The login username to check (case-sensitive)
-     * @param password The new password
-     */
-    @Modifying
-    @Query("UPDATE User u SET u.password = :password WHERE u.login = :login")
-    void updatePasswordByLogin(@Param("login") String login, @Param("password") String password);
 }

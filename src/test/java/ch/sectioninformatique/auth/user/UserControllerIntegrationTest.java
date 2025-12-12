@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.sectioninformatique.auth.AuthApplication;
-import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,11 +23,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -61,6 +60,10 @@ public class UserControllerIntegrationTest {
         /** UserService instance for user-related operations. */
         @Autowired
         private UserService userService;
+
+        /** UserRepository instance for user-related operations. */
+        @Autowired
+        private UserRepository userRepository;
 
         /**
          * Test the /users/me endpoint with real data.
@@ -768,7 +771,8 @@ public class UserControllerIntegrationTest {
          * Test the /users/{userId}/revoke-manager endpoint with a non-existing user.
          * This test retrieves a known admin user, generates an authentication token
          * for the admin,
-         * and performs a PUT request to revoke the manager role from a non-existing user.
+         * and performs a PUT request to revoke the manager role from a non-existing
+         * user.
          * It verifies that the response status is Not Found and saves the response
          * and token to files for later use.
          * 
@@ -1079,8 +1083,9 @@ public class UserControllerIntegrationTest {
         public void revokeAdminRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                .contentType(MediaType.APPLICATION_JSON))
+                MvcResult result = mockMvc
+                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
+                                                .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -1109,9 +1114,10 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
+                MvcResult result = mockMvc
+                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -1148,9 +1154,10 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(userDto);
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
+                MvcResult result = mockMvc
+                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isForbidden())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -1269,8 +1276,9 @@ public class UserControllerIntegrationTest {
         public void downgradeAdminRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
                 UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                .contentType(MediaType.APPLICATION_JSON))
+                MvcResult result = mockMvc
+                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
+                                                .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -1298,9 +1306,10 @@ public class UserControllerIntegrationTest {
                 String token = "this.is.not.a.valid.token";
                 UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
+                MvcResult result = mockMvc
+                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$.message").exists())
                                 .andReturn();
@@ -1340,18 +1349,20 @@ public class UserControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
-                                .andExpect(content().string("User deleted successfully"))
+                                .andExpect(jsonPath("$.message").value("User deleted successfully"))
+                                .andExpect(jsonPath("$.deletedUserLogin").value("test.user@test.com"))
                                 .andReturn();
 
                 String responseBody = result.getResponse().getContentAsString();
 
-                // Assert: verify user no longer exists
-                assertThrows(AppException.class, () -> {
-                        userService.findByLogin("test.user@test.com");
-                }, "Expected AppException when fetching deleted user");
+                Optional<User> deletedUserOpt = userRepository.findByLogin("test.user@test.com");
+                assertTrue(deletedUserOpt.isPresent(), "User should exist in the database");
+
+                User deletedUser = deletedUserOpt.get(); // Extract the User
+                assertTrue(deletedUser.isDeleted(), "User should be marked as deleted");
 
                 // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response.txt");
+                Path path = Paths.get("target/test-data/users-deleteUser-response.json");
                 Files.createDirectories(path.getParent());
                 Files.writeString(path, responseBody);
 

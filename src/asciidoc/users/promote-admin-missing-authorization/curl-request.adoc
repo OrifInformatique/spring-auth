@@ -1,5 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/users/100/promote-admin' -i -X PUT \
-    -H 'Accept: application/json'
-----

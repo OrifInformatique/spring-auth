@@ -1,6 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "message" : "Last name contains invalid characters"
-}
-----

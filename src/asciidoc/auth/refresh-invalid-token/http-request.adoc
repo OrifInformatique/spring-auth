@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-GET /auth/refresh HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080
-
-----

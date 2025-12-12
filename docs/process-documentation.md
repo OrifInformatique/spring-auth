@@ -209,6 +209,29 @@ sequenceDiagram
 
 _Sequence Diagram showing an example of the authentication flow._
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant template_frontback
+    participant spring-auth
+    participant database
+
+    Client->>template_frontback: /auth/login with credentials
+    template_frontback->>spring-auth: /auth/login with credentials
+    spring-auth->>database: store new refresh token
+    spring-auth-->>template_frontback: response with refresh token cookie
+    template_frontback->>Client: response with refresh token cookie
+    Client->>template_frontback: /auth/refresh with refresh token in body
+    template_frontback->>spring-auth: /auth/refresh with refresh token in body
+    spring-auth->>database: Check if token exist
+    database->>spring-auth: Confirm that token exist
+    spring-auth->>database: store new refresh token
+    spring-auth->>template_frontback: send new access token in body with new refresh token in cookie
+    template_frontback->>Client: send new access token in body with new refresh token in cookie
+    Client->>template_frontback: /users/... with access token
+```
+_Sequence Diagram showing an example of the refresh token workflow._
+
 | File                    | Description                                               |
 | ----------------------- | --------------------------------------------------------- |
 | `AuthController.java`   | Controller handling user authentication and registration. |

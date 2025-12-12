@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/auth/set-password' -i -X PUT \
-    -H 'Content-Type: application/json' \
-    -d '{
-  "newPassword" : "TestNewPassword"
-}'
-----

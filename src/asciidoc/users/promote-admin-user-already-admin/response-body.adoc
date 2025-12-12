@@ -1,6 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "message" : "The user is already an admin"
-}
-----
