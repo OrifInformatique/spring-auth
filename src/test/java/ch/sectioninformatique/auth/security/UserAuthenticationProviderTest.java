@@ -43,9 +43,22 @@ class UserAuthenticationProviderTest {
         authenticationProvider = new UserAuthenticationProvider(userService);
         // Use reflection to set the secret key
         try {
-            java.lang.reflect.Field field = UserAuthenticationProvider.class.getDeclaredField("secretKey");
-            field.setAccessible(true);
-            field.set(authenticationProvider, Base64.getEncoder().encodeToString(TEST_SECRET_KEY.getBytes()));
+            java.lang.reflect.Field accessField = UserAuthenticationProvider.class.getDeclaredField("secretAccessKey");
+            accessField.setAccessible(true);
+            accessField.set(authenticationProvider, Base64.getEncoder().encodeToString(TEST_SECRET_KEY.getBytes()));
+
+            java.lang.reflect.Field refreshField = UserAuthenticationProvider.class.getDeclaredField("secretRefreshKey");
+            refreshField.setAccessible(true);
+            refreshField.set(authenticationProvider, Base64.getEncoder().encodeToString(TEST_SECRET_KEY.getBytes()));
+
+            // Also set token lifetimes so tokens created in tests are valid for a reasonable window
+            java.lang.reflect.Field accessLifetime = UserAuthenticationProvider.class.getDeclaredField("accessTokenLifetime");
+            accessLifetime.setAccessible(true);
+            accessLifetime.set(authenticationProvider, java.time.Duration.ofMinutes(10));
+
+            java.lang.reflect.Field refreshLifetime = UserAuthenticationProvider.class.getDeclaredField("refreshTokenLifetime");
+            refreshLifetime.setAccessible(true);
+            refreshLifetime.set(authenticationProvider, java.time.Duration.ofDays(30));
         } catch (Exception e) {
             throw new RuntimeException("Failed to set secret key", e);
         }

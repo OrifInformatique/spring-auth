@@ -255,15 +255,37 @@ sequenceDiagram
 
 _Sequence Diagram showing an example of the authentication flow._
 
-| File                     | Description                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------- |
-| `AuthController.java`    | Controller handling user authentication, registration, and password management.       |
-| `CredentialsDto.java`    | Data Transfer Object (DTO) for login credentials.                                     |
-| `OAuth2Controller.java`  | Controller handling OAuth2 authentication flows with Microsoft Entra ID (Azure AD).   |
-| `PasswordConfig.java`    | Configuration class for password encoding and BCrypt strength settings.               |
-| `PasswordNotReused.java` | Custom validation annotation ensuring new password differs from current password.     |
-| `PasswordUpdateDto.java` | DTO for handling password update requests with old and new password validation.       |
-| `SignUpDto.java`         | DTO for user registration with validation constraints.                                |
+```mermaid
+sequenceDiagram
+    participant Client
+    participant template_frontback
+    participant spring-auth
+    participant database
+
+    Client->>template_frontback: /auth/login with credentials
+    template_frontback->>spring-auth: /auth/login with credentials
+    spring-auth->>database: store new refresh token
+    spring-auth-->>template_frontback: response with refresh token cookie
+    template_frontback->>Client: response with refresh token cookie
+    Client->>template_frontback: /auth/refresh with refresh token in body
+    template_frontback->>spring-auth: /auth/refresh with refresh token in body
+    spring-auth->>database: Check if token exist
+    database->>spring-auth: Confirm that token exist
+    spring-auth->>database: store new refresh token
+    spring-auth->>template_frontback: send new access token in body with new refresh token in cookie
+    template_frontback->>Client: send new access token in body with new refresh token in cookie
+    Client->>template_frontback: /users/... with access token
+```
+_Sequence Diagram showing an example of the refresh token workflow._
+
+| File                    | Description                                               |
+| ----------------------- | --------------------------------------------------------- |
+| `AuthController.java`   | Controller handling user authentication and registration. |
+| `CredentialsDto.java`   | Data Transfer Object (DTO) for login credentials.         |
+| `NewPasswordDto.java`   | DTO for handling new password requests.                   |
+| `OAuth2Controller.java` | Controller handling OAuth2 authentication flows.          |
+| `PasswordConfig.java`   | Configuration class for password policies and encryption. |
+| `SignUpDto.java`        | DTO for registration functionalities.                     |
 
 ---
 

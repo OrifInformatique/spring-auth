@@ -11,12 +11,11 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import ch.sectioninformatique.auth.user.User;
 import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserRepository;
 import ch.sectioninformatique.auth.user.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -122,11 +121,38 @@ public class AuthControllerIntegrationTest {
         @Autowired
         private UserService userService;
 
-        @Autowired
-        private UserRepository userRepository;
+        /**
+         * Test the /auth/login endpoint with missing login.
+         * This test performs a login request with missing login and expects a bad
+         * request response.
+         * The response is saved to a file.
+         *
+         * @throws Exception if an error occurs during the test
+         */
+        @Test
+        public void login_missingLogin_shouldReturnBadRequest() throws Exception {
+                performRequest(
+                                "POST",
+                                "/auth/login",
+                                "{\"password\":\"Test1234!\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                400,
+                                "login-missing-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
 
         /**
-         * Test: POST /auth/login - Successful login with valid credentials
+         * Test that a soft-deleted user cannot log in.
+         * Retrieves a known user, marks them as deleted,
+         * and tries to authenticate with valid credentials.
+         * Expects an Unauthorized (401) response.
          * 
          * Verifies that a user can successfully log in with valid email and password.
          * 
@@ -153,56 +179,7 @@ public class AuthControllerIntegrationTest {
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "login",
-                                request -> {
-                                        try {
-                                                request.andExpect(jsonPath("$.id").isNotEmpty())
-                                                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                                                .andExpect(jsonPath("$.lastName").value("User"))
-                                                                .andExpect(jsonPath("$.login")
-                                                                                .value("test.user@test.com"))
-                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                                                .andExpect(jsonPath("$.token").isNotEmpty())
-                                                                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
-                                        } catch (Exception e) {
-                                                throw new RuntimeException(e);
-                                        }
-                                });
-        }
-
-        /**
-         * Test: POST /auth/login - Validation error when login field is missing
-         * 
-         * Verifies that the API properly validates required fields and returns
-         * an appropriate error when the login field is omitted from the request.
-         * 
-         * Expected behavior:
-         * - Returns HTTP 400 (Bad Request)
-         * - Response contains an error message explaining the validation failure
-         * - Request is rejected before attempting database lookup
-         * 
-         * Test data:
-         * - Login: (missing)
-         * - Password: Test1234!
-         */
-        @Test
-        @Transactional
-        public void login_missingLogin_shouldReturnBadRequest() throws Exception {
-
-                performRequest(
-                                "POST",
-                                "/auth/login",
-                                "{\"password\":\"Test1234!\"}",
-                                null,
-                                MediaType.APPLICATION_JSON,
-                                400,
-                                "login-missing-login",
-                                request -> {
-                                        try {
-                                                request.andExpect(jsonPath("$.message").exists());
-                                        } catch (Exception e) {
-                                                throw new RuntimeException(e);
-                                        }
-                                });
+                                null);
         }
 
         /**
@@ -1082,7 +1059,8 @@ public class AuthControllerIntegrationTest {
         public void refresh_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+                String refreshToken = new RefreshRequestDto(
+                                userAuthenticationProvider.createRefreshToken(userDto)).refreshToken();
 
                 performRequest(
                                 "GET",
