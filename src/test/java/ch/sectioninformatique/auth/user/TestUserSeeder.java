@@ -98,39 +98,37 @@ public class TestUserSeeder implements CommandLineRunner {
 
 			// Create users with User.builder()
 
-			User testUser = User.builder()
-					.firstName("Test")
-					.lastName("User")
-					.login("test.user@test.com")
-					.password(passwordEncoder.encode("Test1234!"))
-					.mainRole(userRole)
-					.build();
+		User testUser = User.builder()
+				.firstName("Test")
+				.lastName("User")
+				.login("test.user@test.com")
+				.password(passwordEncoder.encode("Test1234!"))
+				.mainRole(userRole)
+				.build();
 
-			User testManager = User.builder()
-					.firstName("Test")
-					.lastName("Manager")
-					.login("test.manager@test.com")
-					.password(passwordEncoder.encode("ManagerTest123!"))
-					.mainRole(managerRole)
-					.build();
+		User testManager = User.builder()
+				.firstName("Test")
+				.lastName("Manager")
+				.login("test.manager@test.com")
+				.password(passwordEncoder.encode("ManagerTest123!"))
+				.mainRole(managerRole)
+				.build();
 
-			User testAdmin = User.builder()
-					.firstName("Test")
-					.lastName("Admin")
-					.login("test.admin@test.com")
-					.password(passwordEncoder.encode("AdminTest123!"))
-					.mainRole(adminRole)
-					.build();
+		User testAdmin = User.builder()
+				.firstName("Test")
+				.lastName("Admin")
+				.login("test.admin@test.com")
+				.password(passwordEncoder.encode("AdminTest123!"))
+				.mainRole(adminRole)
+				.build();
 
-			User testAdmin2 = User.builder()
-					.firstName("Test2")
-					.lastName("Admin2")
-					.login("test.admin2@test.com")
-					.password(passwordEncoder.encode("AdminTest123!2"))
-					.mainRole(adminRole)
-					.build();
-
-			userRepository.saveAll(Arrays.asList(testUser, testManager, testAdmin, testAdmin2));
+		User testAdmin2 = User.builder()
+				.firstName("Test2")
+				.lastName("Admin2")
+				.login("test.admin2@test.com")
+				.password(passwordEncoder.encode("AdminTest123!2"))
+				.mainRole(adminRole)
+				.build();			userRepository.saveAll(Arrays.asList(testUser, testManager, testAdmin, testAdmin2));
 		} else {
 			System.out.println("Users table not empty - Skipping user seeding");
 		}

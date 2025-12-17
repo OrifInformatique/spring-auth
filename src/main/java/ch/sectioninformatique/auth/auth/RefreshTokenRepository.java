@@ -42,5 +42,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
      *
      * @param userLogin The login/username of the user whose tokens should be deleted.
      */
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
     void deleteByUserLogin(String userLogin);
 }
