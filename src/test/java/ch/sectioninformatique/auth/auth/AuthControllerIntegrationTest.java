@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
@@ -555,7 +556,7 @@ public class AuthControllerIntegrationTest {
                                                                                 .value("test.newuser@test.com"))
                                                                 .andExpect(jsonPath("$.mainRole").value("USER"))
                                                                 .andExpect(jsonPath("$.token").isNotEmpty())
-                                                                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+                                                                .andExpect(cookie().exists("refresh_token"));
 
                                                 // Assert: fetch user again and verify user created
                                                 UserDto updatedUser = userService.findByLogin("test.newuser@test.com");
@@ -1059,25 +1060,23 @@ public class AuthControllerIntegrationTest {
         public void refresh_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                String refreshToken = new RefreshRequestDto(
-                                userAuthenticationProvider.createRefreshToken(userDto)).refreshToken();
+                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+                // Store the refresh token in the database
+                userService.storeRefreshToken(userDto.getLogin(), refreshToken, java.time.Instant.now().plus(java.time.Duration.ofDays(30)));
+                
+                String requestBody = "{\"refreshToken\":\"" + refreshToken + "\"}";
 
                 performRequest(
-                                "GET",
+                                "POST",
                                 "/auth/refresh",
+                                requestBody,
                                 null,
-                                refreshToken,
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "refresh",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.firstName").value("Test"))
-                                                                .andExpect(jsonPath("$.lastName").value("User"))
-                                                                .andExpect(jsonPath("$.login")
-                                                                                .value("test.user@test.com"))
-                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                                                .andExpect(jsonPath("$.token").isNotEmpty());
+                                                request.andExpect(jsonPath("$.accessToken").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1254,13 +1253,13 @@ public class AuthControllerIntegrationTest {
         public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+                String accessToken = userAuthenticationProvider.createToken(userDto);
 
                 performRequest(
                                 "PUT",
                                 "/auth/update-password",
                                 "{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}",
-                                refreshToken,
+                                accessToken,
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "update-password",
@@ -1294,13 +1293,13 @@ public class AuthControllerIntegrationTest {
         public void setPassword_missingBody_shouldReturnBadRequest() throws Exception {
                 UserDto userDto = userService.findByLogin("test.user@test.com");
 
-                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+                String accessToken = userAuthenticationProvider.createToken(userDto);
 
                 performRequest(
                                 "PUT",
                                 "/auth/update-password",
                                 "",
-                                refreshToken,
+                                accessToken,
                                 MediaType.APPLICATION_JSON,
                                 400,
                                 "update-password-missing-body",

@@ -170,13 +170,11 @@ public class UserControllerIntegrationTest {
                                 "me",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.id").isNotEmpty())
-                                                                .andExpect(jsonPath("$.firstName").value("Test"))
+                                                request.andExpect(jsonPath("$.firstName").value("Test"))
                                                                 .andExpect(jsonPath("$.lastName").value("User"))
                                                                 .andExpect(jsonPath("$.login")
                                                                                 .value("test.user@test.com"))
-                                                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                                                .andExpect(jsonPath("$.token").isNotEmpty());
+                                                                .andExpect(jsonPath("$.mainRole").value("USER"));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }

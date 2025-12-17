@@ -112,7 +112,7 @@ class UserAuthenticationProviderTest {
         when(userService.findByLogin(TEST_LOGIN)).thenReturn(user);
 
         // When
-        Authentication authentication = authenticationProvider.validateToken(token);
+        Authentication authentication = authenticationProvider.validateTokenStrongly(token);
 
         // Then
         assertNotNull(authentication);
@@ -143,7 +143,7 @@ class UserAuthenticationProviderTest {
         when(userService.createAzureUser(any())).thenReturn(user);
 
         // When
-        Authentication authentication = authenticationProvider.validateToken(token);
+        Authentication authentication = authenticationProvider.validateTokenStrongly(token);
 
         // Then
         assertNotNull(authentication);
