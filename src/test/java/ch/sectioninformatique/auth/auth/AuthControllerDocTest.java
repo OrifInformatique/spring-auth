@@ -3,8 +3,6 @@ package ch.sectioninformatique.auth.auth;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
@@ -14,12 +12,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientWebSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -62,7 +60,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(controllers = AuthController.class, excludeAutoConfiguration = {
                 SecurityAutoConfiguration.class,
-                OAuth2ClientAutoConfiguration.class
+                OAuth2ClientWebSecurityAutoConfiguration.class
 })
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
@@ -79,21 +77,21 @@ public class AuthControllerDocTest {
         private static String registerResponseJson;
 
         /** Mocked UserService for simulating user-related operations. */
-        @MockBean
+        @MockitoBean
         private UserService userService;
 
         /**
          * Mocked UserAuthenticationProvider for simulating authentication operations.
          */
-        @MockBean
+        @MockitoBean
         private UserAuthenticationProvider userAuthenticationProvider;
 
         /** Mocked Authentication for simulating security context. */
-        @MockBean
+        @MockitoBean
         private Authentication authentication;
 
         /** Mocked SecurityContext for simulating security context. */
-        @MockBean
+        @MockitoBean
         private SecurityContext securityContext;
 
         /**
