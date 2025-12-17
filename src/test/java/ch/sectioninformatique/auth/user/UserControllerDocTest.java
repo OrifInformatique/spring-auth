@@ -43,7 +43,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAu
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -74,31 +74,31 @@ class UserControllerDocTest {
         private MockMvc mockMvc;
 
         /** Mocked UserService for simulating user-related operations */
-        @MockitoBean
+        @MockBean
         private UserService userService;
 
         /** Mocked UserMapper for simulating user-related mapping operations */
-        @MockitoBean
+        @MockBean
         private UserMapper userMapper;
 
         /** Mocked RoleRepository for simulating role-related database operations */
-        @MockitoBean
+        @MockBean
         private RoleRepository roleRepository;
 
         /** Mocked UserRepository for simulating user-related database operations */
-        @MockitoBean
+        @MockBean
         private UserRepository userRepository;
 
         /**
          * Mocked UserAuthenticationProvider for simulating authentication operations
          */
-        @MockitoBean
+        @MockBean
         private UserAuthenticationProvider userAuthenticationProvider;
 
-        @MockitoBean
+        @MockBean
         private Authentication authentication;
 
-        @MockitoBean
+        @MockBean
         private SecurityContext securityContext;
 
         private static String meResponseJson;
