@@ -20,7 +20,11 @@ import jakarta.persistence.EntityManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +109,7 @@ public class UserService {
 
         // remove previous token if rotation enabled
         refreshTokenRepository.deleteByUserLogin(userLogin);
+        refreshTokenRepository.flush(); // ensure delete is executed before insert
 
         RefreshToken token = new RefreshToken();
         token.setUserLogin(userLogin);
@@ -126,8 +131,9 @@ public class UserService {
      * @return {@code true} if the token is valid, {@code false} otherwise.
      */
     public boolean validateRefreshToken(String userLogin, String refreshToken) {
+        String hashedRefreshToken = hashRefreshToken(refreshToken);
         return refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
-                .filter(stored -> passwordEncoder.matches(refreshToken, stored.getTokenHash()))
+                .filter(stored -> hashedRefreshToken.equals(stored.getTokenHash()))
                 .filter(stored -> stored.getExpiresAt().isAfter(Instant.now()))
                 .isPresent();
     }
@@ -149,16 +155,24 @@ public class UserService {
     }
 
     /**
-     * Hashes a raw token using a secure password encoder.
+     * Hashes a refresh token using SHA-256 before storing it in the database.
+     * This provides an extra layer of security by ensuring that even if the
+     * database is compromised, the raw tokens cannot be retrieved.
      * 
      * Storing hashed tokens prevents the raw token from being exposed in case
      * of a database compromise.
      *
      * @param token The raw refresh token to hash.
-     * @return The hashed representation of the token.
+     * @return The Base64-encoded SHA-256 hash of the token.
      */
     private String hashRefreshToken(String token) {
-        return passwordEncoder.encode(token);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
     }
 
     /**
