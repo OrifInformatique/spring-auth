@@ -29,7 +29,8 @@ services:
     depends_on:
       - db
     networks:
-      - spring_network
+      - spring_network # application network to let Spring app talk to the database
+      - shared_network # shared network to let Spring app talk to other services like spring-auth
 
   db:
     container_name: "spring-auth-mariadb"
@@ -49,4 +50,8 @@ services:
 
 networks:
   spring_network:
+    driver: bridge
+
+  shared_network:
+    name: shared_network # force name without project prefix to be accessible by other projects
     driver: bridge
