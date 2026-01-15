@@ -25,11 +25,6 @@ import java.util.Map;
  * - Intercepts all incoming HTTP requests
  * - Validates JWT tokens in the Authorization header
  * - Sets up Spring Security context with authenticated user information
- * 
- * The filter implements different validation strategies based on the HTTP
- * method:
- * - GET requests use standard token validation
- * - Other methods use strong token validation
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +40,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     private final UserAuthenticationProvider userAuthenticationProvider;
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    /**
+     * Used for writing JSON error responses when token verification fails.
+     */
+    private final ObjectMapper mapper;
 
     /**
      * Processes each incoming request to validate JWT tokens.
@@ -53,7 +51,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * - Extracts the Authorization header from the request
      * - Validates the JWT token if present
      * - Sets up the security context with authenticated user information
-     * - Applies different validation strategies based on HTTP method
      * - Clears security context if validation fails
      *
      * @param request     The incoming HTTP request
@@ -68,40 +65,62 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        if (request == null || response == null || filterChain == null) {
-            throw new IllegalArgumentException("Request, response and filterChain cannot be null");
-        }
-
+        // Retrieve Authorization header ("Authorization: Bearer <token>")
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (header != null) {
-            String[] authElements = header.split(" ");
-
-            if (authElements.length == 2
-                    && "Bearer".equals(authElements[0])) {
-                try {
-
-                    SecurityContextHolder.getContext().setAuthentication(
-                            userAuthenticationProvider.validateTokenStrongly(authElements[1]));
-                } catch (JWTVerificationException e) {
-                    SecurityContextHolder.clearContext();
-                    log.debug("Invalid JWT token: {}", e.getMessage());
-
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json;charset=UTF-8");
-
-                    Map<String, String> errorBody = Map.of("message", e.getMessage());
-                    mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
-                    response.getWriter().flush();
-                    return;
-                } catch (RuntimeException e) {
-                    // Preserve behavior for other runtime exceptions
-                    SecurityContextHolder.clearContext();
-                    throw e;
-                }
-            }
+        // If the Authorization header is missing OR doesn't start with "Bearer ",
+        // simply continue the filter chain without authentication.
+        if (header == null || !header.toLowerCase().startsWith("bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        // Extract the JWT token (everything after "Bearer ")
+        String token = header.substring(7).trim();
+
+        try {
+            // Validate the token and set Authentication object in the SecurityContext
+            SecurityContextHolder.getContext().setAuthentication(
+                    userAuthenticationProvider.validateToken(token));
+        } catch (JWTVerificationException e) {
+            // Specific exception thrown when JWT is invalid or expired.
+
+            // Clear previous authentication just in case
+            SecurityContextHolder.clearContext();
+
+            // Return a 401 Unauthorized with a JSON error message
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+
+            String message = switch (e.getClass().getSimpleName()) {
+                case "TokenExpiredException" -> "Token has expired";
+                case "InvalidClaimException" -> "Token contains invalid claims";
+                case "SignatureVerificationException" -> "Token signature is invalid";
+                default -> "Invalid JWT token";
+            };
+
+            log.debug("JWT validation failed: {}", message, e);
+            Map<String, String> errorBody = Map.of(
+                    "message", message,
+                    "error", "INVALID_TOKEN");
+
+            var writer = response.getWriter();
+            mapper.writeValue(writer, errorBody);
+            writer.flush();
+            return;
+
+        } catch (RuntimeException e) {
+            // Catch any other unexpected error during token validation
+
+            SecurityContextHolder.clearContext();
+            log.error("Unexpected error during JWT validation", e);
+
+            // Re-throw to let Spring handle global exception handling
+            throw e;
+        }
+
+        // If authentication succeeded or token not required,
+        // continue normal request processing.
         filterChain.doFilter(request, response);
     }
 }

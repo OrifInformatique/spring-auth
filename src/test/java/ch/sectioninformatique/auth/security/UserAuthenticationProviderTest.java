@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -88,37 +88,6 @@ class UserAuthenticationProviderTest {
         // Then
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3); // JWT has 3 parts
-    }
-
-    /**
-     * Tests the basic token validation.
-     * Verifies that:
-     * - Valid token is accepted
-     * - Authentication object is created with correct user details
-     * - Authorities are properly set
-     */
-    @Test
-    void testValidateToken() {
-        // Given
-        UserDto user = UserDto.builder()
-                .login(TEST_LOGIN)
-                .firstName(TEST_FIRST_NAME)
-                .lastName(TEST_LAST_NAME)
-                .mainRole("USER")
-                .permissions(Arrays.asList("read", "write"))
-                .build();
-
-        String token = authenticationProvider.createToken(user);
-
-        // When
-        Authentication authentication = authenticationProvider.validateToken(token);
-
-        // Then
-        assertNotNull(authentication);
-        assertTrue(authentication instanceof UsernamePasswordAuthenticationToken);
-        assertEquals(TEST_LOGIN, ((UserDto) authentication.getPrincipal()).getLogin());
-        assertTrue(authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().startsWith("ROLE_")));
     }
 
     /**

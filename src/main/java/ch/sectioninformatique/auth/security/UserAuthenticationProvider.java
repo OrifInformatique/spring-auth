@@ -19,6 +19,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
+import ch.sectioninformatique.auth.security.SecurityExceptions.SecurityException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +66,9 @@ public class UserAuthenticationProvider {
      * Service for user-related operations, including user creation and retrieval
      */
     private final UserService userService;
+
+    @Value("${spring.security.oauth2.client.provider.azure.issuer-uri}")
+    private String azureUri;
 
     /**
      * Initializes the authentication provider by encoding the secret key.
@@ -246,11 +250,27 @@ public class UserAuthenticationProvider {
         } catch (Exception e) {
             // If user doesn't exist, create a new Azure user
             log.debug("User not found, creating new Azure user: {}", decoded.getSubject());
+            DecodedJWT decodedAzure = JWT.decode(token);
+            String issuer = decodedAzure.getIssuer();
+            // Only verify issuer if both issuer and azureUri are present
+            if (issuer != null && azureUri != null && !issuer.equals(azureUri)) {
+                throw new SecurityException("Token not from trusted Azure tenant");
+            }
+
+            String firstName = decodedAzure.getClaim("firstName").asString();
+            String lastName = decodedAzure.getClaim("lastName").asString();
+
+            if (firstName == null || firstName.isBlank()) {
+                throw new SecurityException("JWT missing required claim: firstName");
+            }
+            if (lastName == null || lastName.isBlank()) {
+                throw new SecurityException("JWT missing required claim: lastName");
+            }
 
             UserDto newUser = UserDto.builder()
-                    .login(decoded.getSubject())
-                    .firstName(decoded.getClaim("firstName").asString())
-                    .lastName(decoded.getClaim("lastName").asString())
+                    .login(decodedAzure.getSubject())
+                    .firstName(decodedAzure.getClaim("firstName").asString())
+                    .lastName(decodedAzure.getClaim("lastName").asString())
                     .mainRole("USER")
                     .build();
 

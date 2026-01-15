@@ -2,34 +2,52 @@
 
 ## Table of Contents
 
-- [Documentation Tools](#documentation-tools)
-- [Overview](#overview)
-- [1. Spring-Auth](#1-spring-auth)
-  - [1.1 General Information](#11-general-information)
-  - [1.2 Root Files](#12-root-files)
-  - [1.3 Root Folders](#13-root-folders)
-  - [1.4 Source Structure (`src`)](#14-source-structure-src)
-    - [1.4.1 `main`](#141-main)
-    - [1.4.2 `test`](#142-test)
-  - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
-  - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
-  - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
-  - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
-  - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
-  - [1.10 Error and Exception Managment (`main/java/app`)](#110-error-and-exception-managment-mainjavaapp)
-  - [1.11 Main Test Modules (`main/test`)](#111-main-test-modules-maintest)
-  - [1.12 Security Tests (`main/test/security`)](#112-security-tests-maintestsecurity)
-  - [1.13 Authentication Tests (`main/test/auth`)](#113-authentication-tests-maintestauth)
-  - [1.14 User Tests (`main/test/user`)](#114-user-tests-maintestuser)
-  - [1.15 External Integrations (Microsoft Entra ID / Azure AD)](#115-external-integrations-microsoft-entra-id--azure-ad)
-    - [1.15.1 OAuth2 Integration (Azure AD)](#1151-oauth2-integration-azure-ad)
-    - [1.15.2 OAuth2 Scopes and Claims](#1152-oauth2-scopes-and-claims)
+- [Application Documentation](#application-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Documentation Tools](#documentation-tools)
+  - [Overview](#overview)
+  - [1. Spring-Auth](#1-spring-auth)
+    - [1.1 General Information](#11-general-information)
+    - [1.2 Root Files](#12-root-files)
+    - [1.3 Root Folders](#13-root-folders)
+    - [1.4 Source Structure (`src`)](#14-source-structure-src)
+      - [1.4.1 `main`](#141-main)
+      - [1.4.2 `test`](#142-test)
+    - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
+    - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
+    - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
+    - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
+    - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
+    - [1.10 Error and Exception Management (`main/java/app`)](#110-error-and-exception-management-mainjavaapp)
+    - [1.11 Test Structure (`test/java`)](#111-test-structure-testjava)
+    - [1.12 Security Tests (`test/java/security`)](#112-security-tests-testjavasecurity)
+    - [1.13 Authentication Tests (`test/java/auth`)](#113-authentication-tests-testjavaauth)
+    - [1.14 User Tests (`test/java/user`)](#114-user-tests-testjavauser)
+    - [1.15 External Integrations (Microsoft Entra ID / Azure AD)](#115-external-integrations-microsoft-entra-id--azure-ad)
+      - [1.15.1 OAuth2 Integration (Azure AD)](#1151-oauth2-integration-azure-ad)
+      - [1.15.2 OAuth2 Scopes and Claims](#1152-oauth2-scopes-and-claims)
+  - [2. API Endpoints Summary](#2-api-endpoints-summary)
+    - [2.1 Authentication Endpoints (`/auth`)](#21-authentication-endpoints-auth)
+    - [2.2 OAuth2 Endpoints (`/oauth2`)](#22-oauth2-endpoints-oauth2)
+    - [2.3 User Management Endpoints (`/users`)](#23-user-management-endpoints-users)
+  - [3. Testing and Documentation](#3-testing-and-documentation)
+    - [3.1 Environment Profiles](#31-environment-profiles)
+    - [3.2 Test Execution](#32-test-execution)
+    - [3.3 API Documentation Generation](#33-api-documentation-generation)
+  - [4. Security Architecture](#4-security-architecture)
+    - [4.1 Authentication Flow](#41-authentication-flow)
+    - [4.2 Role-Based Access Control](#42-role-based-access-control)
+    - [4.3 Password Security](#43-password-security)
+  - [5. Database Schema](#5-database-schema)
+    - [5.1 Key Tables](#51-key-tables)
+    - [5.2 Soft Delete Pattern](#52-soft-delete-pattern)
+  - [6. Additional Resources](#6-additional-resources)
 
 ---
 
 ## Documentation Tools
 
-Recomended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid).
+Recommended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid).
 
 ---
 
@@ -62,13 +80,25 @@ graph TD
 
 **Tools & Dependencies:**
 
-- Java / OpenJDK 21
-- Spring Boot 3.3.5
-- Maven 3.9
-- MariaDB 11.4
-- Docker Desktop
+- **Java / OpenJDK:** 21
+- **Spring Boot:** 3.3.5
+- **Maven:** 3.9+
+- **MariaDB:** 11.4
+- **Docker Desktop:** Latest
 
-> **Note:** Detailed setup and run instructions are provided in the project’s main [`README.md`](../README.md).
+**Key Libraries:**
+
+- **Spring Security:** Authentication and authorization framework
+- **Spring Data JPA:** Database access and ORM
+- **Spring OAuth2 Client:** Microsoft Entra ID (Azure AD) integration
+- **Auth0 Java-JWT (4.3.0):** JWT token generation and validation
+- **MapStruct (1.5.5):** Java bean mappings and DTO conversions
+- **Lombok (1.18.36):** Reduces boilerplate code
+- **Spring REST Docs (3.0.1):** API documentation generation
+- **Jakarta Validation:** Bean validation and custom constraints
+- **Dotenv Java:** Environment variable management
+
+> **Note:** Detailed setup and run instructions are provided in the project's main [`README.md`](../README.md).
 
 ---
 
@@ -84,7 +114,7 @@ graph TD
 | `.env`                   | Environment variables for local development and deployment.      |
 | `README.md`              | Project overview, setup instructions, and documentation links.   |
 
---
+---
 
 ### 1.3 Root Folders
 
@@ -124,15 +154,7 @@ Contains test classes for unit and integration tests.
 | `auth`                     | Handles authorization processes such as login and registration.                               |
 | `security`                 | Security-related classes: JWT filters, password encoding, and authentication management.      |
 | `users`                    | Manages user profiles, roles, and permissions.                                                |
-| `TemplateApplication.java` | Main Spring Boot entry point containing the `main()` method. Run the project from this class. |
-
----
-
-### 1.8 Tests Controlleurs (`main/java/test`)
-
-| File                   | Description                          |
-| ---------------------- | ------------------------------------ |
-| `TestControlleur.java` | Controlleur to test fonctionalities. |
+| `AuthApplication.java` | Main Spring Boot entry point containing the `main()` method. Run the project from this class. |
 
 ---
 
@@ -143,68 +165,92 @@ sequenceDiagram
     participant Client
     participant JwtAuthFilter
     participant UserAuthenticationProvider
-    participant UserService
-    participant UserController
-    participant UserAuthenticationEntryPoint
+    participant Controller
+    participant Service
 
     Client->>JwtAuthFilter: HTTP request with JWT token
-    note right of JwtAuthFilter: Filter intercepts request
-    JwtAuthFilter->>UserAuthenticationProvider: validateToken(token)
-    note right of UserAuthenticationProvider: Check token & optionally fetch user
-    UserAuthenticationProvider->>UserService: Lookup user in DB
-    alt User exists
-        UserService->>UserAuthenticationProvider: Return user info
-    else User not found
-        UserService->>UserAuthenticationProvider: Create new Azure user
-    end
-    UserAuthenticationProvider->>JwtAuthFilter: Return Authentication object
-    alt Authentication fails
-        JwtAuthFilter->>UserAuthenticationEntryPoint: 401 Unauthorized
-        UserAuthenticationEntryPoint->>Client: Return 401 response
-    else Authentication succeeds
-        JwtAuthFilter->>UserController: Forward request
-        note right of UserController: Controller handles action
-        UserController->>UserService: Perform business logic
-        UserService->>UserController: Return resul
-        UserController->>Client: Return HTTP response
+    note right of JwtAuthFilter: Filter intercepts all requests
+    
+    alt Token present
+        JwtAuthFilter->>UserAuthenticationProvider: validateToken(token)
+        
+        alt Token valid
+            UserAuthenticationProvider->>JwtAuthFilter: Return Authentication object
+            JwtAuthFilter->>Controller: Forward authenticated request
+            Controller->>Service: Perform business logic
+            Service->>Controller: Return result
+            Controller->>Client: Return HTTP response
+        else Token invalid/expired
+            UserAuthenticationProvider-->>Client: 401 Unauthorized (Invalid JWT token)
+        end
+    else No token
+        JwtAuthFilter->>Controller: Forward unauthenticated request
+        
+        alt Public endpoint
+            Controller->>Client: Return HTTP response
+        else Protected endpoint
+            Controller-->>Client: 403 Forbidden (Access Denied)
+        end
     end
 ```
 
 _Sequence Diagram showing JWT authentication and request handling flow._
 
-| File                                | Description                                                        |
-| ----------------------------------- | ------------------------------------------------------------------ |
-| `JwtAuthFilter.java`                | Authentication filter that processes tokens for incoming requests. |
-| `PermissionEnum.java`               | Enumeration defining available permissions.                        |
-| `Role.java`                         | Role entity class representing a user role.                        |
-| `RoleEnum.java`                     | Enumeration defining roles and their permissions.                  |
-| `RoleRepository.java`               | Interface for database operations related to roles.                |
-| `RoleSeeder.java`                   | Seeds the database with predefined roles.                          |
-| `SecurityConfig.java`               | Security configuration defining the filter chain and access rules. |
-| `UserAuthenticationEntryPoint.java` | Handles unauthenticated access by returning a 401 response.        |
-| `UserAuthenticationProvider.java`   | Authentication provider for validating user credentials.           |
-| `WebClientConfig.java`              | Web client configuration for communication with other apps.        |
-| `WebConfig.java`                    | Web configuration for general web-related settings.                |
+| File                                | Description                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------ |
+| `CorsConfigurationValidator.java`   | Validates CORS configuration at startup to ensure security compliance.         |
+| `CustomAccessDeniedHandler.java`    | Handles authenticated but unauthorized requests (403 Forbidden).               |
+| `JwtAuthFilter.java`                | Authentication filter that processes JWT tokens for incoming requests.         |
+| `PermissionEnum.java`               | Enumeration defining available permissions (read, write, update, delete).      |
+| `Role.java`                         | Role entity class representing a user role in the database.                    |
+| `RoleEnum.java`                     | Enumeration defining roles (USER, MANAGER, ADMIN) and their permissions.       |
+| `RoleRepository.java`               | Interface for database operations related to roles.                            |
+| `RoleSeeder.java`                   | Seeds the database with predefined roles on application startup.               |
+| `SecurityConfig.java`               | Security configuration defining the filter chain and access rules.             |
+| `UserAuthenticationEntryPoint.java` | Handles unauthenticated access by returning a 401 Unauthorized response.       |
+| `UserAuthenticationProvider.java`   | Authentication provider for validating JWT tokens and user credentials.        |
 
 ---
 
 ---
 
-### 1.7Auth Module (`main/java/auth`)
+### 1.7 Auth Module (`main/java/auth`)
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant AuthController
     participant UserService
+    participant PasswordEncoder
     participant UserRepository
+    participant UserMapper
+    participant AuthProvider
 
-    Client->>AuthController: /auth/login with credentials
-    AuthController->>UserService: userService.login(credentialsDto)
-    UserService->>UserRepository: userRepository.findByLogin(credentialsDto.login())
-    UserRepository->>UserService: User found
-    UserService->>AuthController: Return UserDto
-    AuthController->>Client: Response with UserDto
+    Client->>AuthController: POST /auth/login with credentials
+    AuthController->>UserService: login(credentialsDto)
+    UserService->>UserRepository: findByLogin(login)
+    
+    alt User found
+        UserRepository->>UserService: Return User entity
+        UserService->>PasswordEncoder: matches(password, hashedPassword)
+        
+        alt Password valid
+            PasswordEncoder->>UserService: true
+            UserService->>UserMapper: toUserDto(user)
+            UserMapper->>UserService: Return UserDto
+            UserService->>AuthController: Return UserDto
+            AuthController->>AuthProvider: createToken(userDto)
+            AuthProvider->>AuthController: Return JWT token
+            AuthController->>AuthProvider: createRefreshToken(userDto)
+            AuthProvider->>AuthController: Return refresh token
+            AuthController->>Client: 200 OK with UserDto + tokens
+        else Password invalid
+            PasswordEncoder->>UserService: false
+            UserService-->>Client: 401 Unauthorized (Invalid credentials)
+        end
+    else User not found
+        UserRepository-->>Client: 401 Unauthorized (Invalid credentials)
+    end
 ```
 
 _Sequence Diagram showing an example of the authentication flow._
@@ -402,59 +448,82 @@ _Sequence Diagram showing an example of the user management flow._
 | ------------------- | ------------------------------------------------------------------- |
 | `MapperConfig.java` | Fallback configuration to expose MapStruct mappers as Spring beans. |
 
+---
+
+### 1.10 Error and Exception Management (`main/java/app`)
+
+**Errors:**
+
+| File                   | Description                                        |
+| ---------------------- | -------------------------------------------------- |
+| `errors/ErrorDto.java` | Record serving as Data Transfer Object for errors. |
+
+**Exceptions:**
+
+| File                                      | Description                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| `AppException.java`                       | Base custom exception class for application-specific errors.             |
+| `CustomException.java`                    | Custom exception with HTTP status code support.                          |
+| `GlobalExceptionHandler.java`             | Global exception handler for REST API endpoints (replaces deprecated).   |
+| `InvalidCredentialsException.java`        | Thrown when login credentials are invalid.                               |
+| `RoleNotFoundException.java`              | Thrown when a requested role is not found in the database.               |
+| `SecurityException.java`                  | Security-related exceptions.                                             |
+| `UnauthorizedActionException.java`        | Thrown when a user attempts an action without proper authorization.      |
+| `UserAlreadyAdminException.java`          | Thrown when attempting to promote a user who is already an admin.        |
+| `UserAlreadyExistsException.java`         | Thrown when attempting to register with an existing login.               |
+| `UserAlreadyManagerException.java`        | Thrown when attempting to promote a user who is already a manager.       |
+| `UserAlreadyRegularException.java`        | Thrown when attempting to downgrade a user who is already a regular user. |
+| `UserHasLowerRightsException.java`        | Thrown when a user tries to modify another user with higher privileges.  |
+| `UserNotFoundException.java`              | Thrown when a requested user is not found in the database.               |
 
 ---
 
-### 1.10 Error and Exception Managment (`main/java/app`)
+### 1.11 Test Structure (`test/java`)
 
-| File                                   | Description                                                |
-| -------------------------------------- | ---------------------------------------------------------- |
-| `errors/ErrorDto.java`                 | Record serving as Data Transfer object for Errors.         |
-| `exceptions/AppException.java`         | Custome exception class for application specifique errors. |
-| `exceptions/RestExceptionHandler.java` | Global exception handler for REST API endpoints.           |
-
----
-
-### 1.11 Main Test Modules (`main/test`)
-
-| File                                   | Description                                                |
-| -------------------------------------- | ---------------------------------------------------------- |
-| `security`                      | Tests related to the security and authentification fonctionalities of the app. |
-| `test`                          | Tests related to the test endpoints of the app.                                |
-| `user`                          | Tests related to the user managment fonctionalities of the app.                |
-| `TemplateApplicationTests.java` | Load the context of the app.                                                   |
-| `TestConfigurationDebug.java`   | Test the existence of the environnment variables.                              |
+| Module/File                     | Description                                                                  |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| `security/`                     | Tests related to the security and authentication functionalities of the app. |
+| `auth/`                         | Tests related to the authentication endpoints of the app.                    |
+| `user/`                         | Tests related to the user management functionalities of the app.             |
+| `TemplateApplicationTests.java` | Loads the Spring application context for integration testing.                |
+| `TestConfigurationDebug.java`   | Tests the existence of the environment variables.                            |
 
 ---
 
-### 1.12 Security Tests (`main/test/security`)
+### 1.12 Security Tests (`test/java/security`)
 
-| File                                   | Description                                                |
-| -------------------------------------- | ---------------------------------------------------------- |
-| `UserAuthentificationProvider.java` | Tests the methodes in `UserAuthentificationProvider`. |
-
----
-
-### 1.13 Authentication Tests (`main/test/auth`)
-
-| File                                   | Description                                                |
-| -------------------------------------- | ---------------------------------------------------------- |
-| `AuthControllerIntegrationTest.java` | Tests the methodes in `AuthController` and save the result in data files.           |
-| `AuthControllerDocTest.java`         | Generate the documentation of the methodes in `AuthController` from the data files. |
+| File                                    | Description                                                    |
+| --------------------------------------- | -------------------------------------------------------------- |
+| `CustomAccessDeniedHandlerTest.java`    | Tests the custom 403 Forbidden response handler.               |
+| `PermissionEnumTest.java`               | Tests the permission enumeration values and getters.           |
+| `RoleEnumTest.java`                     | Tests the role enumeration and granted authorities.            |
+| `RoleTest.java`                         | Tests the `Role` entity class.                                 |
+| `UserAuthenticationEntryPointTest.java` | Tests the 401 Unauthorized entry point handler.                |
+| `UserAuthenticationProviderTest.java`   | Tests JWT token validation and authentication provider logic.  |
 
 ---
 
-### 1.14 User Tests (`main/test/user`)
+### 1.13 Authentication Tests (`test/java/auth`)
 
-| File                                   | Description                                                |
-| -------------------------------------- | ---------------------------------------------------------- |
-| `TestUserSeeder.java`                | Specialised seeder that create `Users` only in test mode.                           |
-| `UserControllerIntegrationTest.java` | Tests the methodes in `UserController` and save the result in data files.           |
-| `UserControllerDocTest.java`         | Generate the documentation of the methodes in `UserController` from the data files. |
-| `UserDtoTest.java`                   | Test the `UserDto` object.                                                          |
-| `UserMapperTest.java`                | Test the `UserMapper` interface.                                                    |
-| `UserServiceTest.java`               | Test the `UserService` class.                                                       |
-| `UserTest.java`                      | Test the `User` object.                                                             |
+| File                                 | Description                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| `AuthControllerIntegrationTest.java` | Integration tests for authentication endpoints (login, register, etc.).   |
+| `CredentialsDtoTest.java`            | Tests the `CredentialsDto` validation and structure.                      |
+| `SignUpDtoTest.java`                 | Tests the `SignUpDto` validation constraints.                             |
+
+---
+
+### 1.14 User Tests (`test/java/user`)
+
+| File                                 | Description                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------ |
+| `TestUserSeeder.java`                | Specialized seeder that creates `User` entities only in test mode.                   |
+| `UserControllerIntegrationTest.java` | Tests the methods in `UserController` and saves the results in data files.          |
+| `UserControllerDocTest.java`         | Generates the documentation of the methods in `UserController` from the data files. |
+| `UserDtoTest.java`                   | Tests the `UserDto` object.                                                          |
+| `UserMapperTest.java`                | Tests the `UserMapper` interface.                                                    |
+| `UserServiceTest.java`               | Tests the `UserService` class.                                                       |
+| `UserTest.java`                      | Tests the `User` entity.                                                             |
 
 ---
 
@@ -506,7 +575,7 @@ When users log in via Microsoft Entra ID, the process follows the standard OAuth
 
    - A local JWT is created using UserAuthenticationProvider.createToken(user).
 
-   - The app redirects the browser to the frontend (http://localhost:4000/oauth2/success) with the JWT token in the URL query parameters.
+   - The app redirects the browser to the frontend (http://localhost:{port}/oauth2/success) with the JWT token in the URL query parameters.
 
 #### 1.15.2 OAuth2 Scopes and Claims
 Azure AD provides the following standard OpenID Connect scopes in the ID token:
@@ -530,3 +599,188 @@ Example claims that can be extracted from the Azure token:
   "scp": "openid profile email User.Read"
 }
 ```
+
+---
+
+## 2. API Endpoints Summary
+
+### 2.1 Authentication Endpoints (`/auth`)
+
+| Method | Endpoint             | Auth Required | Description                                    |
+| ------ | -------------------- | ------------- | ---------------------------------------------- |
+| POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
+| POST   | `/auth/register`     | No            | Register a new user account                    |
+| GET    | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
+| PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
+
+### 2.2 OAuth2 Endpoints (`/oauth2`)
+
+| Method | Endpoint                       | Auth Required | Description                              |
+| ------ | ------------------------------ | ------------- | ---------------------------------------- |
+| GET    | `/oauth2/authorization/azure`  | No            | Redirect to Microsoft login page         |
+| GET    | `/oauth2/success`              | No            | Callback endpoint after Azure login      |
+
+### 2.3 User Management Endpoints (`/users`)
+
+| Method | Endpoint                        | Permission Required | Description                                  |
+| ------ | ------------------------------- | ------------------- | -------------------------------------------- |
+| GET    | `/users/me`                     | Authenticated       | Get current authenticated user info          |
+| GET    | `/users/all`                    | `user:read`         | Get all active users                         |
+| GET    | `/users/all-with-deleted`       | `user:read`         | Get all users including soft-deleted         |
+| GET    | `/users/deleted`                | `user:read`         | Get only soft-deleted users                  |
+| PUT    | `/users/{userId}/restore`       | `user:update`       | Restore a soft-deleted user                  |
+| PUT    | `/users/{userId}/promote-manager` | `user:update`     | Promote user to MANAGER role                 |
+| PUT    | `/users/{userId}/downgrade-manager` | `user:update`   | Downgrade manager to USER role               |
+| PUT    | `/users/{userId}/promote-admin` | `user:update`       | Promote user to ADMIN role                   |
+| PUT    | `/users/{userId}/downgrade-admin` | `user:update`     | Downgrade admin to MANAGER role              |
+| DELETE | `/users/{userId}`               | `user:delete`       | Soft delete a user (marks as deleted)        |
+| DELETE | `/users/{userId}/permanent`     | `user:delete`       | Permanently delete a user from database      |
+
+---
+
+## 3. Testing and Documentation
+
+### 3.1 Environment Profiles
+
+The application supports three environment profiles controlled by the `ENVIRONMENT` variable in `.env`:
+
+- **`dev`:** Development mode - runs the application with Spring Boot DevTools, skips tests
+- **`test`:** Testing mode - runs the full test suite and generates API documentation
+- **`prod`:** Production mode - builds optimized JAR and runs the application
+
+Switch environments by updating `.env`:
+```properties
+ENVIRONMENT=dev  # or test, or prod
+```
+
+### 3.2 Test Execution
+
+The application uses **JUnit 5** and **Spring Boot Test** for testing:
+
+- **Unit Tests:** Test individual components in isolation
+- **Integration Tests:** Test complete request/response flows with database interactions
+- **Documentation Tests:** Generate API documentation using Spring REST Docs
+
+**Run tests using Docker Compose:**
+```bash
+# Set environment to test in .env file
+ENVIRONMENT=test
+
+# Run tests
+docker compose up --build
+```
+
+This will:
+- Build the application with Maven
+- Run the complete test suite (`mvn verify`)
+- Generate test reports and API documentation snippets
+- Create the database schema for testing
+
+**Run tests locally with Maven (without Docker):**
+```bash
+mvn test                 # Run tests only
+mvn verify              # Run tests + integration tests
+```
+
+### 3.3 API Documentation Generation
+
+API documentation is automatically generated using **Spring REST Docs** and **AsciiDoc**:
+
+1. Integration tests capture HTTP requests/responses as snippets (saved to `src/asciidoc/`)
+2. AsciiDoc templates combine snippets into comprehensive documentation
+3. Maven plugin generates HTML documentation during the build process
+
+**Generated documentation locations:**
+- **Snippets:** `target/generated-snippets/` (raw test output)
+- **HTML Documentation:** `docs/index.html` (final API documentation)
+
+**Generate documentation using Docker:**
+```bash
+# Set environment to test
+ENVIRONMENT=test
+
+# Build and run tests to generate docs
+docker compose up --build
+
+# Documentation will be available in docs/index.html
+```
+
+**Generate documentation with Maven:**
+```bash
+mvn clean package
+```
+
+---
+
+## 4. Security Architecture
+
+### 4.1 Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SecurityFilter
+    participant JwtAuthFilter
+    participant AuthProvider
+    participant Controller
+
+    Client->>SecurityFilter: HTTP Request + JWT
+    SecurityFilter->>JwtAuthFilter: Filter Request
+    JwtAuthFilter->>AuthProvider: Validate Token
+    
+    alt Token Valid
+        AuthProvider->>JwtAuthFilter: Authentication Object
+        JwtAuthFilter->>Controller: Authorized Request
+        Controller->>Client: Response
+    else Token Invalid
+        AuthProvider->>Client: 401 Unauthorized
+    end
+```
+
+### 4.2 Role-Based Access Control
+
+The application implements a hierarchical role system:
+
+- **USER:** Basic permissions (`user:read` for own profile)
+- **MANAGER:** User permissions + user management (`user:read`, `user:write`, `user:update`)
+- **ADMIN:** All permissions including user deletion (`user:read`, `user:write`, `user:update`, `user:delete`)
+
+### 4.3 Password Security
+
+- **BCrypt hashing** with configurable strength (default: 12)
+- **Password reuse validation** prevents updating to same password
+- **Secure password handling** using `char[]` instead of `String` in DTOs
+- **Minimum length:** 8 characters
+- **Maximum length:** 72 characters (BCrypt limitation)
+
+---
+
+## 5. Database Schema
+
+### 5.1 Key Tables
+
+- **`users`:** Stores user accounts with credentials and profile information
+- **`roles`:** Defines available roles in the system
+- **`user_roles`:** Many-to-many relationship between users and roles
+- **`password_history`:** Tracks password changes for reuse prevention
+
+### 5.2 Soft Delete Pattern
+
+Users can be soft-deleted (marked as inactive) or permanently deleted:
+- Soft delete: Sets `deleted_at` timestamp, user remains in database
+- Permanent delete: Removes user record entirely
+- Soft-deleted users can be restored by administrators
+
+---
+
+## 6. Additional Resources
+
+- **Main README:** [README.md](../README.md) - Setup and installation guide
+- **API Documentation:** `target/generated-snippets-html/index.html` - Auto-generated API docs
+- **Docker Compose:** `compose.yml` - Container orchestration configuration
+- **Database Schema:** `init.sql` - Database initialization script
+
+---
+
+**Last Updated:** December 2025  
+**Version:** 1.2.0-SNAPSHOT

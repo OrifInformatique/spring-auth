@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.MappingTarget;
+import java.util.Arrays;
 import org.mapstruct.factory.Mappers;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -82,5 +85,24 @@ public interface UserMapper {
         return authorities.stream()
             .map(auth -> auth.getAuthority())
             .collect(Collectors.toList());
+    }
+
+    /**
+     * After mapping from SignUpDto to User, clear sensitive data held in the
+     * source object (the password char[]). This reduces the window of time the
+     * raw password is present in memory and follows the good practice of
+     * explicitly zeroing-out sensitive arrays after use.
+     *
+     * Note: SignUpDto stores the password as a mutable `char[]` to allow this
+     * clearing; we mutate the array in-place to avoid creating additional
+     * String objects containing the password.
+     */
+    @AfterMapping
+    default void clearPasswordAfterMapping(SignUpDto source, @MappingTarget User target) {
+        if (source == null) return;
+        char[] pwd = source.password();
+        if (pwd != null) {
+            Arrays.fill(pwd, '\0');
+        }
     }
 }

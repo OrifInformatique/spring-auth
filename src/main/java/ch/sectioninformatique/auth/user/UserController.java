@@ -5,8 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,16 +50,12 @@ public class UserController {
      * - Returns the user's profile information
      * - Is accessible to all authenticated users
      *
+     * @param currentUser The currently authenticated user, injected by Spring Security
      * @return ResponseEntity containing the current user's DTO
      */
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDto> authenticatedUser() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
+    public ResponseEntity<UserDto> authenticatedUser(@AuthenticationPrincipal UserDto currentUser) {
         return ResponseEntity.ok(currentUser);
     }
 
@@ -75,8 +70,9 @@ public class UserController {
      */
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<User>> allUsers() {
-        List<User> users = userService.allUsers();
+    public ResponseEntity<List<UserDto>> allUsers() {
+        List<UserDto> users = userService.allUsers();
+        
         return ResponseEntity.ok(users);
     }
 
@@ -91,8 +87,8 @@ public class UserController {
      */
     @GetMapping("/all-with-deleted")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<User>> allWithDeletedUsers() {
-        List<User> users = userService.allWithDeletedUsers();
+    public ResponseEntity<List<UserDto>> allWithDeletedUsers() {
+        List<UserDto> users = userService.allWithDeletedUsers();
         return ResponseEntity.ok(users); 
     }
 
@@ -107,8 +103,8 @@ public class UserController {
      */
     @GetMapping("/deleted")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<User>> deletedUsers() {
-        List<User> users = userService.deletedUsers();
+    public ResponseEntity<List<UserDto>> deletedUsers() {
+        List<UserDto> users = userService.deletedUsers();
         return ResponseEntity.ok(users);
     }
 

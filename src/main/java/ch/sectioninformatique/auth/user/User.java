@@ -75,7 +75,7 @@ public class User implements UserDetails {
     /**
      * User's hashed password.
      */
-    @Column(nullable = false)
+    @Column(nullable = false, length = 72)
     private String password;
 
     /**
@@ -234,24 +234,4 @@ public class User implements UserDetails {
         }
         return true;
     }
-
-    /**
-     * Returns the Main role assigned to the user.
-     * This method assumes the user has at least one role.
-     *
-     * @return The main role
-     */
-    public Role getMainRole() {
-        return mainRole;
-    }
-
-    /**
-     * Adds a new main role to the user.
-     *
-     * @param role The main role to set for the user
-     */
-    public void setMainRole(Role role) {
-        mainRole = role;
-    }
-
 }
