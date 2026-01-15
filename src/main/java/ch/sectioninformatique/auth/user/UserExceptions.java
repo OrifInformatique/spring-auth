@@ -1,5 +1,7 @@
 package ch.sectioninformatique.auth.user;
 
+import org.springframework.http.HttpStatus;
+
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 
 /**
@@ -12,7 +14,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyExistsException extends AppException {
         public UserAlreadyExistsException(String login) {
-            super("User already exists: " + login);
+            super("User already exists: " + login, HttpStatus.CONFLICT);
         }
     }
 
@@ -21,7 +23,7 @@ public class UserExceptions {
      */
     public static class UserNotFoundException extends AppException {
         public UserNotFoundException(String loginOrId) {
-            super("User not found: " + loginOrId);
+            super("User not found: " + loginOrId, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -30,7 +32,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyAdminException extends AppException {
         public UserAlreadyAdminException(String login) {
-            super("User already admin: " + login);
+            super("User already admin: " + login, HttpStatus.CONFLICT);
         }
     }
 
@@ -39,7 +41,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyManagerException extends AppException {
         public UserAlreadyManagerException(String login) {
-            super("User already manager: " + login);
+            super("User already manager: " + login, HttpStatus.CONFLICT);
         }
     }
 
@@ -48,7 +50,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyRegularException extends AppException {
         public UserAlreadyRegularException(String login) {
-            super("User already regular: " + login);
+            super("User already regular: " + login, HttpStatus.CONFLICT);
         }
     }
 }

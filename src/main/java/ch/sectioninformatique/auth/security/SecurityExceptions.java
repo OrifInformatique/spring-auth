@@ -1,5 +1,7 @@
 package ch.sectioninformatique.auth.security;
 
+import org.springframework.http.HttpStatus;
+
 import ch.sectioninformatique.auth.app.exceptions.AppException;
 
 /**
@@ -12,7 +14,7 @@ public class SecurityExceptions {
      */
     public static class RoleNotFoundException extends AppException {
         public RoleNotFoundException(RoleEnum role) {
-            super("Role not found: " + role.name());
+            super("Role not found: " + role.name(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -21,7 +23,7 @@ public class SecurityExceptions {
      */
     public static class SecurityException extends AppException {
         public SecurityException(String message) {
-            super(message);
+            super(message, HttpStatus.FORBIDDEN);
         }
     }
 
@@ -30,7 +32,7 @@ public class SecurityExceptions {
      */
     public static class UnauthorizedActionException extends AppException {
         public UnauthorizedActionException(String message) {
-            super(message);
+            super(message, HttpStatus.FORBIDDEN);
         }
     }
 
@@ -39,7 +41,7 @@ public class SecurityExceptions {
      */
     public static class UserHasLowerRightsException extends AppException {
         public UserHasLowerRightsException(String login) {
-            super("User has insufficient rights: " + login);
+            super("User has insufficient rights: " + login, HttpStatus.FORBIDDEN);
         }
     }
 }
