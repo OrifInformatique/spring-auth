@@ -35,14 +35,14 @@ import org.springframework.transaction.annotation.Isolation;
 
 import org.hibernate.Session;
 
-import ch.sectioninformatique.auth.app.exceptions.InvalidCredentialsException;
-import ch.sectioninformatique.auth.app.exceptions.UserAlreadyExistsException;
-import ch.sectioninformatique.auth.app.exceptions.UserAlreadyManagerException;
-import ch.sectioninformatique.auth.app.exceptions.UserAlreadyRegularException;
-import ch.sectioninformatique.auth.app.exceptions.UserHasLowerRightsException;
-import ch.sectioninformatique.auth.app.exceptions.UserNotFoundException;
-import ch.sectioninformatique.auth.app.exceptions.RoleNotFoundException;
-import ch.sectioninformatique.auth.app.exceptions.UserAlreadyAdminException;
+import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyManagerException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyRegularException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
 
 /**
  * Service class for managing user-related operations.

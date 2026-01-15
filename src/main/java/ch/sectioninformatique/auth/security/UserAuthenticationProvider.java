@@ -19,6 +19,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
+import ch.sectioninformatique.auth.security.SecurityExceptions.SecurityException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

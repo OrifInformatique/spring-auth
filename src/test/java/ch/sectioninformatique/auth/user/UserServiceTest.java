@@ -375,7 +375,7 @@ public class UserServiceTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.promoteToManager(userId));
-        assertEquals("The user is already a manager: john@test.com", exception.getMessage());
+        assertEquals("User already manager: john@test.com", exception.getMessage());
     }
 
     /**
@@ -496,6 +496,6 @@ public class UserServiceTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.deleteUser(userId));
-        assertEquals("The user has lower rights than desired: user@test.com", exception.getMessage());
+        assertEquals("User has insufficient rights: user@test.com", exception.getMessage());
     }
 }

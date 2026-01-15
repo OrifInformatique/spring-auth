@@ -9,6 +9,15 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyManagerException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyRegularException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
