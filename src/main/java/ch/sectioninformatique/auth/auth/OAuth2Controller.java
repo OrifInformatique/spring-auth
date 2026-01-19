@@ -172,7 +172,7 @@ public class OAuth2Controller {
                 .secure(true)
                 .path("/")
                 .maxAge(Duration.ofDays(30))
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
