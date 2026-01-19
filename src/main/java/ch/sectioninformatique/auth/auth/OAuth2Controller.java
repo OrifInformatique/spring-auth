@@ -168,7 +168,7 @@ public class OAuth2Controller {
         // Create a secure HTTP-only cookie with the JWT token
         ResponseCookie cookie = ResponseCookie
                 .from("token", jwt)
-                .httpOnly(true)
+                .httpOnly(false) // Accessible via JavaScript
                 .secure(true)
                 .path("/")
                 .maxAge(Duration.ofDays(30))
