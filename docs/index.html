@@ -716,7 +716,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY4NDgxOTY1LCJleHAiOjE3NzEwNzM5NjV9.Ezz4T82LgQgCS2asK-Y_dWOgRqPNBUGlaEyhyChz1_k; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 14 Feb 2026 12:59:25 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY1OTY1OTAwLCJleHAiOjE3Njg1NTc5MDB9.W4YIne3uCtOFAlkfzw8RdoRV_f8TNgbEh57Eq2eZcFM; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 16 Jan 2026 10:05:00 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -731,7 +731,7 @@ Content-Length: 458
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjUsImV4cCI6MTc2ODQ4MjI2NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.un6g-W3zW5f4N2hTm2L5R3WBs3JsGZuYoDUsRFzglQc",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MDAsImV4cCI6MTc2NTk2NjIwMCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.0F6Jk4nUtIHUg2CEnWRq2cxNTkwRKZnyM11oLNnysqo",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -755,7 +755,7 @@ Content-Length: 458
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 30
 Host: localhost:8080
 
@@ -768,26 +768,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 203
+Content-Length: 37
 
 {
-  "fieldErrors" : {
-    "login" : "Login is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login is required",
-  "timestamp" : "2026-01-15T12:59:25.167153458",
-  "status" : 400
+  "message" : "Login is required"
 }</code></pre>
 </div>
 </div>
@@ -804,7 +789,7 @@ Content-Length: 203
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 36
 Host: localhost:8080
 
@@ -817,26 +802,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 215
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "password" : "Password is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "password: Password is required",
-  "timestamp" : "2026-01-15T12:59:25.428095975",
-  "status" : 400
+  "message" : "Password is required"
 }</code></pre>
 </div>
 </div>
@@ -853,7 +823,7 @@ Content-Length: 215
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 66
 Host: localhost:8080
 
@@ -867,26 +837,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 237
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email format"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email format",
-  "timestamp" : "2026-01-15T12:59:25.018623176",
-  "status" : 400
+  "message" : "Invalid email format"
 }</code></pre>
 </div>
 </div>
@@ -903,7 +858,7 @@ Content-Length: 237
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -911,23 +866,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400,
-  "timestamp" : "2026-01-15T12:59:25.387750369"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -944,7 +887,7 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 53
 Host: localhost:8080
 
@@ -955,23 +898,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 167
+Content-Length: 57
 
 {
-  "message" : "JSON is incomplete - missing closing bracket or quote",
-  "error" : "Bad Request",
-  "status" : 400,
-  "timestamp" : "2026-01-15T12:59:25.154527233"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -988,7 +919,7 @@ Content-Length: 167
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 57
 Host: localhost:8080
 
@@ -1002,26 +933,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 237
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email format"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email format",
-  "timestamp" : "2026-01-15T12:59:24.847717639",
-  "status" : 400
+  "message" : "Invalid email format"
 }</code></pre>
 </div>
 </div>
@@ -1065,10 +981,10 @@ X-Frame-Options: DENY
 Content-Length: 134
 
 {
-  "message" : "Invalid credentials",
-  "error" : "Unauthorized",
   "status" : 401,
-  "timestamp" : "2026-01-15T12:59:25.365260764"
+  "error" : "Unauthorized",
+  "message" : "Invalid credentials",
+  "timestamp" : "2025-12-17T10:05:00.791507115"
 }</code></pre>
 </div>
 </div>
@@ -1091,12 +1007,11 @@ Content-Length: 134
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 64
+Content-Length: 67
 Host: localhost:8080
 
 {
-  "login" : "test.user@test.com",
+  "login" : "non.existent@test.com",
   "password" : "Test1234!"
 }</code></pre>
 </div>
@@ -1105,23 +1020,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 415 Unsupported Media Type
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 181
+Content-Length: 70
 
 {
-  "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "error" : "Unsupported Media Type",
-  "status" : 415,
-  "timestamp" : "2026-01-15T12:59:24.911492926"
+  "message" : "Unsupported content type: application/octet-stream"
 }</code></pre>
 </div>
 </div>
@@ -1144,7 +1047,7 @@ Content-Length: 181
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 69
 Host: localhost:8080
 
@@ -1158,23 +1061,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 39
 
 {
-  "message" : "Invalid credentials",
-  "error" : "Unauthorized",
-  "status" : 401,
-  "timestamp" : "2026-01-15T12:59:25.131133075"
+  "message" : "Invalid credentials"
 }</code></pre>
 </div>
 </div>
@@ -1191,12 +1082,12 @@ Content-Length: 134
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 72
+Content-Type: application/json
+Content-Length: 69
 Host: localhost:8080
 
 {
-  "login" : "non.existent@test.com",
+  "login" : "test.user@test.com",
   "password" : "WrongPassword!"
 }</code></pre>
 </div>
@@ -1205,23 +1096,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 39
 
 {
-  "message" : "Invalid credentials",
-  "error" : "Unauthorized",
-  "status" : 401,
-  "timestamp" : "2026-01-15T12:59:25.412850831"
+  "message" : "Invalid credentials"
 }</code></pre>
 </div>
 </div>
@@ -1260,7 +1139,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Location: /auth/users/test.newuser@test.com
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY4NDgxOTY1LCJleHAiOjE3NzEwNzM5NjV9.k1dR_0VYfWa0lBkrwe9bDPbmi9bHiN65B_TZ6Pd8Xb0; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 14 Feb 2026 12:59:25 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY1OTY1OTAxLCJleHAiOjE3Njg1NTc5MDF9.MDgWpAtVXOVZ5pXY8jdXNdMvkYFOJxoPWtMHDX1I4Ow; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 16 Jan 2026 10:05:01 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1275,7 +1154,7 @@ Content-Length: 472
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjUsImV4cCI6MTc2ODQ4MjI2NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.9HqqL0Z_3gyHT1Dew8kJEYfoJKLzTVPkvwV78Vkwrek",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MDEsImV4cCI6MTc2NTk2NjIwMSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.FE4t2Qq4prp9ZiN51MPcfNX_XoVyEBajpCDptA1Pqf4",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -1299,7 +1178,7 @@ Content-Length: 472
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 96
 Host: localhost:8080
 
@@ -1314,26 +1193,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 221
+Content-Length: 42
 
 {
-  "fieldErrors" : {
-    "firstName" : "First name is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "firstName: First name is required",
-  "timestamp" : "2026-01-15T12:59:24.828140337",
-  "status" : 400
+  "message" : "First name is required"
 }</code></pre>
 </div>
 </div>
@@ -1350,7 +1214,7 @@ Content-Length: 221
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 94
 Host: localhost:8080
 
@@ -1365,26 +1229,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 217
+Content-Length: 41
 
 {
-  "fieldErrors" : {
-    "lastName" : "Last name is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "lastName: Last name is required",
-  "timestamp" : "2026-01-15T12:59:24.809409094",
-  "status" : 400
+  "message" : "Last name is required"
 }</code></pre>
 </div>
 </div>
@@ -1401,7 +1250,7 @@ Content-Length: 217
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 83
 Host: localhost:8080
 
@@ -1416,26 +1265,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 203
+Content-Length: 37
 
 {
-  "fieldErrors" : {
-    "login" : "Login is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login is required",
-  "timestamp" : "2026-01-15T12:59:25.043241515",
-  "status" : 400
+  "message" : "Login is required"
 }</code></pre>
 </div>
 </div>
@@ -1452,7 +1286,7 @@ Content-Length: 203
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 89
 Host: localhost:8080
 
@@ -1467,26 +1301,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 215
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "password" : "Password is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "password: Password is required",
-  "timestamp" : "2026-01-15T12:59:25.006055978",
-  "status" : 400
+  "message" : "Password is required"
 }</code></pre>
 </div>
 </div>
@@ -1503,7 +1322,7 @@ Content-Length: 215
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 119
 Host: localhost:8080
 
@@ -1519,26 +1338,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 223
+Content-Length: 47
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email",
-  "timestamp" : "2026-01-15T12:59:25.711654337",
-  "status" : 400
+  "message" : "Login must be a valid email"
 }</code></pre>
 </div>
 </div>
@@ -1555,7 +1359,7 @@ Content-Length: 223
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1563,23 +1367,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400,
-  "timestamp" : "2026-01-15T12:59:25.700543091"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -1596,34 +1388,22 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 98
+Content-Type: application/json
+Content-Length: 100
 Host: localhost:8080
 
-{"firstName":"Test", "lastName":"User", "login":"test.newuser@test.com", "password":"testPassword"</code></pre>
+{"firstName":"Test","lastName":"NewUser", "login":"test.newuser@test.com", "password":"testPassword"</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 167
+Content-Length: 57
 
 {
-  "message" : "JSON is incomplete - missing closing bracket or quote",
-  "error" : "Bad Request",
-  "status" : 400,
-  "timestamp" : "2026-01-15T12:59:25.030612796"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -1640,7 +1420,7 @@ Content-Length: 167
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 124
 Host: localhost:8080
 
@@ -1656,26 +1436,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 365
+Content-Length: 58
 
 {
-  "fieldErrors" : {
-    "firstName" : "First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
-  },
-  "error" : "Validation Failed",
-  "message" : "firstName: First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)",
-  "timestamp" : "2026-01-15T12:59:25.281479514",
-  "status" : 400
+  "message" : "First name contains invalid characters"
 }</code></pre>
 </div>
 </div>
@@ -1692,7 +1457,7 @@ Content-Length: 365
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 124
 Host: localhost:8080
 
@@ -1708,26 +1473,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 361
+Content-Length: 57
 
 {
-  "fieldErrors" : {
-    "lastName" : "Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
-  },
-  "error" : "Validation Failed",
-  "message" : "lastName: Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)",
-  "timestamp" : "2026-01-15T12:59:25.723675293",
-  "status" : 400
+  "message" : "Last name contains invalid characters"
 }</code></pre>
 </div>
 </div>
@@ -1744,7 +1494,7 @@ Content-Length: 361
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 107
 Host: localhost:8080
 
@@ -1760,26 +1510,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 223
+Content-Length: 47
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email",
-  "timestamp" : "2026-01-15T12:59:24.876472524",
-  "status" : 400
+  "message" : "Login must be a valid email"
 }</code></pre>
 </div>
 </div>
@@ -1802,13 +1537,12 @@ Content-Length: 223
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 120
+Content-Length: 117
 Host: localhost:8080
 
 {
   "firstName" : "Test",
-  "lastName" : "NewUser",
+  "lastName" : "User",
   "login" : "test.newuser@test.com",
   "password" : "testPassword"
 }</code></pre>
@@ -1818,23 +1552,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 415 Unsupported Media Type
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 181
+Content-Length: 70
 
 {
-  "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "error" : "Unsupported Media Type",
-  "status" : 415,
-  "timestamp" : "2026-01-15T12:59:24.991560311"
+  "message" : "Unsupported content type: application/octet-stream"
 }</code></pre>
 </div>
 </div>
@@ -1857,7 +1579,7 @@ Content-Length: 181
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 111
 Host: localhost:8080
 
@@ -1873,23 +1595,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 40
 
 {
-  "message" : "User already exists: test.user@test.com",
-  "error" : "Conflict",
-  "status" : 409,
-  "timestamp" : "2026-01-15T12:59:24.931261201"
+  "message" : "Login already exists"
 }</code></pre>
 </div>
 </div>
@@ -1913,7 +1623,7 @@ Content-Length: 210
 Host: localhost:8080
 
 {
-  "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3NzEwNzM5NjR9.IdFja31M5dL-QeZp_RHMz2IJU7eaKkgd9qNKI3xuod8"
+  "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY1OTY1ODk5LCJleHAiOjE3Njg1NTc4OTl9.XxyD1IgPxB4N_-5pIsPnennVNNm79dj1S71DSkuuVYs"
 }</code></pre>
 </div>
 </div>
@@ -1924,7 +1634,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3NzEwNzM5NjR9.IdFja31M5dL-QeZp_RHMz2IJU7eaKkgd9qNKI3xuod8; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 14 Feb 2026 12:59:24 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY1OTY1ODk5LCJleHAiOjE3Njg1NTc4OTl9.XxyD1IgPxB4N_-5pIsPnennVNNm79dj1S71DSkuuVYs; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 16 Jan 2026 10:04:59 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1935,7 +1645,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838"
+  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU4OTksImV4cCI6MTc2NTk2NjE5OSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.p-4aS3UdqRWCu0I8IG18ldpqV31Li5IyFX2GoiE9wxw"
 }</code></pre>
 </div>
 </div>
@@ -2118,8 +1828,7 @@ Content-Length: 75
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjUsImV4cCI6MTc2ODQ4MjI2NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.un6g-W3zW5f4N2hTm2L5R3WBs3JsGZuYoDUsRFzglQc
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2133,16 +1842,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 49
 
 {
@@ -2167,8 +1867,7 @@ Content-Length: 49
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2176,23 +1875,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400,
-  "timestamp" : "2026-01-15T12:59:24.896330463"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -2215,7 +1902,7 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2229,16 +1916,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -2261,8 +1939,7 @@ Content-Length: 75
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjUsImV4cCI6MTc2ODQ4MjI2NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.un6g-W3zW5f4N2hTm2L5R3WBs3JsGZuYoDUsRFzglQc
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2276,16 +1953,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 49
 
 {
@@ -2310,8 +1978,7 @@ Content-Length: 49
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2319,23 +1986,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400,
-  "timestamp" : "2026-01-15T12:59:24.896330463"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -2358,7 +2013,7 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2372,16 +2027,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -2410,7 +2056,7 @@ Content-Length: 75
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MTEsImV4cCI6MTc2NTk2NjIxMSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.QmIEP0_6Ox7oublxkDH4ubElVajv7CFMRoAW9Fl-1Fo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2538,7 +2184,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0NzQ3NjMsImV4cCI6MTc2ODQ3NTA2MywiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.Jv7mKDZSuxlTVL1RPczgbds0pa4lXKsQEmaOphwCTAQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NTg3MTAsImV4cCI6MTc2NTk1OTAxMCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.2MxBB3XcWm_YSDla4LbCDJy4TplrxZEqSrVK54wiVuc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2577,7 +2223,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MTMsImV4cCI6MTc2NTk2NjIxMywiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.BN7Ra5uUm4KZaNSC3Vj0qVHxvJldDjqv-Ew9B10p_bM
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2732,7 +2378,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0NzQ3NjQsImV4cCI6MTc2ODQ3NTA2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.TCKz6Q6_veL_v-eRUbLASc4c8UO9Mk5kaYOJjWPK71I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NTg3MTAsImV4cCI6MTc2NTk1OTAxMCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.2MxBB3XcWm_YSDla4LbCDJy4TplrxZEqSrVK54wiVuc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2774,7 +2420,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all-with-deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2847,7 +2493,7 @@ Content-Length: 748
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTYzLCJleHAiOjE3Njg0ODIyNjMsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.W7USMmnbpq8Hjno74Q4s2VpG3XJjAf64LnSkS-4rj4A
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTA5LCJleHAiOjE3NjU5NjYyMDksImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.wR5mLb0sFn3A6SK07AVPl52W2oz9CtsXQYlVUY2q6xE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2884,7 +2530,7 @@ Content-Length: 3
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3009,7 +2655,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MTIsImV4cCI6MTc2NTk2NjIxMiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.vSSoW4FI7C69O7dbzu-6d0s2N6b2qjqMWfihaYwZFa8
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3054,7 +2700,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3075,10 +2721,10 @@ X-Frame-Options: DENY
 Content-Length: 132
 
 {
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
   "status" : 404,
-  "timestamp" : "2026-01-15T12:59:24.447709914"
+  "error" : "Not Found",
+  "message" : "User not found: 9999",
+  "timestamp" : "2025-12-17T10:05:12.381167896"
 }</code></pre>
 </div>
 </div>
@@ -3102,7 +2748,7 @@ Content-Length: 132
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3120,13 +2766,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 154
+Content-Length: 163
 
 {
-  "message" : "User already manager: test.manager@test.com",
-  "error" : "Conflict",
   "status" : 409,
-  "timestamp" : "2026-01-15T12:59:24.327047849"
+  "error" : "Conflict",
+  "message" : "The user is already a manager: test.manager@test.com",
+  "timestamp" : "2025-12-17T10:05:11.934927095"
 }</code></pre>
 </div>
 </div>
@@ -3144,7 +2790,7 @@ Content-Length: 154
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/3/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3162,13 +2808,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 160
 
 {
-  "message" : "User already admin: test.admin@test.com",
-  "error" : "Conflict",
   "status" : 409,
-  "timestamp" : "2026-01-15T12:59:24.133365655"
+  "error" : "Conflict",
+  "message" : "The user is already an admin: test.admin@test.com",
+  "timestamp" : "2025-12-17T10:05:11.212470813"
 }</code></pre>
 </div>
 </div>
@@ -3188,7 +2834,7 @@ Content-Length: 150
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTYzLCJleHAiOjE3Njg0ODIyNjMsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.W7USMmnbpq8Hjno74Q4s2VpG3XJjAf64LnSkS-4rj4A
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEwLCJleHAiOjE3NjU5NjYyMTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.FQUYQKbvN0ZEuNS0qgyh_FKaC0Zj_T27Dx7YhnoCCTo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3313,7 +2959,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MTAsImV4cCI6MTc2NTk2NjIxMCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.baQwsA4R75Ibx2nWy--XcLvgjcNvad8146DyKvWLPWY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3358,7 +3004,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTYzLCJleHAiOjE3Njg0ODIyNjMsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.W7USMmnbpq8Hjno74Q4s2VpG3XJjAf64LnSkS-4rj4A
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEwLCJleHAiOjE3NjU5NjYyMTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.FQUYQKbvN0ZEuNS0qgyh_FKaC0Zj_T27Dx7YhnoCCTo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3379,10 +3025,10 @@ X-Frame-Options: DENY
 Content-Length: 132
 
 {
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
   "status" : 404,
-  "timestamp" : "2026-01-15T12:59:23.987555562"
+  "error" : "Not Found",
+  "message" : "User not found: 9999",
+  "timestamp" : "2025-12-17T10:05:10.521661495"
 }</code></pre>
 </div>
 </div>
@@ -3402,7 +3048,7 @@ Content-Length: 132
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTYzLCJleHAiOjE3Njg0ODIyNjMsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.W7USMmnbpq8Hjno74Q4s2VpG3XJjAf64LnSkS-4rj4A
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEwLCJleHAiOjE3NjU5NjYyMTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.FQUYQKbvN0ZEuNS0qgyh_FKaC0Zj_T27Dx7YhnoCCTo
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3524,7 +3170,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MTAsImV4cCI6MTc2NTk2NjIxMCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.baQwsA4R75Ibx2nWy--XcLvgjcNvad8146DyKvWLPWY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3569,7 +3215,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3590,10 +3236,10 @@ X-Frame-Options: DENY
 Content-Length: 132
 
 {
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
   "status" : 404,
-  "timestamp" : "2026-01-15T12:59:24.306941167"
+  "error" : "Not Found",
+  "message" : "User not found: 9999",
+  "timestamp" : "2025-12-17T10:05:11.866781674"
 }</code></pre>
 </div>
 </div>
@@ -3617,7 +3263,7 @@ Content-Length: 132
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/3/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3635,13 +3281,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 160
 
 {
-  "message" : "User already admin: test.admin@test.com",
-  "error" : "Conflict",
   "status" : 409,
-  "timestamp" : "2026-01-15T12:59:24.149912499"
+  "error" : "Conflict",
+  "message" : "The user is already an admin: test.admin@test.com",
+  "timestamp" : "2025-12-17T10:05:11.291168567"
 }</code></pre>
 </div>
 </div>
@@ -3661,7 +3307,7 @@ Content-Length: 150
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3783,7 +3429,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg0ODE5NjQsImV4cCI6MTc2ODQ4MjI2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.f2_7UmISopKpr6nznmuDRL9-_KHvLMPNZzybk4wj838
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NjU5MTIsImV4cCI6MTc2NTk2NjIxMiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.vSSoW4FI7C69O7dbzu-6d0s2N6b2qjqMWfihaYwZFa8
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3828,7 +3474,7 @@ Content-Length: 33
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTExLCJleHAiOjE3NjU5NjYyMTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Fq677DIASwHmhyFtieTmQaTlzVVUbu-w0QjGZS3tuXk
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3849,10 +3495,10 @@ X-Frame-Options: DENY
 Content-Length: 132
 
 {
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
   "status" : 404,
-  "timestamp" : "2026-01-15T12:59:24.102473684"
+  "error" : "Not Found",
+  "message" : "User not found: 9999",
+  "timestamp" : "2025-12-17T10:05:11.058208048"
 }</code></pre>
 </div>
 </div>
@@ -3872,7 +3518,7 @@ Content-Length: 132
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3993,7 +3639,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4117,7 +3763,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4157,7 +3803,7 @@ Content-Length: 90
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1/permanent HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4197,7 +3843,7 @@ Content-Length: 89
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/restore HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY4NDgxOTY0LCJleHAiOjE3Njg0ODIyNjQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.vZNOxa0LmYlAa2A3Lq1XoHOPzLQf-4i_tiMFI59i_jc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTY1OTEyLCJleHAiOjE3NjU5NjYyMTIsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.VvkddT46yTAShUz9KfWpHEX73urNXPKbXI2ntApJW9Q
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4229,7 +3875,7 @@ User restored successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-01-14 14:04:26 UTC
+Last updated 2026-01-19 06:59:56 UTC
 </div>
 </div>
 </body>

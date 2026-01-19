@@ -3,10 +3,10 @@ package ch.sectioninformatique.auth.auth;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +22,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Controller handling OAuth2 authentication flows.
- * This controller manages the OAuth2 authentication process, specifically handling
- * the success callback from OAuth2 providers and generating JWT tokens for authenticated users.
+ * This controller manages the OAuth2 authentication process, specifically
+ * handling
+ * the success callback from OAuth2 providers and generating JWT tokens for
+ * authenticated users.
  */
 @RequestMapping("/oauth2")
 @RestController
@@ -36,27 +38,32 @@ public class OAuth2Controller {
     /**
      * Constructs a new Oauth2Controller with the required dependencies.
      *
-     * @param userAuthenticationProvider Provider for user authentication and token generation
-     * @param userService Service for user management
+     * @param userAuthenticationProvider Provider for user authentication and token
+     *                                   generation
+     * @param userService                Service for user management
      */
     public OAuth2Controller(UserAuthenticationProvider userAuthenticationProvider,
-                            UserService userService) {
+            UserService userService) {
         this.userAuthenticationProvider = userAuthenticationProvider;
         this.userService = userService;
     }
 
     /**
      * Handles the OAuth2 authentication success callback.
-     * This endpoint processes the OAuth2 authentication token, extracts user information,
-     * and generates a JWT token for the authenticated user. It then redirects to the frontend
+     * This endpoint processes the OAuth2 authentication token, extracts user
+     * information,
+     * and generates a JWT token for the authenticated user. It then redirects to
+     * the frontend
      * with the generated token.
      *
-     * @param authentication The OAuth2 authentication token containing user information
-     * @param response The HTTP response object used for redirection
+     * @param authentication The OAuth2 authentication token containing user
+     *                       information
+     * @param response       The HTTP response object used for redirection
      * @throws IOException If an I/O error occurs during the response handling
      */
     @GetMapping("/success")
-    public void oauth2Success(OAuth2AuthenticationToken authentication, HttpServletResponse response) throws IOException {
+    public void oauth2Success(OAuth2AuthenticationToken authentication, HttpServletResponse response)
+            throws IOException {
         if (authentication == null) {
             response.sendError(HttpStatus.UNAUTHORIZED.value(), "Authentication token is missing.");
             return;
@@ -92,11 +99,22 @@ public class OAuth2Controller {
         // Generate a JWT using your custom UserAuthenticationProvider.
         String jwt = userAuthenticationProvider.createToken(user);
 
-        // Construct a redirect URL for your frontend with the token
-        String redirectUrl = String.format("http://localhost:4000/oauth2/success?token=%s&loginType=azure",
-                URLEncoder.encode(jwt, StandardCharsets.UTF_8));
+        // Create a secure HTTP-only cookie with the JWT token
+        ResponseCookie cookie = ResponseCookie
+                .from("token", jwt)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(30))
+                .sameSite("Strict")
+                .build();
 
-        log.debug("Redirecting to frontend with JWT token");
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        // Redirect to frontend without token in URL
+        String redirectUrl = "http://localhost:4000/oauth2/success?loginType=azure";
+
+        log.debug("Redirecting to frontend with JWT token in secure cookie");
         response.sendRedirect(redirectUrl);
     }
 }
