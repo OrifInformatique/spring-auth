@@ -25,10 +25,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Controller handling OAuth2 authentication flows.
- * This controller manages the OAuth2 authentication process, specifically
- * handling
- * the success callback from OAuth2 providers and generating JWT tokens for
- * authenticated users.
+ * This controller manages the OAuth2 authentication process for Azure OAuth2 authentication.
+ * 
+ * Provides two endpoints:
+ * - /oauth2/login/azure: Initiates the OAuth2 flow by storing redirect URL and redirecting to Azure
+ * - /oauth2/success: Handles the callback from Azure after successful authentication
+ * 
+ * The controller generates JWT tokens for authenticated users and stores them in secure cookies.
  */
 @RequestMapping("/oauth2")
 @RestController
@@ -36,7 +39,7 @@ public class OAuth2Controller {
 
     private static final String REDIRECT_URL_SESSION_KEY = "oauth2_redirect_url";
     private static final String DEFAULT_REDIRECT_URL = "http://localhost:4000/oauth2/success?loginType=azure";
-    
+
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
     private static final Logger log = LoggerFactory.getLogger(OAuth2Controller.class);
@@ -56,10 +59,15 @@ public class OAuth2Controller {
 
     /**
      * Initiates OAuth2 authentication flow with Azure.
-     * This endpoint stores the redirect URL in the session before initiating the OAuth2 flow.
-     * After successful authentication, the user will be redirected back to the stored URL.
+     * This endpoint is called by the Spring Client App to start the OAuth2 flow.
+     * It stores the calling URL (from Referer header or redirectUrl parameter) in the session,
+     * then redirects to Spring Security's OAuth2 authorization endpoint.
      *
-     * @param redirectUrl The URL to redirect to after successful authentication (optional)
+     * Flow step: App → spring-auth (step 2)
+     *
+     * @param redirectUrl The URL to redirect to after successful authentication (optional).
+     *                    If not provided, uses the Referer header. If neither is available,
+     *                    uses DEFAULT_REDIRECT_URL.
      * @param request     The HTTP request object containing the session
      * @param response    The HTTP response object used for redirection
      * @throws IOException If an I/O error occurs during the response handling
@@ -69,9 +77,9 @@ public class OAuth2Controller {
             @RequestParam(required = false) String redirectUrl,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        
+
         HttpSession session = request.getSession(true);
-        
+
         // Store redirect URL in session if provided, otherwise store the referer header
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
             session.setAttribute(REDIRECT_URL_SESSION_KEY, redirectUrl);
@@ -86,23 +94,33 @@ public class OAuth2Controller {
                 log.debug("No redirect URL provided, using default: {}", DEFAULT_REDIRECT_URL);
             }
         }
-        
+
         // Redirect to Spring Security's OAuth2 authorization endpoint
         response.sendRedirect("/oauth2/authorization/azure");
     }
 
     /**
-     * Handles the OAuth2 authentication success callback.
-     * This endpoint processes the OAuth2 authentication token, extracts user
-     * information,
-     * and generates a JWT token for the authenticated user. It then redirects to
-     * the frontend
-     * with the generated token. The redirect URL is retrieved from the session if available.
-     * 
-     * Frontend link : window.location.href = `${AUTH_API_URL}/auth/oauth2/login?returnTo=` + encodeURIComponent(window.location.href);
+     * Handles the OAuth2 authentication success callback from Azure.
+     * This endpoint is called by Spring Security after successful Azure authentication.
+     * It:
+     * 1. Extracts user information from the OAuth2 token
+     * 2. Creates or updates the user in the local database
+     * 3. Generates a JWT token
+     * 4. Sets the JWT in a secure HTTP-only cookie
+     * 5. Retrieves the stored redirect URL from session
+     * 6. Redirects back to the Spring Client App
      *
-     * @param authentication The OAuth2 authentication token containing user
-     *                       information
+     * Flow step: Azure → spring-auth (step 4-5)
+     *
+     * Complete OAuth2 Flow:
+     * 1. Frontend → App: User initiates login
+     * 2. App → spring-auth (/oauth2/login/azure): Calls with Referer header
+     * 3. spring-auth → Azure: Redirects to Azure OAuth2 authorization endpoint
+     * 4. Azure → spring-auth (/oauth2/success): User authenticates and is redirected back
+     * 5. spring-auth → App: Redirects to stored Referer URL with JWT cookie
+     * 6. App → Frontend: Redirects user back to original location with JWT cookie
+     *
+     * @param authentication The OAuth2 authentication token containing user information
      * @param request        The HTTP request object containing the session
      * @param response       The HTTP response object used for redirection
      * @throws IOException If an I/O error occurs during the response handling
@@ -162,7 +180,7 @@ public class OAuth2Controller {
         // Retrieve redirect URL from session, or use default
         HttpSession session = request.getSession(false);
         String redirectUrl = DEFAULT_REDIRECT_URL;
-        
+
         if (session != null) {
             String storedUrl = (String) session.getAttribute(REDIRECT_URL_SESSION_KEY);
             if (storedUrl != null && !storedUrl.isEmpty()) {
@@ -172,7 +190,7 @@ public class OAuth2Controller {
                 log.debug("Using stored redirect URL from session: {}", redirectUrl);
             }
         }
-        
+
         // Ensure redirectUrl includes loginType parameter if not already present
         if (!redirectUrl.contains("loginType=")) {
             redirectUrl += (redirectUrl.contains("?") ? "&" : "?") + "loginType=azure";
