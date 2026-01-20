@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
 @RestController
 public class OAuth2Controller {
 
-    private static final String REDIRECT_URL_SESSION_KEY = "oauth2_redirect_url";
-    private static final String DEFAULT_REDIRECT_URL = "http://localhost:4000/oauth2/success?loginType=azure";
+    private static final String REDIRECT_URL_SESSION_KEY = "OAUTH2_RETURN_URL";
+    private static final String DEFAULT_REDIRECT_URL = "/redirect-after-login";
 
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
