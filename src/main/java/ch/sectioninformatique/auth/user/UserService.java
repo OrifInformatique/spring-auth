@@ -87,7 +87,7 @@ public class UserService {
         User user = userRepository.findByLogin(credentialsDto.login())
                 .orElseThrow(() -> new InvalidCredentialsException());
 
-        if (!passwordEncoder.matches(CharBuffer.wrap(credentialsDto.password()), user.getPassword())) {
+        if (!passwordEncoder.matches(new String(credentialsDto.password()), user.getPassword())) {
             throw new InvalidCredentialsException();
         }
         return userMapper.toUserDto(user);
@@ -196,8 +196,12 @@ public class UserService {
             throw new UserAlreadyExistsException(user.getLogin());
         });
 
+        // IMPORTANT: Encode the password BEFORE mapping, because the mapper's @AfterMapping
+        // clears the password array for security reasons
+        String encodedPassword = passwordEncoder.encode(new String(userDto.password()));
+        
         User user = userMapper.signUpToUser(userDto);
-        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.password())));
+        user.setPassword(encodedPassword);
 
         // Add default USER role
         Role userRole = roleRepository.findByName(RoleEnum.USER)
@@ -222,11 +226,11 @@ public class UserService {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new InvalidCredentialsException());
 
-        if (passwordEncoder.matches(CharBuffer.wrap(passwords.oldPassword()), user.getPassword()) == false) {
+        if (!passwordEncoder.matches(new String(passwords.oldPassword()), user.getPassword())) {
             throw new InvalidCredentialsException();
         }
 
-        String encodedPassword = passwordEncoder.encode(CharBuffer.wrap(passwords.newPassword()));
+        String encodedPassword = passwordEncoder.encode(new String(passwords.newPassword()));
         user.setPassword(encodedPassword);
     }
 
