@@ -199,22 +199,24 @@ public class AuthController {
      * This endpoint handles the logout process by:
      * - Retrieving the authenticated user from the security context.
      * - Deleting all stored refresh tokens for the user from the database.
+     * - Returning a refresh token with zero lifespan to clear it on the frontend.
      * - Preventing token reuse after logout for enhanced security.
      * 
-     * Note: Access tokens remain valid until expiration (cannot be revoked server-side).
-     * Clients should discard the access token immediately upon successful logout.
+     * The refresh token with zero lifespan is sent back in the response to allow
+     * the frontend to immediately invalidate the token on the client side.
      * 
      * Security considerations:
      * - Requires authentication (@PreAuthorize("isAuthenticated()")).
      * - Clears refresh tokens to prevent new access tokens from being issued.
-     * - The client should clear the HTTP-only refresh_token cookie on logout.
+     * - Returns an expired refresh token to force frontend cleanup.
+     * - The client should discard all tokens immediately upon successful logout.
      *
-     * @return ResponseEntity with a success message upon successful logout.
+     * @return ResponseEntity with a refresh token (zero lifespan) to invalidate on frontend.
      * @throws AppException if the user is not properly authenticated.
      */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<TokenResponseDto> logout() {
         // Retrieve the current authentication from the security context
         Authentication authentication = SecurityContextHolder
                 .getContext()
@@ -225,14 +227,29 @@ public class AuthController {
 
         // Validate that the user is properly authenticated
         if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         // Delete all refresh tokens for this user from the database
         // This prevents the user from obtaining new access tokens after logout
         userService.deleteRefreshTokens(currentUser.getLogin());
 
-        // Return a success response
-        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+        // Create a refresh token with zero lifespan to invalidate it on the frontend
+        // This token is immediately expired and serves as a signal to clear the token client-side
+        String expiredRefreshToken = userAuthenticationProvider.createExpiredRefreshToken(currentUser);
+
+        // Create secure HTTP-only cookie for the expired refresh token
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", expiredRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh")
+                .maxAge(Duration.ZERO)
+                .sameSite("Strict")
+                .build();
+
+        // Return the expired refresh token in both the response body and cookie
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new TokenResponseDto(expiredRefreshToken));
     }
 }
