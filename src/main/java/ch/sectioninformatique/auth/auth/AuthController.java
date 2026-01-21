@@ -192,4 +192,23 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        UserDto currentUser = (UserDto) authentication.getPrincipal();
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        // Delete refresh tokens from database
+        userService.deleteRefreshTokens(currentUser.getLogin());
+
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
 }

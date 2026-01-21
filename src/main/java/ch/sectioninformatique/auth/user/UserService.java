@@ -607,4 +607,15 @@ public class UserService {
 
         return userMapper.toUserDto(savedUser);
     }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public boolean deleteRefreshTokens(String userLogin) {
+        try {
+            refreshTokenRepository.deleteByUserLogin(userLogin);
+            return true;
+        } catch (Exception e) {
+            log.error("Error deleting refresh tokens for user {}: {}", userLogin, e.getMessage());
+            return false;
+        }
+    }
 }
