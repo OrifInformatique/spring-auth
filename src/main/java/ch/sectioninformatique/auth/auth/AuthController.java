@@ -193,22 +193,46 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
 
+    /**
+     * Logs out the authenticated user by invalidating all refresh tokens.
+     * 
+     * This endpoint handles the logout process by:
+     * - Retrieving the authenticated user from the security context.
+     * - Deleting all stored refresh tokens for the user from the database.
+     * - Preventing token reuse after logout for enhanced security.
+     * 
+     * Note: Access tokens remain valid until expiration (cannot be revoked server-side).
+     * Clients should discard the access token immediately upon successful logout.
+     * 
+     * Security considerations:
+     * - Requires authentication (@PreAuthorize("isAuthenticated()")).
+     * - Clears refresh tokens to prevent new access tokens from being issued.
+     * - The client should clear the HTTP-only refresh_token cookie on logout.
+     *
+     * @return ResponseEntity with a success message upon successful logout.
+     * @throws AppException if the user is not properly authenticated.
+     */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
+        // Retrieve the current authentication from the security context
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
 
+        // Extract the authenticated user's information
         UserDto currentUser = (UserDto) authentication.getPrincipal();
 
+        // Validate that the user is properly authenticated
         if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
 
-        // Delete refresh tokens from database
+        // Delete all refresh tokens for this user from the database
+        // This prevents the user from obtaining new access tokens after logout
         userService.deleteRefreshTokens(currentUser.getLogin());
 
+        // Return a success response
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 }
