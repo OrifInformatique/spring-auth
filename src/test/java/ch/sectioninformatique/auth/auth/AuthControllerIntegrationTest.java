@@ -6,12 +6,14 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
+import ch.sectioninformatique.auth.user.UserRepository;
 import ch.sectioninformatique.auth.user.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,7 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
@@ -121,6 +125,12 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private UserService userService;
+
+        @Autowired
+        private UserRepository userRepository;
+
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
         /**
          * Test the /auth/login endpoint with missing login.
@@ -539,10 +549,15 @@ public class AuthControllerIntegrationTest {
         @Transactional
         public void register_withRealData_shouldReturnSuccess() throws Exception {
 
+                String rawPassword = "testPassword";
+                String requestBody =
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\""
+                                                + rawPassword + "\"}";
+
                 performRequest(
                                 "POST",
                                 "/auth/register",
-                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                requestBody,
                                 null,
                                 MediaType.APPLICATION_JSON,
                                 201,
@@ -570,6 +585,14 @@ public class AuthControllerIntegrationTest {
                                                                 "User login should match");
                                                 assertEquals("USER", updatedUser.getMainRole(),
                                                                 "User role should be USER");
+
+                                                var storedUser = userRepository.findByLogin("test.newuser@test.com")
+                                                                .orElseThrow(() -> new RuntimeException("User not found after registration"));
+
+                                                assertTrue(passwordEncoder.matches(rawPassword, storedUser.getPassword()),
+                                                                "Stored password should match encoded raw password");
+                                                assertNotEquals(rawPassword, storedUser.getPassword(),
+                                                                "Password must not be stored in plain text");
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
