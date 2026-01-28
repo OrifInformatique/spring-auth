@@ -710,7 +710,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 64
 Host: localhost:8080
 
@@ -724,17 +724,8 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY5MTU3MTYzLCJleHAiOjE3NzE3NDkxNjN9.cg1oB6TzWTIZG61ZQg1Dt8uYuxzJiI4DF2_KczHTdXM; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 22 Feb 2026 08:32:43 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 16 Jan 2026 14:21:31 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 458
 
 {
@@ -742,7 +733,7 @@ Content-Length: 458
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNjMsImV4cCI6MTc2OTE1NzQ2MywiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.VdzLkeatXhgWOekIwDVj4dln_U59iG0d4EvkQ9QRopg",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNjYsImV4cCI6MTc2NTk4MTU2NiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.MzFACXzlYfLytfeXnWJm0_ajue7kyZuGvERvpYD5p8Q",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -766,7 +757,7 @@ Content-Length: 458
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 30
 Host: localhost:8080
 
@@ -779,26 +770,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 203
+Content-Length: 37
 
 {
-  "fieldErrors" : {
-    "login" : "Login is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login is required",
-  "timestamp" : "2026-01-23T08:32:43.726159953",
-  "status" : 400
+  "message" : "Login is required"
 }</code></pre>
 </div>
 </div>
@@ -815,7 +791,7 @@ Content-Length: 203
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 36
 Host: localhost:8080
 
@@ -828,26 +804,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 215
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "password" : "Password is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "password: Password is required",
-  "timestamp" : "2026-01-23T08:32:44.496989762",
-  "status" : 400
+  "message" : "Password is required"
 }</code></pre>
 </div>
 </div>
@@ -864,7 +825,7 @@ Content-Length: 215
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 66
 Host: localhost:8080
 
@@ -878,26 +839,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 237
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email format"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email format",
-  "timestamp" : "2026-01-23T08:32:43.110261661",
-  "status" : 400
+  "message" : "Invalid email format"
 }</code></pre>
 </div>
 </div>
@@ -914,7 +860,7 @@ Content-Length: 237
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -922,23 +868,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "timestamp" : "2026-01-23T08:32:44.282364356",
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -955,7 +889,7 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 53
 Host: localhost:8080
 
@@ -966,23 +900,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 167
+Content-Length: 57
 
 {
-  "timestamp" : "2026-01-23T08:32:43.650527508",
-  "message" : "JSON is incomplete - missing closing bracket or quote",
-  "error" : "Bad Request",
-  "status" : 400
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -999,7 +921,7 @@ Content-Length: 167
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 57
 Host: localhost:8080
 
@@ -1013,26 +935,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 237
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email format"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email format",
-  "timestamp" : "2026-01-23T08:32:42.163695833",
-  "status" : 400
+  "message" : "Invalid email format"
 }</code></pre>
 </div>
 </div>
@@ -1076,7 +983,7 @@ X-Frame-Options: DENY
 Content-Length: 134
 
 {
-  "timestamp" : "2026-01-23T08:32:44.150681946",
+  "timestamp" : "2025-12-12T14:23:05.359463047",
   "message" : "Invalid credentials",
   "error" : "Unauthorized",
   "status" : 401
@@ -1102,12 +1009,11 @@ Content-Length: 134
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 64
+Content-Length: 67
 Host: localhost:8080
 
 {
-  "login" : "test.user@test.com",
+  "login" : "non.existent@test.com",
   "password" : "Test1234!"
 }</code></pre>
 </div>
@@ -1116,23 +1022,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 415 Unsupported Media Type
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 181
+Content-Length: 70
 
 {
-  "timestamp" : "2026-01-23T08:32:42.637836918",
-  "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "error" : "Unsupported Media Type",
-  "status" : 415
+  "message" : "Unsupported content type: application/octet-stream"
 }</code></pre>
 </div>
 </div>
@@ -1155,7 +1049,7 @@ Content-Length: 181
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 69
 Host: localhost:8080
 
@@ -1169,23 +1063,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 39
 
 {
-  "timestamp" : "2026-01-23T08:32:43.505380929",
-  "message" : "Invalid credentials",
-  "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Invalid credentials"
 }</code></pre>
 </div>
 </div>
@@ -1202,12 +1084,12 @@ Content-Length: 134
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 72
+Content-Type: application/json
+Content-Length: 69
 Host: localhost:8080
 
 {
-  "login" : "non.existent@test.com",
+  "login" : "test.user@test.com",
   "password" : "WrongPassword!"
 }</code></pre>
 </div>
@@ -1216,23 +1098,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 39
 
 {
-  "timestamp" : "2026-01-23T08:32:44.416309893",
-  "message" : "Invalid credentials",
-  "error" : "Unauthorized",
-  "status" : 401
+  "message" : "Invalid credentials"
 }</code></pre>
 </div>
 </div>
@@ -1251,7 +1121,7 @@ Content-Length: 134
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 120
 Host: localhost:8080
 
@@ -1267,18 +1137,9 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Location: /auth/users/test.newuser@test.com
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY5MTU3MDcwLCJleHAiOjE3NzE3NDkwNzB9.gHAjCKpjArAPQAHPOlgWXVPuveseIdWJAM0VXeMZnog; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 22 Feb 2026 08:31:10 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 16 Jan 2026 14:21:30 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 472
 
 {
@@ -1286,7 +1147,7 @@ Content-Length: 472
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcwNzAsImV4cCI6MTc2OTE1NzM3MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.ORnZ2QH38GPOIRjH0aO5vbEOwDHgzmELXplQ84HDIgM",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNjYsImV4cCI6MTc2NTk4MTU2NiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.m6zPhzfZF-CnZcF8o2TueGTpByknWUBpWsgKb7O67mU",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -1310,7 +1171,7 @@ Content-Length: 472
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 96
 Host: localhost:8080
 
@@ -1325,26 +1186,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 221
+Content-Length: 42
 
 {
-  "fieldErrors" : {
-    "firstName" : "First name is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "firstName: First name is required",
-  "timestamp" : "2026-01-23T08:32:42.088075526",
-  "status" : 400
+  "message" : "First name is required"
 }</code></pre>
 </div>
 </div>
@@ -1361,7 +1207,7 @@ Content-Length: 221
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 94
 Host: localhost:8080
 
@@ -1376,26 +1222,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 217
+Content-Length: 41
 
 {
-  "fieldErrors" : {
-    "lastName" : "Last name is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "lastName: Last name is required",
-  "timestamp" : "2026-01-23T08:32:41.686418729",
-  "status" : 400
+  "message" : "Last name is required"
 }</code></pre>
 </div>
 </div>
@@ -1412,7 +1243,7 @@ Content-Length: 217
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 83
 Host: localhost:8080
 
@@ -1427,26 +1258,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 202
+Content-Length: 37
 
 {
-  "fieldErrors" : {
-    "login" : "Login is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login is required",
-  "timestamp" : "2026-01-23T08:32:43.368567777",
-  "status" : 400
+  "message" : "Login is required"
 }</code></pre>
 </div>
 </div>
@@ -1463,7 +1279,7 @@ Content-Length: 202
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 89
 Host: localhost:8080
 
@@ -1478,26 +1294,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 215
+Content-Length: 40
 
 {
-  "fieldErrors" : {
-    "password" : "Password is required"
-  },
-  "error" : "Validation Failed",
-  "message" : "password: Password is required",
-  "timestamp" : "2026-01-23T08:32:43.040675253",
-  "status" : 400
+  "message" : "Password is required"
 }</code></pre>
 </div>
 </div>
@@ -1514,7 +1315,7 @@ Content-Length: 215
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 119
 Host: localhost:8080
 
@@ -1530,26 +1331,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 223
+Content-Length: 47
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email",
-  "timestamp" : "2026-01-23T08:32:45.191250418",
-  "status" : 400
+  "message" : "Login must be a valid email"
 }</code></pre>
 </div>
 </div>
@@ -1566,7 +1352,7 @@ Content-Length: 223
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1574,23 +1360,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "timestamp" : "2026-01-23T08:32:45.121605038",
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -1607,34 +1381,22 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 98
+Content-Type: application/json
+Content-Length: 100
 Host: localhost:8080
 
-{"firstName":"Test", "lastName":"User", "login":"test.newuser@test.com", "password":"testPassword"</code></pre>
+{"firstName":"Test","lastName":"NewUser", "login":"test.newuser@test.com", "password":"testPassword"</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 167
+Content-Length: 57
 
 {
-  "timestamp" : "2026-01-23T08:32:43.210074520",
-  "message" : "JSON is incomplete - missing closing bracket or quote",
-  "error" : "Bad Request",
-  "status" : 400
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -1651,7 +1413,7 @@ Content-Length: 167
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 124
 Host: localhost:8080
 
@@ -1667,26 +1429,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 365
+Content-Length: 58
 
 {
-  "fieldErrors" : {
-    "firstName" : "First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
-  },
-  "error" : "Validation Failed",
-  "message" : "firstName: First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)",
-  "timestamp" : "2026-01-23T08:32:44.015129898",
-  "status" : 400
+  "message" : "First name contains invalid characters"
 }</code></pre>
 </div>
 </div>
@@ -1703,7 +1450,7 @@ Content-Length: 365
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 124
 Host: localhost:8080
 
@@ -1719,26 +1466,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 361
+Content-Length: 57
 
 {
-  "fieldErrors" : {
-    "lastName" : "Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
-  },
-  "error" : "Validation Failed",
-  "message" : "lastName: Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)",
-  "timestamp" : "2026-01-23T08:32:45.264355002",
-  "status" : 400
+  "message" : "Last name contains invalid characters"
 }</code></pre>
 </div>
 </div>
@@ -1755,7 +1487,7 @@ Content-Length: 361
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 107
 Host: localhost:8080
 
@@ -1771,26 +1503,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 223
+Content-Length: 47
 
 {
-  "fieldErrors" : {
-    "login" : "Login must be a valid email"
-  },
-  "error" : "Validation Failed",
-  "message" : "login: Login must be a valid email",
-  "timestamp" : "2026-01-23T08:32:42.410103262",
-  "status" : 400
+  "message" : "Login must be a valid email"
 }</code></pre>
 </div>
 </div>
@@ -1813,13 +1530,12 @@ Content-Length: 223
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: text/plain;charset=UTF-8
-Content-Length: 120
+Content-Length: 117
 Host: localhost:8080
 
 {
   "firstName" : "Test",
-  "lastName" : "NewUser",
+  "lastName" : "User",
   "login" : "test.newuser@test.com",
   "password" : "testPassword"
 }</code></pre>
@@ -1829,23 +1545,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 415 Unsupported Media Type
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 181
+Content-Length: 70
 
 {
-  "timestamp" : "2026-01-23T08:32:42.971977877",
-  "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "error" : "Unsupported Media Type",
-  "status" : 415
+  "message" : "Unsupported content type: application/octet-stream"
 }</code></pre>
 </div>
 </div>
@@ -1868,7 +1572,7 @@ Content-Length: 181
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 111
 Host: localhost:8080
 
@@ -1884,23 +1588,11 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 40
 
 {
-  "timestamp" : "2026-01-23T08:32:42.720702517",
-  "message" : "User already exists: test.user@test.com",
-  "error" : "Conflict",
-  "status" : 409
+  "message" : "Login already exists"
 }</code></pre>
 </div>
 </div>
@@ -1919,34 +1611,23 @@ Content-Length: 150
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/refresh HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 210
+Content-Type: application/json
+Content-Length: 35
 Host: localhost:8080
 
-{
-  "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY5MTU3MTYyLCJleHAiOjE3NzE3NDkxNjJ9.cq9mzx9IrP6rutiOseGYHQxPzE_oIEe9y8FWgFJI80Y"
-}</code></pre>
+{"refreshToken":"eqfarhsrhjzje..."}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY5MTU3MTYyLCJleHAiOjE3NzE3NDkxNjJ9.cq9mzx9IrP6rutiOseGYHQxPzE_oIEe9y8FWgFJI80Y; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 22 Feb 2026 08:32:42 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzY1OTgxMjY2LCJleHAiOjE3Njg1NzMyNjZ9.otMaJOy5_cG4SG9zFu4o_w51e0qJyTU0CYdA7tlBJtQ; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 16 Jan 2026 14:21:31 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNjIsImV4cCI6MTc2OTE1NzQ2MiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.lY2dqUF0P9sdUsueguFYUqJnNX7-Qq_npW2KawrXL5M"
+  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNjYsImV4cCI6MTc2NTk4MTU2NiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.MzFACXzlYfLytfeXnWJm0_ajue7kyZuGvERvpYD5p8Q"
 }</code></pre>
 </div>
 </div>
@@ -2125,35 +1806,13 @@ Content-Length: 75
 <div class="paragraph">
 <p>This is an example output for the <code>POST /auth/logout</code> endpoint.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5ODI0OTEsImV4cCI6MTc2ODk4Mjc5MSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.Whp8NeuM7vZJYuEje2A3Dwn3THdwPiacWT4Ah6oNOYo
-Host: localhost:8080</code></pre>
+<p>Unresolved directive in index.adoc - include::auth/logout/http-request.adoc[]</p>
 </div>
-</div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 43
-
-{
-  "message" : "Logged out successfully"
-}</code></pre>
-</div>
+<p>Unresolved directive in index.adoc - include::auth/logout/http-response.adoc[]</p>
 </div>
 <div class="paragraph">
 <p>It logs out the authenticated user by invalidating their refresh token.</p>
@@ -2168,34 +1827,13 @@ Content-Length: 43
 <div class="paragraph">
 <p>This is an example output when the token is missing in the request.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: localhost:8080</code></pre>
+<p>Unresolved directive in index.adoc - include::auth/logout-missing-token/http-request.adoc[]</p>
 </div>
-</div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 75
-
-{
-  "message" : "Full authentication is required to access this resource"
-}</code></pre>
-</div>
+<p>Unresolved directive in index.adoc - include::auth/logout-missing-token/http-response.adoc[]</p>
 </div>
 <div class="paragraph">
 <p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
@@ -2206,36 +1844,13 @@ Content-Length: 75
 <div class="paragraph">
 <p>This is an example output when the token provided is malformed.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080</code></pre>
+<p>Unresolved directive in index.adoc - include::auth/logout-malformed-token/http-request.adoc[]</p>
 </div>
-</div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
-
-{
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
-}</code></pre>
-</div>
+<p>Unresolved directive in index.adoc - include::auth/logout-malformed-token/http-response.adoc[]</p>
 </div>
 <div class="paragraph">
 <p>It returns a 401 Unauthorized error indicating that the token is invalid.</p>
@@ -2246,36 +1861,13 @@ Content-Length: 66
 <div class="paragraph">
 <p>This is an example output when the token provided is expired.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5Nzk3OTgsImV4cCI6MTc2ODk4MDA5OCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.Z1wmO_UM8aM99wyfyR9pK9J0KdVSdJ1ITWYPq7HQgH4
-Host: localhost:8080</code></pre>
+<p>Unresolved directive in index.adoc - include::auth/logout-expired-token/http-request.adoc[]</p>
 </div>
-</div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
-
-{
-  "error" : "INVALID_TOKEN",
-  "message" : "Token has expired"
-}</code></pre>
-</div>
+<p>Unresolved directive in index.adoc - include::auth/logout-expired-token/http-response.adoc[]</p>
 </div>
 <div class="paragraph">
 <p>It returns a 401 Unauthorized error indicating that the token has expired.</p>
@@ -2292,8 +1884,7 @@ Content-Length: 66
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNjQsImV4cCI6MTc2OTE1NzQ2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.kOWO622wo7_U08T6csQAMAhF5TR7vhcKzryD-U_muOE
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2307,16 +1898,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 49
 
 {
@@ -2326,149 +1908,6 @@ Content-Length: 49
 </div>
 <div class="paragraph">
 <p>It sets a password for a user account using a token.</p>
-</div>
-<div class="sect3">
-<h4 id="_1_4_1_error_response_400_bad_request">1.4.1 Error Response - 400 - Bad Request</h4>
-<div class="paragraph">
-<p>These are example outputs for the <code>PUT /auth/update-password</code> endpoint for bad request.</p>
-</div>
-<div class="sect4">
-<h5 id="_1_4_1_1_missing_body">1.4.1.1 Missing Body</h5>
-<div class="paragraph">
-<p>This is an example output when the request body is missing.</p>
-</div>
-<div class="listingblock">
-<div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNjIsImV4cCI6MTc2OTE1NzQ2MiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.lY2dqUF0P9sdUsueguFYUqJnNX7-Qq_npW2KawrXL5M
-Host: localhost:8080</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
-
-{
-  "timestamp" : "2026-01-23T08:32:42.562774344",
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It returns a 400 Bad Request error indicating that the request body is missing.</p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_1_4_2_error_response_401_unauthorised">1.4.2 Error Response - 401 - Unauthorised</h4>
-<div class="paragraph">
-<p>These are example outputs for the <code>PUT /auth/update-password</code> endpoint for unauthorized access.</p>
-</div>
-<div class="sect4">
-<h5 id="_1_4_2_1_missing_token">1.4.2.1 Missing Token</h5>
-<div class="paragraph">
-<p>This is an example output when the request token is missing.</p>
-</div>
-<div class="listingblock">
-<div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 70
-Host: localhost:8080
-
-{
-  "oldPassword" : "Test1234!",
-  "newPassword" : "TestNewPassword"
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 75
-
-{
-  "message" : "Full authentication is required to access this resource"
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_1_5_update_password">1.5 Update Password</h3>
-<div class="paragraph">
-<p>This is an example output for the <code>PUT /auth/update-password</code> endpoint.</p>
-</div>
-<div class="listingblock">
-<div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNjQsImV4cCI6MTc2OTE1NzQ2NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.kOWO622wo7_U08T6csQAMAhF5TR7vhcKzryD-U_muOE
-Content-Length: 70
-Host: localhost:8080
-
-{
-  "oldPassword" : "Test1234!",
-  "newPassword" : "TestNewPassword"
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">response</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 49
-
-{
-  "message" : "Password updated successfully"
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It sets a new password for the authenticated user.</p>
 </div>
 <div class="sect3">
 <h4 id="_1_5_1_error_response_400_bad_request">1.5.1 Error Response - 400 - Bad Request</h4>
@@ -2484,8 +1923,7 @@ Content-Length: 49
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNjIsImV4cCI6MTc2OTE1NzQ2MiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.lY2dqUF0P9sdUsueguFYUqJnNX7-Qq_npW2KawrXL5M
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2493,23 +1931,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "timestamp" : "2026-01-23T08:32:42.562774344",
-  "message" : "Malformed or missing JSON request body",
-  "error" : "Bad Request",
-  "status" : 400
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -2532,7 +1958,7 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2546,16 +1972,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -2578,8 +1995,7 @@ Content-Length: 75
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5ODY5OTgsImV4cCI6MTc2ODk4NzI5OCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.U6aJ-UJOTYmEtxgE6HKrUrbF-Ii7oJulj1bsfnX1Ub8
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2593,16 +2009,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 49
 
 {
@@ -2627,8 +2034,7 @@ Content-Length: 49
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5ODY5OTUsImV4cCI6MTc2ODk4NzI5NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.xhMmvJD61kwFaEp8HKVrV0Kdoe6PdDZyfLIDJGOUiuE
+Content-Type: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2636,23 +2042,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 57
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
-  "message" : "Malformed or missing JSON request body",
-  "timestamp" : "2026-01-21T09:16:36.016211837"
+  "message" : "Request body is missing or unreadable"
 }</code></pre>
 </div>
 </div>
@@ -2675,7 +2069,7 @@ Content-Length: 152
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 Content-Length: 70
 Host: localhost:8080
 
@@ -2689,16 +2083,7 @@ Host: localhost:8080
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -2726,8 +2111,8 @@ Content-Length: 75
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNzUsImV4cCI6MTc2OTE1NzQ3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.YQ7_1By8_lutlxV2kKulaacOYVYRHQJAJeabEaCAO4A
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzQsImV4cCI6MTc2NTk4MTU3NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.cKNCGJ-mASj-cjMsEmu7fATaBLSkDn2N19r3w8ll8k0
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2735,24 +2120,15 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 183
+Content-Length: 458
 
 {
-  "id" : null,
+  "id" : 1,
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : null,
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzQsImV4cCI6MTc2NTk4MTU3NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.cKNCGJ-mASj-cjMsEmu7fATaBLSkDn2N19r3w8ll8k0",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ ]
@@ -2776,7 +2152,7 @@ Content-Length: 183
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2784,16 +2160,7 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -2814,7 +2181,7 @@ Content-Length: 75
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
 Host: localhost:8080</code></pre>
 </div>
@@ -2823,21 +2190,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -2854,8 +2211,8 @@ Content-Length: 66
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNDk5NzUsImV4cCI6MTc2OTE1MDI3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.YnQytkDCZqJGgAkmzQ-BhzT4I-DBdl3cQcL3kEwZlYc
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NzQwNzQsImV4cCI6MTc2NTk3NDM3NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.T8OS-sdx1R3kWmZvzEZhbkTXc2H7TvctWQDgo49TaiY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2863,21 +2220,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
+Content-Type: application/json
 Content-Length: 66
 
 {
-  "message" : "Token has expired",
-  "error" : "INVALID_TOKEN"
+  "message" : "The Token has expired on 2025-12-17T12:26:14Z."
 }</code></pre>
 </div>
 </div>
@@ -2893,8 +2240,8 @@ Content-Length: 66
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNzcsImV4cCI6MTc2OTE1NzQ3NywiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.YbToL0St3MPgQ2lKf18dnB0IYWB2JNxNaHjOZm9Hexw
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzUsImV4cCI6MTc2NTk4MTU3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.rRdgYxAxzxfXPLn0WJheWghfLEK_4g_GyKkvYl2MH3E
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2902,54 +2249,97 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 748
+Content-Length: 2691
 
 [ {
   "id" : 1,
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : null,
+  "password" : "$2a$10$1TNxqls.trfHAZNd6ZCFKuEM0jid/R1VGP0eyEYUGH1lNZV3S7/KC",
+  "createdAt" : "2025-12-17T14:21:11.732+00:00",
+  "updatedAt" : "2025-12-17T14:21:11.732+00:00",
   "deleted" : false,
-  "mainRole" : "USER",
-  "permissions" : [ ]
+  "mainRole" : {
+    "id" : 1,
+    "name" : "USER",
+    "description" : "Default user role",
+    "createdAt" : "2025-12-17T14:21:11.476+00:00",
+    "updatedAt" : "2025-12-17T14:21:11.476+00:00"
+  },
+  "username" : "test.user@test.com",
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "enabled" : true
 }, {
   "id" : 2,
   "firstName" : "Test",
   "lastName" : "Manager",
   "login" : "test.manager@test.com",
-  "token" : null,
+  "password" : "$2a$10$lFL5UNlvkgF2ka633Xf49uXI94nvRL9d.geBTmgSZTgnQaeHO6bVm",
+  "createdAt" : "2025-12-17T14:21:11.734+00:00",
+  "updatedAt" : "2025-12-17T14:21:11.734+00:00",
   "deleted" : false,
-  "mainRole" : "MANAGER",
-  "permissions" : [ ]
+  "mainRole" : {
+    "id" : 2,
+    "name" : "MANAGER",
+    "description" : "Manager role",
+    "createdAt" : "2025-12-17T14:21:11.485+00:00",
+    "updatedAt" : "2025-12-17T14:21:11.485+00:00"
+  },
+  "username" : "test.manager@test.com",
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "enabled" : true
 }, {
   "id" : 3,
   "firstName" : "Test",
   "lastName" : "Admin",
   "login" : "test.admin@test.com",
-  "token" : null,
+  "password" : "$2a$10$CiIP.gFGZ7DmLmYTmEdT2.kmfglWw/6d/ULpY0V9TFO8ov.BOOv2S",
+  "createdAt" : "2025-12-17T14:21:11.734+00:00",
+  "updatedAt" : "2025-12-17T14:21:11.734+00:00",
   "deleted" : false,
-  "mainRole" : "ADMIN",
-  "permissions" : [ ]
+  "mainRole" : {
+    "id" : 3,
+    "name" : "ADMIN",
+    "description" : "Administrator role",
+    "createdAt" : "2025-12-17T14:21:11.489+00:00",
+    "updatedAt" : "2025-12-17T14:21:11.489+00:00"
+  },
+  "username" : "test.admin@test.com",
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "enabled" : true
 }, {
   "id" : 4,
   "firstName" : "Test2",
   "lastName" : "Admin2",
   "login" : "test.admin2@test.com",
-  "token" : null,
+  "password" : "$2a$10$ZJkozvLjtpLlf3XqqESCUeV3lCOc7MRWOqFweRMF8px6d81j80rwa",
+  "createdAt" : "2025-12-17T14:21:11.735+00:00",
+  "updatedAt" : "2025-12-17T14:21:11.735+00:00",
   "deleted" : false,
-  "mainRole" : "ADMIN",
-  "permissions" : [ ]
+  "mainRole" : {
+    "id" : 3,
+    "name" : "ADMIN",
+    "description" : "Administrator role",
+    "createdAt" : "2025-12-17T14:21:11.489+00:00",
+    "updatedAt" : "2025-12-17T14:21:11.489+00:00"
+  },
+  "username" : "test.admin2@test.com",
+  "authorities" : [ ],
+  "credentialsNonExpired" : true,
+  "accountNonExpired" : true,
+  "accountNonLocked" : true,
+  "enabled" : true
 } ]</code></pre>
 </div>
 </div>
@@ -2970,7 +2360,7 @@ Content-Length: 748
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2978,16 +2368,7 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -3008,7 +2389,7 @@ Content-Length: 75
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
 Host: localhost:8080</code></pre>
 </div>
@@ -3017,21 +2398,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -3048,8 +2419,8 @@ Content-Length: 66
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNDk5NzUsImV4cCI6MTc2OTE1MDI3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.YnQytkDCZqJGgAkmzQ-BhzT4I-DBdl3cQcL3kEwZlYc
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5NzQwNzQsImV4cCI6MTc2NTk3NDM3NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.T8OS-sdx1R3kWmZvzEZhbkTXc2H7TvctWQDgo49TaiY
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3057,21 +2428,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
+Content-Type: application/json
 Content-Length: 66
 
 {
-  "message" : "Token has expired",
-  "error" : "INVALID_TOKEN"
+  "message" : "The Token has expired on 2025-12-17T12:26:14Z."
 }</code></pre>
 </div>
 </div>
@@ -3091,7 +2452,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all-with-deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJ0eXAiOiJhY2Nlc3MiLCJleHAiOjE3NjU1NDk2OTcsImlhdCI6MTc2NTU0OTM5N30.G25yIO2fIk819TogZoWQOIulLHvn2XtnrbTGA-ym8T4
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3164,7 +2525,7 @@ Content-Length: 748
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc0LCJleHAiOjE3NjkxNTc0NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.ySuNE4y3FyyAmb63YmiQ6K0xbdwrnLXGy7kCWfPwi_o
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJ0eXAiOiJhY2Nlc3MiLCJleHAiOjE3NjU1NDk2OTUsImlhdCI6MTc2NTU0OTM5NX0.FKWd5l0-mYeRfv9fx6G3cr_Np68K3GmSOwXX1bfG9u0
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3199,9 +2560,9 @@ Content-Length: 3
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc1LCJleHAiOjE3NjkxNTc0NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Yuf-50mt-AUJtsRw2GQEPUjDYsM4p9eHveKLwUjqsZc
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3209,17 +2570,8 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 37
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 
 User promoted to manager successfully</code></pre>
 </div>
@@ -3240,25 +2592,17 @@ User promoted to manager successfully</code></pre>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -3278,31 +2622,22 @@ Content-Length: 75
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080</code></pre>
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -3324,30 +2659,22 @@ Content-Length: 66
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNzYsImV4cCI6MTc2OTE1NzQ3NiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.a4XWi8OzLJFIIrdJCoBtmgrf6IYy0ZeGCWxyyPoZl0Q
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzUsImV4cCI6MTc2NTk4MTU3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.rRdgYxAxzxfXPLn0WJheWghfLEK_4g_GyKkvYl2MH3E
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 36
 
 {
-  "message" : "Access Denied"
+  "message" : "Access is denied"
 }</code></pre>
 </div>
 </div>
@@ -3369,33 +2696,22 @@ Content-Length: 33
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc1LCJleHAiOjE3NjU5ODE1NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.4DyLwkZEZ4TMN-kbAgq_XgcL1EPLk_2U7fTFT58C5Ec
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 34
 
 {
-  "timestamp" : "2026-01-23T08:32:56.714843290",
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found"
 }</code></pre>
 </div>
 </div>
@@ -3417,33 +2733,22 @@ Content-Length: 132
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 154
+Content-Length: 49
 
 {
-  "timestamp" : "2026-01-23T08:32:56.314759472",
-  "message" : "User already manager: test.manager@test.com",
-  "error" : "Conflict",
-  "status" : 409
+  "message" : "The user is already a manager"
 }</code></pre>
 </div>
 </div>
@@ -3459,33 +2764,22 @@ Content-Length: 154
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/3/promote-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc1LCJleHAiOjE3NjkxNTc0NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Yuf-50mt-AUJtsRw2GQEPUjDYsM4p9eHveKLwUjqsZc
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 48
 
 {
-  "timestamp" : "2026-01-23T08:32:55.707374359",
-  "message" : "User already admin: test.admin@test.com",
-  "error" : "Conflict",
-  "status" : 409
+  "message" : "The user is already an admin"
 }</code></pre>
 </div>
 </div>
@@ -3503,9 +2797,9 @@ Content-Length: 150
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc0LCJleHAiOjE3NjkxNTc0NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.ySuNE4y3FyyAmb63YmiQ6K0xbdwrnLXGy7kCWfPwi_o
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3513,17 +2807,8 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 33
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 
 Manager role revoked successfully</code></pre>
 </div>
@@ -3544,25 +2829,17 @@ Manager role revoked successfully</code></pre>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -3582,31 +2859,22 @@ Content-Length: 75
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080</code></pre>
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -3628,30 +2896,22 @@ Content-Length: 66
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNzUsImV4cCI6MTc2OTE1NzQ3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.YQ7_1By8_lutlxV2kKulaacOYVYRHQJAJeabEaCAO4A
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzQsImV4cCI6MTc2NTk4MTU3NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.cKNCGJ-mASj-cjMsEmu7fATaBLSkDn2N19r3w8ll8k0
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 36
 
 {
-  "message" : "Access Denied"
+  "message" : "Access is denied"
 }</code></pre>
 </div>
 </div>
@@ -3673,33 +2933,22 @@ Content-Length: 33
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/revoke-manager HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc1LCJleHAiOjE3NjkxNTc0NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Yuf-50mt-AUJtsRw2GQEPUjDYsM4p9eHveKLwUjqsZc
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-manager HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 34
 
 {
-  "timestamp" : "2026-01-23T08:32:55.195137071",
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found"
 }</code></pre>
 </div>
 </div>
@@ -3717,9 +2966,9 @@ Content-Length: 132
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc0LCJleHAiOjE3NjkxNTc0NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.ySuNE4y3FyyAmb63YmiQ6K0xbdwrnLXGy7kCWfPwi_o
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3727,17 +2976,8 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 32
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 
 Admin role assigned successfully</code></pre>
 </div>
@@ -3758,25 +2998,17 @@ Admin role assigned successfully</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -3793,31 +3025,22 @@ Content-Length: 75
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080</code></pre>
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -3839,30 +3062,22 @@ Content-Length: 66
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNzUsImV4cCI6MTc2OTE1NzQ3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.YQ7_1By8_lutlxV2kKulaacOYVYRHQJAJeabEaCAO4A
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzQsImV4cCI6MTc2NTk4MTU3NCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.cKNCGJ-mASj-cjMsEmu7fATaBLSkDn2N19r3w8ll8k0
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 36
 
 {
-  "message" : "Access Denied"
+  "message" : "Access is denied"
 }</code></pre>
 </div>
 </div>
@@ -3884,33 +3099,22 @@ Content-Length: 33
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/promote-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 34
 
 {
-  "timestamp" : "2026-01-23T08:32:56.222414298",
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found"
 }</code></pre>
 </div>
 </div>
@@ -3932,33 +3136,22 @@ Content-Length: 132
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/3/promote-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc1LCJleHAiOjE3NjkxNTc0NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Yuf-50mt-AUJtsRw2GQEPUjDYsM4p9eHveKLwUjqsZc
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/promote-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 48
 
 {
-  "timestamp" : "2026-01-23T08:32:55.770778222",
-  "message" : "User already admin: test.admin@test.com",
-  "error" : "Conflict",
-  "status" : 409
+  "message" : "The user is already an admin"
 }</code></pre>
 </div>
 </div>
@@ -3976,9 +3169,9 @@ Content-Length: 150
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3986,17 +3179,8 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 31
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 
 Admin role revoked successfully</code></pre>
 </div>
@@ -4014,25 +3198,17 @@ Admin role revoked successfully</code></pre>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -4052,31 +3228,22 @@ Content-Length: 75
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080</code></pre>
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -4098,30 +3265,22 @@ Content-Length: 66
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjkxNTcxNzYsImV4cCI6MTc2OTE1NzQ3NiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.a4XWi8OzLJFIIrdJCoBtmgrf6IYy0ZeGCWxyyPoZl0Q
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NjU5ODEyNzUsImV4cCI6MTc2NTk4MTU3NSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.rRdgYxAxzxfXPLn0WJheWghfLEK_4g_GyKkvYl2MH3E
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 403 Forbidden
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 36
 
 {
-  "message" : "Access Denied"
+  "message" : "Access is denied"
 }</code></pre>
 </div>
 </div>
@@ -4143,33 +3302,22 @@ Content-Length: 33
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/revoke-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc1LCJleHAiOjE3NjkxNTc0NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.Yuf-50mt-AUJtsRw2GQEPUjDYsM4p9eHveKLwUjqsZc
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/revoke-admin HTTP/1.1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc0LCJleHAiOjE3NjU5ODE1NzQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.JKAwXV9dJVWfv3t7H24SbHbdCHsSxaoTga1f-dpQ8kE
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 404 Not Found
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 34
 
 {
-  "timestamp" : "2026-01-23T08:32:55.574181214",
-  "message" : "User not found: 9999",
-  "error" : "Not Found",
-  "status" : 404
+  "message" : "User not found"
 }</code></pre>
 </div>
 </div>
@@ -4187,9 +3335,9 @@ Content-Length: 132
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc3LCJleHAiOjE3NjkxNTc0NzcsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.8hP7YfzlqF_15U4eZJ9K7NIoNlzSBKkRSoETJTUkjYk
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc1LCJleHAiOjE3NjU5ODE1NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.4DyLwkZEZ4TMN-kbAgq_XgcL1EPLk_2U7fTFT58C5Ec
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4197,17 +3345,8 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 34
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 
 Admin role downgraded successfully</code></pre>
 </div>
@@ -4228,25 +3367,17 @@ Admin role downgraded successfully</code></pre>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: localhost:8080</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
+Accept: application/json
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -4266,31 +3397,22 @@ Content-Length: 75
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/100/downgrade-admin HTTP/1.1
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
-Host: localhost:8080</code></pre>
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -4308,9 +3430,9 @@ Content-Length: 66
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY1OTgxMjc1LCJleHAiOjE3NjU5ODE1NzUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.4DyLwkZEZ4TMN-kbAgq_XgcL1EPLk_2U7fTFT58C5Ec
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4318,21 +3440,12 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 90
 
 {
-  "message" : "User deleted successfully",
-  "deletedUserLogin" : "test.user@test.com"
+  "deletedUserLogin" : "test.user@test.com",
+  "message" : "User deleted successfully"
 }</code></pre>
 </div>
 </div>
@@ -4352,8 +3465,8 @@ Content-Length: 90
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
+Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4361,16 +3474,7 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
 Content-Length: 75
 
 {
@@ -4390,8 +3494,8 @@ Content-Length: 75
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
-Content-Type: application/json;charset=UTF-8
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/100 HTTP/1.1
+Accept: application/json
 Authorization: Bearer this.is.not.a.valid.token
 Host: localhost:8080</code></pre>
 </div>
@@ -4400,21 +3504,11 @@ Host: localhost:8080</code></pre>
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json;charset=UTF-8
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 66
+Content-Type: application/json
+Content-Length: 72
 
 {
-  "message" : "Invalid JWT token",
-  "error" : "INVALID_TOKEN"
+  "message" : "The token was expected to have 3 parts, but got &gt; 3."
 }</code></pre>
 </div>
 </div>
@@ -4434,7 +3528,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJ0eXAiOiJhY2Nlc3MiLCJleHAiOjE3NjU1NDk2OTcsImlhdCI6MTc2NTU0OTM5N30.G25yIO2fIk819TogZoWQOIulLHvn2XtnrbTGA-ym8T4
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4474,7 +3568,7 @@ Content-Length: 90
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1/permanent HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc3LCJleHAiOjE3NjkxNTc0NzcsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.8hP7YfzlqF_15U4eZJ9K7NIoNlzSBKkRSoETJTUkjYk
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJ0eXAiOiJhY2Nlc3MiLCJleHAiOjE3NjU1NDk2OTcsImlhdCI6MTc2NTU0OTM5N30.G25yIO2fIk819TogZoWQOIulLHvn2XtnrbTGA-ym8T4
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4514,7 +3608,7 @@ Content-Length: 89
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/restore HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzY5MTU3MTc2LCJleHAiOjE3NjkxNTc0NzYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbXX0.XOPDUXKVbq38WGjX8YJDHcwPQCxSKmwVjBqAodizliQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiQWRtaW4iLCJtYWluUm9sZSI6IkFETUlOIiwicGVybWlzc2lvbnMiOltdLCJ0eXAiOiJhY2Nlc3MiLCJleHAiOjE3NjU1NDk2OTcsImlhdCI6MTc2NTU0OTM5N30.G25yIO2fIk819TogZoWQOIulLHvn2XtnrbTGA-ym8T4
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -4546,7 +3640,7 @@ User restored successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-01-21 10:37:29 UTC
+Last updated 2026-01-28 09:44:22 UTC
 </div>
 </div>
 </body>
