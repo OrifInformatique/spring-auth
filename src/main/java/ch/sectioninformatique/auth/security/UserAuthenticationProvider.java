@@ -135,6 +135,32 @@ public class UserAuthenticationProvider {
     }
 
     /**
+     * Creates an expired JWT refresh token for logout purposes.
+     * This token is immediately expired and serves as a signal to clear the token on the client side.
+     * The token includes:
+     * - Issue time set to now
+     * - Expiration time set to now (making it immediately expired)
+     * 
+     * This is used during logout to send back to the frontend, allowing the frontend
+     * to immediately invalidate the refresh token.
+     *
+     * @param user The user to create an expired token for
+     * @return An immediately expired JWT refresh token string
+     */
+    public String createExpiredRefreshToken(UserDto user) {
+        Date issueDate = new Date();
+        Date validity = issueDate; // Set expiration to now, making it immediately expired
+
+        Algorithm algorithm = Algorithm.HMAC256(secretRefreshKey);
+        return JWT.create()
+                .withSubject(user.getLogin())
+                .withClaim("typ", "refresh")
+                .withIssuedAt(issueDate)
+                .withExpiresAt(validity)
+                .sign(algorithm);
+    }
+
+    /**
      * Builds a list of authorities from a role and permissions.
      * This method converts:
      * - Role into a "ROLE_" prefixed authority

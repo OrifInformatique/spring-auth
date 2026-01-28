@@ -305,13 +305,14 @@ public class UserService {
     /**
      * Restore a soft deleted user
      * 
-     * @param userId
-     * @return
+     * @param userId The ID of the user to restore
+     * @return UserDto containing the restored user's information
+     * @throws UserNotFoundException if the user is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto restoreDeletedUser(Long userId) {
         User user = userRepository.findByIdDeleted(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
         user.setDeleted(false);
         userRepository.save(user);
         return userMapper.toUserDto(user);
@@ -360,8 +361,11 @@ public class UserService {
      * - Removes existing roles and assigns the user role
      *
      * @param userId The ID of the user to revoke the manager role from
-     * @throws RuntimeException if the user is not found, already a user, or the
-     *                          user role is not found
+     * @return UserDto containing the updated user's information
+     * @throws UserNotFoundException if the user is not found
+     * @throws UserAlreadyRegularException if the user is already a regular user
+     * @throws UserAlreadyAdminException if the user is an admin
+     * @throws RoleNotFoundException if the user role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto revokeManagerRole(Long userId) {
@@ -370,6 +374,10 @@ public class UserService {
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new UserAlreadyRegularException(user.getLogin());
+        }
+
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new UserAlreadyAdminException(user.getLogin());
         }
 
         Role userRole = roleRepository.findByName(RoleEnum.USER)
@@ -385,25 +393,26 @@ public class UserService {
      * Promotes a user to the admin role.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already a admin
+     * - Checks if the user is already an admin
      * - Removes existing roles and assigns the admin role
      *
      * @param userId The ID of the user to promote
      * @return UserDto containing the updated user's information
-     * @throws RuntimeException if the user is not found, already a admin, or the
-     *                          admin role is not found
+     * @throws UserNotFoundException if the user is not found
+     * @throws UserAlreadyAdminException if the user is already an admin
+     * @throws RoleNotFoundException if the admin role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto promoteToAdmin(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
-    if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-        throw new UserAlreadyAdminException(user.getLogin());
-    }
+        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
+            throw new UserAlreadyAdminException(user.getLogin());
+        }
 
-    Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-        .orElseThrow(() -> new RoleNotFoundException(RoleEnum.ADMIN));
+        Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
+                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.ADMIN));
 
         user.setMainRole(adminRole);
         userRepository.save(user);
@@ -411,15 +420,18 @@ public class UserService {
     }
 
     /**
-     * Downgrades a admin to an manager role.
+     * Downgrades an admin to a manager role.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already an manager or has lower rights
+     * - Checks if the user is already a manager or has lower rights
      * - Removes existing roles and assigns the manager role
      *
      * @param userId The ID of the user to downgrade
-     * @throws RuntimeException if the user is not found, already an manager, or the
-     *                          manager role is not found
+     * @return UserDto containing the updated user's information
+     * @throws UserNotFoundException if the user is not found
+     * @throws UserHasLowerRightsException if the user has lower rights than admin
+     * @throws UserAlreadyManagerException if the user is already a manager
+     * @throws RoleNotFoundException if the manager role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto downgradeAdminRole(Long userId) {
@@ -446,24 +458,31 @@ public class UserService {
      * Revokes the admin role from a user.
      * This operation:
      * - Verifies the user exists
-     * - Checks if the user is already a regular user
+     * - Checks if the user is already a regular user or manager
      * - Removes existing roles and assigns the user role
      *
      * @param userId The ID of the user to revoke the admin role from
-     * @throws RuntimeException if the user is not found, already a user, or the
-     *                          user role is not found
+     * @return UserDto containing the updated user's information
+     * @throws UserNotFoundException if the user is not found
+     * @throws UserAlreadyRegularException if the user is already a regular user
+     * @throws UserAlreadyManagerException if the user is a manager
+     * @throws RoleNotFoundException if the user role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto revokeAdminRole(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
-    if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-        throw new UserAlreadyRegularException(user.getLogin());
-    }
+        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
+            throw new UserAlreadyRegularException(user.getLogin());
+        }
 
-    Role userRole = roleRepository.findByName(RoleEnum.USER)
-        .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
+        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
+            throw new UserAlreadyManagerException(user.getLogin());
+        }
+
+        Role userRole = roleRepository.findByName(RoleEnum.USER)
+                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
 
         user.setMainRole(userRole);
         userRepository.save(user);
@@ -506,23 +525,23 @@ public class UserService {
      * - Soft-deletes the user
      *
      * @param userId The ID of the user to delete
-     * @return The deleted User entity, or null if deletion was successful
-     * @throws RuntimeException if the user is not found or the authenticated user
-     *                          lacks permissions
+     * @return UserDto containing the deleted user's information
+     * @throws UserNotFoundException if the user is not found
+     * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto deleteUser(Long userId) {
         // Get the user to delete
-    User userToDelete = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
         // Get the authenticated user (the actor)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
 
         // Get the full user entity for the authenticated user
-    User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
-        .orElseThrow(() -> new UserNotFoundException(authenticatedUser.getLogin()));
+        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
+                .orElseThrow(() -> new UserNotFoundException(authenticatedUser.getLogin()));
 
         // Check if the action is authorized
         if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
@@ -542,9 +561,9 @@ public class UserService {
      * - Permanently deletes the user
      *
      * @param userId The ID of the user to permanently delete
-     * @return The deleted User entity, or null if deletion was successful
-     * @throws RuntimeException if the user is not found or the authenticated user
-     *                          lacks permissions
+     * @return UserDto containing the deleted user's information
+     * @throws UserNotFoundException if the user is not found
+     * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto deletePermanentUser(Long userId) {
@@ -610,5 +629,24 @@ public class UserService {
         log.debug("Azure user created successfully: {}", savedUser.getLogin());
 
         return userMapper.toUserDto(savedUser);
+    }
+
+    /**
+     * Deletes all refresh tokens associated with a user.
+     * This operation is typically used during logout or when a user's
+     * authentication needs to be invalidated across all sessions.
+     *
+     * @param userLogin The login/username of the user whose tokens should be deleted
+     * @throws UserNotFoundException if the user is not found
+     */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void deleteRefreshTokens(String userLogin) {
+        log.debug("Deleting refresh tokens for user: {}", userLogin);
+        
+        // Verify user exists before deleting tokens
+        userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new UserNotFoundException(userLogin));
+        
+        refreshTokenRepository.deleteByUserLogin(userLogin);
     }
 }

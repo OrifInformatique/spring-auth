@@ -192,4 +192,56 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
+
+    /**
+     * Logs out the authenticated user by invalidating all refresh tokens.
+     * 
+     * This endpoint handles the logout process by:
+     * - Retrieving the authenticated user from the security context.
+     * - Deleting all stored refresh tokens for the user from the database.
+     * - Returning an expired refresh token in a secure HTTP-only cookie to invalidate on the frontend.
+     * - Preventing token reuse after logout for enhanced security.
+     * 
+     * Security considerations:
+     * - Requires authentication (@PreAuthorize("isAuthenticated()")).
+     * - Clears refresh tokens to prevent new access tokens from being issued.
+     * - Returns an expired refresh token to force frontend cleanup.
+     *
+     * @return ResponseEntity with a success message and expired refresh token in a secure cookie.
+     * @throws AppException if the user is not properly authenticated.
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        // Retrieve the current authenticated user from the security context
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        UserDto currentUser = (UserDto) authentication.getPrincipal();
+
+        // Validate that the user is properly authenticated
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Delete all refresh tokens for this user from the database to prevent token reuse
+        userService.deleteRefreshTokens(currentUser.getLogin());
+
+        // Create an expired refresh token to signal frontend to clear the token
+        String expiredRefreshToken = userAuthenticationProvider.createExpiredRefreshToken(currentUser);
+
+        // Create secure HTTP-only cookie with zero lifespan for the expired refresh token
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", expiredRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh")
+                .maxAge(Duration.ZERO)
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(Map.of("message", "Logged out successfully"));
+    }
 }
