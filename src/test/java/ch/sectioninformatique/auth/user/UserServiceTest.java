@@ -119,7 +119,7 @@ public class UserServiceTest {
      * 
      * Act & Assert:
      * - Call userService.login() with non-existent email
-     * - Verify AppException is thrown with message "Invalid credentials"
+     * - Verify AppException is thrown with message "error.authorisation.invalid.credentials"
      * - Error message should not reveal whether user exists (security best practice)
      */
     @Test
@@ -133,7 +133,7 @@ public class UserServiceTest {
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
-        assertEquals("Invalid credentials", exception.getMessage());
+        assertEquals("error.authorisation.invalid.credentials", exception.getMessage());
     }
 
     /**
@@ -148,7 +148,7 @@ public class UserServiceTest {
      * 
      * Act & Assert:
      * - Call userService.login() with wrong password
-     * - Verify AppException is thrown with message "Invalid credentials"
+     * - Verify AppException is thrown with message "error.authorisation.invalid.credentials"
      * - Error message should be same as user not found (security best practice)
      */
     @Test
@@ -164,7 +164,7 @@ public class UserServiceTest {
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
             () -> userService.login(new CredentialsDto(login, password.toCharArray())));
-        assertEquals("Invalid credentials", exception.getMessage());
+        assertEquals("error.authorisation.invalid.credentials", exception.getMessage());
     }
 
     /**

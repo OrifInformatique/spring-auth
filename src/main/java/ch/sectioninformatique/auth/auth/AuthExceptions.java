@@ -3,6 +3,7 @@ package ch.sectioninformatique.auth.auth;
 import org.springframework.http.HttpStatus;
 
 import ch.sectioninformatique.auth.app.exceptions.AppException;
+import ch.sectioninformatique.auth.security.RoleEnum;
 
 /**
  * Authentication-related exceptions for the auth package.
@@ -14,7 +15,7 @@ public class AuthExceptions {
      */
     public static class InvalidCredentialsException extends AppException {
         public InvalidCredentialsException() {
-            super("Invalid credentials", HttpStatus.UNAUTHORIZED);
+            super("error.authorisation.invalid.credentials", HttpStatus.UNAUTHORIZED);
         }
     }
 }
