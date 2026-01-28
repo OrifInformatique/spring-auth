@@ -1,5 +1,8 @@
 package ch.sectioninformatique.auth.app.exceptions;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +19,9 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Autowired
+    private MessageSource messageSource;
+
     // Helper method to format responses
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
         return ResponseEntity.status(status).body(
@@ -31,7 +37,22 @@ public class GlobalExceptionHandler {
     // -------------------------------
     @ExceptionHandler(AppException.class)
     public ResponseEntity<Object> handleAppException(AppException ex) {
-        return buildResponse(ex.getStatus(), ex.getMessage());
+        String message;
+        
+        // If the exception has a message key, resolve it from messages.properties
+        if (ex.getMessageKey() != null) {
+            message = messageSource.getMessage(
+                ex.getMessageKey(), 
+                ex.getMessageArgs(), 
+                ex.getMessage(), // fallback to default message
+                LocaleContextHolder.getLocale()
+            );
+        } else {
+            // Legacy behavior: use the message directly
+            message = ex.getMessage();
+        }
+        
+        return buildResponse(ex.getStatus(), message);
     }
 
     // -------------------------------

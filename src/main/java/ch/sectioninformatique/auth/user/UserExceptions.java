@@ -14,7 +14,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyExistsException extends AppException {
         public UserAlreadyExistsException(String login) {
-            super("User already exists: " + login, HttpStatus.CONFLICT);
+            super("error.user.already.exists", HttpStatus.CONFLICT, login);
         }
     }
 
@@ -23,7 +23,7 @@ public class UserExceptions {
      */
     public static class UserNotFoundException extends AppException {
         public UserNotFoundException(String loginOrId) {
-            super("User not found: " + loginOrId, HttpStatus.NOT_FOUND);
+            super("error.user.not.found", HttpStatus.NOT_FOUND, loginOrId);
         }
     }
 
@@ -32,7 +32,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyAdminException extends AppException {
         public UserAlreadyAdminException(String login) {
-            super("User already admin: " + login, HttpStatus.CONFLICT);
+            super("error.user.already.admin", HttpStatus.CONFLICT, login);
         }
     }
 
@@ -41,7 +41,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyManagerException extends AppException {
         public UserAlreadyManagerException(String login) {
-            super("User already manager: " + login, HttpStatus.CONFLICT);
+            super("error.user.already.manager", HttpStatus.CONFLICT, login);
         }
     }
 
@@ -50,7 +50,7 @@ public class UserExceptions {
      */
     public static class UserAlreadyRegularException extends AppException {
         public UserAlreadyRegularException(String login) {
-            super("User already regular: " + login, HttpStatus.CONFLICT);
+            super("error.user.already.regular", HttpStatus.CONFLICT, login);
         }
     }
 }

@@ -96,7 +96,7 @@ public class UserServiceTest {
         UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, false, "USER", null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
         when(userMapper.toUserDto(user)).thenReturn(expectedDto);
 
         // Act
@@ -105,7 +105,7 @@ public class UserServiceTest {
         // Assert
         assertEquals(expectedDto, result);
         verify(userRepository).findByLogin(login);
-        verify(passwordEncoder).matches(CharBuffer.wrap(password), user.getPassword());
+        verify(passwordEncoder).matches(password, user.getPassword());
     }
 
     /**
@@ -159,7 +159,7 @@ public class UserServiceTest {
         User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null,false, null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(CharBuffer.wrap(password), user.getPassword())).thenReturn(false);
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
 
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
@@ -209,7 +209,7 @@ public class UserServiceTest {
         userRole.setName(RoleEnum.USER);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(CharBuffer.wrap(password))).thenReturn("hashedPassword");
+        when(passwordEncoder.encode(password)).thenReturn("hashedPassword");
         when(roleRepository.findByName(RoleEnum.USER)).thenReturn(Optional.of(userRole));
         when(userMapper.signUpToUser(signUpDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
@@ -221,7 +221,7 @@ public class UserServiceTest {
         // Assert
         assertEquals(expectedDto, result);
         verify(userRepository).findByLogin(login);
-        verify(passwordEncoder).encode(CharBuffer.wrap(password));
+        verify(passwordEncoder).encode(password);
         verify(roleRepository).findByName(RoleEnum.USER);
         verify(userRepository).save(user);
     }
@@ -254,7 +254,8 @@ public class UserServiceTest {
         // Act & Assert
         AppException exception = assertThrows(AppException.class, 
             () -> userService.register(signUpDto));
-        assertEquals("User already exists: existing@test.com", exception.getMessage());
+        assertEquals("error.user.already.exists", exception.getMessageKey());
+        assertArrayEquals(new Object[]{"existing@test.com"}, exception.getMessageArgs());
     }
 
     /**
@@ -335,9 +336,10 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, 
+        AppException exception = assertThrows(AppException.class, 
             () -> userService.promoteToManager(userId));
-        assertEquals("User not found: 1", exception.getMessage());
+        assertEquals("error.user.not.found", exception.getMessageKey());
+        assertArrayEquals(new Object[]{"1"}, exception.getMessageArgs());
     }
 
     /**
@@ -373,9 +375,10 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, 
+        AppException exception = assertThrows(AppException.class, 
             () -> userService.promoteToManager(userId));
-        assertEquals("User already manager: john@test.com", exception.getMessage());
+        assertEquals("error.user.already.manager", exception.getMessageKey());
+        assertArrayEquals(new Object[]{"john@test.com"}, exception.getMessageArgs());
     }
 
     /**
