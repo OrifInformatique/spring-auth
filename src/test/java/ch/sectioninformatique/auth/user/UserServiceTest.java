@@ -497,8 +497,9 @@ public class UserServiceTest {
         when(userRepository.findByLogin("user@test.com")).thenReturn(Optional.of(authenticatedUser));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, 
+        AppException exception = assertThrows(AppException.class, 
             () -> userService.deleteUser(userId));
-        assertEquals("User has insufficient rights: user@test.com", exception.getMessage());
+        assertEquals("error.security.insufficient.rights", exception.getMessageKey());
+        assertArrayEquals(new Object[]{"user@test.com"}, exception.getMessageArgs());
     }
 }

@@ -14,16 +14,25 @@ public class SecurityExceptions {
      */
     public static class RoleNotFoundException extends AppException {
         public RoleNotFoundException(RoleEnum role) {
-            super("Role not found: " + role.name(), HttpStatus.NOT_FOUND);
+            super("error.security.role.not.found", HttpStatus.NOT_FOUND, role.name());
         }
     }
 
     /**
-     * Thrown when a security validation fails or unauthorized access is attempted.
+     * Thrown when an Azure token is not from a trusted tenant.
      */
-    public static class SecurityException extends AppException {
-        public SecurityException(String message) {
-            super(message, HttpStatus.FORBIDDEN);
+    public static class TokenNotFromTrustedTenantException extends AppException {
+        public TokenNotFromTrustedTenantException() {
+            super("error.security.token.untrusted.tenant", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    /**
+     * Thrown when a required claim is missing from the JWT token.
+     */
+    public static class MissingJwtClaimException extends AppException {
+        public MissingJwtClaimException(String claimName) {
+            super("error.security.jwt.missing.claim", HttpStatus.FORBIDDEN, claimName);
         }
     }
 
@@ -41,7 +50,7 @@ public class SecurityExceptions {
      */
     public static class UserHasLowerRightsException extends AppException {
         public UserHasLowerRightsException(String login) {
-            super("User has insufficient rights: " + login, HttpStatus.FORBIDDEN);
+            super("error.security.insufficient.rights", HttpStatus.FORBIDDEN, login);
         }
     }
 }
