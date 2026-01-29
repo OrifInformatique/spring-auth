@@ -40,6 +40,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.Cookie;
 
 /**
  * Integration tests for AuthController.
@@ -98,6 +99,67 @@ public class AuthControllerIntegrationTest {
                 // Set Authorization header only if token is provided
                 if (token != null) {
                         requestType.header("Authorization", "Bearer " + token);
+                }
+
+                // Set content type
+                requestType.contentType(contentType);
+
+                // Perform request
+                var request = mockMvc.perform(requestType)
+                                .andExpect(status().is(expectedStatus));
+
+                // Execute any additional assertions provided in the lambda
+                if (script != null) {
+                        script.accept(request);
+                }
+
+                // Generate a REST Docs snippet for the request/response pair
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint())));
+
+        }
+
+        /**
+         * Helper method for performing and documenting HTTP requests with a cookie.
+         * This keeps tests consistent with performRequest while allowing cookie-based auth.
+         */
+        private void performRequest(
+                        String requestTypeString,
+                        String endpoint,
+                        String content,
+                        String token,
+                        MediaType contentType,
+                        int expectedStatus,
+                        String docsFileName,
+                        Cookie cookie,
+                        Consumer<ResultActions> script) throws Exception {
+
+                var requestType = get(endpoint);
+
+                if (requestTypeString.equals("GET")) {
+                        requestType = get(endpoint);
+                } else if (requestTypeString.equals("POST")) {
+                        requestType = post(endpoint);
+                } else if (requestTypeString.equals("PUT")) {
+                        requestType = put(endpoint);
+                } else if (requestTypeString.equals("DELETE")) {
+                        requestType = delete(endpoint);
+                } else {
+                        throw new IllegalArgumentException("Unsupported request type: " + requestTypeString);
+                }
+
+                // Set content only if it's not null
+                if (content != null) {
+                        requestType.content(content);
+                }
+
+                // Set Authorization header only if token is provided
+                if (token != null) {
+                        requestType.header("Authorization", "Bearer " + token);
+                }
+
+                if (cookie != null) {
+                        requestType.cookie(cookie);
                 }
 
                 // Set content type
@@ -1080,17 +1142,16 @@ public class AuthControllerIntegrationTest {
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
                 // Store the refresh token in the database
                 userService.storeRefreshToken(userDto.getLogin(), refreshToken, java.time.Instant.now().plus(java.time.Duration.ofDays(30)));
-                
-                String requestBody = "{\"refreshToken\":\"" + refreshToken + "\"}";
 
                 performRequest(
                                 "POST",
                                 "/auth/refresh",
-                                requestBody,
+                                null,
                                 null,
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "refresh",
+                                new Cookie("refresh_token", refreshToken),
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.accessToken").isNotEmpty());

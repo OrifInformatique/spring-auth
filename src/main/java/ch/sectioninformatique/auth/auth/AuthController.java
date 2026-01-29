@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,199 +51,212 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class AuthController {
 
-    private final UserService userService;
-    private final UserAuthenticationProvider userAuthenticationProvider;
+        private final UserService userService;
+        private final UserAuthenticationProvider userAuthenticationProvider;
 
-    /**
-     * Authenticates a user with provided credentials and issues JWT access and
-     * refresh tokens.
-     * 
-     * - Validates user credentials via UserService.
-     * - Generates an access token for immediate authentication.
-     * - Generates a refresh token and stores it securely with expiration.
-     * - Sends the refresh token in a secure HTTP-only cookie.
-     *
-     * @param credentialsDto credentialsDto The DTO containing user login and
-     *                       password.
-     * @return ResponseEntity with the authenticated user's info and access token in
-     *         body.
-     */
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
-        UserDto userDto = userService.login(credentialsDto);
+        /*
+         * Refresh token lifetime (e.g., "30d" for 30 days), configured via environment
+         * variable.
+         */
+        @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
+        private Duration refreshTokenLifetime;
 
-        String accessToken = userAuthenticationProvider.createToken(userDto);
-        String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+        /**
+         * Authenticates a user with provided credentials and issues JWT access and
+         * refresh tokens.
+         * 
+         * - Validates user credentials via UserService.
+         * - Generates an access token for immediate authentication.
+         * - Generates a refresh token and stores it securely with expiration.
+         * - Sends the refresh token in a secure HTTP-only cookie.
+         *
+         * @param credentialsDto credentialsDto The DTO containing user login and
+         *                       password.
+         * @return ResponseEntity with the authenticated user's info and access token in
+         *         body.
+         */
+        @PostMapping("/login")
+        public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
+                UserDto userDto = userService.login(credentialsDto);
 
-        userDto.setToken(accessToken);
+                String accessToken = userAuthenticationProvider.createToken(userDto);
+                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
 
-        // Store refresh token in database with expiration
-        userService.storeRefreshToken(userDto.getLogin(), refreshToken, Instant.now().plus(Duration.ofDays(30)));
+                userDto.setToken(accessToken);
 
-        // Create secure HTTP-only cookie for the refresh token
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/auth/refresh")
-                .maxAge(Duration.ofDays(30))
-                .sameSite("Strict")
-                .build();
+                // Store refresh token in database with expiration
+                userService.storeRefreshToken(userDto.getLogin(), refreshToken,
+                                Instant.now().plus(refreshTokenLifetime));
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(userDto);
-    }
+                // Create secure HTTP-only cookie for the refresh token
+                ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
+                                .httpOnly(true)
+                                .secure(true)
+                                .path("/auth/refresh")
+                                .maxAge(refreshTokenLifetime)
+                                .sameSite("Strict")
+                                .build();
 
-    /**
-     * Refreshes the access token using a valid refresh token.
-     * 
-     * - Validates the refresh token and ensures it matches the stored token.
-     * - Rotates refresh tokens to enhance security (prevents reuse).
-     * - Returns a new access token and sets the new refresh token as HTTP-only
-     * cookie.
-     *
-     * @param request DTO containing the refresh token.
-     * @return ResponseEntity containing a new access token.
-     * @throws AppException if the refresh token is invalid or expired.
-     */
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponseDto> refreshLogin(@RequestBody RefreshRequestDto request) {
-
-        DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(request.refreshToken());
-        String login = jwt.getSubject();
-
-        if (!userService.validateRefreshToken(login, request.refreshToken())) {
-            throw new AppException("Invalid refresh token", HttpStatus.UNAUTHORIZED);
+                return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .body(userDto);
         }
 
-        UserDto user = userService.findByLogin(login);
+        /**
+         * Refreshes the access token using a valid refresh token.
+         * 
+         * - Validates the refresh token and ensures it matches the stored token.
+         * - Rotates refresh tokens to enhance security (prevents reuse).
+         * - Returns a new access token and sets the new refresh token as HTTP-only
+         * cookie.
+         *
+         * @param request DTO containing the refresh token.
+         * @return ResponseEntity containing a new access token.
+         * @throws AppException if the refresh token is invalid or expired.
+         */
+        @PostMapping("/refresh")
+        public ResponseEntity<TokenResponseDto> refreshLogin(@CookieValue("refresh_token") String refreshToken) {
 
-        // rotate tokens
-        String newAccess = userAuthenticationProvider.createToken(user);
-        String newRefresh = userAuthenticationProvider.createRefreshToken(user);
+                DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(refreshToken);
+                String login = jwt.getSubject();
 
-        userService.storeRefreshToken(login, newRefresh, jwt.getExpiresAt().toInstant());
+                if (!userService.validateRefreshToken(login, refreshToken)) {
+                        throw new AppException("Invalid refresh token", HttpStatus.UNAUTHORIZED);
+                }
 
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", newRefresh)
-                .httpOnly(true)
-                .secure(true)
-                .path("/auth/refresh")
-                .maxAge(Duration.ofDays(30))
-                .sameSite("Strict")
-                .build();
+                UserDto user = userService.findByLogin(login);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new TokenResponseDto(newAccess));
-    }
+                // rotate tokens
+                String newAccess = userAuthenticationProvider.createToken(user);
+                String newRefresh = userAuthenticationProvider.createRefreshToken(user);
 
-    /**
-     * Registers a new user in the system.
-     *
-     * @param user The signup data containing the new user's information
-     * @return ResponseEntity containing the created user's information and JWT
-     *         token
-     */
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
-        UserDto createdUser = userService.register(user);
+                userService.storeRefreshToken(login, newRefresh, jwt.getExpiresAt().toInstant());
 
-        String accessToken = userAuthenticationProvider.createToken(createdUser);
-        String refreshToken = userAuthenticationProvider.createRefreshToken(createdUser);
+                ResponseCookie cookie = ResponseCookie.from("refresh_token", newRefresh)
+                                .httpOnly(true)
+                                .secure(true)
+                                .path("/auth/refresh")
+                                .maxAge(refreshTokenLifetime)
+                                .sameSite("Strict")
+                                .build();
 
-        createdUser.setToken(accessToken);
-
-        // Store refresh token in database with expiration
-        userService.storeRefreshToken(createdUser.getLogin(), refreshToken, Instant.now().plus(Duration.ofDays(30)));
-
-        // Create secure HTTP-only cookie for the refresh token
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/auth/refresh")
-                .maxAge(Duration.ofDays(30))
-                .sameSite("Strict")
-                .build();
-
-        return ResponseEntity.created(URI.create("/auth/users/" + createdUser.getLogin()))
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(createdUser);
-    }
-
-    /**
-     * Change the password of the User
-     * 
-     * @param passwords A password Dto who contain both the old password for
-     *                  verification and the new for update
-     * @return ResponseEntity containing a confirmation message
-     */
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping("/update-password")
-    public ResponseEntity<?> updatePassword(@RequestBody @Valid PasswordUpdateDto passwords) {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
-
-        if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+                return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .body(new TokenResponseDto(newAccess));
         }
 
-        userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
+        /**
+         * Registers a new user in the system.
+         *
+         * @param user The signup data containing the new user's information
+         * @return ResponseEntity containing the created user's information and JWT
+         *         token
+         */
+        @PostMapping("/register")
+        public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
+                UserDto createdUser = userService.register(user);
 
-        return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
-    }
+                String accessToken = userAuthenticationProvider.createToken(createdUser);
+                String refreshToken = userAuthenticationProvider.createRefreshToken(createdUser);
 
-    /**
-     * Logs out the authenticated user by invalidating all refresh tokens.
-     * 
-     * This endpoint handles the logout process by:
-     * - Retrieving the authenticated user from the security context.
-     * - Deleting all stored refresh tokens for the user from the database.
-     * - Returning an expired refresh token in a secure HTTP-only cookie to invalidate on the frontend.
-     * - Preventing token reuse after logout for enhanced security.
-     * 
-     * Security considerations:
-     * - Requires authentication (@PreAuthorize("isAuthenticated()")).
-     * - Clears refresh tokens to prevent new access tokens from being issued.
-     * - Returns an expired refresh token to force frontend cleanup.
-     *
-     * @return ResponseEntity with a success message and expired refresh token in a secure cookie.
-     * @throws AppException if the user is not properly authenticated.
-     */
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // Retrieve the current authenticated user from the security context
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+                createdUser.setToken(accessToken);
 
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
+                // Store refresh token in database with expiration
+                userService.storeRefreshToken(createdUser.getLogin(), refreshToken,
+                                Instant.now().plus(refreshTokenLifetime));
 
-        // Validate that the user is properly authenticated
-        if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+                // Create secure HTTP-only cookie for the refresh token
+                ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
+                                .httpOnly(true)
+                                .secure(true)
+                                .path("/auth/refresh")
+                                .maxAge(refreshTokenLifetime)
+                                .sameSite("Strict")
+                                .build();
+
+                return ResponseEntity.created(URI.create("/auth/users/" + createdUser.getLogin()))
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .body(createdUser);
         }
 
-        // Delete all refresh tokens for this user from the database to prevent token reuse
-        userService.deleteRefreshTokens(currentUser.getLogin());
+        /**
+         * Change the password of the User
+         * 
+         * @param passwords A password Dto who contain both the old password for
+         *                  verification and the new for update
+         * @return ResponseEntity containing a confirmation message
+         */
+        @PreAuthorize("isAuthenticated()")
+        @PutMapping("/update-password")
+        public ResponseEntity<?> updatePassword(@RequestBody @Valid PasswordUpdateDto passwords) {
+                Authentication authentication = SecurityContextHolder
+                                .getContext()
+                                .getAuthentication();
 
-        // Create an expired refresh token to signal frontend to clear the token
-        String expiredRefreshToken = userAuthenticationProvider.createExpiredRefreshToken(currentUser);
+                UserDto currentUser = (UserDto) authentication.getPrincipal();
 
-        // Create secure HTTP-only cookie with zero lifespan for the expired refresh token
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", expiredRefreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/auth/refresh")
-                .maxAge(Duration.ZERO)
-                .sameSite("Strict")
-                .build();
+                if (currentUser == null) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+                }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Map.of("message", "Logged out successfully"));
-    }
+                userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
+
+                return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+        }
+
+        /**
+         * Logs out the authenticated user by invalidating all refresh tokens.
+         * 
+         * This endpoint handles the logout process by:
+         * - Retrieving the authenticated user from the security context.
+         * - Deleting all stored refresh tokens for the user from the database.
+         * - Returning an expired refresh token in a secure HTTP-only cookie to
+         * invalidate on the frontend.
+         * - Preventing token reuse after logout for enhanced security.
+         * 
+         * Security considerations:
+         * - Requires authentication (@PreAuthorize("isAuthenticated()")).
+         * - Clears refresh tokens to prevent new access tokens from being issued.
+         * - Returns an expired refresh token to force frontend cleanup.
+         *
+         * @return ResponseEntity with a success message and expired refresh token in a
+         *         secure cookie.
+         * @throws AppException if the user is not properly authenticated.
+         */
+        @PreAuthorize("isAuthenticated()")
+        @PostMapping("/logout")
+        public ResponseEntity<?> logout() {
+                // Retrieve the current authenticated user from the security context
+                Authentication authentication = SecurityContextHolder
+                                .getContext()
+                                .getAuthentication();
+
+                UserDto currentUser = (UserDto) authentication.getPrincipal();
+
+                // Validate that the user is properly authenticated
+                if (currentUser == null) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+                }
+
+                // Delete all refresh tokens for this user from the database to prevent token
+                // reuse
+                userService.deleteRefreshTokens(currentUser.getLogin());
+
+                // Create an expired refresh token to signal frontend to clear the token
+                String expiredRefreshToken = userAuthenticationProvider.createExpiredRefreshToken(currentUser);
+
+                // Create secure HTTP-only cookie with zero lifespan for the expired refresh
+                // token
+                ResponseCookie cookie = ResponseCookie.from("refresh_token", expiredRefreshToken)
+                                .httpOnly(true)
+                                .secure(true)
+                                .path("/auth/refresh")
+                                .maxAge(Duration.ZERO)
+                                .sameSite("Strict")
+                                .build();
+
+                return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .body(Map.of("message", "Logged out successfully"));
+        }
 }
