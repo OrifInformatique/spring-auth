@@ -53,13 +53,13 @@ public class UserAuthenticationProvider {
     /**
      * Access token lifetime (e.g., "5m" for 5 minutes), configured via environment variable.
      */
-    @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME:5m}")
+    @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME}")
     private Duration accessTokenLifetime;
 
     /**
      * Refresh token lifetime (e.g., "30d" for 30 days), configured via environment variable.
      */
-    @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME:30d}")
+    @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
     private Duration refreshTokenLifetime;
 
     /**
