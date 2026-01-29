@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce.Cluster.Refresh;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -53,6 +55,13 @@ public class AuthController {
         private final UserService userService;
         private final UserAuthenticationProvider userAuthenticationProvider;
 
+        /*
+         * Refresh token lifetime (e.g., "30d" for 30 days), configured via environment
+         * variable.
+         */
+        @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
+        private Duration refreshTokenLifetime;
+
         /**
          * Authenticates a user with provided credentials and issues JWT access and
          * refresh tokens.
@@ -78,14 +87,14 @@ public class AuthController {
 
                 // Store refresh token in database with expiration
                 userService.storeRefreshToken(userDto.getLogin(), refreshToken,
-                                Instant.now().plus(Duration.ofDays(30)));
+                                Instant.now().plus(refreshTokenLifetime));
 
                 // Create secure HTTP-only cookie for the refresh token
                 ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
                                 .httpOnly(true)
                                 .secure(true)
                                 .path("/auth/refresh")
-                                .maxAge(Duration.ofDays(30))
+                                .maxAge(refreshTokenLifetime)
                                 .sameSite("Strict")
                                 .build();
 
@@ -106,15 +115,10 @@ public class AuthController {
          * @return ResponseEntity containing a new access token.
          * @throws AppException if the refresh token is invalid or expired.
          */
-            @PostMapping("/refresh")
-            public ResponseEntity<TokenResponseDto> refreshLogin(
-                            @CookieValue(value = "refresh_token", required = false) String refreshToken) {
+        @PostMapping("/refresh")
+        public ResponseEntity<TokenResponseDto> refreshLogin(@CookieValue("refresh_token") String refreshToken) {
 
-                    if (refreshToken == null || refreshToken.isBlank()) {
-                            throw new AppException("Missing refresh token", HttpStatus.UNAUTHORIZED);
-                    }
-
-                        DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(refreshToken);
+                DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(refreshToken);
                 String login = jwt.getSubject();
 
                 if (!userService.validateRefreshToken(login, refreshToken)) {
@@ -133,7 +137,7 @@ public class AuthController {
                                 .httpOnly(true)
                                 .secure(true)
                                 .path("/auth/refresh")
-                                .maxAge(Duration.ofDays(30))
+                                .maxAge(refreshTokenLifetime)
                                 .sameSite("Strict")
                                 .build();
 
@@ -160,14 +164,14 @@ public class AuthController {
 
                 // Store refresh token in database with expiration
                 userService.storeRefreshToken(createdUser.getLogin(), refreshToken,
-                                Instant.now().plus(Duration.ofDays(30)));
+                                Instant.now().plus(refreshTokenLifetime));
 
                 // Create secure HTTP-only cookie for the refresh token
                 ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
                                 .httpOnly(true)
                                 .secure(true)
                                 .path("/auth/refresh")
-                                .maxAge(Duration.ofDays(30))
+                                .maxAge(refreshTokenLifetime)
                                 .sameSite("Strict")
                                 .build();
 
