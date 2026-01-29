@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -225,7 +226,11 @@ public class AuthController {
          */
         @PreAuthorize("isAuthenticated()")
         @PostMapping("/logout")
-        public ResponseEntity<?> logout() {
+        public ResponseEntity<?> logout(HttpServletRequest request) {
+                var session = request.getSession(false);
+                if (session != null) {
+                        session.invalidate();
+                }
                 // Retrieve the current authenticated user from the security context
                 Authentication authentication = SecurityContextHolder
                                 .getContext()
@@ -254,6 +259,8 @@ public class AuthController {
                                 .maxAge(Duration.ZERO)
                                 .sameSite("Strict")
                                 .build();
+
+                SecurityContextHolder.clearContext();
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
