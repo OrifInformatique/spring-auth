@@ -3,6 +3,8 @@ package ch.sectioninformatique.auth.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +77,9 @@ public class UserService {
     private final UserMapper userMapper;
 
     private final RefreshTokenRepository refreshTokenRepository;
+
+    /** Message source for localized error messages */
+    private final MessageSource messageSource;
 
     /**
      * Authenticates a user with their credentials.
@@ -171,7 +176,14 @@ public class UserService {
             byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not available", e);
+            throw new RuntimeException(
+                    messageSource.getMessage(
+                            "error.security.hash.algorithm.unavailable",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    ),
+                    e
+            );
         }
     }
 
