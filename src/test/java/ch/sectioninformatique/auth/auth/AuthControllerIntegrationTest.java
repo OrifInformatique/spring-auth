@@ -6,12 +6,14 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
+import ch.sectioninformatique.auth.user.UserRepository;
 import ch.sectioninformatique.auth.user.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,7 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
@@ -31,8 +35,12 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
 import java.util.function.Consumer;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.Cookie;
 
 /**
  * Integration tests for AuthController.
@@ -111,6 +119,67 @@ public class AuthControllerIntegrationTest {
 
         }
 
+        /**
+         * Helper method for performing and documenting HTTP requests with a cookie.
+         * This keeps tests consistent with performRequest while allowing cookie-based auth.
+         */
+        private void performRequest(
+                        String requestTypeString,
+                        String endpoint,
+                        String content,
+                        String token,
+                        MediaType contentType,
+                        int expectedStatus,
+                        String docsFileName,
+                        Cookie cookie,
+                        Consumer<ResultActions> script) throws Exception {
+
+                var requestType = get(endpoint);
+
+                if (requestTypeString.equals("GET")) {
+                        requestType = get(endpoint);
+                } else if (requestTypeString.equals("POST")) {
+                        requestType = post(endpoint);
+                } else if (requestTypeString.equals("PUT")) {
+                        requestType = put(endpoint);
+                } else if (requestTypeString.equals("DELETE")) {
+                        requestType = delete(endpoint);
+                } else {
+                        throw new IllegalArgumentException("Unsupported request type: " + requestTypeString);
+                }
+
+                // Set content only if it's not null
+                if (content != null) {
+                        requestType.content(content);
+                }
+
+                // Set Authorization header only if token is provided
+                if (token != null) {
+                        requestType.header("Authorization", "Bearer " + token);
+                }
+
+                if (cookie != null) {
+                        requestType.cookie(cookie);
+                }
+
+                // Set content type
+                requestType.contentType(contentType);
+
+                // Perform request
+                var request = mockMvc.perform(requestType)
+                                .andExpect(status().is(expectedStatus));
+
+                // Execute any additional assertions provided in the lambda
+                if (script != null) {
+                        script.accept(request);
+                }
+
+                // Generate a REST Docs snippet for the request/response pair
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint())));
+
+        }
+
         /** MockMvc instance for performing HTTP requests in tests. */
         @Autowired
         private MockMvc mockMvc;
@@ -121,6 +190,12 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private UserService userService;
+
+        @Autowired
+        private UserRepository userRepository;
+
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
         /**
          * Test the /auth/login endpoint with missing login.
@@ -539,10 +614,15 @@ public class AuthControllerIntegrationTest {
         @Transactional
         public void register_withRealData_shouldReturnSuccess() throws Exception {
 
+                String rawPassword = "testPassword";
+                String requestBody =
+                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\""
+                                                + rawPassword + "\"}";
+
                 performRequest(
                                 "POST",
                                 "/auth/register",
-                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}",
+                                requestBody,
                                 null,
                                 MediaType.APPLICATION_JSON,
                                 201,
@@ -570,6 +650,14 @@ public class AuthControllerIntegrationTest {
                                                                 "User login should match");
                                                 assertEquals("USER", updatedUser.getMainRole(),
                                                                 "User role should be USER");
+
+                                                var storedUser = userRepository.findByLogin("test.newuser@test.com")
+                                                                .orElseThrow(() -> new RuntimeException("User not found after registration"));
+
+                                                assertTrue(passwordEncoder.matches(rawPassword, storedUser.getPassword()),
+                                                                "Stored password should match encoded raw password");
+                                                assertNotEquals(rawPassword, storedUser.getPassword(),
+                                                                "Password must not be stored in plain text");
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -993,15 +1081,6 @@ public class AuthControllerIntegrationTest {
         }
 
         /**
-                                        try {
-                                                request.andExpect(jsonPath("$.message").exists());
-                                        } catch (Exception e) {
-                                                throw new RuntimeException(e);
-                                        }
-                                });
-        }
-
-        /**
          * Test: POST /auth/register - Conflict error when registering with existing email
          * 
          * Verifies that the API prevents duplicate user registrations with the same email.
@@ -1063,17 +1142,16 @@ public class AuthControllerIntegrationTest {
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
                 // Store the refresh token in the database
                 userService.storeRefreshToken(userDto.getLogin(), refreshToken, java.time.Instant.now().plus(java.time.Duration.ofDays(30)));
-                
-                String requestBody = "{\"refreshToken\":\"" + refreshToken + "\"}";
 
                 performRequest(
                                 "POST",
                                 "/auth/refresh",
-                                requestBody,
+                                null,
                                 null,
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "refresh",
+                                new Cookie("refresh_token", refreshToken),
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.accessToken").isNotEmpty());
@@ -1340,6 +1418,159 @@ public class AuthControllerIntegrationTest {
                                 MediaType.APPLICATION_JSON,
                                 401,
                                 "update-password-missing-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/logout - Successful logout
+         * 
+         * Verifies that authenticated users can successfully log out by invalidating
+         * their refresh tokens. After logout, the refresh token should no longer be valid.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 200 (OK)
+         * - Response contains success message
+         * - Refresh tokens are deleted from the database
+         * - User can no longer use their refresh token
+         * - User must re-login to obtain new tokens
+         * 
+         * Test data:
+         * - User: test.user@test.com (authenticated via access token)
+         */
+        @Test
+        @Transactional
+        public void logout_withValidToken_shouldReturnSuccess() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+                String accessToken = userAuthenticationProvider.createToken(userDto);
+
+                performRequest(
+                                "POST",
+                                "/auth/logout",
+                                null,
+                                accessToken,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "logout",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/logout - Authentication error without token
+         * 
+         * Verifies that the logout endpoint requires user authentication.
+         * Unauthenticated requests should be rejected.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Request is rejected due to missing authentication
+         * - Response contains authentication error message
+         * - No tokens are deleted (invalid request)
+         * 
+         * Test data:
+         * - Authorization header: (missing)
+         */
+        @Test
+        @Transactional
+        public void logout_missingToken_shouldReturnUnauthorized() throws Exception {
+
+                performRequest(
+                                "POST",
+                                "/auth/logout",
+                                null,
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "logout-missing-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/logout - Authentication error with malformed token
+         * 
+         * Verifies that the logout endpoint rejects invalid or malformed JWT tokens.
+         * Invalid tokens should not grant access even if the request is properly formatted.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token validation fails
+         * - Response contains authentication error message
+         * - No tokens are deleted (invalid authentication)
+         * 
+         * Test data:
+         * - Authorization header: Bearer this.is.not.a.valid.token (malformed JWT)
+         */
+        @Test
+        @Transactional
+        public void logout_withMalformedToken_shouldReturnUnauthorized() throws Exception {
+                String malformedToken = "this.is.not.a.valid.token";
+
+                performRequest(
+                                "POST",
+                                "/auth/logout",
+                                null,
+                                malformedToken,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "logout-malformed-token",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.message").exists());
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                });
+        }
+
+        /**
+         * Test: POST /auth/logout - Authentication error with expired token
+         * 
+         * Verifies that the logout endpoint rejects expired access tokens.
+         * Even if a token was previously valid, expired tokens should not grant access.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 401 (Unauthorized)
+         * - Token expiration validation fails
+         * - Response contains authentication error message
+         * - No tokens are deleted (token no longer valid)
+         * 
+         * Test data:
+         * - User: test.user@test.com
+         * - JWT Token: Expired 2 hours ago
+         */
+        @Test
+        @Transactional
+        public void logout_withExpiredToken_shouldReturnUnauthorized() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+
+                String expiredToken = userAuthenticationProvider.createToken(userDto, Date.from(
+                                Instant.now().minus(2, ChronoUnit.HOURS)));
+
+                performRequest(
+                                "POST",
+                                "/auth/logout",
+                                null,
+                                expiredToken,
+                                MediaType.APPLICATION_JSON,
+                                401,
+                                "logout-expired-token",
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message").exists());

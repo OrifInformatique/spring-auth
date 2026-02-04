@@ -278,13 +278,33 @@ sequenceDiagram
 ```
 _Sequence Diagram showing an example of the refresh token workflow._
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant template_frontback
+    participant spring-auth
+    participant database
+
+    Client->>template_frontback: POST /auth/logout (Authorization: Bearer)
+    template_frontback->>spring-auth: POST /auth/logout (Authorization: Bearer)
+    spring-auth->>database: delete all refresh tokens for user
+    spring-auth-->>template_frontback: 200 OK (Logged out)
+    template_frontback-->>Client: 200 OK
+```
+_Sequence Diagram showing the logout flow and token invalidation._
+
 | File                    | Description                                               |
 | ----------------------- | --------------------------------------------------------- |
 | `AuthController.java`   | Controller handling user authentication and registration. |
 | `CredentialsDto.java`   | Data Transfer Object (DTO) for login credentials.         |
-| `NewPasswordDto.java`   | DTO for handling new password requests.                   |
+| `PasswordUpdateDto.java` | DTO for handling password update requests.               |
+| `RefreshRequestDto.java` | DTO for refresh token requests.                          |
+| `TokenResponseDto.java` | DTO for token responses (access token).                   |
+| `RefreshToken.java`     | Entity class for storing hashed refresh tokens.           |
+| `RefreshTokenRepository.java` | Repository for refresh token database operations.  |
 | `OAuth2Controller.java` | Controller handling OAuth2 authentication flows.          |
 | `PasswordConfig.java`   | Configuration class for password policies and encryption. |
+| `PasswordNotReused.java` | Custom validation constraint for password reuse checks.   |
 | `SignUpDto.java`        | DTO for registration functionalities.                     |
 
 ---
@@ -430,6 +450,74 @@ sequenceDiagram
 
 _Sequence Diagram showing an example of the user management flow._
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SecurityLayer
+    participant UserController
+    participant UserService
+    participant UserRepository
+
+    %% /users/{userId}/promote-admin
+    Client->>SecurityLayer: /users/{userId}/promote-admin
+    SecurityLayer->>UserController: Requires ADMIN role
+    UserController->>UserService: promoteToAdmin(userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: save(user with ADMIN role)
+    UserService-->>UserController: confirmation
+    UserController-->>Client: 200 OK (Admin role assigned)
+
+    %% /users/{userId}/revoke-admin and /downgrade-admin
+    Client->>SecurityLayer: /users/{userId}/revoke-admin or /downgrade-admin
+    SecurityLayer->>UserController: Requires ADMIN role
+    UserController->>UserService: revokeAdminRole or downgradeAdminRole (userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: save(user with downgraded role)
+    UserService-->>UserController: confirmation
+    UserController-->>Client: 200 OK (Admin role revoked/downgraded)
+```
+_Sequence Diagram showing admin role assignment and revocation._
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SecurityLayer
+    participant UserController
+    participant UserService
+    participant UserRepository
+
+    %% Soft delete
+    Client->>SecurityLayer: DELETE /users/{userId}
+    SecurityLayer->>UserController: Requires user:delete
+    UserController->>UserService: deleteUser(userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: mark deleted_at
+    UserService-->>UserController: deleted user info
+    UserController-->>Client: 200 OK (soft deleted)
+
+    %% Restore
+    Client->>SecurityLayer: PUT /users/{userId}/restore
+    SecurityLayer->>UserController: Requires user:update
+    UserController->>UserService: restoreDeletedUser(userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: clear deleted_at
+    UserService-->>UserController: restored user info
+    UserController-->>Client: 200 OK (restored)
+
+    %% Permanent delete
+    Client->>SecurityLayer: DELETE /users/{userId}/permanent
+    SecurityLayer->>UserController: Requires user:delete
+    UserController->>UserService: deletePermanentUser(userId)
+    UserService->>UserRepository: deleteById(userId)
+    UserService-->>UserController: confirmation
+    UserController-->>Client: 200 OK (permanently deleted)
+```
+_Sequence Diagram showing soft delete, restore, and permanent delete._
+
 | File                  | Description                                                                        |
 | --------------------- | ---------------------------------------------------------------------------------- |
 | `User.java`           | Entity class representing a user in the system.                                    |
@@ -460,21 +548,22 @@ _Sequence Diagram showing an example of the user management flow._
 
 **Exceptions:**
 
-| File                                      | Description                                                              |
-| ----------------------------------------- | ------------------------------------------------------------------------ |
-| `AppException.java`                       | Base custom exception class for application-specific errors.             |
-| `CustomException.java`                    | Custom exception with HTTP status code support.                          |
-| `GlobalExceptionHandler.java`             | Global exception handler for REST API endpoints (replaces deprecated).   |
-| `InvalidCredentialsException.java`        | Thrown when login credentials are invalid.                               |
-| `RoleNotFoundException.java`              | Thrown when a requested role is not found in the database.               |
-| `SecurityException.java`                  | Security-related exceptions.                                             |
-| `UnauthorizedActionException.java`        | Thrown when a user attempts an action without proper authorization.      |
-| `UserAlreadyAdminException.java`          | Thrown when attempting to promote a user who is already an admin.        |
-| `UserAlreadyExistsException.java`         | Thrown when attempting to register with an existing login.               |
-| `UserAlreadyManagerException.java`        | Thrown when attempting to promote a user who is already a manager.       |
-| `UserAlreadyRegularException.java`        | Thrown when attempting to downgrade a user who is already a regular user. |
-| `UserHasLowerRightsException.java`        | Thrown when a user tries to modify another user with higher privileges.  |
-| `UserNotFoundException.java`              | Thrown when a requested user is not found in the database.               |
+Exceptions are organized within container classes for better organization:
+
+| Container Class | Nested Exception | Description |
+| --- | --- | --- |
+| `AppException.java` | `AppException` | Base custom exception class for application-specific errors. |
+| `GlobalExceptionHandler.java` | | Global exception handler for REST API endpoints. |
+| `AuthExceptions.java` | `InvalidCredentialsException` | Thrown when login credentials are invalid. |
+| `SecurityExceptions.java` | `RoleNotFoundException` | Thrown when a requested role is not found in the database. |
+| `SecurityExceptions.java` | `SecurityException` | Security-related exceptions. |
+| `SecurityExceptions.java` | `UnauthorizedActionException` | Thrown when a user attempts an action without proper authorization. |
+| `SecurityExceptions.java` | `UserHasLowerRightsException` | Thrown when a user tries to modify another user with higher privileges. |
+| `UserExceptions.java` | `UserAlreadyExistsException` | Thrown when attempting to register with an existing login. |
+| `UserExceptions.java` | `UserNotFoundException` | Thrown when a requested user is not found in the database. |
+| `UserExceptions.java` | `UserAlreadyAdminException` | Thrown when attempting to promote a user who is already an admin. |
+| `UserExceptions.java` | `UserAlreadyManagerException` | Thrown when attempting to promote a user who is already a manager. |
+| `UserExceptions.java` | `UserAlreadyRegularException` | Thrown when attempting to downgrade a user who is already a regular user. |
 
 ---
 
@@ -610,8 +699,9 @@ Example claims that can be extracted from the Azure token:
 | ------ | -------------------- | ------------- | ---------------------------------------------- |
 | POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
 | POST   | `/auth/register`     | No            | Register a new user account                    |
-| GET    | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
+| POST   | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
 | PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
+| POST   | `/auth/logout`       | Yes           | Logout and invalidate refresh tokens            |
 
 ### 2.2 OAuth2 Endpoints (`/oauth2`)
 
@@ -630,9 +720,10 @@ Example claims that can be extracted from the Azure token:
 | GET    | `/users/deleted`                | `user:read`         | Get only soft-deleted users                  |
 | PUT    | `/users/{userId}/restore`       | `user:update`       | Restore a soft-deleted user                  |
 | PUT    | `/users/{userId}/promote-manager` | `user:update`     | Promote user to MANAGER role                 |
-| PUT    | `/users/{userId}/downgrade-manager` | `user:update`   | Downgrade manager to USER role               |
-| PUT    | `/users/{userId}/promote-admin` | `user:update`       | Promote user to ADMIN role                   |
-| PUT    | `/users/{userId}/downgrade-admin` | `user:update`     | Downgrade admin to MANAGER role              |
+| PUT    | `/users/{userId}/revoke-manager` | `user:update`      | Revoke MANAGER role from user                |
+| PUT    | `/users/{userId}/promote-admin` | `ADMIN` role        | Promote user to ADMIN role                   |
+| PUT    | `/users/{userId}/revoke-admin` | `ADMIN` role         | Revoke ADMIN role from user                  |
+| PUT    | `/users/{userId}/downgrade-admin` | `ADMIN` role       | Downgrade admin to MANAGER role              |
 | DELETE | `/users/{userId}`               | `user:delete`       | Soft delete a user (marks as deleted)        |
 | DELETE | `/users/{userId}/permanent`     | `user:delete`       | Permanently delete a user from database      |
 

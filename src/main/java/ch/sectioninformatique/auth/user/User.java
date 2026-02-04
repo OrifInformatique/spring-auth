@@ -3,7 +3,6 @@ package ch.sectioninformatique.auth.user;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
@@ -12,7 +11,6 @@ import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import ch.sectioninformatique.auth.security.Role;
@@ -110,10 +108,10 @@ public class User implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        Set<Role> roleList = new HashSet<>();
-        roleList.add(this.mainRole);
-        return authorities;
+        if (this.mainRole == null || this.mainRole.getName() == null) {
+            return new HashSet<>();
+        }
+        return this.mainRole.getName().getGrantedAuthorities();
     }
 
     /**
