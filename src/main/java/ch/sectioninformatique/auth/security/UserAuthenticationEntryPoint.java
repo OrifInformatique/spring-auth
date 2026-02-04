@@ -46,7 +46,7 @@ public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
      * - Content-Type: application/json header
      * - JSON body containing either:
      *   - The specific authentication exception message if available
-     *   - A default "Invalid or missing authentication token" message if no specific message is available
+    *   - A default error.security.authentication.token.invalid.or.missing message if no specific message is available
      *
      * @param request The HTTP request that triggered the authentication failure
      * @param response The HTTP response to be sent back to the client

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Support for various AuthenticationException types (BadCredentialsException, InsufficientAuthenticationException)
  * 
  * UserAuthenticationEntryPoint is invoked when authentication fails or is missing
- * (e.g., invalid credentials, missing token, expired token).
+ * (e.g., invalid or missing authentication token).
  */
 @SpringBootTest
 public class UserAuthenticationEntryPointTest {
@@ -57,17 +57,18 @@ public class UserAuthenticationEntryPointTest {
     }
 
     /**
-     * Test: AuthenticationException returns 401 with custom error message
-     * 
-     * Verifies that when an AuthenticationException with a custom message is handled,
-     * the response contains HTTP 401 status, JSON content type, and the exception's message.
-     * 
-     * Test data: BadCredentialsException with "Invalid credentials"
-     * 
-     * Expected:
-     * - HTTP status: 401 Unauthorized
-     * - Content-Type: application/json
-     * - Response body: ErrorDto with "Invalid credentials"
+    * Test: AuthenticationException returns 401 with error.security.authentication.token.invalid.or.missing message
+    * 
+    * Verifies that when an AuthenticationException with a custom message is handled,
+    * the response contains HTTP 401 status, JSON content type, and the
+    * error.security.authentication.token.invalid.or.missing message.
+    * 
+    * Test data: BadCredentialsException with a non-localized message
+    * 
+    * Expected:
+    * - HTTP status: 401 Unauthorized
+    * - Content-Type: application/json
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_withAuthenticationException_shouldReturn401WithMessage() throws Exception {
@@ -101,7 +102,7 @@ public class UserAuthenticationEntryPointTest {
      * Expected:
      * - HTTP status: 401 Unauthorized
      * - Content-Type: application/json
-     * - Response body: ErrorDto with "Authentication failed"
+    * - Response body: ErrorDto with the error.security.authentication.failed message
      */
     @Test
     public void commence_withNullException_shouldReturn401WithDefaultMessage() throws Exception {
@@ -132,7 +133,7 @@ public class UserAuthenticationEntryPointTest {
      * Expected:
      * - HTTP status: 401 Unauthorized
      * - Content-Type: application/json
-     * - Response body: ErrorDto with "Invalid or missing authentication token"
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_withExceptionWithNullMessage_shouldReturn401WithDefaultMessage() throws Exception {
@@ -159,14 +160,14 @@ public class UserAuthenticationEntryPointTest {
      * Test: Response body contains valid JSON structure
      * 
      * Verifies that the response body is valid JSON with the expected structure,
-     * containing a "message" field with the exception message.
-     * 
-     * Test data: BadCredentialsException with "Token expired"
+    * containing a "message" field with the error.security.authentication.token.invalid.or.missing message.
+    * 
+    * Test data: BadCredentialsException with a non-localized message
      * 
      * Expected:
      * - Response body is valid JSON
      * - JSON contains "message" field
-     * - Message value is "Token expired"
+    * - Message value is the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_shouldReturnValidJsonStructure() throws Exception {
@@ -237,11 +238,11 @@ public class UserAuthenticationEntryPointTest {
      * Verifies that InsufficientAuthenticationException (thrown when authentication
      * is required but not provided) is handled correctly with its custom message.
      * 
-     * Test data: InsufficientAuthenticationException with "Full authentication is required"
+    * Test data: InsufficientAuthenticationException with a non-localized message
      * 
      * Expected:
      * - HTTP status: 401 Unauthorized
-     * - Response body: ErrorDto with "Full authentication is required"
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_withInsufficientAuthenticationException_shouldReturn401() throws Exception {
@@ -273,7 +274,7 @@ public class UserAuthenticationEntryPointTest {
      * 
      * Expected:
      * - HTTP status: 401 Unauthorized
-     * - Response body: ErrorDto with "Invalid or missing authentication token"
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_shouldHandleEmptyExceptionMessage() throws Exception {

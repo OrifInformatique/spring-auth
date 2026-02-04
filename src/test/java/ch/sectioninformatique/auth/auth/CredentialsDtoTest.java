@@ -66,7 +66,7 @@ public class CredentialsDtoTest {
      * Test data:
      * - Login: not-an-email (no @ symbol or domain)
      * 
-     * Expected: 1 violation with message containing "valid email"
+    * Expected: 1 violation with message key validation.credentials.login.email
      */
     @Test
     public void credentialsDto_withInvalidEmail_shouldFailValidation() {
@@ -95,7 +95,7 @@ public class CredentialsDtoTest {
      * - Login: "" (empty string)
      * - Password: password123 (valid)
      * 
-     * Expected: At least 1 violation about required/blank field
+    * Expected: At least 1 violation for required/blank login (validation.credentials.login.required)
      */
     @Test
     public void credentialsDto_withBlankLogin_shouldFailValidation() {
@@ -124,7 +124,7 @@ public class CredentialsDtoTest {
      * - Login: test@example.com (valid)
      * - Password: null
      * 
-     * Expected: 1 violation with message containing "required"
+    * Expected: 1 violation with message key validation.credentials.password.required
      */
     @Test
     public void credentialsDto_withNullPassword_shouldFailValidation() {
@@ -153,7 +153,7 @@ public class CredentialsDtoTest {
      * - Login: test@example.com (valid)
      * - Password: "short" (5 characters - below minimum)
      * 
-     * Expected: 1 violation with message about "between 8 and 72" characters
+    * Expected: 1 violation with message key validation.credentials.password.size
      */
     @Test
     public void credentialsDto_withPasswordTooShort_shouldFailValidation() {
@@ -182,7 +182,7 @@ public class CredentialsDtoTest {
      * - Login: test@example.com (valid)
      * - Password: 73-character string (above maximum)
      * 
-     * Expected: 1 violation with message about "between 8 and 72" characters
+    * Expected: 1 violation with message key validation.credentials.password.size
      */
     @Test
     public void credentialsDto_withPasswordTooLong_shouldFailValidation() {

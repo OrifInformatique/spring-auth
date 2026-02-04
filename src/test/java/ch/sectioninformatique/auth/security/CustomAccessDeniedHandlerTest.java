@@ -58,17 +58,17 @@ public class CustomAccessDeniedHandlerTest {
     }
 
     /**
-     * Test: AccessDeniedException returns 403 with custom error message
-     * 
-     * Verifies that when an AccessDeniedException with a custom message is handled,
-     * the response contains HTTP 403 status, JSON content type, and the exception's message.
-     * 
-     * Test data: AccessDeniedException with "Custom access denied message"
-     * 
-     * Expected:
-     * - HTTP status: 403 Forbidden
-     * - Content-Type: application/json
-     * - Response body: ErrorDto with "Custom access denied message"
+    * Test: AccessDeniedException returns 403 with error.security.access.denied message
+    * 
+    * Verifies that when an AccessDeniedException is handled, the response contains
+    * HTTP 403 status, JSON content type, and the error.security.access.denied message.
+    * 
+    * Test data: AccessDeniedException with a non-localized message
+    * 
+    * Expected:
+    * - HTTP status: 403 Forbidden
+    * - Content-Type: application/json
+    * - Response body: ErrorDto with the error.security.access.denied message
      */
     @Test
     public void handle_withAccessDeniedException_shouldReturn403WithMessage() throws Exception {
@@ -97,7 +97,7 @@ public class CustomAccessDeniedHandlerTest {
      * Expected:
      * - HTTP status: 403 Forbidden
      * - Content-Type: application/json
-     * - Response body: ErrorDto with default message "You don't have the necessary rights to perform this action"
+    * - Response body: ErrorDto with the error.security.access.denied message
      */
     @Test
     public void handle_withNullException_shouldReturn403WithDefaultMessage() throws Exception {
@@ -123,7 +123,7 @@ public class CustomAccessDeniedHandlerTest {
      * Expected:
      * - HTTP status: 403 Forbidden
      * - Content-Type: application/json
-     * - Response body: ErrorDto with default message "You don't have the necessary rights to perform this action"
+    * - Response body: ErrorDto with the error.security.access.denied message
      */
     @Test
     public void handle_withExceptionWithNullMessage_shouldReturn403WithDefaultMessage() throws Exception {
@@ -142,17 +142,17 @@ public class CustomAccessDeniedHandlerTest {
     }
 
     /**
-     * Test: Response body contains valid JSON structure
-     * 
-     * Verifies that the response body is valid JSON with the expected structure,
-     * containing a "message" field with the exception message.
-     * 
-     * Test data: AccessDeniedException with "Insufficient permissions"
-     * 
-     * Expected:
-     * - Response body is valid JSON
-     * - JSON contains "message" field
-     * - Message value is "Insufficient permissions"
+    * Test: Response body contains valid JSON structure
+    * 
+    * Verifies that the response body is valid JSON with the expected structure,
+    * containing a "message" field with the error.security.access.denied message.
+    * 
+    * Test data: AccessDeniedException with a non-localized message
+    * 
+    * Expected:
+    * - Response body is valid JSON
+    * - JSON contains "message" field
+    * - Message value is the error.security.access.denied message
      */
     @Test
     public void handle_shouldReturnValidJsonStructure() throws Exception {

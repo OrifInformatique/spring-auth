@@ -139,7 +139,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-     * Expected: Validation error containing "First name is required"
+    * Expected: Validation error containing validation.signup.firstName.required
      */
     @Test
     public void signUpDto_withBlankFirstName_shouldFailValidation() {
@@ -172,7 +172,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-     * Expected: Validation error containing "Last name is required"
+    * Expected: Validation error containing validation.signup.lastName.required
      */
     @Test
     public void signUpDto_withBlankLastName_shouldFailValidation() {
@@ -205,7 +205,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-     * Expected: Validation error containing "invalid characters"
+    * Expected: Validation error containing validation.signup.firstName.pattern
      */
     @Test
     public void signUpDto_withInvalidFirstNameCharacters_shouldFailValidation() {
@@ -238,7 +238,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-     * Expected: Validation error containing "invalid characters"
+    * Expected: Validation error containing validation.signup.lastName.pattern
      */
     @Test
     public void signUpDto_withInvalidLastNameCharacters_shouldFailValidation() {
@@ -271,7 +271,7 @@ public class SignUpDtoTest {
      * - login: "not-an-email" (invalid email format)
      * - password: "Password123!"
      * 
-     * Expected: Validation error containing "valid email"
+    * Expected: Validation error containing validation.signup.login.email
      */
     @Test
     public void signUpDto_withInvalidEmail_shouldFailValidation() {
@@ -304,7 +304,7 @@ public class SignUpDtoTest {
      * - login: "" (empty string)
      * - password: "Password123!"
      * 
-     * Expected: Validation error containing "Login is required"
+    * Expected: Validation error containing validation.signup.login.required
      */
     @Test
     public void signUpDto_withBlankLogin_shouldFailValidation() {
@@ -337,7 +337,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: null
      * 
-     * Expected: Validation error containing "Password is required"
+    * Expected: Validation error containing validation.signup.password.required
      */
     @Test
     public void signUpDto_withNullPassword_shouldFailValidation() {
@@ -370,7 +370,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Pass1!" (only 6 characters)
      * 
-     * Expected: Validation error containing "between 8 and 72"
+    * Expected: Validation error containing validation.signup.password.size
      */
     @Test
     public void signUpDto_withPasswordTooShort_shouldFailValidation() {
@@ -403,7 +403,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: 73-character string
      * 
-     * Expected: Validation error containing "between 8 and 72"
+    * Expected: Validation error containing validation.signup.password.size
      */
     @Test
     public void signUpDto_withPasswordTooLong_shouldFailValidation() {

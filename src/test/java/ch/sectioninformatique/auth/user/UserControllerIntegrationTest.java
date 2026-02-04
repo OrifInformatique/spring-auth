@@ -608,7 +608,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Step 1: Soft-delete succeeds (HTTP 200)
          * - Step 2: Restore succeeds (HTTP 200)
-         * - Response contains success message: "User restored successfully"
+         * - Response contains success message: "message.user.restored"
          * - User is marked as active again in the database
          * - User can log in after restoration
          * 
@@ -664,7 +664,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User is permanently removed from the database
-         * - Response contains confirmation message: "User deleted permanently"
+         * - Response contains confirmation message: "message.user.deleted.permanent"
          * - Response includes the deleted user's login for confirmation
          * - User cannot be restored after permanent deletion
          * 
@@ -709,7 +709,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from USER to MANAGER
-         * - Response contains success message: "User promoted to manager successfully"
+         * - Response contains success message: "message.user.promoted.manager"
          * - Database is updated with new role
          * - User gains MANAGER permissions immediately
          * 
@@ -1006,7 +1006,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from MANAGER to USER
-         * - Response contains success message: "Manager role revoked successfully"
+         * - Response contains success message: "message.user.revoked.manager"
          * - Database is updated with new role
          * - User loses manager permissions immediately
          * 
@@ -1219,7 +1219,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed to ADMIN
-         * - Response contains success message: "Admin role assigned successfully"
+         * - Response contains success message: "message.user.promoted.admin"
          * - Database is updated with new role
          * - User gains all administrative permissions immediately
          * 
@@ -1475,7 +1475,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from ADMIN to USER
-         * - Response contains success message: "Admin role revoked successfully"
+         * - Response contains success message: "message.user.revoked.admin"
          * - Database is updated with new role
          * - User loses admin permissions immediately
          * 
@@ -1689,7 +1689,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from ADMIN to MANAGER
-         * - Response contains success message: "Admin role downgraded successfully"
+         * - Response contains success message: "message.user.downgraded.admin"
          * - Database is updated with new role
          * - User loses admin permissions but retains manager permissions
          * 
@@ -1822,7 +1822,7 @@ public class UserControllerIntegrationTest {
          * - Returns HTTP 200 (OK)
          * - User is marked as deleted in the database (isDeleted = true)
          * - User record remains in database for audit/recovery purposes
-         * - Response contains success message: "User deleted successfully"
+         * - Response contains success message: "message.user.deleted"
          * - Response includes the deleted user's login for confirmation
          * - User cannot log in after soft deletion
          * 

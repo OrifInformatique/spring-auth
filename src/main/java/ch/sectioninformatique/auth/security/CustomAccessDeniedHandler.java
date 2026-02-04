@@ -15,8 +15,7 @@ import java.io.IOException;
 
 /**
  * Handles requests that are authenticated but not authorized (403 Forbidden).
- * Returns a JSON response with a proper message so integration tests expecting
- * a $.message field will pass.
+ * Returns a JSON response with the error.security.access.denied message.
  */
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
