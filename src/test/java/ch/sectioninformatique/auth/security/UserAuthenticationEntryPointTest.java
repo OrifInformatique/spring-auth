@@ -2,8 +2,13 @@ package ch.sectioninformatique.auth.security;
 
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * UserAuthenticationEntryPoint is invoked when authentication fails or is missing
  * (e.g., invalid credentials, missing token, expired token).
  */
+@SpringBootTest
 public class UserAuthenticationEntryPointTest {
 
     private UserAuthenticationEntryPoint entryPoint;
@@ -33,12 +39,21 @@ public class UserAuthenticationEntryPointTest {
     private MockHttpServletResponse response;
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @BeforeEach
     public void setUp() {
-        entryPoint = new UserAuthenticationEntryPoint();
+        entryPoint = new UserAuthenticationEntryPoint(messageSource);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
+        LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
     }
 
     /**
