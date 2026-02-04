@@ -22,25 +22,25 @@ import jakarta.validation.constraints.Size;
  * @param password  The user's password as a character array
  */
 public record SignUpDto(
-        @NotBlank(message = "First name is required") 
+        @NotBlank(message = "{validation.signup.firstName.required}") 
         @Pattern(
             regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$", 
-            message = "First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
+            message = "{validation.signup.firstName.pattern}"
         ) 
         String firstName,
 
-        @NotBlank(message = "Last name is required") 
+        @NotBlank(message = "{validation.signup.lastName.required}") 
         @Pattern(
             regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$", 
-            message = "Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
+            message = "{validation.signup.lastName.pattern}"
         ) 
         String lastName,
 
-        @NotBlank(message = "Login is required") 
-        @Email(message = "Login must be a valid email") 
+        @NotBlank(message = "{validation.signup.login.required}") 
+        @Email(message = "{validation.signup.login.email}") 
         String login,
 
-        @NotNull(message = "Password is required") 
-        @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
+        @NotNull(message = "{validation.signup.password.required}") 
+        @Size(min = 8, max = 72, message = "{validation.signup.password.size}")
         char[] password
 ) {}

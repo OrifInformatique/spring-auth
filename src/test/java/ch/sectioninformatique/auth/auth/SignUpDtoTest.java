@@ -157,7 +157,7 @@ public class SignUpDtoTest {
         // Assert
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("First name is required")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.firstName.required")));
     }
 
     /**
@@ -190,7 +190,7 @@ public class SignUpDtoTest {
         // Assert
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("Last name is required")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.lastName.required")));
     }
 
     /**
@@ -223,7 +223,7 @@ public class SignUpDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("invalid characters")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.firstName.pattern")));
     }
 
     /**
@@ -256,7 +256,7 @@ public class SignUpDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("invalid characters")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.lastName.pattern")));
     }
 
     /**
@@ -289,7 +289,7 @@ public class SignUpDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("valid email")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.login.email")));
     }
 
     /**
@@ -322,7 +322,7 @@ public class SignUpDtoTest {
         // Assert
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("Login is required")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.login.required")));
     }
 
     /**
@@ -355,7 +355,7 @@ public class SignUpDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("Password is required")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.password.required")));
     }
 
     /**
@@ -388,7 +388,7 @@ public class SignUpDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("between 8 and 72")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.password.size")));
     }
 
     /**
@@ -422,7 +422,7 @@ public class SignUpDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("between 8 and 72")));
+            .anyMatch(v -> v.getMessage().contains("validation.signup.password.size")));
     }
 
     /**
