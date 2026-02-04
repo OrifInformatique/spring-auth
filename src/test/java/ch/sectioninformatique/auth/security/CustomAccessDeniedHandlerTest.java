@@ -83,7 +83,7 @@ public class CustomAccessDeniedHandlerTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Custom access denied message", errorDto.message());
+        assertEquals(message("error.security.access.denied"), errorDto.message());
     }
 
     /**
@@ -166,7 +166,7 @@ public class CustomAccessDeniedHandlerTest {
         String responseBody = response.getContentAsString();
         assertNotNull(responseBody);
         assertTrue(responseBody.contains("message"));
-        assertTrue(responseBody.contains("Insufficient permissions"));
+        assertTrue(responseBody.contains(message("error.security.access.denied")));
     }
 
     /**

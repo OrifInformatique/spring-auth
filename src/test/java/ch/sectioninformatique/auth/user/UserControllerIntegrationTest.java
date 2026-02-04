@@ -1,10 +1,14 @@
 package ch.sectioninformatique.auth.user;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -137,6 +141,23 @@ public class UserControllerIntegrationTest {
         @Autowired
         private UserRepository userRepository;
 
+        @Autowired
+        private MessageSource messageSource;
+
+        @BeforeEach
+        public void setUp() {
+                LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+        }
+
+        @AfterEach
+        public void tearDown() {
+                LocaleContextHolder.resetLocaleContext();
+        }
+
+        private String message(String key, Object... args) {
+                return messageSource.getMessage(key, args, java.util.Locale.ENGLISH);
+        }
+
         /**
          * Test: GET /users/me - Retrieve authenticated user's information
          * 
@@ -210,7 +231,8 @@ public class UserControllerIntegrationTest {
                                 "me-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -247,7 +269,8 @@ public class UserControllerIntegrationTest {
                                 "me-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -289,7 +312,8 @@ public class UserControllerIntegrationTest {
                                 "me-expired-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.expired")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -392,7 +416,8 @@ public class UserControllerIntegrationTest {
                                 "all-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -429,7 +454,8 @@ public class UserControllerIntegrationTest {
                                 "all-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -471,7 +497,8 @@ public class UserControllerIntegrationTest {
                                 "all-expired-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.expired")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -620,7 +647,8 @@ public class UserControllerIntegrationTest {
                                 "restore",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$").value("User restored successfully"));
+                                                request.andExpect(jsonPath("$")
+                                                                .value(message("message.user.restored")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -663,7 +691,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value("User deleted permanently"))
+                                                                .value(message("message.user.deleted.permanent")))
                                                                 .andExpect(jsonPath("$.deletedUserLogin")
                                                                                 .value("test.user@test.com"));
                                         } catch (Exception e) {
@@ -709,7 +737,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(content()
-                                                                .string("User promoted to manager successfully"));
+                                                                .string(message("message.user.promoted.manager")));
 
                                                 // Assert: fetch user again and verify role changed to MANAGER
                                                 UserDto updatedUser = userService.findByLogin("test.user@test.com");
@@ -754,7 +782,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -794,7 +823,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -834,7 +864,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -875,7 +906,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", fakeUserId)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -915,7 +947,9 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-user-already-manager",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.already.manager",
+                                                                                managerDto.getLogin())));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -954,7 +988,9 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-user-already-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.already.admin",
+                                                                                adminDto.getLogin())));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -998,7 +1034,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(
-                                                                content().string("Manager role revoked successfully"));
+                                                                content().string(message("message.user.revoked.manager")));
 
                                                 // Assert: fetch manager again and verify role changed to USER
                                                 UserDto updatedManager = userService
@@ -1044,7 +1080,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1083,7 +1120,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1124,7 +1162,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1163,7 +1202,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", "9999")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1206,7 +1246,7 @@ public class UserControllerIntegrationTest {
                                 "promote-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(content().string("Admin role assigned successfully"));
+                                                request.andExpect(content().string(message("message.user.promoted.admin")));
 
                                                 // Assert: fetch manager again and verify role changed to ADMIN
                                                 UserDto updatedManager = userService
@@ -1252,7 +1292,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1291,7 +1332,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1332,7 +1374,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1373,7 +1416,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", fakeUserId)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1413,7 +1457,9 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-user-already-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.already.admin",
+                                                                                adminDto.getLogin())));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1456,7 +1502,7 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(content().string("Admin role revoked successfully"));
+                                                request.andExpect(content().string(message("message.user.revoked.admin")));
 
                                                 // Assert: fetch admin again and verify role changed to USER
                                                 UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
@@ -1501,7 +1547,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1541,7 +1588,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1583,7 +1631,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1623,7 +1672,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", "9999")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1667,7 +1717,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(
-                                                                content().string("Admin role downgraded successfully"));
+                                                                content().string(message("message.user.downgraded.admin")));
 
                                                 // Assert: fetch admin again and verify role changed to MANAGER
                                                 UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
@@ -1712,7 +1762,8 @@ public class UserControllerIntegrationTest {
                                 "downgrade-admin-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1752,7 +1803,8 @@ public class UserControllerIntegrationTest {
                                 "downgrade-admin-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1798,7 +1850,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value("User deleted successfully"))
+                                                                .value(message("message.user.deleted")))
                                                                 .andExpect(jsonPath("$.deletedUserLogin")
                                                                                 .value("test.user@test.com"));
 
@@ -1843,7 +1895,8 @@ public class UserControllerIntegrationTest {
                                 "delete-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1883,7 +1936,8 @@ public class UserControllerIntegrationTest {
                                 "delete-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
