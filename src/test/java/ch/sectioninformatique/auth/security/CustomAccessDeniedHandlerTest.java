@@ -53,6 +53,10 @@ public class CustomAccessDeniedHandlerTest {
         LocaleContextHolder.resetLocaleContext();
     }
 
+    private String message(String key, Object... args) {
+        return messageSource.getMessage(key, args, java.util.Locale.ENGLISH);
+    }
+
     /**
      * Test: AccessDeniedException returns 403 with custom error message
      * 
@@ -105,7 +109,7 @@ public class CustomAccessDeniedHandlerTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("You don't have the necessary rights to perform this action", errorDto.message());
+        assertEquals(message("error.security.access.denied"), errorDto.message());
     }
 
     /**
@@ -134,7 +138,7 @@ public class CustomAccessDeniedHandlerTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("You don't have the necessary rights to perform this action", errorDto.message());
+        assertEquals(message("error.security.access.denied"), errorDto.message());
     }
 
     /**
