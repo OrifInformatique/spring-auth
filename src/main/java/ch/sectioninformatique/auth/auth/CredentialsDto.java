@@ -18,7 +18,7 @@ import jakarta.validation.constraints.Size;
  */
 public record CredentialsDto(
     @NotBlank(message = "{validation.credentials.login.required}")
-    @Email(message = "{validation.credentials.login.email}")
+    @Email
     String login,
 
     @NotNull(message = "{validation.credentials.password.required}")
