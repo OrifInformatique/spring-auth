@@ -16,6 +16,11 @@ import java.util.Locale;
 @Configuration
 public class LocaleConfig implements WebMvcConfigurer {
 
+    /**
+     * Configure the message source for internationalization.
+     * 
+     * @return MessageSource for resolving messages
+     */
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource ms = new ReloadableResourceBundleMessageSource();
@@ -39,6 +44,12 @@ public class LocaleConfig implements WebMvcConfigurer {
         return slr;
     }
 
+    /**
+     * Configure the validator to use the message source for validation messages.
+     * 
+     * @param messageSource
+     * @return LocalValidatorFactoryBean
+     */
     @Bean
     public LocalValidatorFactoryBean validator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
@@ -46,6 +57,11 @@ public class LocaleConfig implements WebMvcConfigurer {
         return bean;
     }
 
+    /**
+     * Interceptor to change the locale based on the "lang" request parameter.
+     * 
+     * @return LocaleChangeInterceptor
+     */
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
@@ -53,6 +69,9 @@ public class LocaleConfig implements WebMvcConfigurer {
         return lci;
     }
 
+    /**
+     * Register the locale change interceptor.
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
