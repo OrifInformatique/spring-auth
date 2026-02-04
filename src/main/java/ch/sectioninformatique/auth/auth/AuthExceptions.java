@@ -15,7 +15,7 @@ public class AuthExceptions {
      */
     public static class InvalidCredentialsException extends AppException {
         public InvalidCredentialsException() {
-            super("error.authorisation.invalid.credentials", HttpStatus.UNAUTHORIZED);
+            super("error.authorisation.invalid.credentials", HttpStatus.UNAUTHORIZED, new Object[]{});
         }
     }
 }

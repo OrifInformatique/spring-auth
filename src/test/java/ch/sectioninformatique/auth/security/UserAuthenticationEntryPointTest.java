@@ -82,7 +82,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Invalid credentials", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                java.util.Locale.ENGLISH),
+            errorDto.message());
     }
 
     /**
@@ -108,7 +113,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Authentication failed", errorDto.message());  // Default message when authException is null
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.failed",
+                null,
+                java.util.Locale.ENGLISH),
+            errorDto.message());  // Default message when authException is null
     }
 
     /**
@@ -137,7 +147,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Invalid or missing authentication token", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                java.util.Locale.ENGLISH),
+            errorDto.message());
     }
 
     /**
@@ -165,7 +180,11 @@ public class UserAuthenticationEntryPointTest {
         String responseBody = response.getContentAsString();
         assertNotNull(responseBody);
         assertTrue(responseBody.contains("message"));
-        assertTrue(responseBody.contains("Token expired"));
+        assertTrue(responseBody.contains(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                java.util.Locale.ENGLISH)));
     }
 
     /**
@@ -236,7 +255,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals(401, response.getStatus());
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Full authentication is required", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                java.util.Locale.ENGLISH),
+            errorDto.message());
     }
 
     /**
@@ -263,6 +287,11 @@ public class UserAuthenticationEntryPointTest {
         assertEquals(401, response.getStatus());
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Invalid or missing authentication token", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                java.util.Locale.ENGLISH),
+            errorDto.message());
     }
 }

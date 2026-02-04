@@ -13,6 +13,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.context.NoSuchMessageException;
 
 import java.io.IOException;
 
@@ -67,13 +68,27 @@ public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
             LocaleContextHolder.getLocale()
         );
         if (authException != null) {
-            errorMessage = authException.getMessage();
-            if (errorMessage == null || errorMessage.isEmpty()) {
-            errorMessage = messageSource.getMessage(
-                "error.security.authentication.token.invalid.or.missing",
-                null,
-                LocaleContextHolder.getLocale()
-            );
+            String exceptionMessage = authException.getMessage();
+            if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
+                try {
+                    errorMessage = messageSource.getMessage(
+                            exceptionMessage,
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
+                } catch (NoSuchMessageException ignored) {
+                    errorMessage = messageSource.getMessage(
+                            "error.security.authentication.token.invalid.or.missing",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
+                }
+            } else {
+                errorMessage = messageSource.getMessage(
+                        "error.security.authentication.token.invalid.or.missing",
+                        null,
+                        LocaleContextHolder.getLocale()
+                );
             }
         }
         

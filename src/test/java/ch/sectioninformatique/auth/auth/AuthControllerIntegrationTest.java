@@ -214,6 +214,14 @@ public class AuthControllerIntegrationTest {
                 LocaleContextHolder.resetLocaleContext();
         }
 
+        private String message(String key, Object... args) {
+                return messageSource.getMessage(key, args, java.util.Locale.ENGLISH);
+        }
+
+        private String validationMessage(String field, String key) {
+                return field + ": " + message(key);
+        }
+
         /**
          * Test the /auth/login endpoint with missing login.
          * This test performs a login request with missing login and expects a bad
@@ -234,7 +242,9 @@ public class AuthControllerIntegrationTest {
                                 "login-missing-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("login",
+                                                                                "validation.credentials.login.required")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -304,7 +314,9 @@ public class AuthControllerIntegrationTest {
                                 "login-missing-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("password",
+                                                                                "validation.credentials.password.required")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -340,7 +352,9 @@ public class AuthControllerIntegrationTest {
                                 "login-invalid-email-format",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("login",
+                                                                                "validation.credentials.login.email")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -375,7 +389,8 @@ public class AuthControllerIntegrationTest {
                                 "login-empty-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.request.json.malformed.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -411,7 +426,8 @@ public class AuthControllerIntegrationTest {
                                 "login-malformed-json",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.request.json.incomplete")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -449,7 +465,9 @@ public class AuthControllerIntegrationTest {
                                 "login-sql-injection-attempt-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("login",
+                                                                                "validation.credentials.login.email")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -487,7 +505,8 @@ public class AuthControllerIntegrationTest {
                                 "login-sql-injection-attempt-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.authorisation.invalid.credentials")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -523,7 +542,13 @@ public class AuthControllerIntegrationTest {
                                 "login-wrong-media-type",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message(
+                                                                                "error.media.type.unsupported",
+                                                                                MediaType.valueOf("text/plain;charset=UTF-8"),
+                                                                                java.util.List.of(
+                                                                                        MediaType.APPLICATION_JSON,
+                                                                                        MediaType.valueOf("application/*+json")))));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -560,7 +585,8 @@ public class AuthControllerIntegrationTest {
                                 "login-wrong-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.authorisation.invalid.credentials")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -598,7 +624,8 @@ public class AuthControllerIntegrationTest {
                                 "login-non-existent-user",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.authorisation.invalid.credentials")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -713,7 +740,9 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-first-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("firstName",
+                                                                                "validation.signup.firstName.required")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -752,7 +781,9 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-last-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("lastName",
+                                                                                "validation.signup.lastName.required")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -791,7 +822,9 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("login",
+                                                                                "validation.signup.login.required")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -830,7 +863,9 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("password",
+                                                                                "validation.signup.password.required")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -867,7 +902,9 @@ public class AuthControllerIntegrationTest {
                                 "register-invalid-email-format",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("login",
+                                                                                "validation.signup.login.email")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -903,7 +940,8 @@ public class AuthControllerIntegrationTest {
                                 "register-empty-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.request.json.malformed.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -939,7 +977,8 @@ public class AuthControllerIntegrationTest {
                                 "register-malformed-json",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.request.json.incomplete")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -977,7 +1016,9 @@ public class AuthControllerIntegrationTest {
                                 "register-sql-injection-attempt-first-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("firstName",
+                                                                                "validation.signup.firstName.pattern")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1015,7 +1056,9 @@ public class AuthControllerIntegrationTest {
                                 "register-sql-injection-attempt-last-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("lastName",
+                                                                                "validation.signup.lastName.pattern")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1053,7 +1096,9 @@ public class AuthControllerIntegrationTest {
                                 "register-sql-injection-attempt-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(validationMessage("login",
+                                                                                "validation.signup.login.email")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1090,7 +1135,13 @@ public class AuthControllerIntegrationTest {
                                 "register-wrong-media-type",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message(
+                                                                                "error.media.type.unsupported",
+                                                                                MediaType.valueOf("text/plain;charset=UTF-8"),
+                                                                                java.util.List.of(
+                                                                                        MediaType.APPLICATION_JSON,
+                                                                                        MediaType.valueOf("application/*+json")))));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1127,7 +1178,10 @@ public class AuthControllerIntegrationTest {
                                 "register-duplicate-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message(
+                                                                                "error.user.already.exists",
+                                                                                "test.user@test.com")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1207,7 +1261,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-missing-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1244,7 +1299,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-invalid-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1280,7 +1336,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1318,7 +1375,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-empty-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1404,7 +1462,8 @@ public class AuthControllerIntegrationTest {
                                 "update-password-missing-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.request.json.malformed.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1441,7 +1500,8 @@ public class AuthControllerIntegrationTest {
                                 "update-password-missing-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1520,7 +1580,8 @@ public class AuthControllerIntegrationTest {
                                 "logout-missing-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1557,7 +1618,8 @@ public class AuthControllerIntegrationTest {
                                 "logout-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1598,7 +1660,8 @@ public class AuthControllerIntegrationTest {
                                 "logout-expired-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.expired")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
