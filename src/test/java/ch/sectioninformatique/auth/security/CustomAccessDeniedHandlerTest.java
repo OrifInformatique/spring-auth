@@ -3,7 +3,12 @@ package ch.sectioninformatique.auth.security;
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * CustomAccessDeniedHandler is invoked when an authenticated user attempts
  * to access a resource they don't have permission for.
  */
+@SpringBootTest
 public class CustomAccessDeniedHandlerTest {
 
     private CustomAccessDeniedHandler handler;
@@ -30,12 +36,21 @@ public class CustomAccessDeniedHandlerTest {
     private MockHttpServletResponse response;
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @BeforeEach
     public void setUp() {
-        handler = new CustomAccessDeniedHandler();
+        handler = new CustomAccessDeniedHandler(messageSource);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
+        LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
     }
 
     /**
