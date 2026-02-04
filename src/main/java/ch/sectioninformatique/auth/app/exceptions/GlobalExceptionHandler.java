@@ -63,19 +63,43 @@ public class GlobalExceptionHandler {
         // Collect ALL field errors, not just the first one
         Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
-                .forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
+            .forEach(error -> {
+                String defaultMessage = error.getDefaultMessage();
+                String messageKey = defaultMessage != null ? defaultMessage : "error.validation.failed";
+                String resolved = messageSource.getMessage(
+                    messageKey,
+                    null,
+                    defaultMessage != null
+                        ? defaultMessage
+                        : messageSource.getMessage(
+                            "error.validation.failed",
+                            null,
+                            LocaleContextHolder.getLocale()
+                        ),
+                    LocaleContextHolder.getLocale()
+                );
+                fieldErrors.put(error.getField(), resolved);
+            });
 
         // Create a single message combining all field errors for backward compatibility
         String combinedMessage = fieldErrors.entrySet().stream()
                 .map(entry -> entry.getKey() + ": " + entry.getValue())
                 .reduce((e1, e2) -> e1 + "; " + e2)
-                .orElse("Validation failed");
+            .orElse(messageSource.getMessage(
+                "error.validation.failed",
+                null,
+                LocaleContextHolder.getLocale()
+            ));
 
         // Build response with both message and detailed fieldErrors
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Validation Failed");
+        response.put("error", messageSource.getMessage(
+            "error.validation.failed.title",
+            null,
+            LocaleContextHolder.getLocale()
+        ));
         response.put("message", combinedMessage);
         response.put("fieldErrors", fieldErrors);
 
@@ -84,17 +108,33 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<Object> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
-        return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getMessage());
+        String message = messageSource.getMessage(
+                "error.media.type.unsupported",
+                new Object[] {ex.getContentType(), ex.getSupportedMediaTypes()},
+                ex.getMessage(),
+                LocaleContextHolder.getLocale()
+        );
+        return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Object> handleMissingParams(MissingServletRequestParameterException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getParameterName() + " parameter is missing");
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            messageSource.getMessage(
+                "error.request.parameter.missing",
+                new Object[] {ex.getParameterName()},
+                LocaleContextHolder.getLocale()
+            ));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleMalformedJson(HttpMessageNotReadableException ex) {
-        String message = "Malformed or missing JSON request body";
+        String message = messageSource.getMessage(
+            "error.request.json.malformed.or.missing",
+            null,
+            LocaleContextHolder.getLocale()
+        );
         
         // Extract more specific error information if available
         Throwable cause = ex.getCause();
@@ -103,13 +143,29 @@ public class GlobalExceptionHandler {
             // Provide more specific guidance based on the parsing error
             if (causeMessage != null) {
                 if (causeMessage.contains("Unexpected end-of-input")) {
-                    message = "JSON is incomplete - missing closing bracket or quote";
+                    message = messageSource.getMessage(
+                            "error.request.json.incomplete",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
                 } else if (causeMessage.contains("Unexpected character")) {
-                    message = "JSON contains invalid character - check for unescaped quotes or missing commas";
+                    message = messageSource.getMessage(
+                            "error.request.json.invalid.character",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
                 } else if (causeMessage.contains("cannot deserialize")) {
-                    message = "Invalid value type for a field - check your data types match the schema";
+                    message = messageSource.getMessage(
+                            "error.request.json.invalid.value.type",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
                 } else if (causeMessage.contains("No content to map")) {
-                    message = "Empty or missing request body";
+                    message = messageSource.getMessage(
+                            "error.request.json.empty.or.missing",
+                            null,
+                            LocaleContextHolder.getLocale()
+                    );
                 }
             }
         }

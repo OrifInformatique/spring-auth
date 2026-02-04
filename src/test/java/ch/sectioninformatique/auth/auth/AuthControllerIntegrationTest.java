@@ -1,10 +1,14 @@
 package ch.sectioninformatique.auth.auth;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -196,6 +200,19 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private PasswordEncoder passwordEncoder;
+
+        @Autowired
+        private MessageSource messageSource;
+
+        @BeforeEach
+        public void setUp() {
+                LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+        }
+
+        @AfterEach
+        public void tearDown() {
+                LocaleContextHolder.resetLocaleContext();
+        }
 
         /**
          * Test the /auth/login endpoint with missing login.
@@ -1343,7 +1360,11 @@ public class AuthControllerIntegrationTest {
                                 "update-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message").value(
+                                                        messageSource.getMessage(
+                                                                "message.password.updated",
+                                                                null,
+                                                                java.util.Locale.ENGLISH)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1459,7 +1480,11 @@ public class AuthControllerIntegrationTest {
                                 "logout",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message").value(
+                                                        messageSource.getMessage(
+                                                                "message.logout.success",
+                                                                null,
+                                                                java.util.Locale.ENGLISH)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
