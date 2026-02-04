@@ -82,7 +82,7 @@ public class CredentialsDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("valid email")));
+            .anyMatch(v -> v.getMessage().contains("validation.credentials.login.email")));
     }
 
     /**
@@ -169,7 +169,7 @@ public class CredentialsDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("between 8 and 72")));
+            .anyMatch(v -> v.getMessage().contains("validation.credentials.password.size")));
     }
 
     /**
@@ -199,7 +199,7 @@ public class CredentialsDtoTest {
         // Assert
         assertEquals(1, violations.size());
         assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("between 8 and 72")));
+            .anyMatch(v -> v.getMessage().contains("validation.credentials.password.size")));
     }
 
     /**

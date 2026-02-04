@@ -17,11 +17,11 @@ import jakarta.validation.constraints.Size;
  * @param password The user's password as a character array
  */
 public record CredentialsDto(
-    @NotBlank(message = "Login is required")
-    @Email(message = "Login must be a valid email format")
+    @NotBlank(message = "{validation.credentials.login.required}")
+    @Email(message = "{validation.credentials.login.email}")
     String login,
 
-    @NotNull(message = "Password is required")
-    @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters long")
+    @NotNull(message = "{validation.credentials.password.required}")
+    @Size(min = 8, max = 72, message = "{validation.credentials.password.size}")
     char[] password
 ) {}

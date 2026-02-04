@@ -7,6 +7,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +33,7 @@ public class OAuth2Controller {
 
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
+    private final MessageSource messageSource;
     private static final Logger log = LoggerFactory.getLogger(OAuth2Controller.class);
 
     /**
@@ -40,9 +43,11 @@ public class OAuth2Controller {
      * @param userService Service for user management
      */
     public OAuth2Controller(UserAuthenticationProvider userAuthenticationProvider,
-                            UserService userService) {
+                            UserService userService,
+                            MessageSource messageSource) {
         this.userAuthenticationProvider = userAuthenticationProvider;
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -58,14 +63,16 @@ public class OAuth2Controller {
     @GetMapping("/success")
     public void oauth2Success(OAuth2AuthenticationToken authentication, HttpServletResponse response) throws IOException {
         if (authentication == null) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Authentication token is missing.");
+            String message = messageSource.getMessage("error.oauth2.missing.authentication", null, LocaleContextHolder.getLocale());
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), message);
             return;
         }
 
         // Retrieve OAuth2User principal from the authentication token.
         OAuth2User principal = (OAuth2User) authentication.getPrincipal();
         if (principal == null) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "OAuth2 user details not found.");
+            String message = messageSource.getMessage("error.oauth2.user.not.found", null, LocaleContextHolder.getLocale());
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), message);
             return;
         }
 
@@ -76,7 +83,12 @@ public class OAuth2Controller {
         String familyName = principal.getAttribute("family_name");
 
         if (Objects.isNull(email)) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Required user attribute not found.");
+            String message = messageSource.getMessage(
+                    "error.oauth2.missing.user.attribute",
+                    new Object[] {"email"},
+                    LocaleContextHolder.getLocale()
+            );
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), message);
             return;
         }
 
