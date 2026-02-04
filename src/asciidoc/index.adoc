@@ -395,7 +395,7 @@ include::auth/logout-expired-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token has expired.
 
-=== 1.5 Set Password
+=== 1.5 Update Password
 This is an example output for the `PUT /auth/update-password` endpoint.
 
 .request
@@ -404,7 +404,7 @@ include::auth/update-password/http-request.adoc[]
 .response
 include::auth/update-password/http-response.adoc[]
 
-It sets a password for a user account using a token.
+It updates the password for the authenticated user.
 
 ==== 1.5.1 Error Response - 400 - Bad Request
 These are example outputs for the `PUT /auth/update-password` endpoint for bad request.
@@ -424,45 +424,6 @@ It returns a 400 Bad Request error indicating that the request body is missing.
 These are example outputs for the `PUT /auth/update-password` endpoint for unauthorized access.
 
 ===== 1.5.2.1 Missing Token
-This is an example output when the request token is missing.
-
-.request
-include::auth/update-password-missing-token/http-request.adoc[]
-
-.response
-include::auth/update-password-missing-token/http-response.adoc[]
-
-It returns a 401 Unauthorized error indicating that full authentication is required.
-
-=== 1.6 Update Password
-This is an example output for the `PUT /auth/update-password` endpoint.
-
-.request
-include::auth/update-password/http-request.adoc[]
-
-.response
-include::auth/update-password/http-response.adoc[]
-
-It sets a new password for the authenticated user.
-
-==== 1.6.1 Error Response - 400 - Bad Request
-These are example outputs for the `PUT /auth/update-password` endpoint for bad request.
-
-===== 1.6.1.1 Missing Body
-This is an example output when the request body is missing.
-
-.request
-include::auth/update-password-missing-body/http-request.adoc[]
-
-.response
-include::auth/update-password-missing-body/http-response.adoc[]
-
-It returns a 400 Bad Request error indicating that the request body is missing.
-
-==== 1.6.2 Error Response - 401 - Unauthorised
-These are example outputs for the `PUT /auth/update-password` endpoint for unauthorized access.
-
-===== 1.6.2.1 Missing Token
 This is an example output when the request token is missing.
 
 .request
@@ -603,7 +564,7 @@ It promotes a user to the "MANAGER" role.
 ==== 2.5.1 Error Response - 401 - Unauthorized
 These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for unauthorized access.
 
-===== 2.3.1.1 Missing Authorization Header
+===== 2.5.1.1 Missing Authorization Header
 This is an example output when the Authorization header is missing in the request.
 
 .request
@@ -614,7 +575,7 @@ include::users/promote-manager-missing-authorization/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
-===== 2.3.1.2 Malformed Token
+===== 2.5.1.2 Malformed Token
 This is an example output when the token provided is malformed.
 
 .request
@@ -625,10 +586,10 @@ include::users/promote-manager-malformed-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
-==== 2.3.2 Error Response - 403 - Forbidden
+==== 2.5.2 Error Response - 403 - Forbidden
 These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for forbidden access.
 
-===== 2.3.2.1 Non-Admin User - Promote User to Manager
+===== 2.5.2.1 Non-Admin User - Promote User to Manager
 This is an example output when a non-admin user attempts to promote a user to manager.
 
 .request
@@ -639,10 +600,10 @@ include::users/promote-manager-non-admin/http-response.adoc[]
 
 It returns a 403 Forbidden error indicating that access is denied.
 
-==== 2.3.3 Error Response - 404 - Not Found
+==== 2.5.3 Error Response - 404 - Not Found
 These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for not found errors.
 
-===== 2.3.3.1 User Not Found
+===== 2.5.3.1 User Not Found
 This is an example output when the user to be promoted is not found.    
 
 .request
@@ -653,10 +614,10 @@ include::users/promote-manager-user-not-found/http-response.adoc[]
 
 It returns a 404 Not Found error indicating that the user was not found.
 
-==== 2.3.4 Error Response - 409 - Conflict
+==== 2.5.4 Error Response - 409 - Conflict
 These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for conflict errors.
 
-===== 2.3.4.1 User Already Manager
+===== 2.5.4.1 User Already Manager
 This is an example output when the user to be promoted is already a manager.
 
 .request
@@ -667,7 +628,7 @@ include::users/promote-manager-user-already-manager/http-response.adoc[]
 
 It returns a 409 Conflict error indicating that the user is already a manager.
 
-===== 2.3.4.2 User Already Admin
+===== 2.5.4.2 User Already Admin
 This is an example output when the user to be promoted is already an admin.
 
 .request
