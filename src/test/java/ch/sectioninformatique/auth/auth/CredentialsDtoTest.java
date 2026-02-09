@@ -1,12 +1,20 @@
 package ch.sectioninformatique.auth.auth;
 
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import java.lang.annotation.Annotation;
+import java.util.Locale;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,14 +30,35 @@ import static org.junit.jupiter.api.Assertions.*;
  * 
  * The tests use Jakarta Bean Validation API to verify constraint violations.
  */
+@SpringBootTest(classes = ch.sectioninformatique.auth.AuthApplication.class)
 public class CredentialsDtoTest {
 
-    private static Validator validator;
+    private static final ResourceBundleMessageSource HV_MESSAGES = new ResourceBundleMessageSource();
 
-    @BeforeAll
-    public static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+    static {
+        HV_MESSAGES.setBasename("org.hibernate.validator.ValidationMessages");
+        HV_MESSAGES.setDefaultEncoding("UTF-8");
+    }
+
+    @Autowired
+    private Validator validator;
+
+    @BeforeEach
+    public void setUp() {
+        LocaleContextHolder.setLocale(Locale.FRANCE);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
+    }
+
+    private boolean hasViolation(Set<ConstraintViolation<CredentialsDto>> violations,
+                                 String field,
+                                 Class<? extends Annotation> annotationType) {
+        return violations.stream().anyMatch(v ->
+            v.getPropertyPath().toString().equals(field)
+                && v.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationType));
     }
 
     /**
@@ -66,7 +95,7 @@ public class CredentialsDtoTest {
      * Test data:
      * - Login: not-an-email (no @ symbol or domain)
      * 
-    * Expected: 1 violation with message key validation.credentials.login.email
+        * Expected: 1 @Email constraint violation on login
      */
     @Test
     public void credentialsDto_withInvalidEmail_shouldFailValidation() {
@@ -81,8 +110,7 @@ public class CredentialsDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.credentials.login.email")));
+        assertTrue(hasViolation(violations, "login", Email.class));
     }
 
     /**
@@ -95,7 +123,7 @@ public class CredentialsDtoTest {
      * - Login: "" (empty string)
      * - Password: password123 (valid)
      * 
-    * Expected: At least 1 violation for required/blank login (validation.credentials.login.required)
+        * Expected: At least 1 @NotBlank constraint violation on login
      */
     @Test
     public void credentialsDto_withBlankLogin_shouldFailValidation() {
@@ -110,8 +138,7 @@ public class CredentialsDtoTest {
 
         // Assert
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("required") || v.getMessage().contains("must not be blank")));
+        assertTrue(hasViolation(violations, "login", NotBlank.class));
     }
 
     /**
@@ -124,7 +151,7 @@ public class CredentialsDtoTest {
      * - Login: test@example.com (valid)
      * - Password: null
      * 
-    * Expected: 1 violation with message key validation.credentials.password.required
+        * Expected: 1 @NotNull constraint violation on password
      */
     @Test
     public void credentialsDto_withNullPassword_shouldFailValidation() {
@@ -139,8 +166,7 @@ public class CredentialsDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("required")));
+        assertTrue(hasViolation(violations, "password", NotNull.class));
     }
 
     /**
@@ -153,7 +179,7 @@ public class CredentialsDtoTest {
      * - Login: test@example.com (valid)
      * - Password: "short" (5 characters - below minimum)
      * 
-    * Expected: 1 violation with message key validation.credentials.password.size
+        * Expected: 1 @Size constraint violation on password
      */
     @Test
     public void credentialsDto_withPasswordTooShort_shouldFailValidation() {
@@ -168,8 +194,7 @@ public class CredentialsDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.credentials.password.size")));
+        assertTrue(hasViolation(violations, "password", Size.class));
     }
 
     /**
@@ -182,7 +207,7 @@ public class CredentialsDtoTest {
      * - Login: test@example.com (valid)
      * - Password: 73-character string (above maximum)
      * 
-    * Expected: 1 violation with message key validation.credentials.password.size
+        * Expected: 1 @Size constraint violation on password
      */
     @Test
     public void credentialsDto_withPasswordTooLong_shouldFailValidation() {
@@ -198,8 +223,7 @@ public class CredentialsDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.credentials.password.size")));
+        assertTrue(hasViolation(violations, "password", Size.class));
     }
 
     /**

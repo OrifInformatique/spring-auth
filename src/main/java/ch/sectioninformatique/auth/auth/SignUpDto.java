@@ -22,25 +22,23 @@ import jakarta.validation.constraints.Size;
  * @param password  The user's password as a character array
  */
 public record SignUpDto(
-        @NotBlank(message = "{validation.signup.firstName.required}") 
+        @NotBlank() 
         @Pattern(
-            regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$", 
-            message = "{validation.signup.firstName.pattern}"
+            regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$"
         ) 
         String firstName,
 
         @NotBlank(message = "{validation.signup.lastName.required}") 
         @Pattern(
-            regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$", 
-            message = "{validation.signup.lastName.pattern}"
+            regexp = "^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$"
         ) 
         String lastName,
 
-        @NotBlank(message = "{validation.signup.login.required}") 
-        @Email(message = "{validation.signup.login.email}") 
+        @NotBlank() 
+        @Email() 
         String login,
 
-        @NotNull(message = "{validation.signup.password.required}") 
-        @Size(min = 8, max = 72, message = "{validation.signup.password.size}")
+        @NotNull() 
+        @Size(min = 8, max = 72)
         char[] password
 ) {}

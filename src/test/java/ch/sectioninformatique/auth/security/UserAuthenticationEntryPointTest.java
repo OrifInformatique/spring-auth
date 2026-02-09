@@ -48,7 +48,7 @@ public class UserAuthenticationEntryPointTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
-        LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+        LocaleContextHolder.setLocale(java.util.Locale.getDefault());
     }
 
     @AfterEach
@@ -87,7 +87,7 @@ public class UserAuthenticationEntryPointTest {
             messageSource.getMessage(
                 "error.security.authentication.token.invalid.or.missing",
                 null,
-                java.util.Locale.ENGLISH),
+                LocaleContextHolder.getLocale()),
             errorDto.message());
     }
 
@@ -118,7 +118,7 @@ public class UserAuthenticationEntryPointTest {
             messageSource.getMessage(
                 "error.security.authentication.failed",
                 null,
-                java.util.Locale.ENGLISH),
+                LocaleContextHolder.getLocale()),
             errorDto.message());  // Default message when authException is null
     }
 
@@ -152,7 +152,7 @@ public class UserAuthenticationEntryPointTest {
             messageSource.getMessage(
                 "error.security.authentication.token.invalid.or.missing",
                 null,
-                java.util.Locale.ENGLISH),
+                LocaleContextHolder.getLocale()),
             errorDto.message());
     }
 
@@ -185,7 +185,7 @@ public class UserAuthenticationEntryPointTest {
             messageSource.getMessage(
                 "error.security.authentication.token.invalid.or.missing",
                 null,
-                java.util.Locale.ENGLISH)));
+                LocaleContextHolder.getLocale())));
     }
 
     /**
@@ -260,7 +260,7 @@ public class UserAuthenticationEntryPointTest {
             messageSource.getMessage(
                 "error.security.authentication.token.invalid.or.missing",
                 null,
-                java.util.Locale.ENGLISH),
+                LocaleContextHolder.getLocale()),
             errorDto.message());
     }
 
@@ -292,7 +292,7 @@ public class UserAuthenticationEntryPointTest {
             messageSource.getMessage(
                 "error.security.authentication.token.invalid.or.missing",
                 null,
-                java.util.Locale.ENGLISH),
+                LocaleContextHolder.getLocale()),
             errorDto.message());
     }
 }

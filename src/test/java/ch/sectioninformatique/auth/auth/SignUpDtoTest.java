@@ -1,14 +1,22 @@
 package ch.sectioninformatique.auth.auth;
 
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.Set;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import java.lang.annotation.Annotation;
+import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -24,14 +32,35 @@ import static org.junit.jupiter.api.Assertions.*;
  * 
  * SignUpDto is used for user registration requests.
  */
+@SpringBootTest(classes = ch.sectioninformatique.auth.AuthApplication.class)
 public class SignUpDtoTest {
 
-    private static Validator validator;
+    private static final ResourceBundleMessageSource HV_MESSAGES = new ResourceBundleMessageSource();
 
-    @BeforeAll
-    public static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+    static {
+        HV_MESSAGES.setBasename("org.hibernate.validator.ValidationMessages");
+        HV_MESSAGES.setDefaultEncoding("UTF-8");
+    }
+
+    @Autowired
+    private Validator validator;
+
+    @BeforeEach
+    public void setUp() {
+        LocaleContextHolder.setLocale(Locale.FRANCE);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
+    }
+
+    private boolean hasViolation(Set<ConstraintViolation<SignUpDto>> violations,
+                                 String field,
+                                 Class<? extends Annotation> annotationType) {
+        return violations.stream().anyMatch(v ->
+            v.getPropertyPath().toString().equals(field)
+                && v.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationType));
     }
 
     /**
@@ -139,7 +168,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-    * Expected: Validation error containing validation.signup.firstName.required
+        * Expected: @NotBlank constraint violation on firstName
      */
     @Test
     public void signUpDto_withBlankFirstName_shouldFailValidation() {
@@ -156,8 +185,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.firstName.required")));
+        assertTrue(hasViolation(violations, "firstName", NotBlank.class));
     }
 
     /**
@@ -172,7 +200,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-    * Expected: Validation error containing validation.signup.lastName.required
+        * Expected: @NotBlank constraint violation on lastName
      */
     @Test
     public void signUpDto_withBlankLastName_shouldFailValidation() {
@@ -189,8 +217,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.lastName.required")));
+        assertTrue(hasViolation(violations, "lastName", NotBlank.class));
     }
 
     /**
@@ -205,7 +232,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-    * Expected: Validation error containing validation.signup.firstName.pattern
+        * Expected: @Pattern constraint violation on firstName
      */
     @Test
     public void signUpDto_withInvalidFirstNameCharacters_shouldFailValidation() {
@@ -222,8 +249,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.firstName.pattern")));
+        assertTrue(hasViolation(violations, "firstName", Pattern.class));
     }
 
     /**
@@ -238,7 +264,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Password123!"
      * 
-    * Expected: Validation error containing validation.signup.lastName.pattern
+        * Expected: @Pattern constraint violation on lastName
      */
     @Test
     public void signUpDto_withInvalidLastNameCharacters_shouldFailValidation() {
@@ -255,8 +281,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.lastName.pattern")));
+        assertTrue(hasViolation(violations, "lastName", Pattern.class));
     }
 
     /**
@@ -271,7 +296,7 @@ public class SignUpDtoTest {
      * - login: "not-an-email" (invalid email format)
      * - password: "Password123!"
      * 
-    * Expected: Validation error containing validation.signup.login.email
+        * Expected: @Email constraint violation on login
      */
     @Test
     public void signUpDto_withInvalidEmail_shouldFailValidation() {
@@ -288,8 +313,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.login.email")));
+        assertTrue(hasViolation(violations, "login", Email.class));
     }
 
     /**
@@ -304,7 +328,7 @@ public class SignUpDtoTest {
      * - login: "" (empty string)
      * - password: "Password123!"
      * 
-    * Expected: Validation error containing validation.signup.login.required
+        * Expected: @NotBlank constraint violation on login
      */
     @Test
     public void signUpDto_withBlankLogin_shouldFailValidation() {
@@ -321,8 +345,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.login.required")));
+        assertTrue(hasViolation(violations, "login", NotBlank.class));
     }
 
     /**
@@ -337,7 +360,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: null
      * 
-    * Expected: Validation error containing validation.signup.password.required
+        * Expected: @NotNull constraint violation on password
      */
     @Test
     public void signUpDto_withNullPassword_shouldFailValidation() {
@@ -354,8 +377,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.password.required")));
+        assertTrue(hasViolation(violations, "password", NotNull.class));
     }
 
     /**
@@ -370,7 +392,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: "Pass1!" (only 6 characters)
      * 
-    * Expected: Validation error containing validation.signup.password.size
+        * Expected: @Size constraint violation on password
      */
     @Test
     public void signUpDto_withPasswordTooShort_shouldFailValidation() {
@@ -387,8 +409,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.password.size")));
+        assertTrue(hasViolation(violations, "password", Size.class));
     }
 
     /**
@@ -403,7 +424,7 @@ public class SignUpDtoTest {
      * - login: "john.doe@example.com"
      * - password: 73-character string
      * 
-    * Expected: Validation error containing validation.signup.password.size
+        * Expected: @Size constraint violation on password
      */
     @Test
     public void signUpDto_withPasswordTooLong_shouldFailValidation() {
@@ -421,8 +442,7 @@ public class SignUpDtoTest {
 
         // Assert
         assertEquals(1, violations.size());
-        assertTrue(violations.stream()
-            .anyMatch(v -> v.getMessage().contains("validation.signup.password.size")));
+        assertTrue(hasViolation(violations, "password", Size.class));
     }
 
     /**

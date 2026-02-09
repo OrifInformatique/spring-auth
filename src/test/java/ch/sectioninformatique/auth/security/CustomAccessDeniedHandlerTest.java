@@ -45,7 +45,7 @@ public class CustomAccessDeniedHandlerTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
-        LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+        LocaleContextHolder.setLocale(java.util.Locale.getDefault());
     }
 
     @AfterEach
@@ -54,7 +54,7 @@ public class CustomAccessDeniedHandlerTest {
     }
 
     private String message(String key, Object... args) {
-        return messageSource.getMessage(key, args, java.util.Locale.ENGLISH);
+        return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 
     /**

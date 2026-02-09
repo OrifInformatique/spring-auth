@@ -3,7 +3,6 @@ package ch.sectioninformatique.auth.auth;
 import org.springframework.http.HttpStatus;
 
 import ch.sectioninformatique.auth.app.exceptions.AppException;
-import ch.sectioninformatique.auth.security.RoleEnum;
 
 /**
  * Authentication-related exceptions for the auth package.

@@ -1,5 +1,7 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -109,6 +111,7 @@ public class UserControllerIntegrationTest {
 
                 // Set content type
                 requestType.contentType(contentType);
+                requestType.locale(LocaleContextHolder.getLocale());
 
                 // Perform request
                 var request = mockMvc.perform(requestType)
@@ -143,10 +146,9 @@ public class UserControllerIntegrationTest {
 
         @Autowired
         private MessageSource messageSource;
-
         @BeforeEach
         public void setUp() {
-                LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
+                LocaleContextHolder.setLocale(Locale.FRANCE);
         }
 
         @AfterEach
@@ -155,7 +157,7 @@ public class UserControllerIntegrationTest {
         }
 
         private String message(String key, Object... args) {
-                return messageSource.getMessage(key, args, java.util.Locale.ENGLISH);
+                return messageSource.getMessage(key, args, Locale.FRANCE);
         }
 
         /**
@@ -211,7 +213,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing authentication
-         * - Response contains error message
+         * - Response contains localized error message
          * - No user data is returned
          * 
          * Test data:
@@ -286,7 +288,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Token expiration validation fails
-         * - Response contains error message about expired token
+         * - Response contains localized error message about expired token
          * - No user data is returned
          * - Client should request a new token using refresh token
          * 
@@ -396,7 +398,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing authentication
-         * - Response contains error message
+         * - Response contains localized error message
          * - No user list is returned
          * 
          * Test data:
@@ -471,7 +473,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Token expiration validation fails
-         * - Response contains error message about expired token
+         * - Response contains localized error message about expired token
          * - No user list is returned
          * - Client should refresh token and retry
          * 
@@ -760,7 +762,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -881,7 +883,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -923,7 +925,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Request is rejected because user already has MANAGER role
-         * - Response contains error message about user already being manager
+         * - Response contains localized error message about user already being manager
          * - User's role remains MANAGER (unchanged)
          * 
          * Test data:
@@ -965,7 +967,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Request is rejected because user has ADMIN role (higher than MANAGER)
-         * - Response contains error message about conflicting role
+         * - Response contains localized error message about conflicting role
          * - User's role remains ADMIN (unchanged)
          * 
          * Test data:
@@ -1058,7 +1060,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1179,7 +1181,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -1270,7 +1272,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1391,7 +1393,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -1433,7 +1435,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Request is rejected because user already has ADMIN role
-         * - Response contains error message about user already being admin
+         * - Response contains localized error message about user already being admin
          * - User's role remains ADMIN (unchanged)
          * 
          * Test data:
@@ -1525,7 +1527,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1649,7 +1651,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -1740,7 +1742,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1873,7 +1875,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User remains active (not deleted)
          * 
          * Test data:

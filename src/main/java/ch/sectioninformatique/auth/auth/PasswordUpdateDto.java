@@ -16,10 +16,10 @@ import jakarta.validation.constraints.Size;
  */
 @PasswordNotReused
 public record PasswordUpdateDto(
-        @NotNull(message = "{validation.password.update.current.required}")
+        @NotNull()
         char[] oldPassword,
 
-        @NotNull(message = "{validation.password.update.new.required}")
-        @Size(min = 8, max = 72, message = "{validation.password.update.new.size}")
+        @NotNull()
+        @Size(min = 8, max = 72)
         char[] newPassword
 ) {}
