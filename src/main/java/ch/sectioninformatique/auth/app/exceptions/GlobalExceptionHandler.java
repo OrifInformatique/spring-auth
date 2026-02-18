@@ -69,12 +69,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    // Handle unsupported media type errors (e.g., when the client sends a request with an unsupported Content-Type)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<Object> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
         String message = errorMessageResolver.resolveUnsupportedMediaTypeMessage(ex);
         return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message);
     }
 
+    // Handle missing request parameters (e.g., when a required query parameter is not provided)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Object> handleMissingParams(MissingServletRequestParameterException ex) {
         return buildResponse(
@@ -82,6 +84,7 @@ public class GlobalExceptionHandler {
             errorMessageResolver.resolveMissingParamMessage(ex));
     }
 
+    // Handle malformed JSON errors (e.g., when the client sends invalid JSON in the request body)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleMalformedJson(HttpMessageNotReadableException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, errorMessageResolver.resolveMalformedJsonMessage(ex));
