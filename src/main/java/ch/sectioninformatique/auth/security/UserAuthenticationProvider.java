@@ -19,6 +19,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -272,7 +273,7 @@ public class UserAuthenticationProvider {
             log.debug("Built authorities for user {}: {}", user.getLogin(), authorities);
 
             return new UsernamePasswordAuthenticationToken(user, null, authorities);
-        } catch (Exception e) {
+        } catch (UserNotFoundException e) {
             // If user doesn't exist, create a new Azure user
             log.debug("User not found, creating new Azure user: {}", decoded.getSubject());
             DecodedJWT decodedAzure = JWT.decode(token);

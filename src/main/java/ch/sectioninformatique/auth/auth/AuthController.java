@@ -123,9 +123,7 @@ public class AuthController {
                 DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(refreshToken);
                 String login = jwt.getSubject();
 
-                if (!userService.validateRefreshToken(login, refreshToken)) {
-                        throw new AuthExceptions.InvalidRefreshTokenException();
-                }
+                userService.assertValidRefreshToken(login, refreshToken);
 
                 UserDto user = userService.findByLogin(login);
 

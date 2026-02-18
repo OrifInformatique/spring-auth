@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
@@ -24,14 +22,13 @@ import java.util.Set;
  * - Only necessary headers are allowed
  * - Environment-specific restrictions are enforced
  * 
- * Throws IllegalArgumentException if configuration is invalid.
+ * Throws an application exception if configuration is invalid.
  */
 @Configuration
 @Slf4j
 public class CorsConfigurationValidator {
 
     private final Environment environment;
-    private final MessageSource messageSource;
 
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins;
@@ -67,16 +64,15 @@ public class CorsConfigurationValidator {
             "X-API-Key"
     ));
 
-    public CorsConfigurationValidator(Environment environment, MessageSource messageSource) {
+    public CorsConfigurationValidator(Environment environment) {
         this.environment = environment;
-        this.messageSource = messageSource;
     }
 
     /**
      * Validates CORS configuration at application startup.
      * Called automatically by Spring after bean construction.
      * 
-     * @throws IllegalArgumentException if any CORS configuration is invalid
+     * @throws SecurityExceptions.CorsConfigurationException if any CORS configuration is invalid
      */
     @PostConstruct
     public void validateCorsConfiguration() {
@@ -89,8 +85,8 @@ public class CorsConfigurationValidator {
             validateMethods();
             validateHeaders();
             log.info("✓ CORS configuration is valid and secure");
-        } catch (IllegalArgumentException e) {
-            log.error("✗ CORS configuration validation failed: {}", e.getMessage());
+        } catch (SecurityExceptions.CorsConfigurationException e) {
+            log.error("✗ CORS configuration validation failed: {}", e.getMessageKey());
             throw e;
         }
     }
@@ -109,13 +105,8 @@ public class CorsConfigurationValidator {
      */
     private void validateOrigins(boolean isDevOrTest) {
         if (allowedOrigins == null || allowedOrigins.length == 0) {
-            throw new IllegalArgumentException(
-                messageSource.getMessage(
-                    "error.cors.allowed.origins.empty",
-                    null,
-                    LocaleContextHolder.getLocale()
-                )
-            );
+            throw new SecurityExceptions.CorsConfigurationException(
+                    "error.cors.allowed.origins.empty");
         }
 
         Set<String> uniqueOrigins = new HashSet<>();
@@ -126,13 +117,8 @@ public class CorsConfigurationValidator {
             // Check for wildcard
             if ("*".equals(origin)) {
                 if (!isDevOrTest) {
-                    throw new IllegalArgumentException(
-                        messageSource.getMessage(
-                            "error.cors.origin.wildcard.production",
-                            null,
-                            LocaleContextHolder.getLocale()
-                        )
-                    );
+                    throw new SecurityExceptions.CorsConfigurationException(
+                            "error.cors.origin.wildcard.production");
                 }
                 log.warn("⚠ Wildcard CORS origin '*' configured (allowed only in dev/test)");
                 uniqueOrigins.add(origin);
@@ -146,46 +132,32 @@ public class CorsConfigurationValidator {
 
                 // Check protocol is http or https
                 if (!("http".equals(protocol) || "https".equals(protocol))) {
-                    throw new IllegalArgumentException(
-                        messageSource.getMessage(
+                    throw new SecurityExceptions.CorsConfigurationException(
                             "error.cors.origin.invalid.protocol",
-                            new Object[] {origin, protocol},
-                            LocaleContextHolder.getLocale()
-                        )
-                    );
+                            origin,
+                            protocol);
                 }
 
                 // Check for localhost in production
                 String host = uri.getHost();
                 if (!isDevOrTest && ("localhost".equals(host) || "127.0.0.1".equals(host))) {
-                    throw new IllegalArgumentException(
-                        messageSource.getMessage(
+                    throw new SecurityExceptions.CorsConfigurationException(
                             "error.cors.origin.localhost.production",
-                            new Object[] {origin},
-                            LocaleContextHolder.getLocale()
-                        )
-                    );
+                            origin);
                 }
 
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.origin.invalid.url",
-                        new Object[] {origin, e.getMessage()},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        origin,
+                        e.getMessage());
             }
 
             // Check for duplicates
             if (!uniqueOrigins.add(origin)) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.origin.duplicate",
-                        new Object[] {origin},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        origin);
             }
 
             log.debug("✓ Origin validated: {}", origin);
@@ -205,13 +177,8 @@ public class CorsConfigurationValidator {
      */
     private void validateMethods() {
         if (allowedMethods == null || allowedMethods.length == 0) {
-            throw new IllegalArgumentException(
-                messageSource.getMessage(
-                    "error.cors.allowed.methods.empty",
-                    null,
-                    LocaleContextHolder.getLocale()
-                )
-            );
+            throw new SecurityExceptions.CorsConfigurationException(
+                    "error.cors.allowed.methods.empty");
         }
 
         Set<String> uniqueMethods = new HashSet<>();
@@ -221,24 +188,17 @@ public class CorsConfigurationValidator {
 
             // Check if method is in whitelist
             if (!ALLOWED_HTTP_METHODS.contains(method)) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.method.not.allowed",
-                        new Object[] {method, ALLOWED_HTTP_METHODS},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        method,
+                        ALLOWED_HTTP_METHODS);
             }
 
             // Check for duplicates
             if (!uniqueMethods.add(method)) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.method.duplicate",
-                        new Object[] {method},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        method);
             }
 
             log.debug("✓ Method validated: {}", method);
@@ -260,13 +220,8 @@ public class CorsConfigurationValidator {
      */
     private void validateHeaders() {
         if (allowedHeaders == null || allowedHeaders.length == 0) {
-            throw new IllegalArgumentException(
-                messageSource.getMessage(
-                    "error.cors.allowed.headers.empty",
-                    null,
-                    LocaleContextHolder.getLocale()
-                )
-            );
+            throw new SecurityExceptions.CorsConfigurationException(
+                    "error.cors.allowed.headers.empty");
         }
 
         Set<String> uniqueHeaders = new HashSet<>();
@@ -276,35 +231,24 @@ public class CorsConfigurationValidator {
 
             // Check for wildcard
             if ("*".equals(header)) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.header.wildcard.not.allowed",
-                        new Object[] {ALLOWED_HEADER_NAMES},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        ALLOWED_HEADER_NAMES);
             }
 
             // Check if header is in whitelist
             if (!ALLOWED_HEADER_NAMES.contains(header)) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.header.not.allowed",
-                        new Object[] {header, ALLOWED_HEADER_NAMES},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        header,
+                        ALLOWED_HEADER_NAMES);
             }
 
             // Check for duplicates
             if (!uniqueHeaders.add(header)) {
-                throw new IllegalArgumentException(
-                    messageSource.getMessage(
+                throw new SecurityExceptions.CorsConfigurationException(
                         "error.cors.header.duplicate",
-                        new Object[] {header},
-                        LocaleContextHolder.getLocale()
-                    )
-                );
+                        header);
             }
 
             log.debug("Header validated: {}", header);

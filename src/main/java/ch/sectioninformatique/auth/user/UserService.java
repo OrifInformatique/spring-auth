@@ -3,8 +3,6 @@ package ch.sectioninformatique.auth.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +35,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.hibernate.Session;
 
 import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
+import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidRefreshTokenException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyManagerException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyRegularException;
 import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.HashAlgorithmUnavailableException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
 import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
@@ -77,8 +77,6 @@ public class UserService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    /** Message source for localized error messages */
-    private final MessageSource messageSource;
 
     /**
      * Authenticates a user with their credentials.
@@ -124,22 +122,22 @@ public class UserService {
     }
 
     /**
-     * Validates a refresh token for a given user.
-     * 
-     * Checks that the token exists, matches the stored hashed token, is not
-     * revoked,
-     * and has not expired.
+     * Validates a refresh token and throws if it is invalid or expired.
      *
      * @param userLogin    The login/username of the user.
      * @param refreshToken The raw refresh token to validate.
-     * @return {@code true} if the token is valid, {@code false} otherwise.
+     * @throws InvalidRefreshTokenException if the token is invalid or expired
      */
-    public boolean validateRefreshToken(String userLogin, String refreshToken) {
+    public void assertValidRefreshToken(String userLogin, String refreshToken) {
         String hashedRefreshToken = hashRefreshToken(refreshToken);
-        return refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
+        boolean valid = refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
                 .filter(stored -> hashedRefreshToken.equals(stored.getTokenHash()))
                 .filter(stored -> stored.getExpiresAt().isAfter(Instant.now()))
                 .isPresent();
+
+        if (!valid) {
+            throw new InvalidRefreshTokenException();
+        }
     }
 
     /**
@@ -175,14 +173,7 @@ public class UserService {
             byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(
-                    messageSource.getMessage(
-                            "error.security.hash.algorithm.unavailable",
-                            null,
-                            LocaleContextHolder.getLocale()
-                    ),
-                    e
-            );
+            throw new HashAlgorithmUnavailableException();
         }
     }
 
