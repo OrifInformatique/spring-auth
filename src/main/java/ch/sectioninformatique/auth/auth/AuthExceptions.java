@@ -14,7 +14,16 @@ public class AuthExceptions {
      */
     public static class InvalidCredentialsException extends AppException {
         public InvalidCredentialsException() {
-            super("error.authorisation.invalid.credentials", HttpStatus.UNAUTHORIZED, new Object[]{});
+            super(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    /**
+     * Thrown when the refresh token is invalid.
+     */
+    public static class InvalidRefreshTokenException extends AppException {
+        public InvalidRefreshTokenException() {
+            super(HttpStatus.UNAUTHORIZED);
         }
     }
 }

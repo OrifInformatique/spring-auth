@@ -13,8 +13,15 @@ public class UserExceptions {
      * Thrown when a user with the given login already exists.
      */
     public static class UserAlreadyExistsException extends AppException {
+        private final String login;
+
         public UserAlreadyExistsException(String login) {
-            super("error.user.already.exists", HttpStatus.CONFLICT, login);
+            super(HttpStatus.CONFLICT);
+            this.login = login;
+        }
+
+        public String getLogin() {
+            return login;
         }
     }
 
@@ -22,8 +29,15 @@ public class UserExceptions {
      * Thrown when a user with the given login or ID is not found.
      */
     public static class UserNotFoundException extends AppException {
+        private final String loginOrId;
+
         public UserNotFoundException(String loginOrId) {
-            super("error.user.not.found", HttpStatus.NOT_FOUND, loginOrId);
+            super(HttpStatus.NOT_FOUND);
+            this.loginOrId = loginOrId;
+        }
+
+        public String getLoginOrId() {
+            return loginOrId;
         }
     }
 
@@ -31,8 +45,15 @@ public class UserExceptions {
      * Thrown when attempting to promote a user to admin when they are already admin.
      */
     public static class UserAlreadyAdminException extends AppException {
+        private final String login;
+
         public UserAlreadyAdminException(String login) {
-            super("error.user.already.admin", HttpStatus.CONFLICT, login);
+            super(HttpStatus.CONFLICT);
+            this.login = login;
+        }
+
+        public String getLogin() {
+            return login;
         }
     }
 
@@ -40,8 +61,15 @@ public class UserExceptions {
      * Thrown when attempting to promote a user to manager when they are already manager.
      */
     public static class UserAlreadyManagerException extends AppException {
+        private final String login;
+
         public UserAlreadyManagerException(String login) {
-            super("error.user.already.manager", HttpStatus.CONFLICT, login);
+            super(HttpStatus.CONFLICT);
+            this.login = login;
+        }
+
+        public String getLogin() {
+            return login;
         }
     }
 
@@ -49,8 +77,15 @@ public class UserExceptions {
      * Thrown when attempting to demote a user to regular when they are already regular.
      */
     public static class UserAlreadyRegularException extends AppException {
+        private final String login;
+
         public UserAlreadyRegularException(String login) {
-            super("error.user.already.regular", HttpStatus.CONFLICT, login);
+            super(HttpStatus.CONFLICT);
+            this.login = login;
+        }
+
+        public String getLogin() {
+            return login;
         }
     }
 }

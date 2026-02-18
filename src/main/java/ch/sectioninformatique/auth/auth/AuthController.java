@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
@@ -125,12 +124,7 @@ public class AuthController {
                 String login = jwt.getSubject();
 
                 if (!userService.validateRefreshToken(login, refreshToken)) {
-                        throw new AppException(
-                                        messageSource.getMessage(
-                                                        "error.security.refresh.token.invalid",
-                                                        null,
-                                                        LocaleContextHolder.getLocale()),
-                                        HttpStatus.UNAUTHORIZED);
+                        throw new AuthExceptions.InvalidRefreshTokenException();
                 }
 
                 UserDto user = userService.findByLogin(login);
