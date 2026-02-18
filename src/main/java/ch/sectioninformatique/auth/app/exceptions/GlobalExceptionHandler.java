@@ -10,7 +10,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import ch.sectioninformatique.auth.web.ErrorMessageService;
+import ch.sectioninformatique.auth.web.ErrorMessageResolver;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @Autowired
-    private ErrorMessageService errorMessageService;
+    private ErrorMessageResolver errorMessageResolver;
 
     // Helper method to format responses
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     // -------------------------------
     @ExceptionHandler(AppException.class)
     public ResponseEntity<Object> handleAppException(AppException ex) {
-        return buildResponse(ex.getStatus(), errorMessageService.resolveAppExceptionMessage(ex));
+        return buildResponse(ex.getStatus(), errorMessageResolver.resolveAppExceptionMessage(ex));
     }
 
     // -------------------------------
@@ -51,18 +51,18 @@ public class GlobalExceptionHandler {
             .forEach(error -> {
                 fieldErrors.put(
                     error.getField(),
-                    errorMessageService.resolveValidationFieldError(error)
+                    errorMessageResolver.resolveValidationFieldError(error)
                 );
             });
 
         // Create a single message combining all field errors for backward compatibility
-        String combinedMessage = errorMessageService.resolveValidationCombinedMessage(fieldErrors);
+        String combinedMessage = errorMessageResolver.resolveValidationCombinedMessage(fieldErrors);
 
         // Build response with both message and detailed fieldErrors
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", errorMessageService.resolveValidationTitle());
+        response.put("error", errorMessageResolver.resolveValidationTitle());
         response.put("message", combinedMessage);
         response.put("fieldErrors", fieldErrors);
 
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<Object> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
-        String message = errorMessageService.resolveUnsupportedMediaTypeMessage(ex);
+        String message = errorMessageResolver.resolveUnsupportedMediaTypeMessage(ex);
         return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message);
     }
 
@@ -79,11 +79,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleMissingParams(MissingServletRequestParameterException ex) {
         return buildResponse(
             HttpStatus.BAD_REQUEST,
-            errorMessageService.resolveMissingParamMessage(ex));
+            errorMessageResolver.resolveMissingParamMessage(ex));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleMalformedJson(HttpMessageNotReadableException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, errorMessageService.resolveMalformedJsonMessage(ex));
+        return buildResponse(HttpStatus.BAD_REQUEST, errorMessageResolver.resolveMalformedJsonMessage(ex));
     }
 }
