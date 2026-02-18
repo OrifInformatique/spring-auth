@@ -88,7 +88,8 @@ public class GlobalExceptionHandler {
 
         // Build the error response with the combined message and include field errors
         // in the response body
-        Map<String, Object> response = errorResponse(HttpStatus.BAD_REQUEST, combinedMessage);
+        Map<String, Object> response = new java.util.LinkedHashMap<>(
+            errorResponse(HttpStatus.BAD_REQUEST, combinedMessage));
         response.put("fieldErrors", fieldErrors);
 
         return ResponseEntity.badRequest().body(response);
