@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * 
  * For AppExceptions, it uses the provided HTTP status and resolves a localized
  * message if available.
- * For validation errors, it aggregates field errors into a single response with
- * details.
+ * For validation errors, it returns a generic localized message and exposes
+ * per-field details in a structured fieldErrors object.
  * For other exceptions, it returns a generic error message with the appropriate
  * HTTP status.
  * 
@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 // Handlers first, helpers last for a top-down read.
 public class GlobalExceptionHandler {
+
+    private static final String VALIDATION_FAILED_MESSAGE_KEY = "error.validation.failed";
 
     // MessageSource is used to resolve localized messages for exceptions that
     // implement MessageKeyProvider
@@ -62,8 +64,8 @@ public class GlobalExceptionHandler {
     /**
      * Handles validation errors that occur when @Valid annotated request bodies
      * fail validation.
-     * Aggregates field errors into a single response with details about each
-     * invalid field.
+        * Uses a generic top-level message and returns detailed validation
+        * information in fieldErrors for client-side field mapping.
      * 
      * @param ex The MethodArgumentNotValidException to handle
      * @return ResponseEntity containing the error details and appropriate HTTP
@@ -72,24 +74,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
 
-        // Collect field errors into a map of field name to error message
+        // Collect detailed validation errors keyed by field name.
         Map<String, String> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
                         this::resolveValidationFieldError,
                         (existing, replacement) -> replacement));
 
-        // Combine field errors into a single message for the main error response
-        String combinedMessage = fieldErrors.entrySet().stream()
-                .map(entry -> entry.getKey() + ": " + entry.getValue())
-                .collect(Collectors.collectingAndThen(
-                        Collectors.joining("; "),
-                        result -> result.isEmpty() ? HttpStatus.BAD_REQUEST.getReasonPhrase() : result));
+        // Keep the top-level message generic and localized.
+        String genericMessage = msg(VALIDATION_FAILED_MESSAGE_KEY);
 
-        // Build the error response with the combined message and include field errors
-        // in the response body
+        // Include fieldErrors as the source of truth for frontend rendering.
         Map<String, Object> response = new java.util.LinkedHashMap<>(
-            errorResponse(HttpStatus.BAD_REQUEST, combinedMessage));
+            errorResponse(HttpStatus.BAD_REQUEST, genericMessage));
         response.put("fieldErrors", fieldErrors);
 
         return ResponseEntity.badRequest().body(response);
