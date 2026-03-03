@@ -1,15 +1,19 @@
 package ch.sectioninformatique.auth.auth;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
 import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
@@ -38,6 +42,7 @@ import java.util.function.Consumer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Locale;
 
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.Cookie;
@@ -103,6 +108,7 @@ public class AuthControllerIntegrationTest {
 
                 // Set content type
                 requestType.contentType(contentType);
+                requestType.locale(LocaleContextHolder.getLocale());
 
                 // Perform request
                 var request = mockMvc.perform(requestType)
@@ -164,6 +170,7 @@ public class AuthControllerIntegrationTest {
 
                 // Set content type
                 requestType.contentType(contentType);
+                requestType.locale(LocaleContextHolder.getLocale());
 
                 // Perform request
                 var request = mockMvc.perform(requestType)
@@ -197,6 +204,30 @@ public class AuthControllerIntegrationTest {
         @Autowired
         private PasswordEncoder passwordEncoder;
 
+        @Autowired
+        private MessageSource messageSource;
+
+        private static final ResourceBundleMessageSource HV_MESSAGES = new ResourceBundleMessageSource();
+
+        static {
+                HV_MESSAGES.setBasename("org.hibernate.validator.ValidationMessages");
+                HV_MESSAGES.setDefaultEncoding("UTF-8");
+        }
+
+        @BeforeEach
+        public void setUp() {
+                LocaleContextHolder.setLocale(Locale.FRANCE);
+        }
+
+        @AfterEach
+        public void tearDown() {
+                LocaleContextHolder.resetLocaleContext();
+        }
+
+        private String message(String key, Object... args) {
+                return messageSource.getMessage(key, args, Locale.FRANCE);
+        }
+
         /**
          * Test the /auth/login endpoint with missing login.
          * This test performs a login request with missing login and expects a bad
@@ -217,7 +248,7 @@ public class AuthControllerIntegrationTest {
                                 "login-missing-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -266,7 +297,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains an error message explaining the validation failure
+         * - Response includes fieldErrors.password for the validation failure
          * - Request is rejected before attempting authentication
          * 
          * Test data:
@@ -287,7 +318,7 @@ public class AuthControllerIntegrationTest {
                                 "login-missing-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.password").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -302,7 +333,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains an error message about invalid email format
+         * - Response includes fieldErrors.login for invalid email format
          * - Request is rejected during input validation
          * 
          * Test data:
@@ -323,7 +354,7 @@ public class AuthControllerIntegrationTest {
                                 "login-invalid-email-format",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -338,7 +369,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains an error message indicating missing request body
+         * - Response contains a localized error message indicating missing request body
          * - Request fails during JSON parsing/validation
          * 
          * Test data:
@@ -358,7 +389,8 @@ public class AuthControllerIntegrationTest {
                                 "login-empty-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -374,7 +406,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains an error message about JSON parsing failure
+         * - Response contains a localized error message about JSON parsing failure
          * - Request fails during JSON deserialization
          * 
          * Test data:
@@ -394,7 +426,8 @@ public class AuthControllerIntegrationTest {
                                 "login-malformed-json",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -412,7 +445,7 @@ public class AuthControllerIntegrationTest {
          * - Returns HTTP 400 (Bad Request)
          * - SQL injection attempt is rejected by email validation
          * - No database query is executed with malicious input
-         * - Response contains validation error message
+         * - Response includes fieldErrors.login
          * 
          * Test data:
          * - Login: ' OR '1'='1 (SQL injection attempt)
@@ -432,7 +465,7 @@ public class AuthControllerIntegrationTest {
                                 "login-sql-injection-attempt-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -470,7 +503,8 @@ public class AuthControllerIntegrationTest {
                                 "login-sql-injection-attempt-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.authorisation.invalid.credentials")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -486,7 +520,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 415 (Unsupported Media Type)
          * - Request is rejected due to incorrect Content-Type header
-         * - Response contains error message about media type
+         * - Response contains a localized error message about media type
          * 
          * Test data:
          * - Content-Type: text/plain (should be application/json)
@@ -506,7 +540,8 @@ public class AuthControllerIntegrationTest {
                                 "login-wrong-media-type",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -543,7 +578,8 @@ public class AuthControllerIntegrationTest {
                                 "login-wrong-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.authorisation.invalid.credentials")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -581,7 +617,8 @@ public class AuthControllerIntegrationTest {
                                 "login-non-existent-user",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.authorisation.invalid.credentials")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -672,7 +709,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains validation error message
+         * - Response includes fieldErrors.firstName
          * - No user is created in the database
          * - Request is rejected during input validation
          * 
@@ -696,7 +733,7 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-first-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.firstName").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -711,7 +748,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains validation error message
+         * - Response includes fieldErrors.lastName
          * - No user is created in the database
          * - Request is rejected during input validation
          * 
@@ -735,7 +772,7 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-last-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.lastName").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -750,7 +787,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains validation error message
+         * - Response includes fieldErrors.login
          * - No user is created in the database
          * - Request is rejected during input validation
          * 
@@ -774,7 +811,7 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -789,7 +826,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains validation error message
+         * - Response includes fieldErrors.password
          * - No user is created in the database
          * - Request is rejected during input validation
          * 
@@ -813,7 +850,7 @@ public class AuthControllerIntegrationTest {
                                 "register-missing-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.password").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -828,7 +865,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains validation error message about email format
+         * - Response includes fieldErrors.login for email format
          * - No user is created in the database
          * - Request is rejected during email validation
          * 
@@ -850,7 +887,7 @@ public class AuthControllerIntegrationTest {
                                 "register-invalid-email-format",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -865,7 +902,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains error message about missing request body
+         * - Response contains a localized error message about missing request body
          * - No user is created in the database
          * - Request fails during JSON parsing/validation
          * 
@@ -886,7 +923,8 @@ public class AuthControllerIntegrationTest {
                                 "register-empty-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -901,7 +939,7 @@ public class AuthControllerIntegrationTest {
          * 
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
-         * - Response contains error message about JSON parsing failure
+         * - Response contains a localized error message about JSON parsing failure
          * - No user is created in the database
          * - Request fails during JSON deserialization
          * 
@@ -922,7 +960,8 @@ public class AuthControllerIntegrationTest {
                                 "register-malformed-json",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -938,7 +977,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
          * - SQL injection attempt is rejected by name validation
-         * - Response contains validation error message
+         * - Response includes fieldErrors.firstName
          * - No database query is executed with malicious input
          * - No user is created
          * 
@@ -960,7 +999,7 @@ public class AuthControllerIntegrationTest {
                                 "register-sql-injection-attempt-first-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.firstName").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -976,7 +1015,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
          * - SQL injection attempt is rejected by name validation
-         * - Response contains validation error message
+         * - Response includes fieldErrors.lastName
          * - No database query is executed with malicious input
          * - No user is created
          * 
@@ -998,7 +1037,7 @@ public class AuthControllerIntegrationTest {
                                 "register-sql-injection-attempt-last-name",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.lastName").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1014,7 +1053,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
          * - SQL injection attempt is rejected by email validation
-         * - Response contains validation error message
+         * - Response includes fieldErrors.login
          * - No database query is executed with malicious input
          * - No user is created
          * 
@@ -1036,7 +1075,7 @@ public class AuthControllerIntegrationTest {
                                 "register-sql-injection-attempt-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1052,7 +1091,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 415 (Unsupported Media Type)
          * - Request is rejected due to incorrect Content-Type header
-         * - Response contains error message about media type
+         * - Response contains a localized error message about media type
          * - No user is created in the database
          * 
          * Test data:
@@ -1073,7 +1112,8 @@ public class AuthControllerIntegrationTest {
                                 "register-wrong-media-type",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1089,7 +1129,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Registration is rejected because email already exists
-         * - Response contains error message about duplicate login
+         * - Response contains a localized error message about duplicate login
          * - No new user is created (existing user remains unchanged)
          * 
          * Test data:
@@ -1110,7 +1150,10 @@ public class AuthControllerIntegrationTest {
                                 "register-duplicate-login",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message(
+                                                                                "error.user.already.exists",
+                                                                                "test.user@test.com")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1190,7 +1233,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-missing-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1227,7 +1271,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-invalid-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1263,7 +1308,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1301,7 +1347,8 @@ public class AuthControllerIntegrationTest {
                                 "refresh-empty-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1343,7 +1390,8 @@ public class AuthControllerIntegrationTest {
                                 "update-password",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("message.password.updated")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1359,7 +1407,7 @@ public class AuthControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 400 (Bad Request)
          * - Request is rejected due to missing required fields
-         * - Response contains validation error message
+         * - Response contains a localized error message for malformed or missing JSON
          * - User's password remains unchanged
          * 
          * Test data:
@@ -1383,7 +1431,8 @@ public class AuthControllerIntegrationTest {
                                 "update-password-missing-body",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .isNotEmpty());
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1420,7 +1469,8 @@ public class AuthControllerIntegrationTest {
                                 "update-password-missing-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1459,7 +1509,8 @@ public class AuthControllerIntegrationTest {
                                 "logout",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("message.logout.success")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1495,7 +1546,8 @@ public class AuthControllerIntegrationTest {
                                 "logout-missing-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1532,7 +1584,8 @@ public class AuthControllerIntegrationTest {
                                 "logout-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1573,7 +1626,8 @@ public class AuthControllerIntegrationTest {
                                 "logout-expired-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.expired")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }

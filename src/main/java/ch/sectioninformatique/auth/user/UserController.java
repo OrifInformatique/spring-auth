@@ -3,6 +3,8 @@ package ch.sectioninformatique.auth.user;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,14 +35,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     /** Service for handling user-related operations */
     private final UserService userService;
+    private final MessageSource messageSource;
 
     /**
      * Constructs a new UserController with the required service.
      *
      * @param userService Service for handling user-related operations
      */
-    public UserController(UserService userService) {
+    public UserController(UserService userService, MessageSource messageSource) {
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -118,7 +122,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     public ResponseEntity<?> restoreDeletedUser(@PathVariable Long userId) {
         userService.restoreDeletedUser(userId);
-        return ResponseEntity.ok().body("User restored successfully");
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.restored",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
     }
 
     /**
@@ -136,7 +144,11 @@ public class UserController {
     public ResponseEntity<?> promoteToManager(@PathVariable Long userId) {
 
         userService.promoteToManager(userId);
-        return ResponseEntity.ok().body("User promoted to manager successfully");
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.promoted.manager",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
 
     }
 
@@ -155,7 +167,11 @@ public class UserController {
     public ResponseEntity<?> revokeManagerRole(@PathVariable Long userId) {
 
         userService.revokeManagerRole(userId);
-        return ResponseEntity.ok().body("Manager role revoked successfully");
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.revoked.manager",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
     }
 
     /**
@@ -172,7 +188,11 @@ public class UserController {
     @PutMapping("/{userId}/promote-admin")
     public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
         userService.promoteToAdmin(userId);
-        return ResponseEntity.ok().body("Admin role assigned successfully");
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.promoted.admin",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
     }
 
     /**
@@ -189,7 +209,11 @@ public class UserController {
     @PutMapping("/{userId}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
         userService.revokeAdminRole(userId);
-        return ResponseEntity.ok().body("Admin role revoked successfully");
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.revoked.admin",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
     }
 
     /**
@@ -206,7 +230,11 @@ public class UserController {
     @PutMapping("/{userId}/downgrade-admin")
     public ResponseEntity<?> downgradeAdminRole(@PathVariable Long userId) {
         userService.downgradeAdminRole(userId);
-        return ResponseEntity.ok().body("Admin role downgraded successfully");
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.downgraded.admin",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
     }
 
     /**
@@ -224,7 +252,14 @@ public class UserController {
     public ResponseEntity<?> delete(@PathVariable Long userId) {
         UserDto deletedUser = userService.deleteUser(userId);
         return ResponseEntity
-                .ok(Map.of("message", "User deleted successfully", "deletedUserLogin", deletedUser.getLogin()));
+            .ok(Map.of(
+                "message",
+                messageSource.getMessage(
+                    "message.user.deleted",
+                    null,
+                    LocaleContextHolder.getLocale()),
+                "deletedUserLogin",
+                deletedUser.getLogin()));
     }
 
     /**
@@ -242,6 +277,13 @@ public class UserController {
     public ResponseEntity<?> deletePermanent(@PathVariable Long userId) {
         UserDto deletedUser = userService.deletePermanentUser(userId);
         return ResponseEntity
-                .ok(Map.of("message", "User deleted permanently", "deletedUserLogin", deletedUser.getLogin()));
+            .ok(Map.of(
+                "message",
+                messageSource.getMessage(
+                    "message.user.deleted.permanent",
+                    null,
+                    LocaleContextHolder.getLocale()),
+                "deletedUserLogin",
+                deletedUser.getLogin()));
     }
 }

@@ -3,7 +3,12 @@ package ch.sectioninformatique.auth.security;
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * CustomAccessDeniedHandler is invoked when an authenticated user attempts
  * to access a resource they don't have permission for.
  */
+@SpringBootTest
 public class CustomAccessDeniedHandlerTest {
 
     private CustomAccessDeniedHandler handler;
@@ -30,26 +36,39 @@ public class CustomAccessDeniedHandlerTest {
     private MockHttpServletResponse response;
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @BeforeEach
     public void setUp() {
-        handler = new CustomAccessDeniedHandler();
+        handler = new CustomAccessDeniedHandler(messageSource);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
+        LocaleContextHolder.setLocale(java.util.Locale.getDefault());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
+    }
+
+    private String message(String key, Object... args) {
+        return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 
     /**
-     * Test: AccessDeniedException returns 403 with custom error message
-     * 
-     * Verifies that when an AccessDeniedException with a custom message is handled,
-     * the response contains HTTP 403 status, JSON content type, and the exception's message.
-     * 
-     * Test data: AccessDeniedException with "Custom access denied message"
-     * 
-     * Expected:
-     * - HTTP status: 403 Forbidden
-     * - Content-Type: application/json
-     * - Response body: ErrorDto with "Custom access denied message"
+    * Test: AccessDeniedException returns 403 with error.security.access.denied message
+    * 
+    * Verifies that when an AccessDeniedException is handled, the response contains
+    * HTTP 403 status, JSON content type, and the error.security.access.denied message.
+    * 
+    * Test data: AccessDeniedException with a non-localized message
+    * 
+    * Expected:
+    * - HTTP status: 403 Forbidden
+    * - Content-Type: application/json
+    * - Response body: ErrorDto with the error.security.access.denied message
      */
     @Test
     public void handle_withAccessDeniedException_shouldReturn403WithMessage() throws Exception {
@@ -64,7 +83,7 @@ public class CustomAccessDeniedHandlerTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Custom access denied message", errorDto.message());
+        assertEquals(message("error.security.access.denied"), errorDto.message());
     }
 
     /**
@@ -78,7 +97,7 @@ public class CustomAccessDeniedHandlerTest {
      * Expected:
      * - HTTP status: 403 Forbidden
      * - Content-Type: application/json
-     * - Response body: ErrorDto with default message "You don't have the necessary rights to perform this action"
+    * - Response body: ErrorDto with the error.security.access.denied message
      */
     @Test
     public void handle_withNullException_shouldReturn403WithDefaultMessage() throws Exception {
@@ -90,7 +109,7 @@ public class CustomAccessDeniedHandlerTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("You don't have the necessary rights to perform this action", errorDto.message());
+        assertEquals(message("error.security.access.denied"), errorDto.message());
     }
 
     /**
@@ -104,7 +123,7 @@ public class CustomAccessDeniedHandlerTest {
      * Expected:
      * - HTTP status: 403 Forbidden
      * - Content-Type: application/json
-     * - Response body: ErrorDto with default message "You don't have the necessary rights to perform this action"
+    * - Response body: ErrorDto with the error.security.access.denied message
      */
     @Test
     public void handle_withExceptionWithNullMessage_shouldReturn403WithDefaultMessage() throws Exception {
@@ -119,21 +138,21 @@ public class CustomAccessDeniedHandlerTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("You don't have the necessary rights to perform this action", errorDto.message());
+        assertEquals(message("error.security.access.denied"), errorDto.message());
     }
 
     /**
-     * Test: Response body contains valid JSON structure
-     * 
-     * Verifies that the response body is valid JSON with the expected structure,
-     * containing a "message" field with the exception message.
-     * 
-     * Test data: AccessDeniedException with "Insufficient permissions"
-     * 
-     * Expected:
-     * - Response body is valid JSON
-     * - JSON contains "message" field
-     * - Message value is "Insufficient permissions"
+    * Test: Response body contains valid JSON structure
+    * 
+    * Verifies that the response body is valid JSON with the expected structure,
+    * containing a "message" field with the error.security.access.denied message.
+    * 
+    * Test data: AccessDeniedException with a non-localized message
+    * 
+    * Expected:
+    * - Response body is valid JSON
+    * - JSON contains "message" field
+    * - Message value is the error.security.access.denied message
      */
     @Test
     public void handle_shouldReturnValidJsonStructure() throws Exception {
@@ -147,7 +166,7 @@ public class CustomAccessDeniedHandlerTest {
         String responseBody = response.getContentAsString();
         assertNotNull(responseBody);
         assertTrue(responseBody.contains("message"));
-        assertTrue(responseBody.contains("Insufficient permissions"));
+        assertTrue(responseBody.contains(message("error.security.access.denied")));
     }
 
     /**

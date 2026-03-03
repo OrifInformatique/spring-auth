@@ -22,7 +22,7 @@ import java.util.Set;
  * - Only necessary headers are allowed
  * - Environment-specific restrictions are enforced
  * 
- * Throws IllegalArgumentException if configuration is invalid.
+ * Throws an application exception if configuration is invalid.
  */
 @Configuration
 @Slf4j
@@ -72,7 +72,7 @@ public class CorsConfigurationValidator {
      * Validates CORS configuration at application startup.
      * Called automatically by Spring after bean construction.
      * 
-     * @throws IllegalArgumentException if any CORS configuration is invalid
+     * @throws SecurityExceptions.CorsConfigurationException if any CORS configuration is invalid
      */
     @PostConstruct
     public void validateCorsConfiguration() {
@@ -85,8 +85,8 @@ public class CorsConfigurationValidator {
             validateMethods();
             validateHeaders();
             log.info("✓ CORS configuration is valid and secure");
-        } catch (IllegalArgumentException e) {
-            log.error("✗ CORS configuration validation failed: {}", e.getMessage());
+        } catch (SecurityExceptions.CorsConfigurationException e) {
+            log.error("✗ CORS configuration validation failed: {}", e.getMessageKey());
             throw e;
         }
     }
@@ -105,9 +105,8 @@ public class CorsConfigurationValidator {
      */
     private void validateOrigins(boolean isDevOrTest) {
         if (allowedOrigins == null || allowedOrigins.length == 0) {
-            throw new IllegalArgumentException(
-                    "CORS allowed-origins cannot be empty. Configure at least one origin in cors.allowed-origins"
-            );
+            throw new SecurityExceptions.CorsConfigurationException(
+                    "error.cors.allowed.origins.empty");
         }
 
         Set<String> uniqueOrigins = new HashSet<>();
@@ -118,10 +117,8 @@ public class CorsConfigurationValidator {
             // Check for wildcard
             if ("*".equals(origin)) {
                 if (!isDevOrTest) {
-                    throw new IllegalArgumentException(
-                            "Wildcard origin '*' is not allowed in production. " +
-                            "Configure specific allowed origins in cors.allowed-origins"
-                    );
+                    throw new SecurityExceptions.CorsConfigurationException(
+                            "error.cors.origin.wildcard.production");
                 }
                 log.warn("⚠ Wildcard CORS origin '*' configured (allowed only in dev/test)");
                 uniqueOrigins.add(origin);
@@ -135,33 +132,32 @@ public class CorsConfigurationValidator {
 
                 // Check protocol is http or https
                 if (!("http".equals(protocol) || "https".equals(protocol))) {
-                    throw new IllegalArgumentException(
-                            "Origin '" + origin + "' uses invalid protocol '" + protocol + "'. " +
-                            "Only http and https protocols are allowed"
-                    );
+                    throw new SecurityExceptions.CorsConfigurationException(
+                            "error.cors.origin.invalid.protocol",
+                            origin,
+                            protocol);
                 }
 
                 // Check for localhost in production
                 String host = uri.getHost();
                 if (!isDevOrTest && ("localhost".equals(host) || "127.0.0.1".equals(host))) {
-                    throw new IllegalArgumentException(
-                            "Origin '" + origin + "' points to localhost. " +
-                            "Production should not allow localhost origins"
-                    );
+                    throw new SecurityExceptions.CorsConfigurationException(
+                            "error.cors.origin.localhost.production",
+                            origin);
                 }
 
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(
-                        "Origin '" + origin + "' is not a valid URL: " + e.getMessage()
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.origin.invalid.url",
+                        origin,
+                        e.getMessage());
             }
 
             // Check for duplicates
             if (!uniqueOrigins.add(origin)) {
-                throw new IllegalArgumentException(
-                        "Duplicate origin found: '" + origin + "'. " +
-                        "Remove duplicates from cors.allowed-origins"
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.origin.duplicate",
+                        origin);
             }
 
             log.debug("✓ Origin validated: {}", origin);
@@ -181,9 +177,8 @@ public class CorsConfigurationValidator {
      */
     private void validateMethods() {
         if (allowedMethods == null || allowedMethods.length == 0) {
-            throw new IllegalArgumentException(
-                    "CORS allowed-methods cannot be empty. Configure at least one method in cors.allowed-methods"
-            );
+            throw new SecurityExceptions.CorsConfigurationException(
+                    "error.cors.allowed.methods.empty");
         }
 
         Set<String> uniqueMethods = new HashSet<>();
@@ -193,18 +188,17 @@ public class CorsConfigurationValidator {
 
             // Check if method is in whitelist
             if (!ALLOWED_HTTP_METHODS.contains(method)) {
-                throw new IllegalArgumentException(
-                        "HTTP method '" + method + "' is not allowed for CORS. " +
-                        "Allowed methods: " + ALLOWED_HTTP_METHODS
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.method.not.allowed",
+                        method,
+                        ALLOWED_HTTP_METHODS);
             }
 
             // Check for duplicates
             if (!uniqueMethods.add(method)) {
-                throw new IllegalArgumentException(
-                        "Duplicate HTTP method found: '" + method + "'. " +
-                        "Remove duplicates from cors.allowed-methods"
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.method.duplicate",
+                        method);
             }
 
             log.debug("✓ Method validated: {}", method);
@@ -226,9 +220,8 @@ public class CorsConfigurationValidator {
      */
     private void validateHeaders() {
         if (allowedHeaders == null || allowedHeaders.length == 0) {
-            throw new IllegalArgumentException(
-                    "CORS allowed-headers cannot be empty. Configure at least one header in cors.allowed-headers"
-            );
+            throw new SecurityExceptions.CorsConfigurationException(
+                    "error.cors.allowed.headers.empty");
         }
 
         Set<String> uniqueHeaders = new HashSet<>();
@@ -238,28 +231,24 @@ public class CorsConfigurationValidator {
 
             // Check for wildcard
             if ("*".equals(header)) {
-                throw new IllegalArgumentException(
-                        "Wildcard header '*' is not allowed for CORS. " +
-                        "Specify individual header names in cors.allowed-headers. " +
-                        "Allowed headers: " + ALLOWED_HEADER_NAMES
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.header.wildcard.not.allowed",
+                        ALLOWED_HEADER_NAMES);
             }
 
             // Check if header is in whitelist
             if (!ALLOWED_HEADER_NAMES.contains(header)) {
-                throw new IllegalArgumentException(
-                        "Header '" + header + "' is not in the whitelist of allowed CORS headers. " +
-                        "Allowed headers: " + ALLOWED_HEADER_NAMES + ". " +
-                        "If you need a custom header, add it to CorsConfigurationValidator.ALLOWED_HEADER_NAMES"
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.header.not.allowed",
+                        header,
+                        ALLOWED_HEADER_NAMES);
             }
 
             // Check for duplicates
             if (!uniqueHeaders.add(header)) {
-                throw new IllegalArgumentException(
-                        "Duplicate header found: '" + header + "'. " +
-                        "Remove duplicates from cors.allowed-headers"
-                );
+                throw new SecurityExceptions.CorsConfigurationException(
+                        "error.cors.header.duplicate",
+                        header);
             }
 
             log.debug("Header validated: {}", header);

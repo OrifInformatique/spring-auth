@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -139,7 +140,7 @@ class UserAuthenticationProviderTest {
                 .build();
 
         String token = authenticationProvider.createToken(user);
-        when(userService.findByLogin(TEST_LOGIN)).thenThrow(new RuntimeException("User not found"));
+        when(userService.findByLogin(TEST_LOGIN)).thenThrow(new UserNotFoundException("User not found"));
         when(userService.createAzureUser(any())).thenReturn(user);
 
         // When

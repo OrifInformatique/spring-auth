@@ -8,17 +8,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ch.sectioninformatique.auth.app.exceptions.AppException;
+import ch.sectioninformatique.auth.auth.AuthExceptions;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
+import ch.sectioninformatique.auth.security.SecurityExceptions;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import java.nio.CharBuffer;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -111,7 +111,7 @@ public class UserServiceTest {
     /**
      * Test: Login fails when user doesn't exist
      * 
-     * Verifies that the login method throws AppException when attempting
+    * Verifies that the login method throws InvalidCredentialsException when attempting
      * to authenticate with an email that doesn't exist in the database.
      * 
      * Arrange:
@@ -119,11 +119,11 @@ public class UserServiceTest {
      * 
      * Act & Assert:
      * - Call userService.login() with non-existent email
-     * - Verify AppException is thrown with message "Invalid credentials"
+    * - Verify InvalidCredentialsException is thrown
      * - Error message should not reveal whether user exists (security best practice)
      */
     @Test
-    void login_UserNotFound_ThrowsAppException() {
+    void login_UserNotFound_ThrowsInvalidCredentialsException() {
         // Arrange
         String login = "nonexistent@test.com";
         String password = "password123";
@@ -131,15 +131,16 @@ public class UserServiceTest {
         when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
         // Act & Assert
-        AppException exception = assertThrows(AppException.class, 
-            () -> userService.login(new CredentialsDto(login, password.toCharArray())));
-        assertEquals("Invalid credentials", exception.getMessage());
+        assertThrows(
+            AuthExceptions.InvalidCredentialsException.class,
+            () -> userService.login(new CredentialsDto(login, password.toCharArray()))
+        );
     }
 
     /**
      * Test: Login fails with incorrect password
      * 
-     * Verifies that the login method throws AppException when the password
+    * Verifies that the login method throws InvalidCredentialsException when the password
      * doesn't match the user's hashed password.
      * 
      * Arrange:
@@ -148,11 +149,11 @@ public class UserServiceTest {
      * 
      * Act & Assert:
      * - Call userService.login() with wrong password
-     * - Verify AppException is thrown with message "Invalid credentials"
+    * - Verify InvalidCredentialsException is thrown
      * - Error message should be same as user not found (security best practice)
      */
     @Test
-    void login_InvalidPassword_ThrowsAppException() {
+    void login_InvalidPassword_ThrowsInvalidCredentialsException() {
         // Arrange
         String login = "john@test.com";
         String password = "wrongpassword";
@@ -162,9 +163,10 @@ public class UserServiceTest {
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
 
         // Act & Assert
-        AppException exception = assertThrows(AppException.class, 
-            () -> userService.login(new CredentialsDto(login, password.toCharArray())));
-        assertEquals("Invalid credentials", exception.getMessage());
+        assertThrows(
+            AuthExceptions.InvalidCredentialsException.class,
+            () -> userService.login(new CredentialsDto(login, password.toCharArray()))
+        );
     }
 
     /**
@@ -230,18 +232,18 @@ public class UserServiceTest {
      * Test: Registration fails when email already exists
      * 
      * Verifies that attempting to register with an email that already exists
-     * throws an AppException to prevent duplicate accounts.
+    * throws UserAlreadyExistsException to prevent duplicate accounts.
      * 
      * Arrange:
      * - Mock repository to return existing user with the same login
      * 
      * Act & Assert:
      * - Call userService.register() with duplicate email
-     * - Verify AppException is thrown with message indicating user already exists
+    * - Verify UserAlreadyExistsException is thrown with login context
      * - No new user is created
      */
     @Test
-    void register_LoginExists_ThrowsAppException() {
+    void register_LoginExists_ThrowsUserAlreadyExistsException() {
         // Arrange
         String login = "existing@test.com";
         String password = "password123";
@@ -252,9 +254,11 @@ public class UserServiceTest {
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(existingUser));
 
         // Act & Assert
-        AppException exception = assertThrows(AppException.class, 
-            () -> userService.register(signUpDto));
-        assertEquals("User already exists: existing@test.com", exception.getMessage());
+        UserExceptions.UserAlreadyExistsException exception = assertThrows(
+            UserExceptions.UserAlreadyExistsException.class,
+            () -> userService.register(signUpDto)
+        );
+        assertEquals("existing@test.com", exception.getLogin());
     }
 
     /**
@@ -335,9 +339,11 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> userService.promoteToManager(userId));
-        assertEquals("User not found: 1", exception.getMessage());
+        UserExceptions.UserNotFoundException exception = assertThrows(
+            UserExceptions.UserNotFoundException.class,
+            () -> userService.promoteToManager(userId)
+        );
+        assertEquals("1", exception.getLoginOrId());
     }
 
     /**
@@ -373,9 +379,11 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> userService.promoteToManager(userId));
-        assertEquals("User already manager: john@test.com", exception.getMessage());
+        UserExceptions.UserAlreadyManagerException exception = assertThrows(
+            UserExceptions.UserAlreadyManagerException.class,
+            () -> userService.promoteToManager(userId)
+        );
+        assertEquals("john@test.com", exception.getLogin());
     }
 
     /**
@@ -494,8 +502,10 @@ public class UserServiceTest {
         when(userRepository.findByLogin("user@test.com")).thenReturn(Optional.of(authenticatedUser));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-            () -> userService.deleteUser(userId));
-        assertEquals("User has insufficient rights: user@test.com", exception.getMessage());
+        SecurityExceptions.UserHasLowerRightsException exception = assertThrows(
+            SecurityExceptions.UserHasLowerRightsException.class,
+            () -> userService.deleteUser(userId)
+        );
+        assertEquals("user@test.com", exception.getLogin());
     }
 }

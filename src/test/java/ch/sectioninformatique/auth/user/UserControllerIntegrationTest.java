@@ -1,10 +1,16 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -105,6 +111,7 @@ public class UserControllerIntegrationTest {
 
                 // Set content type
                 requestType.contentType(contentType);
+                requestType.locale(LocaleContextHolder.getLocale());
 
                 // Perform request
                 var request = mockMvc.perform(requestType)
@@ -136,6 +143,22 @@ public class UserControllerIntegrationTest {
         /** UserRepository instance for user-related operations. */
         @Autowired
         private UserRepository userRepository;
+
+        @Autowired
+        private MessageSource messageSource;
+        @BeforeEach
+        public void setUp() {
+                LocaleContextHolder.setLocale(Locale.FRANCE);
+        }
+
+        @AfterEach
+        public void tearDown() {
+                LocaleContextHolder.resetLocaleContext();
+        }
+
+        private String message(String key, Object... args) {
+                return messageSource.getMessage(key, args, Locale.FRANCE);
+        }
 
         /**
          * Test: GET /users/me - Retrieve authenticated user's information
@@ -190,7 +213,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing authentication
-         * - Response contains error message
+         * - Response contains localized error message
          * - No user data is returned
          * 
          * Test data:
@@ -210,7 +233,8 @@ public class UserControllerIntegrationTest {
                                 "me-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -247,7 +271,8 @@ public class UserControllerIntegrationTest {
                                 "me-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -263,7 +288,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Token expiration validation fails
-         * - Response contains error message about expired token
+         * - Response contains localized error message about expired token
          * - No user data is returned
          * - Client should request a new token using refresh token
          * 
@@ -289,7 +314,8 @@ public class UserControllerIntegrationTest {
                                 "me-expired-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.expired")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -372,7 +398,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing authentication
-         * - Response contains error message
+         * - Response contains localized error message
          * - No user list is returned
          * 
          * Test data:
@@ -392,7 +418,8 @@ public class UserControllerIntegrationTest {
                                 "all-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -429,7 +456,8 @@ public class UserControllerIntegrationTest {
                                 "all-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -445,7 +473,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Token expiration validation fails
-         * - Response contains error message about expired token
+         * - Response contains localized error message about expired token
          * - No user list is returned
          * - Client should refresh token and retry
          * 
@@ -471,7 +499,8 @@ public class UserControllerIntegrationTest {
                                 "all-expired-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.expired")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -581,7 +610,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Step 1: Soft-delete succeeds (HTTP 200)
          * - Step 2: Restore succeeds (HTTP 200)
-         * - Response contains success message: "User restored successfully"
+         * - Response contains success message: "message.user.restored"
          * - User is marked as active again in the database
          * - User can log in after restoration
          * 
@@ -620,7 +649,8 @@ public class UserControllerIntegrationTest {
                                 "restore",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$").value("User restored successfully"));
+                                                request.andExpect(jsonPath("$")
+                                                                .value(message("message.user.restored")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -636,7 +666,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User is permanently removed from the database
-         * - Response contains confirmation message: "User deleted permanently"
+         * - Response contains confirmation message: "message.user.deleted.permanent"
          * - Response includes the deleted user's login for confirmation
          * - User cannot be restored after permanent deletion
          * 
@@ -663,7 +693,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value("User deleted permanently"))
+                                                                .value(message("message.user.deleted.permanent")))
                                                                 .andExpect(jsonPath("$.deletedUserLogin")
                                                                                 .value("test.user@test.com"));
                                         } catch (Exception e) {
@@ -681,7 +711,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from USER to MANAGER
-         * - Response contains success message: "User promoted to manager successfully"
+         * - Response contains success message: "message.user.promoted.manager"
          * - Database is updated with new role
          * - User gains MANAGER permissions immediately
          * 
@@ -709,7 +739,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(content()
-                                                                .string("User promoted to manager successfully"));
+                                                                .string(message("message.user.promoted.manager")));
 
                                                 // Assert: fetch user again and verify role changed to MANAGER
                                                 UserDto updatedUser = userService.findByLogin("test.user@test.com");
@@ -732,7 +762,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -754,7 +784,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -794,7 +825,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -834,7 +866,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -850,7 +883,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -875,7 +908,8 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", fakeUserId)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -891,7 +925,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Request is rejected because user already has MANAGER role
-         * - Response contains error message about user already being manager
+         * - Response contains localized error message about user already being manager
          * - User's role remains MANAGER (unchanged)
          * 
          * Test data:
@@ -915,7 +949,9 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-user-already-manager",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.already.manager",
+                                                                                managerDto.getLogin())));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -931,7 +967,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Request is rejected because user has ADMIN role (higher than MANAGER)
-         * - Response contains error message about conflicting role
+         * - Response contains localized error message about conflicting role
          * - User's role remains ADMIN (unchanged)
          * 
          * Test data:
@@ -954,7 +990,9 @@ public class UserControllerIntegrationTest {
                                 "promote-manager-user-already-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.already.admin",
+                                                                                adminDto.getLogin())));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -970,7 +1008,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from MANAGER to USER
-         * - Response contains success message: "Manager role revoked successfully"
+         * - Response contains success message: "message.user.revoked.manager"
          * - Database is updated with new role
          * - User loses manager permissions immediately
          * 
@@ -998,7 +1036,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(
-                                                                content().string("Manager role revoked successfully"));
+                                                                content().string(message("message.user.revoked.manager")));
 
                                                 // Assert: fetch manager again and verify role changed to USER
                                                 UserDto updatedManager = userService
@@ -1022,7 +1060,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1044,7 +1082,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1083,7 +1122,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1124,7 +1164,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1140,7 +1181,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -1163,7 +1204,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-manager-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", "9999")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1179,7 +1221,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed to ADMIN
-         * - Response contains success message: "Admin role assigned successfully"
+         * - Response contains success message: "message.user.promoted.admin"
          * - Database is updated with new role
          * - User gains all administrative permissions immediately
          * 
@@ -1206,7 +1248,7 @@ public class UserControllerIntegrationTest {
                                 "promote-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(content().string("Admin role assigned successfully"));
+                                                request.andExpect(content().string(message("message.user.promoted.admin")));
 
                                                 // Assert: fetch manager again and verify role changed to ADMIN
                                                 UserDto updatedManager = userService
@@ -1230,7 +1272,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1252,7 +1294,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1291,7 +1334,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1332,7 +1376,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1348,7 +1393,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -1373,7 +1418,8 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", fakeUserId)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1389,7 +1435,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 409 (Conflict)
          * - Request is rejected because user already has ADMIN role
-         * - Response contains error message about user already being admin
+         * - Response contains localized error message about user already being admin
          * - User's role remains ADMIN (unchanged)
          * 
          * Test data:
@@ -1413,7 +1459,9 @@ public class UserControllerIntegrationTest {
                                 "promote-admin-user-already-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.already.admin",
+                                                                                adminDto.getLogin())));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1429,7 +1477,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from ADMIN to USER
-         * - Response contains success message: "Admin role revoked successfully"
+         * - Response contains success message: "message.user.revoked.admin"
          * - Database is updated with new role
          * - User loses admin permissions immediately
          * 
@@ -1456,7 +1504,7 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(content().string("Admin role revoked successfully"));
+                                                request.andExpect(content().string(message("message.user.revoked.admin")));
 
                                                 // Assert: fetch admin again and verify role changed to USER
                                                 UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
@@ -1479,7 +1527,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1501,7 +1549,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1541,7 +1590,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1583,7 +1633,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-non-admin",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.access.denied")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1600,7 +1651,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 404 (Not Found)
          * - Request is rejected because user ID doesn't exist
-         * - Response contains error message about user not found
+         * - Response contains localized error message about user not found
          * 
          * Test data:
          * - Authenticated as: test.admin@test.com (admin user)
@@ -1623,7 +1674,8 @@ public class UserControllerIntegrationTest {
                                 "revoke-admin-user-not-found",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.user.not.found", "9999")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1639,7 +1691,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 200 (OK)
          * - User's role is changed from ADMIN to MANAGER
-         * - Response contains success message: "Admin role downgraded successfully"
+         * - Response contains success message: "message.user.downgraded.admin"
          * - Database is updated with new role
          * - User loses admin permissions but retains manager permissions
          * 
@@ -1667,7 +1719,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(
-                                                                content().string("Admin role downgraded successfully"));
+                                                                content().string(message("message.user.downgraded.admin")));
 
                                                 // Assert: fetch admin again and verify role changed to MANAGER
                                                 UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
@@ -1690,7 +1742,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User's role remains unchanged
          * 
          * Test data:
@@ -1712,7 +1764,8 @@ public class UserControllerIntegrationTest {
                                 "downgrade-admin-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1752,7 +1805,8 @@ public class UserControllerIntegrationTest {
                                 "downgrade-admin-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
 
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
@@ -1770,7 +1824,7 @@ public class UserControllerIntegrationTest {
          * - Returns HTTP 200 (OK)
          * - User is marked as deleted in the database (isDeleted = true)
          * - User record remains in database for audit/recovery purposes
-         * - Response contains success message: "User deleted successfully"
+         * - Response contains success message: "message.user.deleted"
          * - Response includes the deleted user's login for confirmation
          * - User cannot log in after soft deletion
          * 
@@ -1798,7 +1852,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value("User deleted successfully"))
+                                                                .value(message("message.user.deleted")))
                                                                 .andExpect(jsonPath("$.deletedUserLogin")
                                                                                 .value("test.user@test.com"));
 
@@ -1821,7 +1875,7 @@ public class UserControllerIntegrationTest {
          * Expected behavior:
          * - Returns HTTP 401 (Unauthorized)
          * - Request is rejected due to missing Authorization header
-         * - Response contains error message
+         * - Response contains localized error message
          * - User remains active (not deleted)
          * 
          * Test data:
@@ -1843,7 +1897,8 @@ public class UserControllerIntegrationTest {
                                 "delete-missing-authorization",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.authentication.token.invalid.or.missing")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1883,7 +1938,8 @@ public class UserControllerIntegrationTest {
                                 "delete-malformed-token",
                                 request -> {
                                         try {
-                                                request.andExpect(jsonPath("$.message").exists());
+                                                request.andExpect(jsonPath("$.message")
+                                                                .value(message("error.security.token.invalid")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }

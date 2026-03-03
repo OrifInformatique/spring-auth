@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PasswordNotReusedValidatorImpl.class)
 @Documented
 public @interface PasswordNotReused {
-    String message() default "New password must be different from current password";
+    String message() default "{validation.password.not.reused}";
 
     Class<?>[] groups() default {};
 

@@ -16,7 +16,7 @@
     - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
     - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
     - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
-    - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
+    - [1.8 Users Module (`main/java/user`)](#18-users-module-mainjavauser)
     - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
     - [1.10 Error and Exception Management (`main/java/app`)](#110-error-and-exception-management-mainjavaapp)
     - [1.11 Test Structure (`test/java`)](#111-test-structure-testjava)
@@ -81,7 +81,7 @@ graph TD
 **Tools & Dependencies:**
 
 - **Java / OpenJDK:** 21
-- **Spring Boot:** 3.3.5
+- **Spring Boot:** 3.5.8
 - **Maven:** 3.9+
 - **MariaDB:** 11.4
 - **Docker Desktop:** Latest
@@ -91,9 +91,9 @@ graph TD
 - **Spring Security:** Authentication and authorization framework
 - **Spring Data JPA:** Database access and ORM
 - **Spring OAuth2 Client:** Microsoft Entra ID (Azure AD) integration
-- **Auth0 Java-JWT (4.3.0):** JWT token generation and validation
-- **MapStruct (1.5.5):** Java bean mappings and DTO conversions
-- **Lombok (1.18.36):** Reduces boilerplate code
+- **Auth0 Java-JWT (4.4.0):** JWT token generation and validation
+- **MapStruct (1.6.3):** Java bean mappings and DTO conversions
+- **Lombok (1.18.38):** Reduces boilerplate code
 - **Spring REST Docs (3.0.1):** API documentation generation
 - **Jakarta Validation:** Bean validation and custom constraints
 - **Dotenv Java:** Environment variable management
@@ -153,7 +153,7 @@ Contains test classes for unit and integration tests.
 | `app`                      | Global error and exception handling used throughout the application.                          |
 | `auth`                     | Handles authorization processes such as login and registration.                               |
 | `security`                 | Security-related classes: JWT filters, password encoding, and authentication management.      |
-| `users`                    | Manages user profiles, roles, and permissions.                                                |
+| `user`                     | Manages user profiles, roles, and permissions.                                                |
 | `AuthApplication.java` | Main Spring Boot entry point containing the `main()` method. Run the project from this class. |
 
 ---
@@ -189,7 +189,7 @@ sequenceDiagram
         alt Public endpoint
             Controller->>Client: Return HTTP response
         else Protected endpoint
-            Controller-->>Client: 403 Forbidden (Access Denied)
+            Controller-->>Client: 401 Unauthorized (Missing or invalid authentication token)
         end
     end
 ```
@@ -246,10 +246,10 @@ sequenceDiagram
             AuthController->>Client: 200 OK with UserDto + tokens
         else Password invalid
             PasswordEncoder->>UserService: false
-            UserService-->>Client: 401 Unauthorized (Invalid credentials)
+            UserService-->>Client: 401 Unauthorized (error.authorisation.invalid.credentials)
         end
     else User not found
-        UserRepository-->>Client: 401 Unauthorized (Invalid credentials)
+        UserRepository-->>Client: 401 Unauthorized (error.authorisation.invalid.credentials)
     end
 ```
 
@@ -309,7 +309,7 @@ _Sequence Diagram showing the logout flow and token invalidation._
 
 ---
 
-### 1.8 Users Module (`main/java/users`)
+### 1.8 Users Module (`main/java/user`)
 
 ```mermaid
 classDiagram
@@ -380,7 +380,7 @@ classDiagram
         +List<String> permissions = new ArrayList<>()
     }
 
-    class SignupDto {
+    class SignUpDto {
         <<DTO>>
         +String firstName
         +String lastName
@@ -393,7 +393,7 @@ classDiagram
     class UserMapper {
         <<interface / singleton>>
         +UserDto toUserDto(User user)
-        +User signUpToUser(SignupDto signupDto)
+        +User signUpToUser(SignUpDto signUpDto)
         +List<String> authoritiesToPermissions(Collection<GrantedAuthority> authorities)
     }
 
@@ -406,7 +406,7 @@ classDiagram
     RoleEnum --> "0..*" PermissionEnum : defines
     UserMapper ..> User : uses
     UserMapper ..> UserDto : creates
-    UserMapper ..> SignupDto : uses
+    UserMapper ..> SignUpDto : uses
     User ..|> UserDetails
 ```
 
@@ -445,7 +445,7 @@ sequenceDiagram
     UserService->>UserMapper: toUserDto(user)
     UserMapper-->>UserService: UserDto
     UserService-->>UserController: UserDto
-    UserController-->>Client: ResponseEntity("User promoted to manager successfully")
+    UserController-->>Client: ResponseEntity(message.user.promoted.manager)
 ```
 
 _Sequence Diagram showing an example of the user management flow._
@@ -699,7 +699,7 @@ Example claims that can be extracted from the Azure token:
 | ------ | -------------------- | ------------- | ---------------------------------------------- |
 | POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
 | POST   | `/auth/register`     | No            | Register a new user account                    |
-| POST   | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
+| POST   | `/auth/refresh`      | No            | Refresh access token using refresh token       |
 | PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
 | POST   | `/auth/logout`       | Yes           | Logout and invalidate refresh tokens            |
 
@@ -708,7 +708,7 @@ Example claims that can be extracted from the Azure token:
 | Method | Endpoint                       | Auth Required | Description                              |
 | ------ | ------------------------------ | ------------- | ---------------------------------------- |
 | GET    | `/oauth2/authorization/azure`  | No            | Redirect to Microsoft login page         |
-| GET    | `/oauth2/success`              | No            | Callback endpoint after Azure login      |
+| GET    | `/oauth2/success`              | Yes           | Callback endpoint after Azure login      |
 
 ### 2.3 User Management Endpoints (`/users`)
 

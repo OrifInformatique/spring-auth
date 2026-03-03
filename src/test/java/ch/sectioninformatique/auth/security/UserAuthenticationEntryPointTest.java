@@ -2,8 +2,13 @@ package ch.sectioninformatique.auth.security;
 
 import ch.sectioninformatique.auth.app.errors.ErrorDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,8 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Support for various AuthenticationException types (BadCredentialsException, InsufficientAuthenticationException)
  * 
  * UserAuthenticationEntryPoint is invoked when authentication fails or is missing
- * (e.g., invalid credentials, missing token, expired token).
+ * (e.g., invalid or missing authentication token).
  */
+@SpringBootTest
 public class UserAuthenticationEntryPointTest {
 
     private UserAuthenticationEntryPoint entryPoint;
@@ -33,26 +39,36 @@ public class UserAuthenticationEntryPointTest {
     private MockHttpServletResponse response;
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @BeforeEach
     public void setUp() {
-        entryPoint = new UserAuthenticationEntryPoint();
+        entryPoint = new UserAuthenticationEntryPoint(messageSource);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
+        LocaleContextHolder.setLocale(java.util.Locale.getDefault());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
     }
 
     /**
-     * Test: AuthenticationException returns 401 with custom error message
-     * 
-     * Verifies that when an AuthenticationException with a custom message is handled,
-     * the response contains HTTP 401 status, JSON content type, and the exception's message.
-     * 
-     * Test data: BadCredentialsException with "Invalid credentials"
-     * 
-     * Expected:
-     * - HTTP status: 401 Unauthorized
-     * - Content-Type: application/json
-     * - Response body: ErrorDto with "Invalid credentials"
+    * Test: AuthenticationException returns 401 with error.security.authentication.token.invalid.or.missing message
+    * 
+    * Verifies that when an AuthenticationException with a custom message is handled,
+    * the response contains HTTP 401 status, JSON content type, and the
+    * error.security.authentication.token.invalid.or.missing message.
+    * 
+    * Test data: BadCredentialsException with a non-localized message
+    * 
+    * Expected:
+    * - HTTP status: 401 Unauthorized
+    * - Content-Type: application/json
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_withAuthenticationException_shouldReturn401WithMessage() throws Exception {
@@ -67,7 +83,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Invalid credentials", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                LocaleContextHolder.getLocale()),
+            errorDto.message());
     }
 
     /**
@@ -81,7 +102,7 @@ public class UserAuthenticationEntryPointTest {
      * Expected:
      * - HTTP status: 401 Unauthorized
      * - Content-Type: application/json
-     * - Response body: ErrorDto with "Authentication failed"
+    * - Response body: ErrorDto with the error.security.authentication.failed message
      */
     @Test
     public void commence_withNullException_shouldReturn401WithDefaultMessage() throws Exception {
@@ -93,7 +114,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Authentication failed", errorDto.message());  // Default message when authException is null
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.failed",
+                null,
+                LocaleContextHolder.getLocale()),
+            errorDto.message());  // Default message when authException is null
     }
 
     /**
@@ -107,7 +133,7 @@ public class UserAuthenticationEntryPointTest {
      * Expected:
      * - HTTP status: 401 Unauthorized
      * - Content-Type: application/json
-     * - Response body: ErrorDto with "Invalid or missing authentication token"
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_withExceptionWithNullMessage_shouldReturn401WithDefaultMessage() throws Exception {
@@ -122,21 +148,26 @@ public class UserAuthenticationEntryPointTest {
         assertEquals("application/json", response.getHeader("Content-Type"));
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Invalid or missing authentication token", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                LocaleContextHolder.getLocale()),
+            errorDto.message());
     }
 
     /**
      * Test: Response body contains valid JSON structure
      * 
      * Verifies that the response body is valid JSON with the expected structure,
-     * containing a "message" field with the exception message.
-     * 
-     * Test data: BadCredentialsException with "Token expired"
+    * containing a "message" field with the error.security.authentication.token.invalid.or.missing message.
+    * 
+    * Test data: BadCredentialsException with a non-localized message
      * 
      * Expected:
      * - Response body is valid JSON
      * - JSON contains "message" field
-     * - Message value is "Token expired"
+    * - Message value is the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_shouldReturnValidJsonStructure() throws Exception {
@@ -150,7 +181,11 @@ public class UserAuthenticationEntryPointTest {
         String responseBody = response.getContentAsString();
         assertNotNull(responseBody);
         assertTrue(responseBody.contains("message"));
-        assertTrue(responseBody.contains("Token expired"));
+        assertTrue(responseBody.contains(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                LocaleContextHolder.getLocale())));
     }
 
     /**
@@ -203,11 +238,11 @@ public class UserAuthenticationEntryPointTest {
      * Verifies that InsufficientAuthenticationException (thrown when authentication
      * is required but not provided) is handled correctly with its custom message.
      * 
-     * Test data: InsufficientAuthenticationException with "Full authentication is required"
+    * Test data: InsufficientAuthenticationException with a non-localized message
      * 
      * Expected:
      * - HTTP status: 401 Unauthorized
-     * - Response body: ErrorDto with "Full authentication is required"
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_withInsufficientAuthenticationException_shouldReturn401() throws Exception {
@@ -221,7 +256,12 @@ public class UserAuthenticationEntryPointTest {
         assertEquals(401, response.getStatus());
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Full authentication is required", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                LocaleContextHolder.getLocale()),
+            errorDto.message());
     }
 
     /**
@@ -234,7 +274,7 @@ public class UserAuthenticationEntryPointTest {
      * 
      * Expected:
      * - HTTP status: 401 Unauthorized
-     * - Response body: ErrorDto with "Invalid or missing authentication token"
+    * - Response body: ErrorDto with the error.security.authentication.token.invalid.or.missing message
      */
     @Test
     public void commence_shouldHandleEmptyExceptionMessage() throws Exception {
@@ -248,6 +288,11 @@ public class UserAuthenticationEntryPointTest {
         assertEquals(401, response.getStatus());
 
         ErrorDto errorDto = objectMapper.readValue(response.getContentAsString(), ErrorDto.class);
-        assertEquals("Invalid or missing authentication token", errorDto.message());
+        assertEquals(
+            messageSource.getMessage(
+                "error.security.authentication.token.invalid.or.missing",
+                null,
+                LocaleContextHolder.getLocale()),
+            errorDto.message());
     }
 }

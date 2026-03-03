@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
@@ -54,6 +55,7 @@ public class AuthController {
 
         private final UserService userService;
         private final UserAuthenticationProvider userAuthenticationProvider;
+        private final MessageSource messageSource;
 
         /*
          * Refresh token lifetime (e.g., "30d" for 30 days), configured via environment
@@ -121,9 +123,7 @@ public class AuthController {
                 DecodedJWT jwt = userAuthenticationProvider.validateRefreshToken(refreshToken);
                 String login = jwt.getSubject();
 
-                if (!userService.validateRefreshToken(login, refreshToken)) {
-                        throw new AppException("Invalid refresh token", HttpStatus.UNAUTHORIZED);
-                }
+                userService.assertValidRefreshToken(login, refreshToken);
 
                 UserDto user = userService.findByLogin(login);
 
@@ -197,12 +197,21 @@ public class AuthController {
                 UserDto currentUser = (UserDto) authentication.getPrincipal();
 
                 if (currentUser == null) {
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                        .body(messageSource.getMessage(
+                                                        "error.security.token.invalid",
+                                                        null,
+                                                        LocaleContextHolder.getLocale()));
                 }
 
                 userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
 
-                return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+                return ResponseEntity.ok(Map.of(
+                                "message",
+                                messageSource.getMessage(
+                                                "message.password.updated",
+                                                null,
+                                                LocaleContextHolder.getLocale())));
         }
 
         /**
@@ -264,6 +273,11 @@ public class AuthController {
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .body(Map.of("message", "Logged out successfully"));
+                                .body(Map.of(
+                                                "message",
+                                                messageSource.getMessage(
+                                                                "message.logout.success",
+                                                                null,
+                                                                LocaleContextHolder.getLocale())));
         }
 }

@@ -19,7 +19,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
-import ch.sectioninformatique.auth.security.SecurityExceptions.SecurityException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -273,24 +273,24 @@ public class UserAuthenticationProvider {
             log.debug("Built authorities for user {}: {}", user.getLogin(), authorities);
 
             return new UsernamePasswordAuthenticationToken(user, null, authorities);
-        } catch (Exception e) {
+        } catch (UserNotFoundException e) {
             // If user doesn't exist, create a new Azure user
             log.debug("User not found, creating new Azure user: {}", decoded.getSubject());
             DecodedJWT decodedAzure = JWT.decode(token);
             String issuer = decodedAzure.getIssuer();
             // Only verify issuer if both issuer and azureUri are present
             if (issuer != null && azureUri != null && !issuer.equals(azureUri)) {
-                throw new SecurityException("Token not from trusted Azure tenant");
+                throw new SecurityExceptions.TokenNotFromTrustedTenantException();
             }
 
             String firstName = decodedAzure.getClaim("firstName").asString();
             String lastName = decodedAzure.getClaim("lastName").asString();
 
             if (firstName == null || firstName.isBlank()) {
-                throw new SecurityException("JWT missing required claim: firstName");
+                throw new SecurityExceptions.MissingJwtClaimException("firstName");
             }
             if (lastName == null || lastName.isBlank()) {
-                throw new SecurityException("JWT missing required claim: lastName");
+                throw new SecurityExceptions.MissingJwtClaimException("lastName");
             }
 
             UserDto newUser = UserDto.builder()
