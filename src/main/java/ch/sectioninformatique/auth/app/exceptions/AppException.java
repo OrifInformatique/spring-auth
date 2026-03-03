@@ -11,23 +11,12 @@ public class AppException extends RuntimeException {
     private final HttpStatus status;
 
     /**
-     * Constructs a new AppException with a message
+     * Constructs a new AppException with a specific HTTP status.
      *
-     * @param message The error message
+     * @param status     The HTTP status code to associate with this exception
      */
-    public AppException(String message) {
-        super(message);
-        this.status = null; // default
-    }
-
-    /**
-     * Constructs a new AppException with a message and specific HTTP status.
-     *
-     * @param message The error message
-     * @param status  The HTTP status code to associate with this exception
-     */
-    public AppException(String message, HttpStatus status) {
-        super(message);
+    public AppException(HttpStatus status) {
+        super();
         this.status = status;
     }
 
@@ -39,4 +28,5 @@ public class AppException extends RuntimeException {
     public HttpStatus getStatus() {
         return status;
     }
+
 }
