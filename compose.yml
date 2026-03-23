@@ -18,10 +18,10 @@ services:
       SPRING_PROFILES_ACTIVE: "${ENVIRONMENT}"
       PORT: "${PORT}"
       # Prod database SPRING_DATASOURCE_URL has to be set in the production environment
-      DEV_SPRING_DATASOURCE_URL: "${DEV_SPRING_DATASOURCE_URL}"
+      DEV_SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/dev_db
       TEST_SPRING_DATASOURCE_URL: "${TEST_SPRING_DATASOURCE_URL}"
-      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
-      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY: "${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}"
       SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY: "${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}"
     ports:
@@ -36,7 +36,7 @@ services:
     container_name: "spring-auth-mariadb"
     image: mariadb:11.4
     environment:
-      MARIADB_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MARIADB_ROOT_PASSWORD: pwd
       MARIADB_DATABASE: "${ENVIRONMENT}_db"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
