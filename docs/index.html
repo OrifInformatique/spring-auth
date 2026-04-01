@@ -775,13 +775,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 207
+Content-Length: 200
 
 {
-  "message" : "login: ne doit pas être vide",
-  "timestamp" : "2026-02-25T10:44:42.567098547",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:02.83966258",
   "fieldErrors" : {
     "login" : "Login is required"
   },
@@ -829,13 +829,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 211
+Content-Length: 202
 
 {
-  "message" : "password: ne doit pas être nul",
-  "timestamp" : "2026-02-25T10:44:43.217512294",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:03.57506874",
   "fieldErrors" : {
     "password" : "Password is required"
   },
@@ -887,10 +887,10 @@ X-Frame-Options: DENY
 Content-Length: 236
 
 {
-  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
-  "timestamp" : "2026-02-25T10:44:42.022411371",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:02.219851777",
   "fieldErrors" : {
     "login" : "Login must be a valid email format"
   },
@@ -1026,13 +1026,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 283
+Content-Length: 239
 
 {
-  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
-  "timestamp" : "2026-02-25T10:44:41.211724127",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:01.101087559",
   "fieldErrors" : {
     "login" : "Login must be a valid email format"
   },
@@ -1081,7 +1081,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 136
+Content-Length: 137
 
 {
   "error" : "Unauthorized",
@@ -1189,7 +1189,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 136
+Content-Length: 137
 
 {
   "error" : "Unauthorized",
@@ -1258,24 +1258,11 @@ Content-Length: 137
 <div class="paragraph">
 <p>This is an example output for the <code>POST /auth/register</code> endpoint.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 120
-Accept-Language: fr-fr
-Host: localhost:8080
-
-{
-  "firstName" : "Test",
-  "lastName" : "NewUser",
-  "login" : "test.newuser@test.com",
-  "password" : "testPassword"
-}</code></pre>
+<p>Unresolved directive in index.adoc - include::auth/register/http-request.adoc[]</p>
 </div>
-</div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
@@ -1348,13 +1335,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 214
+Content-Length: 205
 
 {
-  "message" : "firstName: ne doit pas être vide",
-  "timestamp" : "2026-02-25T10:44:41.15362169",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:01.042945912",
   "fieldErrors" : {
     "firstName" : "First name is required"
   },
@@ -1404,13 +1391,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 242
+Content-Length: 218
 
 {
-  "message" : "lastName: {validation.signup.lastName.required}",
-  "timestamp" : "2026-02-25T10:44:40.86597445",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:00.69639525",
   "fieldErrors" : {
     "lastName" : "Last name is required"
   },
@@ -1460,13 +1447,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 207
+Content-Length: 201
 
 {
-  "message" : "login: ne doit pas être vide",
-  "timestamp" : "2026-02-25T10:44:42.195991088",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:02.424072604",
   "fieldErrors" : {
     "login" : "Login is required"
   },
@@ -1516,13 +1503,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 211
+Content-Length: 203
 
 {
-  "message" : "password: ne doit pas être nul",
-  "timestamp" : "2026-02-25T10:44:41.970297385",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:02.157975689",
   "fieldErrors" : {
     "password" : "Password is required"
   },
@@ -1573,13 +1560,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 283
+Content-Length: 238
 
 {
-  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
-  "timestamp" : "2026-02-25T10:44:43.741672037",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:04.00288438",
   "fieldErrors" : {
     "login" : "Login must be a valid email"
   },
@@ -1717,13 +1704,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 285
+Content-Length: 240
 
 {
-  "message" : "firstName: doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\"",
-  "timestamp" : "2026-02-25T10:44:42.824029173",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:03.090352575",
   "fieldErrors" : {
     "firstName" : "First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
   },
@@ -1774,13 +1761,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 283
+Content-Length: 238
 
 {
-  "message" : "lastName: doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\"",
-  "timestamp" : "2026-02-25T10:44:43.791725449",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:04.06543636",
   "fieldErrors" : {
     "lastName" : "Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
   },
@@ -1831,13 +1818,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 283
+Content-Length: 239
 
 {
-  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
-  "timestamp" : "2026-02-25T10:44:41.354523765",
   "status" : 400,
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-04-01T11:42:01.284372028",
   "fieldErrors" : {
     "login" : "Login must be a valid email"
   },
@@ -1919,24 +1906,11 @@ Content-Length: 181
 <div class="paragraph">
 <p>This is an example output when the login provided already exists.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">request</div>
-<div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 111
-Accept-Language: fr-fr
-Host: localhost:8080
-
-{
-  "firstName" : "Test",
-  "lastName" : "User",
-  "login" : "test.user@test.com",
-  "password" : "Test1234!"
-}</code></pre>
+<p>Unresolved directive in index.adoc - include::auth/register-duplicate-login/http-request.adoc[]</p>
 </div>
-</div>
-<div class="listingblock">
+<div class="paragraph">
 <div class="title">response</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 409 Conflict
@@ -2124,8 +2098,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2207,7 +2181,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzcyMDE2MjgxLCJleHAiOjE3NzIwMTYyODF9.qkV6qj7lyQ9hd1pwXqNY3ilz6vhd861sONHqcwQnktM; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc1MDQzNzIxLCJleHAiOjE3NzUwNDM3MjF9.GhWBlXuuX1-heMHH70o6T2M-ggNM50zL9ElJ694Ignc; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2445,8 +2419,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2485,8 +2459,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Le jeton a expiré",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Le jeton a expiré"
 }</code></pre>
 </div>
 </div>
@@ -2641,8 +2615,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2681,8 +2655,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Le jeton a expiré",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Le jeton a expiré"
 }</code></pre>
 </div>
 </div>
@@ -2916,8 +2890,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3058,7 +3032,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 165
+Content-Length: 166
 
 {
   "error" : "Conflict",
@@ -3101,7 +3075,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 162
+Content-Length: 161
 
 {
   "error" : "Conflict",
@@ -3229,8 +3203,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3442,8 +3416,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3703,8 +3677,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3919,8 +3893,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -4045,8 +4019,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
