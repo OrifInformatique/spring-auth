@@ -10,6 +10,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.stereotype.Component;
@@ -44,6 +46,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * Used for writing JSON error responses when token verification fails.
      */
     private final ObjectMapper mapper;
+
+    /**
+     * Message source for localized error messages.
+     */
+    private final MessageSource messageSource;
 
     /**
      * Processes each incoming request to validate JWT tokens.
@@ -93,10 +100,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.setContentType("application/json;charset=UTF-8");
 
             String message = switch (e.getClass().getSimpleName()) {
-                case "TokenExpiredException" -> "Token has expired";
-                case "InvalidClaimException" -> "Token contains invalid claims";
-                case "SignatureVerificationException" -> "Token signature is invalid";
-                default -> "Invalid JWT token";
+                case "TokenExpiredException" -> messageSource.getMessage(
+                    "error.security.token.expired",
+                    null,
+                    LocaleContextHolder.getLocale()
+                );
+                case "InvalidClaimException" -> messageSource.getMessage(
+                    "error.security.token.invalid.claims",
+                    null,
+                    LocaleContextHolder.getLocale()
+                );
+                case "SignatureVerificationException" -> messageSource.getMessage(
+                    "error.security.token.invalid.signature",
+                    null,
+                    LocaleContextHolder.getLocale()
+                );
+                default -> messageSource.getMessage(
+                    "error.security.token.invalid",
+                    null,
+                    LocaleContextHolder.getLocale()
+                );
             };
 
             log.debug("JWT validation failed: {}", message, e);

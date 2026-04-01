@@ -16,7 +16,7 @@
     - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
     - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
     - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
-    - [1.8 Users Module (`main/java/users`)](#18-users-module-mainjavausers)
+    - [1.8 Users Module (`main/java/user`)](#18-users-module-mainjavauser)
     - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
     - [1.10 Error and Exception Management (`main/java/app`)](#110-error-and-exception-management-mainjavaapp)
     - [1.11 Test Structure (`test/java`)](#111-test-structure-testjava)
@@ -81,7 +81,7 @@ graph TD
 **Tools & Dependencies:**
 
 - **Java / OpenJDK:** 21
-- **Spring Boot:** 3.3.5
+- **Spring Boot:** 3.5.8
 - **Maven:** 3.9+
 - **MariaDB:** 11.4
 - **Docker Desktop:** Latest
@@ -91,9 +91,9 @@ graph TD
 - **Spring Security:** Authentication and authorization framework
 - **Spring Data JPA:** Database access and ORM
 - **Spring OAuth2 Client:** Microsoft Entra ID (Azure AD) integration
-- **Auth0 Java-JWT (4.3.0):** JWT token generation and validation
-- **MapStruct (1.5.5):** Java bean mappings and DTO conversions
-- **Lombok (1.18.36):** Reduces boilerplate code
+- **Auth0 Java-JWT (4.4.0):** JWT token generation and validation
+- **MapStruct (1.6.3):** Java bean mappings and DTO conversions
+- **Lombok (1.18.38):** Reduces boilerplate code
 - **Spring REST Docs (3.0.1):** API documentation generation
 - **Jakarta Validation:** Bean validation and custom constraints
 - **Dotenv Java:** Environment variable management
@@ -153,7 +153,7 @@ Contains test classes for unit and integration tests.
 | `app`                      | Global error and exception handling used throughout the application.                          |
 | `auth`                     | Handles authorization processes such as login and registration.                               |
 | `security`                 | Security-related classes: JWT filters, password encoding, and authentication management.      |
-| `users`                    | Manages user profiles, roles, and permissions.                                                |
+| `user`                     | Manages user profiles, roles, and permissions.                                                |
 | `AuthApplication.java` | Main Spring Boot entry point containing the `main()` method. Run the project from this class. |
 
 ---
@@ -189,7 +189,7 @@ sequenceDiagram
         alt Public endpoint
             Controller->>Client: Return HTTP response
         else Protected endpoint
-            Controller-->>Client: 403 Forbidden (Access Denied)
+            Controller-->>Client: 401 Unauthorized (Missing or invalid authentication token)
         end
     end
 ```
@@ -246,10 +246,10 @@ sequenceDiagram
             AuthController->>Client: 200 OK with UserDto + tokens
         else Password invalid
             PasswordEncoder->>UserService: false
-            UserService-->>Client: 401 Unauthorized (Invalid credentials)
+            UserService-->>Client: 401 Unauthorized (error.authorisation.invalid.credentials)
         end
     else User not found
-        UserRepository-->>Client: 401 Unauthorized (Invalid credentials)
+        UserRepository-->>Client: 401 Unauthorized (error.authorisation.invalid.credentials)
     end
 ```
 
@@ -278,18 +278,38 @@ sequenceDiagram
 ```
 _Sequence Diagram showing an example of the refresh token workflow._
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant template_frontback
+    participant spring-auth
+    participant database
+
+    Client->>template_frontback: POST /auth/logout (Authorization: Bearer)
+    template_frontback->>spring-auth: POST /auth/logout (Authorization: Bearer)
+    spring-auth->>database: delete all refresh tokens for user
+    spring-auth-->>template_frontback: 200 OK (Logged out)
+    template_frontback-->>Client: 200 OK
+```
+_Sequence Diagram showing the logout flow and token invalidation._
+
 | File                    | Description                                               |
 | ----------------------- | --------------------------------------------------------- |
 | `AuthController.java`   | Controller handling user authentication and registration. |
 | `CredentialsDto.java`   | Data Transfer Object (DTO) for login credentials.         |
-| `NewPasswordDto.java`   | DTO for handling new password requests.                   |
+| `PasswordUpdateDto.java` | DTO for handling password update requests.               |
+| `RefreshRequestDto.java` | DTO for refresh token requests.                          |
+| `TokenResponseDto.java` | DTO for token responses (access token).                   |
+| `RefreshToken.java`     | Entity class for storing hashed refresh tokens.           |
+| `RefreshTokenRepository.java` | Repository for refresh token database operations.  |
 | `OAuth2Controller.java` | Controller handling OAuth2 authentication flows.          |
 | `PasswordConfig.java`   | Configuration class for password policies and encryption. |
+| `PasswordNotReused.java` | Custom validation constraint for password reuse checks.   |
 | `SignUpDto.java`        | DTO for registration functionalities.                     |
 
 ---
 
-### 1.8 Users Module (`main/java/users`)
+### 1.8 Users Module (`main/java/user`)
 
 ```mermaid
 classDiagram
@@ -360,7 +380,7 @@ classDiagram
         +List<String> permissions = new ArrayList<>()
     }
 
-    class SignupDto {
+    class SignUpDto {
         <<DTO>>
         +String firstName
         +String lastName
@@ -373,7 +393,7 @@ classDiagram
     class UserMapper {
         <<interface / singleton>>
         +UserDto toUserDto(User user)
-        +User signUpToUser(SignupDto signupDto)
+        +User signUpToUser(SignUpDto signUpDto)
         +List<String> authoritiesToPermissions(Collection<GrantedAuthority> authorities)
     }
 
@@ -386,7 +406,7 @@ classDiagram
     RoleEnum --> "0..*" PermissionEnum : defines
     UserMapper ..> User : uses
     UserMapper ..> UserDto : creates
-    UserMapper ..> SignupDto : uses
+    UserMapper ..> SignUpDto : uses
     User ..|> UserDetails
 ```
 
@@ -425,10 +445,78 @@ sequenceDiagram
     UserService->>UserMapper: toUserDto(user)
     UserMapper-->>UserService: UserDto
     UserService-->>UserController: UserDto
-    UserController-->>Client: ResponseEntity("User promoted to manager successfully")
+    UserController-->>Client: ResponseEntity(message.user.promoted.manager)
 ```
 
 _Sequence Diagram showing an example of the user management flow._
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SecurityLayer
+    participant UserController
+    participant UserService
+    participant UserRepository
+
+    %% /users/{userId}/promote-admin
+    Client->>SecurityLayer: /users/{userId}/promote-admin
+    SecurityLayer->>UserController: Requires ADMIN role
+    UserController->>UserService: promoteToAdmin(userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: save(user with ADMIN role)
+    UserService-->>UserController: confirmation
+    UserController-->>Client: 200 OK (Admin role assigned)
+
+    %% /users/{userId}/revoke-admin and /downgrade-admin
+    Client->>SecurityLayer: /users/{userId}/revoke-admin or /downgrade-admin
+    SecurityLayer->>UserController: Requires ADMIN role
+    UserController->>UserService: revokeAdminRole or downgradeAdminRole (userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: save(user with downgraded role)
+    UserService-->>UserController: confirmation
+    UserController-->>Client: 200 OK (Admin role revoked/downgraded)
+```
+_Sequence Diagram showing admin role assignment and revocation._
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SecurityLayer
+    participant UserController
+    participant UserService
+    participant UserRepository
+
+    %% Soft delete
+    Client->>SecurityLayer: DELETE /users/{userId}
+    SecurityLayer->>UserController: Requires user:delete
+    UserController->>UserService: deleteUser(userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: mark deleted_at
+    UserService-->>UserController: deleted user info
+    UserController-->>Client: 200 OK (soft deleted)
+
+    %% Restore
+    Client->>SecurityLayer: PUT /users/{userId}/restore
+    SecurityLayer->>UserController: Requires user:update
+    UserController->>UserService: restoreDeletedUser(userId)
+    UserService->>UserRepository: findById(userId)
+    UserRepository-->>UserService: User
+    UserService->>UserRepository: clear deleted_at
+    UserService-->>UserController: restored user info
+    UserController-->>Client: 200 OK (restored)
+
+    %% Permanent delete
+    Client->>SecurityLayer: DELETE /users/{userId}/permanent
+    SecurityLayer->>UserController: Requires user:delete
+    UserController->>UserService: deletePermanentUser(userId)
+    UserService->>UserRepository: deleteById(userId)
+    UserService-->>UserController: confirmation
+    UserController-->>Client: 200 OK (permanently deleted)
+```
+_Sequence Diagram showing soft delete, restore, and permanent delete._
 
 | File                  | Description                                                                        |
 | --------------------- | ---------------------------------------------------------------------------------- |
@@ -460,21 +548,22 @@ _Sequence Diagram showing an example of the user management flow._
 
 **Exceptions:**
 
-| File                                      | Description                                                              |
-| ----------------------------------------- | ------------------------------------------------------------------------ |
-| `AppException.java`                       | Base custom exception class for application-specific errors.             |
-| `CustomException.java`                    | Custom exception with HTTP status code support.                          |
-| `GlobalExceptionHandler.java`             | Global exception handler for REST API endpoints (replaces deprecated).   |
-| `InvalidCredentialsException.java`        | Thrown when login credentials are invalid.                               |
-| `RoleNotFoundException.java`              | Thrown when a requested role is not found in the database.               |
-| `SecurityException.java`                  | Security-related exceptions.                                             |
-| `UnauthorizedActionException.java`        | Thrown when a user attempts an action without proper authorization.      |
-| `UserAlreadyAdminException.java`          | Thrown when attempting to promote a user who is already an admin.        |
-| `UserAlreadyExistsException.java`         | Thrown when attempting to register with an existing login.               |
-| `UserAlreadyManagerException.java`        | Thrown when attempting to promote a user who is already a manager.       |
-| `UserAlreadyRegularException.java`        | Thrown when attempting to downgrade a user who is already a regular user. |
-| `UserHasLowerRightsException.java`        | Thrown when a user tries to modify another user with higher privileges.  |
-| `UserNotFoundException.java`              | Thrown when a requested user is not found in the database.               |
+Exceptions are organized within container classes for better organization:
+
+| Container Class | Nested Exception | Description |
+| --- | --- | --- |
+| `AppException.java` | `AppException` | Base custom exception class for application-specific errors. |
+| `GlobalExceptionHandler.java` | | Global exception handler for REST API endpoints. |
+| `AuthExceptions.java` | `InvalidCredentialsException` | Thrown when login credentials are invalid. |
+| `SecurityExceptions.java` | `RoleNotFoundException` | Thrown when a requested role is not found in the database. |
+| `SecurityExceptions.java` | `SecurityException` | Security-related exceptions. |
+| `SecurityExceptions.java` | `UnauthorizedActionException` | Thrown when a user attempts an action without proper authorization. |
+| `SecurityExceptions.java` | `UserHasLowerRightsException` | Thrown when a user tries to modify another user with higher privileges. |
+| `UserExceptions.java` | `UserAlreadyExistsException` | Thrown when attempting to register with an existing login. |
+| `UserExceptions.java` | `UserNotFoundException` | Thrown when a requested user is not found in the database. |
+| `UserExceptions.java` | `UserAlreadyAdminException` | Thrown when attempting to promote a user who is already an admin. |
+| `UserExceptions.java` | `UserAlreadyManagerException` | Thrown when attempting to promote a user who is already a manager. |
+| `UserExceptions.java` | `UserAlreadyRegularException` | Thrown when attempting to downgrade a user who is already a regular user. |
 
 ---
 
@@ -610,15 +699,16 @@ Example claims that can be extracted from the Azure token:
 | ------ | -------------------- | ------------- | ---------------------------------------------- |
 | POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
 | POST   | `/auth/register`     | No            | Register a new user account                    |
-| GET    | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
+| POST   | `/auth/refresh`      | No            | Refresh access token using refresh token       |
 | PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
+| POST   | `/auth/logout`       | Yes           | Logout and invalidate refresh tokens            |
 
 ### 2.2 OAuth2 Endpoints (`/oauth2`)
 
 | Method | Endpoint                       | Auth Required | Description                              |
 | ------ | ------------------------------ | ------------- | ---------------------------------------- |
 | GET    | `/oauth2/authorization/azure`  | No            | Redirect to Microsoft login page         |
-| GET    | `/oauth2/success`              | No            | Callback endpoint after Azure login      |
+| GET    | `/oauth2/success`              | Yes           | Callback endpoint after Azure login      |
 
 ### 2.3 User Management Endpoints (`/users`)
 
@@ -630,9 +720,10 @@ Example claims that can be extracted from the Azure token:
 | GET    | `/users/deleted`                | `user:read`         | Get only soft-deleted users                  |
 | PUT    | `/users/{userId}/restore`       | `user:update`       | Restore a soft-deleted user                  |
 | PUT    | `/users/{userId}/promote-manager` | `user:update`     | Promote user to MANAGER role                 |
-| PUT    | `/users/{userId}/downgrade-manager` | `user:update`   | Downgrade manager to USER role               |
-| PUT    | `/users/{userId}/promote-admin` | `user:update`       | Promote user to ADMIN role                   |
-| PUT    | `/users/{userId}/downgrade-admin` | `user:update`     | Downgrade admin to MANAGER role              |
+| PUT    | `/users/{userId}/revoke-manager` | `user:update`      | Revoke MANAGER role from user                |
+| PUT    | `/users/{userId}/promote-admin` | `ADMIN` role        | Promote user to ADMIN role                   |
+| PUT    | `/users/{userId}/revoke-admin` | `ADMIN` role         | Revoke ADMIN role from user                  |
+| PUT    | `/users/{userId}/downgrade-admin` | `ADMIN` role       | Downgrade admin to MANAGER role              |
 | DELETE | `/users/{userId}`               | `user:delete`       | Soft delete a user (marks as deleted)        |
 | DELETE | `/users/{userId}/permanent`     | `user:delete`       | Permanently delete a user from database      |
 

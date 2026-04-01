@@ -513,7 +513,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_1_4_update_password">1.4 Update Password</a>
 <ul class="sectlevel3">
-<li><a href="#_1_4_1_error_response_400_bad_request">1.4.1 Error Response - 400 - Bad Request</a>
+<li><a href="#_1_4_1_error_response_401_unauthorized">1.4.1 Error Response - 401 - Unauthorized</a>
 <ul class="sectlevel4">
 <li><a href="#_1_4_1_1_missing_body">1.4.1.1 Missing Body</a></li>
 </ul>
@@ -559,20 +559,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel4">
 <li><a href="#_2_5_1_1_missing_authorization_header">2.5.1.1 Missing Authorization Header</a></li>
 <li><a href="#_2_5_1_2_malformed_token">2.5.1.2 Malformed Token</a></li>
+<li><a href="#_2_5_1_1_missing_authorization_header">2.5.1.1 Missing Authorization Header</a></li>
+<li><a href="#_2_5_1_2_malformed_token">2.5.1.2 Malformed Token</a></li>
 </ul>
 </li>
 <li><a href="#_2_5_2_error_response_403_forbidden">2.5.2 Error Response - 403 - Forbidden</a>
+<li><a href="#_2_5_2_error_response_403_forbidden">2.5.2 Error Response - 403 - Forbidden</a>
 <ul class="sectlevel4">
+<li><a href="#_2_5_2_1_non_admin_user_promote_user_to_manager">2.5.2.1 Non-Admin User - Promote User to Manager</a></li>
 <li><a href="#_2_5_2_1_non_admin_user_promote_user_to_manager">2.5.2.1 Non-Admin User - Promote User to Manager</a></li>
 </ul>
 </li>
 <li><a href="#_2_5_3_error_response_404_not_found">2.5.3 Error Response - 404 - Not Found</a>
+<li><a href="#_2_5_3_error_response_404_not_found">2.5.3 Error Response - 404 - Not Found</a>
 <ul class="sectlevel4">
+<li><a href="#_2_5_3_1_user_not_found">2.5.3.1 User Not Found</a></li>
 <li><a href="#_2_5_3_1_user_not_found">2.5.3.1 User Not Found</a></li>
 </ul>
 </li>
 <li><a href="#_2_5_4_error_response_409_conflict">2.5.4 Error Response - 409 - Conflict</a>
+<li><a href="#_2_5_4_error_response_409_conflict">2.5.4 Error Response - 409 - Conflict</a>
 <ul class="sectlevel4">
+<li><a href="#_2_5_4_1_user_already_manager">2.5.4.1 User Already Manager</a></li>
+<li><a href="#_2_5_4_2_user_already_admin">2.5.4.2 User Already Admin</a></li>
 <li><a href="#_2_5_4_1_user_already_manager">2.5.4.1 User Already Manager</a></li>
 <li><a href="#_2_5_4_2_user_already_admin">2.5.4.2 User Already Admin</a></li>
 </ul>
@@ -687,6 +696,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 64
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -710,7 +720,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 458
+Content-Length: 514
 
 {
   "id" : 1,
@@ -720,7 +730,7 @@ Content-Length: 458
   "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5MDIxMTEsImV4cCI6MTc2ODkwMjQxMSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.ohuWFVppWEC2ZJ-26pv4_1YACtJL6SzjsVhx-nS9PcQ",
   "deleted" : false,
   "mainRole" : "USER",
-  "permissions" : [ ]
+  "permissions" : [ "ROLE_USER", "user:read" ]
 }</code></pre>
 </div>
 </div>
@@ -743,6 +753,7 @@ Content-Length: 458
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 30
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -764,9 +775,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 203
+Content-Length: 207
 
 {
+  "message" : "login: ne doit pas être vide",
+  "timestamp" : "2026-02-25T10:44:42.567098547",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "Login is required"
   },
@@ -792,6 +807,7 @@ Content-Length: 203
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 36
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -813,9 +829,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 215
+Content-Length: 211
 
 {
+  "message" : "password: ne doit pas être nul",
+  "timestamp" : "2026-02-25T10:44:43.217512294",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "password" : "Password is required"
   },
@@ -841,6 +861,7 @@ Content-Length: 215
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 66
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -866,6 +887,10 @@ X-Frame-Options: DENY
 Content-Length: 236
 
 {
+  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
+  "timestamp" : "2026-02-25T10:44:42.022411371",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "Login must be a valid email format"
   },
@@ -890,6 +915,7 @@ Content-Length: 236
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -907,7 +933,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 339
 
 {
   "error" : "Bad Request",
@@ -932,6 +958,7 @@ Content-Length: 152
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 53
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {"login":"test.user@test.com", "password":"Test1234!"</code></pre>
@@ -951,7 +978,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 167
+Content-Length: 304
 
 {
   "error" : "Bad Request",
@@ -976,6 +1003,7 @@ Content-Length: 167
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 57
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -998,9 +1026,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 237
+Content-Length: 283
 
 {
+  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
+  "timestamp" : "2026-02-25T10:44:41.211724127",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "Login must be a valid email format"
   },
@@ -1026,6 +1058,7 @@ Content-Length: 237
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 66
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1048,7 +1081,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 136
 
 {
   "error" : "Unauthorized",
@@ -1079,6 +1112,7 @@ Content-Length: 134
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 64
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1132,6 +1166,7 @@ Content-Length: 181
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 69
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1154,7 +1189,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 136
 
 {
   "error" : "Unauthorized",
@@ -1179,6 +1214,7 @@ Content-Length: 134
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 72
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1201,7 +1237,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 134
+Content-Length: 137
 
 {
   "error" : "Unauthorized",
@@ -1228,6 +1264,7 @@ Content-Length: 134
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 120
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1254,7 +1291,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 472
+Content-Length: 528
 
 {
   "id" : 5,
@@ -1264,7 +1301,7 @@ Content-Length: 472
   "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5MDIxMTIsImV4cCI6MTc2ODkwMjQxMiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.5Dj4BxzYxlmxyLbR0sLHtHL4rAqLJz1M3VjsK9ZHUFQ",
   "deleted" : false,
   "mainRole" : "USER",
-  "permissions" : [ ]
+  "permissions" : [ "ROLE_USER", "user:read" ]
 }</code></pre>
 </div>
 </div>
@@ -1287,6 +1324,7 @@ Content-Length: 472
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 96
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1310,9 +1348,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 221
+Content-Length: 214
 
 {
+  "message" : "firstName: ne doit pas être vide",
+  "timestamp" : "2026-02-25T10:44:41.15362169",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "firstName" : "First name is required"
   },
@@ -1338,6 +1380,7 @@ Content-Length: 221
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 94
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1361,9 +1404,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 217
+Content-Length: 242
 
 {
+  "message" : "lastName: {validation.signup.lastName.required}",
+  "timestamp" : "2026-02-25T10:44:40.86597445",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "lastName" : "Last name is required"
   },
@@ -1389,6 +1436,7 @@ Content-Length: 217
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 83
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1412,9 +1460,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 203
+Content-Length: 207
 
 {
+  "message" : "login: ne doit pas être vide",
+  "timestamp" : "2026-02-25T10:44:42.195991088",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "Login is required"
   },
@@ -1440,6 +1492,7 @@ Content-Length: 203
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 89
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1463,9 +1516,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 215
+Content-Length: 211
 
 {
+  "message" : "password: ne doit pas être nul",
+  "timestamp" : "2026-02-25T10:44:41.970297385",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "password" : "Password is required"
   },
@@ -1491,6 +1548,7 @@ Content-Length: 215
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 119
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1515,9 +1573,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 223
+Content-Length: 283
 
 {
+  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
+  "timestamp" : "2026-02-25T10:44:43.741672037",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "Login must be a valid email"
   },
@@ -1542,6 +1604,7 @@ Content-Length: 223
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1559,7 +1622,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 337
 
 {
   "error" : "Bad Request",
@@ -1584,6 +1647,7 @@ Content-Length: 152
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 98
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {"firstName":"Test", "lastName":"User", "login":"test.newuser@test.com", "password":"testPassword"</code></pre>
@@ -1603,7 +1667,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 167
+Content-Length: 304
 
 {
   "error" : "Bad Request",
@@ -1628,6 +1692,7 @@ Content-Length: 167
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 124
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1652,9 +1717,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 365
+Content-Length: 285
 
 {
+  "message" : "firstName: doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\"",
+  "timestamp" : "2026-02-25T10:44:42.824029173",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "firstName" : "First name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
   },
@@ -1680,6 +1749,7 @@ Content-Length: 365
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 124
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1704,9 +1774,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 361
+Content-Length: 283
 
 {
+  "message" : "lastName: doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\"",
+  "timestamp" : "2026-02-25T10:44:43.791725449",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "lastName" : "Last name contains invalid characters (only letters, spaces, hyphens and apostrophes allowed)"
   },
@@ -1732,6 +1806,7 @@ Content-Length: 361
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 107
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1756,9 +1831,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 223
+Content-Length: 283
 
 {
+  "message" : "login: doit être une adresse électronique syntaxiquement correcte",
+  "timestamp" : "2026-02-25T10:44:41.354523765",
+  "status" : 400,
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "Login must be a valid email"
   },
@@ -1790,6 +1869,7 @@ Content-Length: 223
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: text/plain;charset=UTF-8
 Content-Length: 120
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1845,6 +1925,7 @@ Content-Length: 181
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 111
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1869,7 +1950,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 158
 
 {
   "error" : "Conflict",
@@ -1888,14 +1969,14 @@ Content-Length: 150
 <div class="sect2">
 <h3 id="_1_3_refresh">1.3 Refresh</h3>
 <div class="paragraph">
-<p>This is an example output for the <code>GET /auth/refresh</code> endpoint.</p>
+<p>This is an example output for the <code>POST /auth/refresh</code> endpoint.</p>
 </div>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/refresh HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 210
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -1918,7 +1999,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 304
+Content-Length: 335
 
 {
   "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5MDIxMTAsImV4cCI6MTc2ODkwMjQxMCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.KJ-3wgmA_nCS8Nx9f3sWQVJBL87M9ovSh_G8pTAVx38"
@@ -1931,7 +2012,7 @@ Content-Length: 304
 <div class="sect3">
 <h4 id="_1_3_1_error_response_401_unauthorized">1.3.1 Error Response - 401 - Unauthorized</h4>
 <div class="paragraph">
-<p>These are example outputs for the <code>GET /auth/refresh</code> endpoint for unauthorized access.</p>
+<p>These are example outputs for the <code>POST /auth/refresh</code> endpoint for unauthorized access.</p>
 </div>
 <div class="sect4">
 <h5 id="_1_3_1_1_missing_token">1.3.1.1 Missing Token</h5>
@@ -1943,6 +2024,7 @@ Content-Length: 304
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1960,10 +2042,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -1981,6 +2063,7 @@ Content-Length: 75
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1998,10 +2081,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -2020,6 +2103,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2037,11 +2121,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2065,6 +2149,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /auth/refresh HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2082,10 +2167,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -2098,12 +2183,12 @@ Content-Length: 75
 <div class="sect2">
 <h3 id="_1_4_update_password">1.4 Update Password</h3>
 <div class="paragraph">
-<p>This is an example output for the <code>PUT /auth/update-password</code> endpoint.</p>
+<p>This is an example output for the <code>POST /auth/logout</code> endpoint.</p>
 </div>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5MDIxMTEsImV4cCI6MTc2ODkwMjQxMSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.ohuWFVppWEC2ZJ-26pv4_1YACtJL6SzjsVhx-nS9PcQ
 Content-Length: 70
@@ -2122,6 +2207,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzcyMDE2MjgxLCJleHAiOjE3NzIwMTYyODF9.qkV6qj7lyQ9hd1pwXqNY3ilz6vhd861sONHqcwQnktM; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2129,10 +2215,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 49
+Content-Length: 41
 
 {
-  "message" : "Password updated successfully"
+  "message" : "Déconnexion réussie"
 }</code></pre>
 </div>
 </div>
@@ -2140,19 +2226,19 @@ Content-Length: 49
 <p>Updates the password for the authenticated user.</p>
 </div>
 <div class="sect3">
-<h4 id="_1_4_1_error_response_400_bad_request">1.4.1 Error Response - 400 - Bad Request</h4>
+<h4 id="_1_4_1_error_response_401_unauthorized">1.4.1 Error Response - 401 - Unauthorized</h4>
 <div class="paragraph">
-<p>These are example outputs for the <code>PUT /auth/update-password</code> endpoint for bad request.</p>
+<p>These are example outputs for the <code>POST /auth/logout</code> endpoint for unauthorized access.</p>
 </div>
 <div class="sect4">
-<h5 id="_1_4_1_1_missing_body">1.4.1.1 Missing Body</h5>
+<h5 id="_1_4_1_1_missing_token">1.4.1.1 Missing Token</h5>
 <div class="paragraph">
-<p>This is an example output when the request body is missing.</p>
+<p>This is an example output when the token is missing in the request.</p>
 </div>
 <div class="listingblock">
 <div class="title">request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3Njg5MDIxMDksImV4cCI6MTc2ODkwMjQwOSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbXX0.rDShP7E9DetTgoIdkSSNuHlDeZY1AhKNARxLmcXps-w
 Host: localhost:8080</code></pre>
@@ -2161,7 +2247,7 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="title">response</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 401 Unauthorized
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
@@ -2172,7 +2258,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 66
 
 {
   "error" : "Bad Request",
@@ -2183,14 +2269,8 @@ Content-Length: 152
 </div>
 </div>
 <div class="paragraph">
-<p>It returns a 400 Bad Request error indicating that the request body is missing.</p>
+<p>It returns a 401 Unauthorized error indicating that full authentication is required.</p>
 </div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_1_4_2_error_response_401_unauthorised">1.4.2 Error Response - 401 - Unauthorised</h4>
-<div class="paragraph">
-<p>These are example outputs for the <code>PUT /auth/update-password</code> endpoint for unauthorized access.</p>
 </div>
 <div class="sect4">
 <h5 id="_1_4_2_1_missing_token">1.4.2.1 Missing Token</h5>
@@ -2203,6 +2283,7 @@ Content-Length: 152
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 70
+Accept-Language: fr-fr
 Host: localhost:8080
 
 {
@@ -2225,10 +2306,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -2271,7 +2352,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 183
+Content-Length: 208
 
 {
   "id" : null,
@@ -2281,7 +2362,7 @@ Content-Length: 183
   "token" : null,
   "deleted" : false,
   "mainRole" : "USER",
-  "permissions" : [ ]
+  "permissions" : [ "ROLE_USER", "user:read" ]
 }</code></pre>
 </div>
 </div>
@@ -2303,6 +2384,7 @@ Content-Length: 183
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2320,10 +2402,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -2342,6 +2424,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2359,11 +2442,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2399,11 +2482,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Token has expired"
+  "message" : "Le jeton a expiré",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2438,7 +2521,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 748
+Content-Length: 970
 
 [ {
   "id" : 1,
@@ -2448,7 +2531,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "USER",
-  "permissions" : [ ]
+  "permissions" : [ "ROLE_USER", "user:read" ]
 }, {
   "id" : 2,
   "firstName" : "Test",
@@ -2457,7 +2540,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "MANAGER",
-  "permissions" : [ ]
+  "permissions" : [ "user:read", "user:write", "ROLE_MANAGER", "user:update" ]
 }, {
   "id" : 3,
   "firstName" : "Test",
@@ -2466,7 +2549,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "ADMIN",
-  "permissions" : [ ]
+  "permissions" : [ "user:delete", "user:read", "user:write", "user:update", "ROLE_ADMIN" ]
 }, {
   "id" : 4,
   "firstName" : "Test2",
@@ -2475,7 +2558,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "ADMIN",
-  "permissions" : [ ]
+  "permissions" : [ "user:delete", "user:read", "user:write", "user:update", "ROLE_ADMIN" ]
 } ]</code></pre>
 </div>
 </div>
@@ -2497,6 +2580,7 @@ Content-Length: 748
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2514,10 +2598,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -2536,6 +2620,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2553,11 +2638,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2593,11 +2678,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Token has expired"
+  "message" : "Le jeton a expiré",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2635,7 +2720,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 748
+Content-Length: 970
 
 [ {
   "id" : 1,
@@ -2645,7 +2730,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "USER",
-  "permissions" : [ ]
+  "permissions" : [ "ROLE_USER", "user:read" ]
 }, {
   "id" : 2,
   "firstName" : "Test",
@@ -2654,7 +2739,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "MANAGER",
-  "permissions" : [ ]
+  "permissions" : [ "user:read", "user:write", "ROLE_MANAGER", "user:update" ]
 }, {
   "id" : 3,
   "firstName" : "Test",
@@ -2663,7 +2748,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "ADMIN",
-  "permissions" : [ ]
+  "permissions" : [ "user:delete", "user:read", "user:write", "user:update", "ROLE_ADMIN" ]
 }, {
   "id" : 4,
   "firstName" : "Test2",
@@ -2672,7 +2757,7 @@ Content-Length: 748
   "token" : null,
   "deleted" : false,
   "mainRole" : "ADMIN",
-  "permissions" : [ ]
+  "permissions" : [ "user:delete", "user:read", "user:write", "user:update", "ROLE_ADMIN" ]
 } ]</code></pre>
 </div>
 </div>
@@ -2739,7 +2824,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 37
+Content-Length: 38
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -2747,7 +2832,7 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 
-User promoted to manager successfully</code></pre>
+Utilisateur promu manager avec succès</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2760,6 +2845,7 @@ User promoted to manager successfully</code></pre>
 </div>
 <div class="sect4">
 <h5 id="_2_5_1_1_missing_authorization_header">2.5.1.1 Missing Authorization Header</h5>
+<h5 id="_2_5_1_1_missing_authorization_header">2.5.1.1 Missing Authorization Header</h5>
 <div class="paragraph">
 <p>This is an example output when the Authorization header is missing in the request.</p>
 </div>
@@ -2768,6 +2854,7 @@ User promoted to manager successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2785,10 +2872,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -2797,6 +2884,7 @@ Content-Length: 75
 </div>
 </div>
 <div class="sect4">
+<h5 id="_2_5_1_2_malformed_token">2.5.1.2 Malformed Token</h5>
 <h5 id="_2_5_1_2_malformed_token">2.5.1.2 Malformed Token</h5>
 <div class="paragraph">
 <p>This is an example output when the token provided is malformed.</p>
@@ -2807,6 +2895,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -2824,11 +2913,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2839,10 +2928,12 @@ Content-Length: 66
 </div>
 <div class="sect3">
 <h4 id="_2_5_2_error_response_403_forbidden">2.5.2 Error Response - 403 - Forbidden</h4>
+<h4 id="_2_5_2_error_response_403_forbidden">2.5.2 Error Response - 403 - Forbidden</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for forbidden access.</p>
 </div>
 <div class="sect4">
+<h5 id="_2_5_2_1_non_admin_user_promote_user_to_manager">2.5.2.1 Non-Admin User - Promote User to Manager</h5>
 <h5 id="_2_5_2_1_non_admin_user_promote_user_to_manager">2.5.2.1 Non-Admin User - Promote User to Manager</h5>
 <div class="paragraph">
 <p>This is an example output when a non-admin user attempts to promote a user to manager.</p>
@@ -2870,10 +2961,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 88
 
 {
-  "message" : "Access Denied"
+  "message" : "Vous n''avez pas les droits nécessaires pour effectuer cette action"
 }</code></pre>
 </div>
 </div>
@@ -2884,10 +2975,12 @@ Content-Length: 33
 </div>
 <div class="sect3">
 <h4 id="_2_5_3_error_response_404_not_found">2.5.3 Error Response - 404 - Not Found</h4>
+<h4 id="_2_5_3_error_response_404_not_found">2.5.3 Error Response - 404 - Not Found</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for not found errors.</p>
 </div>
 <div class="sect4">
+<h5 id="_2_5_3_1_user_not_found">2.5.3.1 User Not Found</h5>
 <h5 id="_2_5_3_1_user_not_found">2.5.3.1 User Not Found</h5>
 <div class="paragraph">
 <p>This is an example output when the user to be promoted is not found.</p>
@@ -2915,7 +3008,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 141
 
 {
   "error" : "Not Found",
@@ -2932,10 +3025,12 @@ Content-Length: 132
 </div>
 <div class="sect3">
 <h4 id="_2_5_4_error_response_409_conflict">2.5.4 Error Response - 409 - Conflict</h4>
+<h4 id="_2_5_4_error_response_409_conflict">2.5.4 Error Response - 409 - Conflict</h4>
 <div class="paragraph">
 <p>These are example outputs for the <code>PUT /users/{userId}/promote-manager</code> endpoint for conflict errors.</p>
 </div>
 <div class="sect4">
+<h5 id="_2_5_4_1_user_already_manager">2.5.4.1 User Already Manager</h5>
 <h5 id="_2_5_4_1_user_already_manager">2.5.4.1 User Already Manager</h5>
 <div class="paragraph">
 <p>This is an example output when the user to be promoted is already a manager.</p>
@@ -2963,7 +3058,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 154
+Content-Length: 165
 
 {
   "error" : "Conflict",
@@ -2978,6 +3073,7 @@ Content-Length: 154
 </div>
 </div>
 <div class="sect4">
+<h5 id="_2_5_4_2_user_already_admin">2.5.4.2 User Already Admin</h5>
 <h5 id="_2_5_4_2_user_already_admin">2.5.4.2 User Already Admin</h5>
 <div class="paragraph">
 <p>This is an example output when the user to be promoted is already an admin.</p>
@@ -3005,7 +3101,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 162
 
 {
   "error" : "Conflict",
@@ -3043,7 +3139,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 33
+Content-Length: 39
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -3051,7 +3147,7 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 
-Manager role revoked successfully</code></pre>
+Rôle de manager révoqué avec succès</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3072,6 +3168,7 @@ Manager role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3089,10 +3186,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -3111,6 +3208,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3128,11 +3226,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3174,10 +3272,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 88
 
 {
-  "message" : "Access Denied"
+  "message" : "Vous n''avez pas les droits nécessaires pour effectuer cette action"
 }</code></pre>
 </div>
 </div>
@@ -3219,7 +3317,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 141
 
 {
   "error" : "Not Found",
@@ -3257,7 +3355,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 32
+Content-Length: 37
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -3265,7 +3363,7 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 
-Admin role assigned successfully</code></pre>
+Rôle d''admin attribué avec succès</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3286,6 +3384,7 @@ Admin role assigned successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3303,10 +3402,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -3322,6 +3421,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3339,11 +3439,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3385,10 +3485,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 88
 
 {
-  "message" : "Access Denied"
+  "message" : "Vous n''avez pas les droits nécessaires pour effectuer cette action"
 }</code></pre>
 </div>
 </div>
@@ -3430,7 +3530,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 141
 
 {
   "error" : "Not Found",
@@ -3478,7 +3578,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 150
+Content-Length: 162
 
 {
   "error" : "Conflict",
@@ -3516,7 +3616,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 31
+Content-Length: 37
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -3524,7 +3624,7 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 
-Admin role revoked successfully</code></pre>
+Rôle d''admin révoqué avec succès</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3542,6 +3642,7 @@ Admin role revoked successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3559,10 +3660,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -3581,6 +3682,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3598,11 +3700,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3644,10 +3746,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 33
+Content-Length: 88
 
 {
-  "message" : "Access Denied"
+  "message" : "Vous n''avez pas les droits nécessaires pour effectuer cette action"
 }</code></pre>
 </div>
 </div>
@@ -3689,7 +3791,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 132
+Content-Length: 141
 
 {
   "error" : "Not Found",
@@ -3727,7 +3829,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 34
+Content-Length: 40
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -3735,7 +3837,7 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 
-Admin role downgraded successfully</code></pre>
+Rôle d''admin rétrogradé avec succès</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3756,6 +3858,7 @@ Admin role downgraded successfully</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3773,10 +3876,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -3795,6 +3898,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3812,11 +3916,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3854,11 +3958,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 90
+Content-Length: 99
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "User deleted successfully"
+  "message" : "Utilisateur supprimé avec succès",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -3880,6 +3984,7 @@ Content-Length: 90
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3897,10 +4002,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 75
+Content-Length: 66
 
 {
-  "message" : "Full authentication is required to access this resource"
+  "message" : "Jeton d''authentification invalide ou manquant"
 }</code></pre>
 </div>
 </div>
@@ -3919,6 +4024,7 @@ Content-Length: 75
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer this.is.not.a.valid.token
+Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -3936,11 +4042,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 66
+Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Invalid JWT token"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3978,11 +4084,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 90
+Content-Length: 99
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "User deleted successfully"
+  "message" : "Utilisateur supprimé avec succès",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4018,11 +4124,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 89
+Content-Length: 102
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "User deleted permanently"
+  "message" : "Utilisateur supprimé définitivement",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4052,7 +4158,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: text/plain;charset=UTF-8
-Content-Length: 26
+Content-Length: 34
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -4060,7 +4166,7 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 
-User restored successfully</code></pre>
+Utilisateur restauré avec succès</code></pre>
 </div>
 </div>
 <div class="paragraph">
