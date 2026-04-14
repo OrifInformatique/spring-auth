@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -650,5 +651,26 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(userLogin));
         
         refreshTokenRepository.deleteByUserLogin(userLogin);
+    }
+
+    public User proceedOAuth2User(OAuth2User oAuth2User) {
+
+        Role userRole = roleRepository.findByName(RoleEnum.USER)
+                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
+    
+        String email = oAuth2User.getAttribute("email");
+        String firstName = oAuth2User.getAttribute("given_name");
+        String lastName = oAuth2User.getAttribute("family_name");
+
+        return userRepository.findByLogin(email)
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .login(email)
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .mainRole(userRole)
+                            .build();
+                    return userRepository.save(newUser);
+                });
     }
 }
