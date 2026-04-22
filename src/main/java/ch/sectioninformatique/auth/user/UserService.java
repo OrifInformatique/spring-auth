@@ -533,7 +533,7 @@ public class UserService {
      * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deleteUser(Long userId) {
+    public UserDto deleteUser(Long userId, boolean hardDelete) {
         // Get the user to delete
         User userToDelete = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -552,7 +552,12 @@ public class UserService {
         }
 
         // Delete the user
-        userRepository.delete(userToDelete);
+        if(hardDelete){
+        userRepository.deletePermanentlyById(userId);
+        }
+        else{
+            userRepository.delete(userToDelete);
+        }
         return userMapper.toUserDto(userToDelete);
     }
 
@@ -672,5 +677,19 @@ public class UserService {
                             .build();
                     return userRepository.save(newUser);
                 });
+    }
+
+    @Transactional
+    public void updateUser(Long userId, UserDto userDto) {
+
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setLogin(userDto.getLogin());
+
+        userRepository.save(user);
     }
 }
