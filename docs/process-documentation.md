@@ -698,8 +698,8 @@ Example claims that can be extracted from the Azure token:
 | Method | Endpoint             | Auth Required | Description                                    |
 | ------ | -------------------- | ------------- | ---------------------------------------------- |
 | POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
-| POST   | `/auth/register`     | No            | Register a new user account                    |
-| POST   | `/auth/refresh`      | No            | Refresh access token using refresh token       |
+| POST   | `/auth/register`     | Yes           | Register a new user account                    |
+| POST   | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
 | PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
 | POST   | `/auth/logout`       | Yes           | Logout and invalidate refresh tokens            |
 
