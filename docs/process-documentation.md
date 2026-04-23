@@ -55,13 +55,14 @@ Recommended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://mark
 
 This document describes the **structure, components, and processes** of the spring-auth application, including configuration files, folder organization, and module responsibilities.
 
-This application powers a **authentication system**, providing:
+This application powers an **authentication system** wich can be used by client applications, providing:
 
-- Secure authentication and authorization (delegated to spring-auth)
-- User and role management
+- Secure registration, authentication and authorization
+- Users list management
+- Users role management (gobal role, shared between all client applications)
 
 ![app interactions](frontend_backend_auth_architecture.png)  
-_Illustrates interactions between the frontend and backend modules of the `template_frontback` app, as well as the `spring-auth` app._
+_Illustrates interactions between the frontend and backend of the client app, using the `spring-auth` API._
 
 ---
 
