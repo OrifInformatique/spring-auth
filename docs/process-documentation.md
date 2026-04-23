@@ -708,6 +708,7 @@ Example claims that can be extracted from the Azure token:
 
 | Method | Endpoint                       | Auth Required | Description                              |
 | ------ | ------------------------------ | ------------- | ---------------------------------------- |
+| GET    | `/oauth2/login/azure`          | No            | Initiate OAuth2 authentication flow      |
 | GET    | `/oauth2/authorization/azure`  | No            | Redirect to Microsoft login page         |
 | GET    | `/oauth2/success`              | Yes           | Callback endpoint after Azure login      |
 
