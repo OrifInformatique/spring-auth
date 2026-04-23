@@ -66,15 +66,15 @@ _Illustrates interactions between the frontend and backend of the client app, us
 
 ---
 
-## 1. Spring-Auth
+## 1. spring-auth
 
-### 1.1 General Information
+### 1.1 General Informations
 
-The `spring-auth` module is a standalone Spring Boot application that provides authentication and authorization services. It manages user credentials, roles, and permissions, and integrates with Microsoft Entra Azure AD for OAuth2 authentication.
+`spring-auth` is a standalone Spring Boot application that provides registration, authentication and authorization services. It manages users credentials, roles, and permissions globally, shared between multiple client applications. It also integrates with Microsoft Azure AD for OAuth2 authentication.
 
 ```mermaid
 graph TD
-    A[Frontend App] -->|REST API| B[spring-auth]
+    A[Client App] -->|REST API| B[spring-auth]
     B --> C[(MariaDB)]
     B --> D[Azure AD / OAuth2]
 ```
@@ -85,7 +85,7 @@ graph TD
 - **Spring Boot:** 3.5.8
 - **Maven:** 3.9+
 - **MariaDB:** 11.4
-- **Docker Desktop:** Latest
+- **Docker Desktop** (in dev/test environment) : Latest
 
 **Key Libraries:**
 
