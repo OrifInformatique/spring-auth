@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -284,5 +285,20 @@ public class AuthController {
                                                                 "message.logout.success",
                                                                 null,
                                                                 LocaleContextHolder.getLocale())));
+        }
+
+        /**
+         * Endpoint to confirm successful login and provide a localized success message.
+         * @return
+         */
+        @PreAuthorize("isAuthenticated()")
+        @GetMapping("/redirect-after-login")
+        public ResponseEntity<?> redirectAfterLogin() {
+                return ResponseEntity.ok(Map.of(
+                                "message",
+                                messageSource.getMessage(
+                                                "message.login.success",
+                                                null,
+                                                LocaleContextHolder.getLocale())));
         }
 }
