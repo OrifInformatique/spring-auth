@@ -2,8 +2,6 @@ package ch.sectioninformatique.auth.auth;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.time.Duration;
 
@@ -74,14 +72,6 @@ public class OAuth2Controller {
         this.userAuthenticationProvider = userAuthenticationProvider;
         this.userService = userService;
         this.messageSource = messageSource;
-    }
-
-    @GetMapping("/login")
-    public ResponseEntity<Object> testCallOAuth2() {
-
-        // Redirect frontend to spring-auth OAuth2 login endpoint
-        URI uri = URI.create("http://localhost:8080/oauth2/authorization/azure");
-        return ResponseEntity.status(HttpStatus.FOUND).location(uri).build();
     }
 
     /**
