@@ -46,7 +46,7 @@ public class OAuth2Controller {
 
     // Fallback redirect target when no external redirect URL is available.
     // This should be a valid endpoint in the client application that can handle the post-login state.
-    private static final String DEFAULT_REDIRECT_URL = "/redirect-after-login";
+    private static final String DEFAULT_REDIRECT_URL = "/auth/redirect-after-login";
 
     // A custom provider used to generate JWT tokens for authenticated users.
     private final UserAuthenticationProvider userAuthenticationProvider;
@@ -231,7 +231,7 @@ public class OAuth2Controller {
             redirectUrl += (redirectUrl.contains("?") ? "&" : "?") + "loginType=azure";
         }
 
-        log.debug("Redirecting to frontend with JWT token in secure cookie: {}", redirectUrl);
+        log.debug("Redirecting to client application with JWT token in secure cookie: {}", redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 }
