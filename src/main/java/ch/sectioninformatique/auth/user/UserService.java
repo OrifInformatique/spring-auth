@@ -528,6 +528,7 @@ public class UserService {
      * - Soft-deletes the user
      *
      * @param userId The ID of the user to delete
+     * @param hardDelete If true, the user will be permanently deleted instead of soft-deleted
      * @return UserDto containing the deleted user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserHasLowerRightsException if the authenticated user lacks permissions
@@ -553,7 +554,7 @@ public class UserService {
 
         // Delete the user
         if(hardDelete){
-        userRepository.deletePermanentlyById(userId);
+            userRepository.deletePermanentlyById(userId);
         }
         else{
             userRepository.delete(userToDelete);
@@ -663,26 +664,21 @@ public class UserService {
         refreshTokenRepository.deleteByUserLogin(userLogin);
     }
 
-    public User proceedOAuth2User(OAuth2User oAuth2User) {
-
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
-    
-        String email = oAuth2User.getAttribute("email");
-        String firstName = oAuth2User.getAttribute("given_name");
-        String lastName = oAuth2User.getAttribute("family_name");
-
-        return userRepository.findByLogin(email)
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .login(email)
-                            .firstName(firstName)
-                            .lastName(lastName)
-                            .mainRole(userRole)
-                            .build();
-                    return userRepository.save(newUser);
-                });
-    }
+     /**
+     * Updates a user's information.
+     * 
+     * This operation:
+     * - Verifies the user exists
+     * - Updates the user's first name, last name, and login
+     * - Saves the updated user to the database
+     * - Returns the updated user's information as a UserDto
+     * 
+     * Note: This method does not allow updating the user's roles or password. Separate methods should be used for those operations.
+     * 
+     * @param userId The ID of the user to update
+     * @param userDto The new user information to update
+     * @throws UserNotFoundException if the user is not found
+     */
 
     @Transactional
     public void updateUser(Long userId, UserDto userDto) {
