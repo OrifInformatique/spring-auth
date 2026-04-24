@@ -194,7 +194,7 @@ public class OAuth2Controller {
                 .build();
 
         // Create or get Azure user in local database
-        user = userService.createAzureUser(user);
+        user = userService.getOrCreateAzureUser(user);
 
         // Generate a JWT using your custom UserAuthenticationProvider.
         String jwt = userAuthenticationProvider.createToken(user);

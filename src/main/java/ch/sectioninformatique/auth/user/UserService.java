@@ -605,7 +605,7 @@ public class UserService {
      * @throws RoleNotFoundException if the default role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto createAzureUser(UserDto userDto) {
+    public UserDto getOrCreateAzureUser(UserDto userDto) {
         log.debug("Creating new Azure user: {}", userDto.getLogin());
 
         // Check if user already exists

@@ -657,7 +657,7 @@ When users log in via Microsoft Entra ID, the process follows the standard OAuth
 
 4. Local User Synchronization
 
-   - If the user doesn’t exist, they are created in the database via UserService.createAzureUser().
+   - If the user doesn’t exist, they are created in the database via UserService.getOrCreateAzureUser().
 
    - Azure users are assigned a default role (USER) and stored for local management.
 

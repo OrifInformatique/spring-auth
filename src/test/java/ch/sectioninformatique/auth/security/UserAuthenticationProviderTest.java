@@ -141,7 +141,7 @@ class UserAuthenticationProviderTest {
 
         String token = authenticationProvider.createToken(user);
         when(userService.findByLogin(TEST_LOGIN)).thenThrow(new UserNotFoundException("User not found"));
-        when(userService.createAzureUser(any())).thenReturn(user);
+        when(userService.getOrCreateAzureUser(any())).thenReturn(user);
 
         // When
         Authentication authentication = authenticationProvider.validateTokenStrongly(token);
@@ -149,7 +149,7 @@ class UserAuthenticationProviderTest {
         // Then
         assertNotNull(authentication);
         assertEquals(TEST_LOGIN, ((UserDto) authentication.getPrincipal()).getLogin());
-        verify(userService).createAzureUser(any());
+        verify(userService).getOrCreateAzureUser(any());
     }
 
     /**
