@@ -253,18 +253,26 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}/{hardDelete}")
     public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable(required = false) Boolean hardDelete) {
+        String resultMessage = "";
 
         // If hardDelete parameter is null, default to false (soft delete)
         boolean isHardDelete = hardDelete != null ? hardDelete : false;
         
+        // Perform the delete operation and get the deleted user's information
         UserDto deletedUser = userService.deleteUser(userId, isHardDelete);
+
+        // Determine the appropriate message based on the type of deletion performed
+        if (isHardDelete) {
+            resultMessage = messageSource.getMessage("message.user.deleted.permanent", null, LocaleContextHolder.getLocale());
+        } else {
+            resultMessage = messageSource.getMessage("message.user.deleted", null, LocaleContextHolder.getLocale());
+        }
+
+        // Return a response containing the result message and the login of the deleted user
         return ResponseEntity
             .ok(Map.of(
                 "message",
-                messageSource.getMessage(
-                    "message.user.deleted",
-                    null,
-                    LocaleContextHolder.getLocale()),
+                resultMessage,
                 "deletedUserLogin",
                 deletedUser.getLogin()));
     }
