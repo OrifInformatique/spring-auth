@@ -301,7 +301,7 @@ public class UserAuthenticationProvider {
                     .build();
 
             // Save the new user
-            userService.createAzureUser(newUser);
+            userService.getOrCreateAzureUser(newUser);
 
             List<String> allRoles = new ArrayList<>();
             allRoles.add(newUser.getMainRole());

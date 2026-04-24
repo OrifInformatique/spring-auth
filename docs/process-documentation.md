@@ -55,25 +55,26 @@ Recommended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://mark
 
 This document describes the **structure, components, and processes** of the spring-auth application, including configuration files, folder organization, and module responsibilities.
 
-This application powers a **authentication system**, providing:
+This application powers an **authentication system** wich can be used by client applications, providing:
 
-- Secure authentication and authorization (delegated to spring-auth)
-- User and role management
+- Secure registration, authentication and authorization
+- Users list management
+- Users role management (gobal role, shared between all client applications)
 
 ![app interactions](frontend_backend_auth_architecture.png)  
-_Illustrates interactions between the frontend and backend modules of the `template_frontback` app, as well as the `spring-auth` app._
+_Illustrates interactions between the frontend and backend of the client app, using the `spring-auth` API._
 
 ---
 
-## 1. Spring-Auth
+## 1. spring-auth
 
-### 1.1 General Information
+### 1.1 General Informations
 
-The `spring-auth` module is a standalone Spring Boot application that provides authentication and authorization services. It manages user credentials, roles, and permissions, and integrates with Microsoft Entra Azure AD for OAuth2 authentication.
+`spring-auth` is a standalone Spring Boot application that provides registration, authentication and authorization services. It manages users credentials, roles, and permissions globally, shared between multiple client applications. It also integrates with Microsoft Azure AD for OAuth2 authentication.
 
 ```mermaid
 graph TD
-    A[Frontend App] -->|REST API| B[spring-auth]
+    A[Client App] -->|REST API| B[spring-auth]
     B --> C[(MariaDB)]
     B --> D[Azure AD / OAuth2]
 ```
@@ -84,7 +85,7 @@ graph TD
 - **Spring Boot:** 3.5.8
 - **Maven:** 3.9+
 - **MariaDB:** 11.4
-- **Docker Desktop:** Latest
+- **Docker Desktop** (in dev/test environment) : Latest
 
 **Key Libraries:**
 
@@ -656,7 +657,7 @@ When users log in via Microsoft Entra ID, the process follows the standard OAuth
 
 4. Local User Synchronization
 
-   - If the user doesn’t exist, they are created in the database via UserService.createAzureUser().
+   - If the user doesn’t exist, they are created in the database via UserService.getOrCreateAzureUser().
 
    - Azure users are assigned a default role (USER) and stored for local management.
 
@@ -698,8 +699,8 @@ Example claims that can be extracted from the Azure token:
 | Method | Endpoint             | Auth Required | Description                                    |
 | ------ | -------------------- | ------------- | ---------------------------------------------- |
 | POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
-| POST   | `/auth/register`     | No            | Register a new user account                    |
-| POST   | `/auth/refresh`      | No            | Refresh access token using refresh token       |
+| POST   | `/auth/register`     | Yes           | Register a new user account                    |
+| POST   | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
 | PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
 | POST   | `/auth/logout`       | Yes           | Logout and invalidate refresh tokens            |
 
@@ -707,6 +708,7 @@ Example claims that can be extracted from the Azure token:
 
 | Method | Endpoint                       | Auth Required | Description                              |
 | ------ | ------------------------------ | ------------- | ---------------------------------------- |
+| GET    | `/oauth2/login/azure`          | No            | Initiate OAuth2 authentication flow      |
 | GET    | `/oauth2/authorization/azure`  | No            | Redirect to Microsoft login page         |
 | GET    | `/oauth2/success`              | Yes           | Callback endpoint after Azure login      |
 

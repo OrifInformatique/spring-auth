@@ -1,8 +1,18 @@
 package ch.sectioninformatique.auth.auth;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.Locale;
+import java.util.function.Consumer;
+
 import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,41 +21,34 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import ch.sectioninformatique.auth.AuthApplication;
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserRepository;
-import ch.sectioninformatique.auth.user.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-
-import java.util.function.Consumer;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Locale;
-
 import org.springframework.transaction.annotation.Transactional;
+
+import ch.sectioninformatique.auth.AuthApplication;
+import ch.sectioninformatique.auth.security.Role;
+import ch.sectioninformatique.auth.security.RoleEnum;
+import ch.sectioninformatique.auth.security.RoleRepository;
+import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
+import ch.sectioninformatique.auth.user.User;
+import ch.sectioninformatique.auth.user.UserDto;
+import ch.sectioninformatique.auth.user.UserMapper;
+import ch.sectioninformatique.auth.user.UserRepository;
+import ch.sectioninformatique.auth.user.UserService;
 import jakarta.servlet.http.Cookie;
+
 
 /**
  * Integration tests for AuthController.
@@ -56,6 +59,7 @@ import jakarta.servlet.http.Cookie;
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class AuthControllerIntegrationTest {
+
 
         /**
          * Helper method for performing and documenting HTTP requests in tests.
@@ -206,6 +210,12 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private MessageSource messageSource;
+
+        @Autowired
+        private RoleRepository roleRepository;
+
+        @Autowired
+        private UserMapper userMapper;
 
         private static final ResourceBundleMessageSource HV_MESSAGES = new ResourceBundleMessageSource();
 
@@ -651,6 +661,20 @@ public class AuthControllerIntegrationTest {
         @Transactional
         public void register_withRealData_shouldReturnSuccess() throws Exception {
 
+                Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
+                        .orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+
+                User admin = User.builder()
+                .firstName("admin")
+                .lastName("test")
+                .login("admin.test@test.com")
+                .mainRole(adminRole)
+                .build();
+
+                UserDto adminDto = userMapper.toUserDto(admin);
+                String token = userAuthenticationProvider.createToken(adminDto);
+                adminDto.setToken(token);
+
                 String rawPassword = "testPassword";
                 String requestBody =
                                 "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\""
@@ -660,7 +684,7 @@ public class AuthControllerIntegrationTest {
                                 "POST",
                                 "/auth/register",
                                 requestBody,
-                                null,
+                                adminDto.getToken(),
                                 MediaType.APPLICATION_JSON,
                                 201,
                                 "register",
@@ -777,6 +801,38 @@ public class AuthControllerIntegrationTest {
                                                 throw new RuntimeException(e);
                                         }
                                 });
+                        }
+
+
+        @Transactional
+        @Test
+        public void register_withWrongPermissions_shouldReturn403() throws Exception{
+
+                Role userRole = roleRepository.findByName(RoleEnum.USER)
+                        .orElseThrow(() -> new RuntimeException("Role USER not found"));
+
+                User user = User.builder()
+                        .firstName("Test")
+	                .lastName("User")
+			.login("test.user@test.com")
+			.password(passwordEncoder.encode("Secure123@Pass"))
+			.mainRole(userRole)
+			.build();
+
+                UserDto userDto = userMapper.toUserDto(user);
+                String token = userAuthenticationProvider.createToken(userDto);
+                userDto.setToken(token);
+
+                performRequest(
+                        "POST", 
+                        "/auth/register",
+                        "{\"firstName\":\"NewTest\",\"lastName\":\"Register\",\"login\":\"newtest.register@test.com\",\"password\":\"testPassword\"}", 
+                        userDto.getToken(),
+                        MediaType.APPLICATION_JSON,
+                        403,
+                        "register-noPermissions",
+                        request ->{}
+                );
         }
 
         /**
@@ -1140,11 +1196,25 @@ public class AuthControllerIntegrationTest {
         @Transactional
         public void register_duplicateLogin_shouldReturnConflict() throws Exception {
 
+                Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
+                        .orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+
+                User admin = User.builder()
+                .firstName("admin")
+                .lastName("test")
+                .login("admin.test@test.com")
+                .mainRole(adminRole)
+                .build();
+
+                UserDto adminDto = userMapper.toUserDto(admin);
+                String token = userAuthenticationProvider.createToken(adminDto);
+                adminDto.setToken(token);
+
                 performRequest(
                                 "POST",
                                 "/auth/register",
                                 "{\"firstName\":\"Test\",\"lastName\":\"User\",\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}",
-                                null,
+                                adminDto.getToken(),
                                 MediaType.APPLICATION_JSON,
                                 409,
                                 "register-duplicate-login",

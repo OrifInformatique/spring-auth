@@ -598,20 +598,25 @@ public class UserService {
     }
 
     /**
-     * Creates a new user from Azure authentication.
+     * If a user is not registered in the database, creates a new user after Azure authentication.
+     * This method is used to integrate users authenticated via Azure AD into the local user management system.
+     * 
      * This method:
      * - Checks if the user already exists
-     * - Creates a new user with Azure data if they don't exist
+     * - If the user exists, returns his information as a UserDto
+     * - If he does not exist, creates a new user with Azure data
      * - Assigns the default USER role
-     * - Generates a temporary password
+     * - Generates a "random" password
+     * - Saves the user to the database
+     * - Returns the created user's information as a UserDto
      *
      * @param userDto The user data from Azure
-     * @return UserDto containing the created user's information
+     * @return UserDto containing the local user's information
      * @throws RoleNotFoundException if the default role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto createAzureUser(UserDto userDto) {
-        log.debug("Creating new Azure user: {}", userDto.getLogin());
+    public UserDto getOrCreateAzureUser(UserDto userDto) {
+        log.debug("Getting or creating Azure user: {}", userDto.getLogin());
 
         // Check if user already exists
         if (userRepository.existsByLogin(userDto.getLogin())) {
@@ -624,7 +629,7 @@ public class UserService {
                 .login(userDto.getLogin())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
-                .password(passwordEncoder.encode("AzureUser" + System.currentTimeMillis())) // Temporary password
+                .password(passwordEncoder.encode("AzureUser" + System.currentTimeMillis())) // "Random" password
                 .build();
 
         // Add default USER role
@@ -634,7 +639,7 @@ public class UserService {
 
         // Save the user
         User savedUser = userRepository.save(user);
-        log.debug("Azure user created successfully: {}", savedUser.getLogin());
+        log.debug("New Azure user registered successfully: {}", savedUser.getLogin());
 
         return userMapper.toUserDto(savedUser);
     }
