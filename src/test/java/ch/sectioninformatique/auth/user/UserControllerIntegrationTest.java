@@ -629,7 +629,7 @@ public class UserControllerIntegrationTest {
                 // First, soft delete the user using the DELETE endpoint
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getId() + "/0",
                                 null,
                                 adminToken,
                                 MediaType.APPLICATION_JSON,
@@ -684,7 +684,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId() + "/permanent",
+                                "/users/" + userDto.getId() + "/true",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1843,7 +1843,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getId() + "/0",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,

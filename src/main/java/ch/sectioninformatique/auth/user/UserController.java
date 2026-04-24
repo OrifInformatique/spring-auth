@@ -247,13 +247,17 @@ public class UserController {
      * - Returns success/error message
      *
      * @param userId The ID of the user to delete
-     * @param hardDelete A boolean for soft or hard delete
+     * @param hardDelete A boolean for soft or hard delete (default: false)
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{userId}/{hardDelete}")
-    public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable boolean hardDelete) {
-        UserDto deletedUser = userService.deleteUser(userId, hardDelete);
+    public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable(required = false) Boolean hardDelete) {
+
+        // If hardDelete parameter is null, default to false (soft delete)
+        boolean isHardDelete = hardDelete != null ? hardDelete : false;
+        
+        UserDto deletedUser = userService.deleteUser(userId, isHardDelete);
         return ResponseEntity
             .ok(Map.of(
                 "message",
