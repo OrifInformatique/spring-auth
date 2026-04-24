@@ -709,7 +709,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc2ODU4OTM1LCJleHAiOjE3Nzk0NTA5MzV9.xKPVww8W1-brPAFQCsFMIsKAjk8LDvJwN8Sz-BCCZlw; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 22 May 2026 11:55:35 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc3MDE5MzkyLCJleHAiOjE3Nzk2MTEzOTJ9.vUCawlepTokT0jynJ1WBHbODi7ETB6ZRv4JrD-sBqgE; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 24 May 2026 08:29:52 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -724,7 +724,7 @@ Content-Length: 514
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5MzUsImV4cCI6MTc3Njg1OTIzNSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.YPYkqdxllqmtt7OQdZtQgc0aHXt6vG9xn6j2sFqAU24",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTkzOTIsImV4cCI6MTc3NzAxOTY5MiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.dkdggrvw2qdPnWJyfZoB4vIH9XB685ah9wJ_Qz9cZvI",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ "ROLE_USER", "user:read" ]
@@ -776,9 +776,9 @@ Content-Length: 201
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:52.540785646",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:35.377185403",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "ne doit pas être vide"
   }
@@ -826,9 +826,9 @@ Content-Length: 203
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:53.199825259",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:36.024481527",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "password" : "ne doit pas être nul"
   }
@@ -877,9 +877,9 @@ Content-Length: 239
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:51.813690914",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:34.843110251",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -922,9 +922,9 @@ Content-Length: 339
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:53.007433326",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;ch.sectioninformatique.auth.user.UserDto&gt; ch.sectioninformatique.auth.auth.AuthController.login(ch.sectioninformatique.auth.auth.CredentialsDto)",
-  "timestamp" : "2026-04-22T11:55:35.825290262"
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -967,9 +967,9 @@ Content-Length: 304
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:52.407053197",
   "message" : "JSON parse error: Unexpected end-of-input: expected close marker for Object (start marker at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1])",
-  "timestamp" : "2026-04-22T11:55:35.279577228"
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -1015,9 +1015,9 @@ Content-Length: 239
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:50.520919291",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:33.700457884",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1066,9 +1066,9 @@ Content-Length: 137
 
 {
   "status" : 401,
-  "error" : "Unauthorized",
+  "timestamp" : "2026-04-24T08:29:52.904025446",
   "message" : "Identifiants invalides",
-  "timestamp" : "2026-04-22T11:55:35.723552953"
+  "error" : "Unauthorized"
 }</code></pre>
 </div>
 </div>
@@ -1120,9 +1120,9 @@ Content-Length: 181
 
 {
   "status" : 415,
-  "error" : "Unsupported Media Type",
+  "timestamp" : "2026-04-24T08:29:51.349923868",
   "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "timestamp" : "2026-04-22T11:55:34.475450367"
+  "error" : "Unsupported Media Type"
 }</code></pre>
 </div>
 </div>
@@ -1174,9 +1174,9 @@ Content-Length: 137
 
 {
   "status" : 401,
-  "error" : "Unauthorized",
+  "timestamp" : "2026-04-24T08:29:52.273625704",
   "message" : "Identifiants invalides",
-  "timestamp" : "2026-04-22T11:55:35.151245774"
+  "error" : "Unauthorized"
 }</code></pre>
 </div>
 </div>
@@ -1222,9 +1222,9 @@ Content-Length: 137
 
 {
   "status" : 401,
-  "error" : "Unauthorized",
+  "timestamp" : "2026-04-24T08:29:53.136111552",
   "message" : "Identifiants invalides",
-  "timestamp" : "2026-04-22T11:55:35.965011967"
+  "error" : "Unauthorized"
 }</code></pre>
 </div>
 </div>
@@ -1244,7 +1244,7 @@ Content-Length: 137
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi50ZXN0QHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTM2LCJleHAiOjE3NzY4NTkyMzYsImZpcnN0TmFtZSI6ImFkbWluIiwibGFzdE5hbWUiOiJ0ZXN0IiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.Ixx6-gvvwXl33LjNlEpNPe2SLXHxgOLwsTGEmsqTiFg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi50ZXN0QHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5MzkzLCJleHAiOjE3NzcwMTk2OTMsImZpcnN0TmFtZSI6ImFkbWluIiwibGFzdE5hbWUiOiJ0ZXN0IiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.T27CIFIDDZBGN9ihvf2wfsXFtWrXpZITLkwbVXGP2F8
 Content-Length: 120
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -1265,7 +1265,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Location: /auth/users/test.newuser@test.com
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc2ODU4OTM2LCJleHAiOjE3Nzk0NTA5MzZ9.28yOXCtZmtzoemrhIYc4WnybLAsR3ozwfIjyTJ43KX8; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 22 May 2026 11:55:36 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc3MDE5MzkzLCJleHAiOjE3Nzk2MTEzOTN9.26pEJZvgXkCcHX4cqBxQIprjOhP1r986adByRY_Y4-8; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 24 May 2026 08:29:53 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1280,7 +1280,7 @@ Content-Length: 528
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5MzYsImV4cCI6MTc3Njg1OTIzNiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.0jFBB7X_TqYR6cGFWQQS9I-tfePB1kiklrgDr6o-Km0",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0Lm5ld3VzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTkzOTMsImV4cCI6MTc3NzAxOTY5MywiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiTmV3VXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.wU3elaCjRiF3GaGpNgwn4o6jDdnIrC0GM9XK2kUkwnY",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ "ROLE_USER", "user:read" ]
@@ -1334,9 +1334,9 @@ Content-Length: 205
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:50.469580966",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:33.637057866",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "firstName" : "ne doit pas être vide"
   }
@@ -1386,9 +1386,9 @@ Content-Length: 219
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:50.203515402",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:33.292177026",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "lastName" : "{validation.signup.lastName.required}"
   }
@@ -1438,9 +1438,9 @@ Content-Length: 201
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:52.136432257",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:35.032719621",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "ne doit pas être vide"
   }
@@ -1490,9 +1490,9 @@ Content-Length: 203
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:51.736875927",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:34.785096526",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "password" : "ne doit pas être nul"
   }
@@ -1543,9 +1543,9 @@ Content-Length: 239
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:53.908031485",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:36.663402968",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1588,9 +1588,9 @@ Content-Length: 337
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:53.844831449",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;ch.sectioninformatique.auth.user.UserDto&gt; ch.sectioninformatique.auth.auth.AuthController.register(ch.sectioninformatique.auth.auth.SignUpDto)",
-  "timestamp" : "2026-04-22T11:55:36.617470353"
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -1633,9 +1633,9 @@ Content-Length: 304
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:51.884206446",
   "message" : "JSON parse error: Unexpected end-of-input: expected close marker for Object (start marker at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1])",
-  "timestamp" : "2026-04-22T11:55:34.900530272"
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -1683,9 +1683,9 @@ Content-Length: 240
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:52.761553647",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:35.604908409",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "firstName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
   }
@@ -1736,9 +1736,9 @@ Content-Length: 239
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:53.965931749",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:36.711145756",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "lastName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
   }
@@ -1785,13 +1785,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 239
+Content-Length: 238
 
 {
   "status" : 400,
-  "error" : "Bad Request",
+  "timestamp" : "2026-04-24T08:29:50.67808318",
   "message" : "Échec de la validation",
-  "timestamp" : "2026-04-22T11:55:33.861799732",
+  "error" : "Bad Request",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1848,9 +1848,9 @@ Content-Length: 181
 
 {
   "status" : 415,
-  "error" : "Unsupported Media Type",
+  "timestamp" : "2026-04-24T08:29:51.668445862",
   "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "timestamp" : "2026-04-22T11:55:34.724093636"
+  "error" : "Unsupported Media Type"
 }</code></pre>
 </div>
 </div>
@@ -1874,7 +1874,7 @@ Content-Length: 181
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi50ZXN0QHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTM0LCJleHAiOjE3NzY4NTkyMzQsImZpcnN0TmFtZSI6ImFkbWluIiwibGFzdE5hbWUiOiJ0ZXN0IiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.xe2Yvvar5LmMSCYb2-lkZgSFTeGDazk0WZ_cZmJBURg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi50ZXN0QHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5MzkxLCJleHAiOjE3NzcwMTk2OTEsImZpcnN0TmFtZSI6ImFkbWluIiwibGFzdE5hbWUiOiJ0ZXN0IiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.KQ3agqAGDVwIhAOmIzwGrI76zopT6YFPcwt5UIWKPzA
 Content-Length: 111
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -1905,9 +1905,9 @@ Content-Length: 158
 
 {
   "status" : 409,
-  "error" : "Conflict",
+  "timestamp" : "2026-04-24T08:29:51.443022808",
   "message" : "L'utilisateur existe déjà: test.user@test.com",
-  "timestamp" : "2026-04-22T11:55:34.544246907"
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -1929,7 +1929,7 @@ Content-Length: 158
 Content-Type: application/json;charset=UTF-8
 Accept-Language: fr-fr
 Host: localhost:8080
-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc2ODU4OTM0LCJleHAiOjE3Nzk0NTA5MzR9.EjHo0qtVuCci08KS5bk7-OGYbZzUt6W1W9sqsvXqwgU</code></pre>
+Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc3MDE5MzkxLCJleHAiOjE3Nzk2MTEzOTF9.6l-BMdlZz7N4BNrD1rPDacSex8nAa1hLVvX3yf519IM</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -1939,7 +1939,7 @@ Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZ
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc2ODU4OTM0LCJleHAiOjE3Nzk0NTA5MzR9.EjHo0qtVuCci08KS5bk7-OGYbZzUt6W1W9sqsvXqwgU; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 22 May 2026 11:55:34 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc3MDE5MzkxLCJleHAiOjE3Nzk2MTEzOTF9.6l-BMdlZz7N4BNrD1rPDacSex8nAa1hLVvX3yf519IM; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 24 May 2026 08:29:51 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1950,7 +1950,7 @@ X-Frame-Options: DENY
 Content-Length: 335
 
 {
-  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5MzQsImV4cCI6MTc3Njg1OTIzNCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.KgKwL0QFNTBKWsh_ZNXe-fo-OtQ1y7R-9dJbiEStFfc"
+  "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTkzOTEsImV4cCI6MTc3NzAxOTY5MSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.YNU04F2bSa74PwJu8ZlWnz5Muh6Oj7ef0daMNRAacew"
 }</code></pre>
 </div>
 </div>
@@ -2072,8 +2072,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2138,7 +2138,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5MzQsImV4cCI6MTc3Njg1OTIzNCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.KgKwL0QFNTBKWsh_ZNXe-fo-OtQ1y7R-9dJbiEStFfc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTkzOTAsImV4cCI6MTc3NzAxOTY5MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.5j87Nf3i19bXAVnLJ_o9WDlS9OfZuXXJIiJvOZ5ODys
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2150,7 +2150,7 @@ Host: localhost:8080</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc2ODU4OTM0LCJleHAiOjE3NzY4NTg5MzR9.kzWNY6e94vx6pfp_yVLoX3Y7GjstloGVK_Y11ZQOHGY; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJyZWZyZXNoIiwiaWF0IjoxNzc3MDE5MzkxLCJleHAiOjE3NzcwMTkzOTF9.-sR9Qs3lOVlelyPr23qFAhICCCCYtMV6kwK82PtkbJI; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2244,8 +2244,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2315,7 +2315,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5NTAsImV4cCI6MTc3Njg1OTI1MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.UjfoUl6xuIqhEvDfE8x7D6OB5LAAyTbYH9mPvMTA6_E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTk0MDYsImV4cCI6MTc3NzAxOTcwNiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.gKp4VFWrro7U9VwVyJDDLiI8MVeCrpuVABFhFC3btb8
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2427,8 +2427,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2446,7 +2446,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTE3NTAsImV4cCI6MTc3Njg1MjA1MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.5oku5QIuOHraHT3Op_ej6ezdUnRFKZEzYG_dBxiqCd4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTIyMDUsImV4cCI6MTc3NzAxMjUwNSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.RaWflREHryDzDXU_TzbUiVwaw0FWJabibLSQ686BeJM
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2468,8 +2468,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Le jeton a expiré"
+  "message" : "Le jeton a expiré",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2486,7 +2486,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5NTIsImV4cCI6MTc3Njg1OTI1MiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.rxR_P_nCcfS1yTaNV_k2xt1QXDYwSbnQhhCFe6okKzU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTk0MDcsImV4cCI6MTc3NzAxOTcwNywiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.4SBHRDoZ6WFnPyjz98X1nk7oUKv_8U1E7EGPmfIVkoE
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2625,8 +2625,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2644,7 +2644,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTE3NTAsImV4cCI6MTc3Njg1MjA1MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.5oku5QIuOHraHT3Op_ej6ezdUnRFKZEzYG_dBxiqCd4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTIyMDUsImV4cCI6MTc3NzAxMjUwNSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.RaWflREHryDzDXU_TzbUiVwaw0FWJabibLSQ686BeJM
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2666,8 +2666,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Le jeton a expiré"
+  "message" : "Le jeton a expiré",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2687,7 +2687,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all-with-deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2761,7 +2761,7 @@ Content-Length: 970
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTQ5LCJleHAiOjE3NzY4NTkyNDksImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.VbdQ6SpR-5W-GlRPefy7aUhyD6qMT_Mdm9ojh5adLMw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA0LCJleHAiOjE3NzcwMTk3MDQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.3GSqNwKroqXPeb9Q6RVOKYZmmwjDWhPE9a8Hoibnl1A
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2799,7 +2799,7 @@ Content-Length: 3
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUwLCJleHAiOjE3NzY4NTkyNTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.aXKp9htTRppd-fTaJR_SYr9hd9Q-4niq5E2IbIlh5FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA1LCJleHAiOjE3NzcwMTk3MDUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.PbE8AGkBuUS3zyGpm8cYd8GDET-dsIXTQ0px6d7dhEo
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2910,8 +2910,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2943,7 +2943,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5NTEsImV4cCI6MTc3Njg1OTI1MSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.MArlTt5GLE4rw7VKY4lVLn96tRYPHSxOkPBYzdktEKY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTk0MDYsImV4cCI6MTc3NzAxOTcwNiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.gKp4VFWrro7U9VwVyJDDLiI8MVeCrpuVABFhFC3btb8
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2997,7 +2997,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3020,9 +3020,9 @@ Content-Length: 141
 
 {
   "status" : 404,
-  "error" : "Not Found",
+  "timestamp" : "2026-04-24T08:30:06.679134395",
   "message" : "Utilisateur non trouvé: 9999",
-  "timestamp" : "2026-04-22T11:55:51.569322971"
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3054,7 +3054,7 @@ Content-Length: 141
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3077,9 +3077,9 @@ Content-Length: 166
 
 {
   "status" : 409,
-  "error" : "Conflict",
+  "timestamp" : "2026-04-24T08:30:06.323793604",
   "message" : "L'utilisateur est déjà manager: test.manager@test.com",
-  "timestamp" : "2026-04-22T11:55:51.158082984"
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -3101,7 +3101,7 @@ Content-Length: 166
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/3/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUwLCJleHAiOjE3NzY4NTkyNTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.aXKp9htTRppd-fTaJR_SYr9hd9Q-4niq5E2IbIlh5FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA1LCJleHAiOjE3NzcwMTk3MDUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.PbE8AGkBuUS3zyGpm8cYd8GDET-dsIXTQ0px6d7dhEo
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3124,9 +3124,9 @@ Content-Length: 162
 
 {
   "status" : 409,
-  "error" : "Conflict",
+  "timestamp" : "2026-04-24T08:30:05.775330042",
   "message" : "L'utilisateur est déjà admin: test.admin@test.com",
-  "timestamp" : "2026-04-22T11:55:50.621190702"
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -3146,7 +3146,7 @@ Content-Length: 162
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTQ5LCJleHAiOjE3NzY4NTkyNDksImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.VbdQ6SpR-5W-GlRPefy7aUhyD6qMT_Mdm9ojh5adLMw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA1LCJleHAiOjE3NzcwMTk3MDUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.PbE8AGkBuUS3zyGpm8cYd8GDET-dsIXTQ0px6d7dhEo
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3249,8 +3249,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3274,7 +3274,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5NTAsImV4cCI6MTc3Njg1OTI1MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.UjfoUl6xuIqhEvDfE8x7D6OB5LAAyTbYH9mPvMTA6_E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTk0MDUsImV4cCI6MTc3NzAxOTcwNSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.UvOkSJOumUMH-M47tEAHE_QREJe648Qn3GI9yg7G2y4
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3320,7 +3320,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUwLCJleHAiOjE3NzY4NTkyNTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.aXKp9htTRppd-fTaJR_SYr9hd9Q-4niq5E2IbIlh5FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA1LCJleHAiOjE3NzcwMTk3MDUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.PbE8AGkBuUS3zyGpm8cYd8GDET-dsIXTQ0px6d7dhEo
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3339,13 +3339,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 140
+Content-Length: 141
 
 {
   "status" : 404,
-  "error" : "Not Found",
+  "timestamp" : "2026-04-24T08:30:05.248233658",
   "message" : "Utilisateur non trouvé: 9999",
-  "timestamp" : "2026-04-22T11:55:50.09187214"
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3365,7 +3365,7 @@ Content-Length: 140
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTQ5LCJleHAiOjE3NzY4NTkyNDksImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.VbdQ6SpR-5W-GlRPefy7aUhyD6qMT_Mdm9ojh5adLMw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA0LCJleHAiOjE3NzcwMTk3MDQsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.3GSqNwKroqXPeb9Q6RVOKYZmmwjDWhPE9a8Hoibnl1A
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3465,8 +3465,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3490,7 +3490,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/2/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5NTAsImV4cCI6MTc3Njg1OTI1MCwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.UjfoUl6xuIqhEvDfE8x7D6OB5LAAyTbYH9mPvMTA6_E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTk0MDUsImV4cCI6MTc3NzAxOTcwNSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.UvOkSJOumUMH-M47tEAHE_QREJe648Qn3GI9yg7G2y4
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3536,7 +3536,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3559,9 +3559,9 @@ Content-Length: 141
 
 {
   "status" : 404,
-  "error" : "Not Found",
+  "timestamp" : "2026-04-24T08:30:06.235744853",
   "message" : "Utilisateur non trouvé: 9999",
-  "timestamp" : "2026-04-22T11:55:51.088914241"
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3585,7 +3585,7 @@ Content-Length: 141
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/3/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUwLCJleHAiOjE3NzY4NTkyNTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.aXKp9htTRppd-fTaJR_SYr9hd9Q-4niq5E2IbIlh5FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA1LCJleHAiOjE3NzcwMTk3MDUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.PbE8AGkBuUS3zyGpm8cYd8GDET-dsIXTQ0px6d7dhEo
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3608,9 +3608,9 @@ Content-Length: 162
 
 {
   "status" : 409,
-  "error" : "Conflict",
+  "timestamp" : "2026-04-24T08:30:05.845106338",
   "message" : "L'utilisateur est déjà admin: test.admin@test.com",
-  "timestamp" : "2026-04-22T11:55:50.686173418"
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -3630,7 +3630,7 @@ Content-Length: 162
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUwLCJleHAiOjE3NzY4NTkyNTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.aXKp9htTRppd-fTaJR_SYr9hd9Q-4niq5E2IbIlh5FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3730,8 +3730,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3755,7 +3755,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzY4NTg5NTEsImV4cCI6MTc3Njg1OTI1MSwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.MArlTt5GLE4rw7VKY4lVLn96tRYPHSxOkPBYzdktEKY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LnVzZXJAdGVzdC5jb20iLCJ0eXAiOiJhY2Nlc3MiLCJpYXQiOjE3NzcwMTk0MDYsImV4cCI6MTc3NzAxOTcwNiwiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoiVXNlciIsIm1haW5Sb2xlIjoiVVNFUiIsInBlcm1pc3Npb25zIjpbIlJPTEVfVVNFUiIsInVzZXI6cmVhZCJdfQ.gKp4VFWrro7U9VwVyJDDLiI8MVeCrpuVABFhFC3btb8
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3801,7 +3801,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/9999/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUwLCJleHAiOjE3NzY4NTkyNTAsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.aXKp9htTRppd-fTaJR_SYr9hd9Q-4niq5E2IbIlh5FE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA1LCJleHAiOjE3NzcwMTk3MDUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.PbE8AGkBuUS3zyGpm8cYd8GDET-dsIXTQ0px6d7dhEo
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3824,9 +3824,9 @@ Content-Length: 141
 
 {
   "status" : 404,
-  "error" : "Not Found",
+  "timestamp" : "2026-04-24T08:30:05.611648421",
   "message" : "Utilisateur non trouvé: 9999",
-  "timestamp" : "2026-04-22T11:55:50.507851442"
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3846,7 +3846,7 @@ Content-Length: 141
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/4/downgrade-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3949,8 +3949,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3970,7 +3970,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4076,8 +4076,8 @@ X-Frame-Options: DENY
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -4097,7 +4097,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4138,7 +4138,7 @@ Content-Length: 99
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1/permanent HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA3LCJleHAiOjE3NzcwMTk3MDcsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.VkOV6vx41EaEOntbkjp2grX2Wcd2IGfgBV3Y5KM6QmI
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4179,7 +4179,7 @@ Content-Length: 102
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/restore HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc2ODU4OTUxLCJleHAiOjE3NzY4NTkyNTEsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.1Z7zcTPEi2jviYU32LDHIJoBkCikkAsekwP-GZSYgqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LmFkbWluQHRlc3QuY29tIiwidHlwIjoiYWNjZXNzIiwiaWF0IjoxNzc3MDE5NDA2LCJleHAiOjE3NzcwMTk3MDYsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IkFkbWluIiwibWFpblJvbGUiOiJBRE1JTiIsInBlcm1pc3Npb25zIjpbInVzZXI6ZGVsZXRlIiwidXNlcjpyZWFkIiwidXNlcjp3cml0ZSIsInVzZXI6dXBkYXRlIiwiUk9MRV9BRE1JTiJdfQ.QLzCWxit8JT726QvGchonTovKNCZzwAd07gjdUhjuI0
 Accept-Language: en-us
 Host: localhost:8080</code></pre>
 </div>
