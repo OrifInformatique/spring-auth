@@ -1,17 +1,16 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.Arrays;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-
-import org.springframework.core.annotation.Order;
-
-import java.util.Arrays;
 
 /**
  * Seeder class for initializing the database with default user data.

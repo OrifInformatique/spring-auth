@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -527,12 +528,13 @@ public class UserService {
      * - Soft-deletes the user
      *
      * @param userId The ID of the user to delete
+     * @param hardDelete If true, the user will be permanently deleted instead of soft-deleted
      * @return UserDto containing the deleted user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deleteUser(Long userId) {
+    public UserDto deleteUser(Long userId, boolean hardDelete) {
         // Get the user to delete
         User userToDelete = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -551,7 +553,12 @@ public class UserService {
         }
 
         // Delete the user
-        userRepository.delete(userToDelete);
+        if(hardDelete){
+            userRepository.deletePermanentlyById(userId);
+        }
+        else{
+            userRepository.delete(userToDelete);
+        }
         return userMapper.toUserDto(userToDelete);
     }
 
@@ -655,5 +662,35 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(userLogin));
         
         refreshTokenRepository.deleteByUserLogin(userLogin);
+    }
+
+     /**
+     * Updates a user's information.
+     * 
+     * This operation:
+     * - Verifies the user exists
+     * - Updates the user's first name, last name, and login
+     * - Saves the updated user to the database
+     * - Returns the updated user's information as a UserDto
+     * 
+     * Note: This method does not allow updating the user's roles or password. Separate methods should be used for those operations.
+     * 
+     * @param userId The ID of the user to update
+     * @param userDto The new user information to update
+     * @throws UserNotFoundException if the user is not found
+     */
+
+    @Transactional
+    public void updateUser(Long userId, UserDto userDto) {
+
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setLogin(userDto.getLogin());
+
+        userRepository.save(user);
     }
 }

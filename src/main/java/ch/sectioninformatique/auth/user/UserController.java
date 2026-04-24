@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * REST controller for managing user operations.
@@ -238,19 +240,20 @@ public class UserController {
     }
 
     /**
-     * Soft-deletes a user from the system.
+     * Method to soft or hard delete users.
      * This endpoint:
      * - Requires the 'user:delete' authority
      * - Validates the authenticated user has sufficient permissions
      * - Returns success/error message
      *
-     * @param userId The ID of the user to soft-delete
+     * @param userId The ID of the user to delete
+     * @param hardDelete A boolean for soft or hard delete
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<?> delete(@PathVariable Long userId) {
-        UserDto deletedUser = userService.deleteUser(userId);
+    @DeleteMapping("/{userId}/{hardDelete}")
+    public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable boolean hardDelete) {
+        UserDto deletedUser = userService.deleteUser(userId, hardDelete);
         return ResponseEntity
             .ok(Map.of(
                 "message",
@@ -262,28 +265,10 @@ public class UserController {
                 deletedUser.getLogin()));
     }
 
-    /**
-     * Permanently deletes a user from the system.
-     * This endpoint:
-     * - Requires the 'user:delete' authority
-     * - Validates the authenticated user has sufficient permissions
-     * - Returns success/error message
-     *
-     * @param userId The ID of the user to permanently delete
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{userId}/permanent")
-    public ResponseEntity<?> deletePermanent(@PathVariable Long userId) {
-        UserDto deletedUser = userService.deletePermanentUser(userId);
-        return ResponseEntity
-            .ok(Map.of(
-                "message",
-                messageSource.getMessage(
-                    "message.user.deleted.permanent",
-                    null,
-                    LocaleContextHolder.getLocale()),
-                "deletedUserLogin",
-                deletedUser.getLogin()));
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        userService.updateUser(id, userDto);
+        return ResponseEntity.ok().body("User updated successfully");
     }
 }
