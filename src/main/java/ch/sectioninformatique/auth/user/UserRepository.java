@@ -52,14 +52,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllDeleted();
 
     /**
-     * Returne a deleted user from his id
+     * Returns a deleted user from his id
      */
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.deleted = true")
     Optional<User> findByIdDeleted(@Param("id") Long id);
 
-    /*
-    * Permanently delete a user
-    * from the database, bypassing any soft delete mechanisms.
+    /**
+    * Permanently delete a user from the database,
+    * bypassing any soft delete mechanisms.
     */
     @Modifying
     @Transactional
