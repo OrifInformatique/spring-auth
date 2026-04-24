@@ -1,11 +1,20 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ch.sectioninformatique.auth.auth.AuthExceptions;
@@ -15,13 +24,6 @@ import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.SecurityExceptions;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link UserService}.
@@ -442,7 +444,7 @@ public class UserServiceTest {
         when(userRepository.findByLogin("manager@test.com")).thenReturn(Optional.of(authenticatedUser));
 
         // Act
-        userService.deleteUser(userId);
+        userService.deleteUser(userId, false);
 
         // Assert
         verify(userRepository).findById(userId);
@@ -504,7 +506,7 @@ public class UserServiceTest {
         // Act & Assert
         SecurityExceptions.UserHasLowerRightsException exception = assertThrows(
             SecurityExceptions.UserHasLowerRightsException.class,
-            () -> userService.deleteUser(userId)
+            () -> userService.deleteUser(userId, false)
         );
         assertEquals("user@test.com", exception.getLogin());
     }
