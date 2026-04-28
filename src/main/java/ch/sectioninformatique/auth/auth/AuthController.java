@@ -87,6 +87,8 @@ public class AuthController {
         public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
                 UserDto userDto = userService.login(credentialsDto);
 
+                System.out.println("Login successful for user: " + userDto.getLogin());
+
                 String accessToken = userAuthenticationProvider.createToken(userDto);
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
 

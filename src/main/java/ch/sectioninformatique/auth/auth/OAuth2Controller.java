@@ -84,6 +84,7 @@ public class OAuth2Controller {
      */
     @GetMapping("/login")
     public ResponseEntity<Object> testCallOAuth2() {
+        System.out.println("Test initiating OAuth2 login flow with Azure...");
 
         // Redirect frontend to spring-auth OAuth2 login endpoint
         URI uri = URI.create("/oauth2/authorization/azure");
@@ -108,6 +109,8 @@ public class OAuth2Controller {
             @RequestParam(required = false) String redirectUrl,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
+
+        System.out.println("Initiating OAuth2 login flow with Azure...");
 
         HttpSession session = request.getSession(true);
 
