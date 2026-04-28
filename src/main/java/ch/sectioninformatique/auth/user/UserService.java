@@ -680,8 +680,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long userId, UserDto userDto) {
-
+    public void updateUser(Long userId, UpdateUserDto userDto) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
@@ -689,6 +688,9 @@ public class UserService {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setLogin(userDto.getLogin());
+
+        String encodedPassword = passwordEncoder.encode(new String(userDto.getPassword()));
+        user.setPassword(encodedPassword);
 
         userRepository.save(user);
     }

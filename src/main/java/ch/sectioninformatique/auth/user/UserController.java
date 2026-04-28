@@ -278,7 +278,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public <UserUpdateDto> ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UpdateUserDto userDto) {
         userService.updateUser(id, userDto);
         return ResponseEntity.ok().body("User updated successfully");
     }
