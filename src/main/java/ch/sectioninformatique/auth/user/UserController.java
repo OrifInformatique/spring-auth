@@ -254,11 +254,22 @@ public class UserController {
     @DeleteMapping("/{userId}/{hardDelete}")
     public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable boolean hardDelete) {
         UserDto deletedUser = userService.deleteUser(userId, hardDelete);
+        if (!hardDelete){
         return ResponseEntity
             .ok(Map.of(
                 "message",
                 messageSource.getMessage(
                     "message.user.deleted",
+                    null,
+                    LocaleContextHolder.getLocale()),
+                "deletedUserLogin",
+                deletedUser.getLogin()));
+        }
+        return ResponseEntity
+            .ok(Map.of(
+                "message",
+                messageSource.getMessage(
+                    "message.user.deleted.permanent",
                     null,
                     LocaleContextHolder.getLocale()),
                 "deletedUserLogin",

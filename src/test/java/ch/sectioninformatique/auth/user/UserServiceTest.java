@@ -389,7 +389,7 @@ public class UserServiceTest {
     }
 
     /**
-     * Test: Successfully delete a user with proper permissions
+     * Test: Successfully soft delete a user with proper permissions
      * 
      * Verifies that a user with sufficient permissions (MANAGER or ADMIN) can
      * delete another user with lower or equal permissions.
@@ -406,9 +406,10 @@ public class UserServiceTest {
      * - User lookup was performed
      * - Authenticated user was retrieved
      * - User was deleted from repository
+     * - User is no longer enable
      */
     @Test
-    void deleteUser_Successful_DeletesUser() {
+    void soft_deleteUser_Successful_DeletesUser() {
         // Arrange
         Long userId = 2L;
         User userToDelete = new User();
@@ -451,6 +452,71 @@ public class UserServiceTest {
         verify(userRepository).findByLogin("manager@test.com");
         verify(userRepository).delete(userToDelete);
     }
+
+        /**
+     * Test: Successfully hard delete a user with proper permissions
+     * 
+     * Verifies that a user with sufficient permissions (MANAGER or ADMIN) can
+     * delete another user with lower or equal permissions.
+     * 
+     * Arrange:
+     * - Mock repository to return the user to be deleted (USER role)
+     * - Mock security context to provide authenticated user (MANAGER role)
+     * - Mock repository to return the authenticated user
+     * 
+     * Act:
+     * - Call userService.deleteUser() with target user ID
+     * 
+     * Assert:
+     * - User lookup was performed
+     * - Authenticated user was retrieved
+     * - User was deleted from repository
+     */
+    @Test
+    void hard_deleteUser_Successful_DeletesUser() {
+        // Arrange
+        Long userId = 2L;
+        User userToDelete = new User();
+        userToDelete.setId(userId);
+        userToDelete.setFirstName("John");
+        userToDelete.setLastName("Doe");
+        userToDelete.setLogin("john@test.com");
+        userToDelete.setPassword("pass");
+        userToDelete.setMainRole(new Role());
+        Role userRole = new Role();
+        userRole.setId(1L);
+        userRole.setName(RoleEnum.USER);
+        userToDelete.setMainRole(userRole);
+        
+        User authenticatedUser = new User();
+        authenticatedUser.setId(3L);
+        authenticatedUser.setFirstName("Manager");
+        authenticatedUser.setLastName("User");
+        authenticatedUser.setLogin("manager@test.com");
+        authenticatedUser.setPassword("pass");
+        authenticatedUser.setMainRole(new Role());
+        Role managerRole = new Role();
+        managerRole.setId(2L);
+        managerRole.setName(RoleEnum.MANAGER);
+        authenticatedUser.setMainRole(managerRole);
+
+        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, false,
+                "ROLE_MANAGER", null);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
+        when(userRepository.findByLogin("manager@test.com")).thenReturn(Optional.of(authenticatedUser));
+
+        // Act
+        userService.deleteUser(userId, true);
+
+        // Assert
+        verify(userRepository).findById(userId);
+        verify(userRepository).findByLogin("manager@test.com");
+        verify(userRepository).deletePermanentlyById(userId);
+    }
+
 
     /**
      * Test: Delete fails when user has insufficient permissions

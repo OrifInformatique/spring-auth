@@ -1,10 +1,20 @@
 package ch.sectioninformatique.auth.user;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,40 +22,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import ch.sectioninformatique.auth.AuthApplication;
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import ch.sectioninformatique.auth.AuthApplication;
+import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
 /**
  * Integration tests for the UserController.
@@ -629,7 +626,7 @@ public class UserControllerIntegrationTest {
                 // First, soft delete the user using the DELETE endpoint
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getId() + "/false",
                                 null,
                                 adminToken,
                                 MediaType.APPLICATION_JSON,
@@ -684,7 +681,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId() + "/permanent",
+                                "/users/" + userDto.getId() + "/true",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1843,7 +1840,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getId() + "/false",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1889,7 +1886,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getId() + "/false",
                                 null,
                                 null,
                                 MediaType.APPLICATION_JSON,
@@ -1930,7 +1927,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getId() + "/false",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
