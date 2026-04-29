@@ -75,23 +75,6 @@ public class OAuth2Controller {
     }
 
     /**
-     * Initiates OAuth2 authentication flow with Azure via a simple redirect.
-     * This endpoint provides a direct way to start the OAuth2 login process
-     * by redirecting to Spring Security's OAuth2 authorization endpoint.
-     * Unlike /login/azure, it does not store a custom redirect URL in the session.
-     *
-     * @return ResponseEntity with HTTP 302 redirect to Azure authorization endpoint
-     */
-    @GetMapping("/login")
-    public ResponseEntity<Object> testCallOAuth2() {
-        log.debug("Test initiating OAuth2 login flow with Azure...");
-
-        // Redirect frontend to spring-auth OAuth2 login endpoint
-        URI uri = URI.create("/oauth2/authorization/azure");
-        return ResponseEntity.status(HttpStatus.FOUND).location(uri).build();
-    }
-
-    /**
      * Initiates OAuth2 authentication flow with Azure.
      * This endpoint is called by the client application to start the OAuth2 flow.
      * It stores the calling URL (from Referer header or redirectUrl parameter) in the session,
