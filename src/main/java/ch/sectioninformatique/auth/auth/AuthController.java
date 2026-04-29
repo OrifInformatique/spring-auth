@@ -6,6 +6,9 @@ import java.time.Instant;
 import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -69,6 +72,9 @@ public class AuthController {
         @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
         private Duration refreshTokenLifetime;
 
+        /** Logger for auth operations */
+	private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
         /**
          * Authenticates a user with provided credentials and issues JWT access and
          * refresh tokens.
@@ -87,7 +93,7 @@ public class AuthController {
         public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
                 UserDto userDto = userService.login(credentialsDto);
 
-                System.out.println("Login successful for user: " + userDto.getLogin());
+                log.info("Login successful for user: " + userDto.getLogin());
 
                 String accessToken = userAuthenticationProvider.createToken(userDto);
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
