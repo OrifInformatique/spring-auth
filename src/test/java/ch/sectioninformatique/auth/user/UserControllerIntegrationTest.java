@@ -655,7 +655,7 @@ public class UserControllerIntegrationTest {
         }
 
         /**
-         * Test: DELETE /users/{userId}/permanent - Permanently delete a user
+         * Test: DELETE /users/{userId}/{permanent} - Permanently delete a user
          * 
          * Verifies that administrators can permanently remove users from the database.
          * Unlike soft-delete, this operation cannot be undone. This should be used with caution.
@@ -1768,6 +1768,58 @@ public class UserControllerIntegrationTest {
                                                 throw new RuntimeException(e);
                                         }
                                 });
+        }
+
+        /**
+         * Test : DELETE/{userId}/false - Reject because of wrong permissions
+         * 
+         * Verifies that the endpoint is accessible only if user has permissions users:delete
+         * to prevent unauthorized user deletion.
+         * 
+         * Expected behavior:
+         * - Returns HTTP 403 (Access denied)
+         * - User remains not deleted
+         * - Response contains error message
+         * 
+         * Test data: 
+         * - target user : test.admin2@test.com
+         * - unauthorized user : test.user@test.com
+         */ 
+
+        @Test
+        @Transactional
+        public void deleteUser_withWrongPermissions_shouldReturns403() throws Exception{
+
+                UserDto userToDelete = userService.findByLogin("test.admin@test.com");
+                UserDto unauthorizedUser = userService.findByLogin("test.user@test.com");
+                
+                String token = userAuthenticationProvider.createToken(unauthorizedUser);
+
+                performRequest(
+                        "DELETE",
+                        "/users/" + userToDelete.getId() + "/false", 
+                        null,
+                        token,
+                        MediaType.APPLICATION_JSON,
+                        403, 
+                        "delete-user-with-wrong-permissions",
+                        request -> {
+                                try {
+                                    request.andExpect(jsonPath("$.message")
+                                    .value(message("error.security.access.denied")));
+                                } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                }
+                        });
+
+                //Verify if the user is deleted
+                try{
+                User deletedUser = userRepository.findByLogin("test.admin@test.com")
+                        .orElseThrow(() -> new AssertionError("User should still exist in database"));
+                        assertTrue(deletedUser.isEnabled(), "User should be marked as deleted");
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
         }
 
         /**
