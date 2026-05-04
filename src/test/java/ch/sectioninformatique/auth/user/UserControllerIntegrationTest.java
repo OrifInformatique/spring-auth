@@ -42,6 +42,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.sectioninformatique.auth.AuthApplication;
+import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 
 /**
@@ -1820,6 +1821,49 @@ public class UserControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
+        }
+
+        /**
+         * Test : PUT /users/{userId} - Update successfully
+         * 
+         * Verifies if the endpoint update works.
+         * 
+         * Expected behavior:
+         * - success message
+         * - user updated
+         * 
+         * Test data:
+         * - admin user (test.admin2@test.com)
+         * - userToUpdate (test.user@test.com)
+         */
+
+        @Test
+        @Transactional
+        public void updateUser_withRealData_shouldReturnSuccess() throws Exception{
+
+                UserDto adminUser = userService.findByLogin("test.admin2@test.com");
+                UserDto userToUpdate = userService.findByLogin("test.user@test.com");
+
+                String token = userAuthenticationProvider.createToken(adminUser);
+
+                performRequest(
+                        "PUT",
+                        "/users/" + userToUpdate.getId(),
+                        "{\"firstName\":\"Updated\", \"lastName\":\"NewUser\", \"login\":\"updated.newuser@test.com\", \"mainRole\": \"ADMIN\", \"password\":\"NewPassword\"}",
+                        token,
+                        MediaType.APPLICATION_JSON,
+                        200,
+                        "update-user-success",
+                        request -> {
+                                
+                        }
+                        );
+                
+                //Verify if the user is updated
+                User updatedUser = userRepository.findByLogin("updated.newuser@test.com")
+                        .orElseThrow(() -> new AssertionError("Updated user should exist in database"));
+
+                assertEquals(RoleEnum.ADMIN, updatedUser.getMainRole().getName(), "User role should be updated to ADMIN");
         }
 
         /**

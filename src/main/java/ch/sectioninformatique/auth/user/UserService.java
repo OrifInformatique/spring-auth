@@ -685,12 +685,24 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
+        Role newRole;
+        try{
+            newRole = roleRepository.findByName(RoleEnum.valueOf(userDto.getMainRole()))
+            .orElseThrow(() -> new RoleNotFoundException(RoleEnum.valueOf(userDto.getMainRole())));
+        } catch(IllegalArgumentException e){
+            newRole = user.getMainRole();
+        }
+
+        String newPassword = new String(userDto.getPassword());
+        if(!newPassword.isEmpty() && !newPassword.isBlank() && !passwordEncoder.matches(newPassword, user.getPassword())){
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            user.setPassword(encodedPassword);
+        }
+
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setLogin(userDto.getLogin());
-
-        String encodedPassword = passwordEncoder.encode(new String(userDto.getPassword()));
-        user.setPassword(encodedPassword);
+        user.setMainRole(newRole);
 
         userRepository.save(user);
     }
