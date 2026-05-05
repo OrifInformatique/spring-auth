@@ -514,7 +514,7 @@ public class UserServiceTest {
         // Assert
         verify(userRepository).findById(userId);
         verify(userRepository).findByLogin("manager@test.com");
-        verify(userRepository).deletePermanentlyById(userId);
+        verify(userRepository).hardDeleteById(userId);
     }
 
 

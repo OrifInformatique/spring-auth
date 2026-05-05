@@ -1,15 +1,14 @@
 package ch.sectioninformatique.auth.security;
 
 
-import java.util.Optional;
-
-import org.springframework.data.repository.CrudRepository;
+import java.util.Optional;      
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * Repository interface for Role entity operations.
  * This interface:
- * - Extends CrudRepository to provide basic CRUD operations for Role entities
+ * - Extends JpaRepository to provide basic CRUD operations for Role entities
  * - Is annotated with @Repository to indicate it's a Spring Data repository
  * - Provides methods to interact with the roles table in the database
  * - Includes custom query methods for role-specific operations
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Repository;
  * - Support role management operations
  */
 @Repository
-public interface RoleRepository extends CrudRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
     /**
      * Finds a role by its name.
      * This method:

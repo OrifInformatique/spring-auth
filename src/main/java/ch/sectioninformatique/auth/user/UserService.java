@@ -553,7 +553,7 @@ public class UserService {
 
         // Delete the user
         if(hardDelete){
-        userRepository.deletePermanentlyById(userId);
+        userRepository.hardDeleteById(userId);
         }
         else{
             userRepository.delete(userToDelete);
@@ -593,7 +593,7 @@ public class UserService {
         }
 
         // Delete the user
-        userRepository.deletePermanentlyById(userId);
+        userRepository.hardDeleteById(userId);
         return userMapper.toUserDto(userToDelete);
     }
 
