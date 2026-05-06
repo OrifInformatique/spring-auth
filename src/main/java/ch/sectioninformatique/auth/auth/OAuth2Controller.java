@@ -1,9 +1,9 @@
 package ch.sectioninformatique.auth.auth;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Objects;
 import java.time.Duration;
+import java.time.Instant;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,11 +12,11 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +48,10 @@ public class OAuth2Controller {
     // Fallback redirect target when no external redirect URL is available.
     // This should be a valid endpoint in the client application that can handle the post-login state.
     private static final String DEFAULT_REDIRECT_URL = "/auth/redirect-after-login";
+
+    // Refresh token lifetime (e.g., "30d" for 30 days), configured via environment variable.
+    @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
+    private Duration refreshTokenLifetime;
 
     // A custom provider used to generate JWT tokens for authenticated users.
     private final UserAuthenticationProvider userAuthenticationProvider;
@@ -174,27 +178,35 @@ public class OAuth2Controller {
             return;
         }
 
-        UserDto user = UserDto.builder()
+        UserDto userDto = UserDto.builder()
                 .login(email)
                 .firstName(givenName)
                 .lastName(familyName)
                 .build();
 
         // Create or get Azure user in local database
-        user = userService.getOrCreateAzureUser(user);
+        userDto = userService.getOrCreateAzureUser(userDto);
 
-        // Generate a JWT using your custom UserAuthenticationProvider.
-        String jwt = userAuthenticationProvider.createToken(user);
+        // Generate a JWT token and refresh token using the UserAuthenticationProvider
+        String accessToken = userAuthenticationProvider.createToken(userDto);
+        String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+        
+        // Set the access token in the response header for client-side use
+        userDto.setToken(accessToken);
+        response.setHeader("Authorization", "Bearer " + accessToken);
 
-        // Create a secure HTTP-only cookie with the JWT token
-        ResponseCookie cookie = ResponseCookie
-                .from("token", jwt)
-                .httpOnly(false) // Accessible via JavaScript
-                .secure(true)
-                .path("/")
-                .maxAge(Duration.ofDays(30))
-                .sameSite("Lax")
-                .build();
+        // Store refresh token in database with expiration
+        userService.storeRefreshToken(userDto.getLogin(), refreshToken,
+                        Instant.now().plus(refreshTokenLifetime));
+
+        // Create secure HTTP-only cookie for the refresh token
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/auth/refresh")
+                        .maxAge(refreshTokenLifetime)
+                        .sameSite("None")
+                        .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
 
@@ -218,7 +230,7 @@ public class OAuth2Controller {
             redirectUrl += (redirectUrl.contains("?") ? "&" : "?") + "loginType=azure";
         }
 
-        log.debug("Redirecting to client application with JWT token in secure cookie: {}", redirectUrl);
+        log.debug("Redirecting to client application with access and refresh tokens: {}", redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 }
