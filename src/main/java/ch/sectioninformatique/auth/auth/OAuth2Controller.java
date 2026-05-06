@@ -32,11 +32,17 @@ import ch.sectioninformatique.auth.user.UserService;
  * Controller handling OAuth2 authentication flows.
  * This controller manages the OAuth2 authentication process for Azure OAuth2 authentication.
  * 
- * Provides two endpoints:
+ * Provides three endpoints:
  * - /oauth2/login/azure: Initiates the OAuth2 flow by storing redirect URL and redirecting to Azure
  * - /oauth2/success: Handles the callback from Azure after successful authentication
+ * - /oauth2/token: Exchanges authentication code for JWT access and refresh token
  * 
- * The controller generates JWT tokens for authenticated users and stores them in secure cookies.
+ * Complete OAuth2 Flow:
+ * 1. Client application → spring-auth (/oauth2/login/azure): Calls with Referer header
+ * 2. spring-auth → Azure: Redirects to Azure OAuth2 authorization endpoint
+ * 3. Azure → spring-auth (/oauth2/success): Callback after User authentication
+ * 4. spring-auth → client application: Redirects to stored Referer URL with a temporary authentication code
+ * 5. Client application → spring-auth (oauth2/token): Exchanges authentication code for JWT access and refresh token
  */
 @RequestMapping("/oauth2")
 @RestController
@@ -121,21 +127,14 @@ public class OAuth2Controller {
     }
 
     /**
-     * Handles the OAuth2 authentication success callback from Azure.
-     * This endpoint is called by Spring Security after successful Azure authentication.
+     * Handles the OAuth2 authentication success callback.
+     * This endpoint is called by Spring Security after successful OAuth2 authentication.
      * It:
      * 1. Extracts user information from the OAuth2 token
      * 2. Creates or updates the user in the local database
-     * 3. Generates a JWT token
-     * 4. Sets the JWT in a secure HTTP-only cookie
-     * 5. Retrieves the stored redirect URL from session
-     * 6. Redirects back to the client application with the JWT cookie set
-     *
-     * Complete OAuth2 Flow:
-     * 1. Client application → spring-auth (/oauth2/login/azure): Calls with Referer header
-     * 2. spring-auth → Azure: Redirects to Azure OAuth2 authorization endpoint
-     * 3. Azure → spring-auth (/oauth2/success): Callback after User authentication
-     * 4. spring-auth → client application: Redirects to stored Referer URL with JWT cookie
+     * 3. Generates a temporary authentication code to exchange with client application
+     * 4. Retrieves the stored redirect URL from session
+     * 5. Redirects back to the client application with the authentication code
      *
      * @param authentication The OAuth2 authentication token containing user information
      * @param request        The HTTP request object containing the session
@@ -232,5 +231,16 @@ public class OAuth2Controller {
 
         log.debug("Redirecting to client application with access and refresh tokens: {}", redirectUrl);
         response.sendRedirect(redirectUrl);
+    }
+
+    /**
+     * Callback method to exchange a temporary authentication code for JWT access and refresh tokens.
+     * This endpoint is called by the client application after a successfull oauth2 login, to exchange
+     * the temporary authentication code for JWT tokens.
+     *
+     * 
+     */
+    @GetMapping("/token")
+    public void getToken() {
     }
 }
