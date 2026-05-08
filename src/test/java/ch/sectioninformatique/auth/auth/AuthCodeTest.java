@@ -73,7 +73,7 @@ public class AuthCodeTest {
         List<AuthCode> retrievedAuthCode = authCodeRepository.findByUserLogin(TEST_userLogin);
         System.out.println("Retrieved auth codes for user " + TEST_userLogin + ": " + retrievedAuthCode.size());
 
-        //Then
+        
         assert !retrievedAuthCode.isEmpty();
     }
 
