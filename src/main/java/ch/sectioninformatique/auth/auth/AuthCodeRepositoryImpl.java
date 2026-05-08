@@ -1,9 +1,10 @@
 package ch.sectioninformatique.auth.auth;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 /**
  * Implementation of the {@link AuthCodeRepository} interface.
@@ -17,11 +18,14 @@ public class AuthCodeRepositoryImpl {
     /**
      * Deletes all expired authentication codes from the database.
      */
+    @Transactional
     public void deleteExpiredCodes() {
-        String jpql = "DELETE e FROM AuthCode e WHERE e.dateExpiration <= :now";
+        String jpql = "DELETE FROM AuthCode e WHERE e.expiresAt <= :now";
 
-        entityManager.createQuery(jpql, AuthCode.class)
-            .setParameter("now", LocalDateTime.now())
-            .getSingleResult();
+        entityManager
+            .createQuery(jpql)
+            .setParameter("now", Instant.now())
+            .executeUpdate();
+
     }
 }
