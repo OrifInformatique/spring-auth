@@ -31,5 +31,5 @@ SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME=5m
 SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME=30d
 
 # Authentication codes configuration
-# These codes are sent to the client application to exchange for JWT tokens
+# These codes are sent to the client application after OAuth2 login, to exchange for JWT tokens
 SECURITY_AUTHENTICATION_CODES_LIFETIME=5m

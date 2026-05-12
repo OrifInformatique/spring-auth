@@ -49,6 +49,12 @@ public class AuthCode {
     private String userLogin;
 
     /**
+     * The redirect URL linked to the authentication code.
+     */
+    @Column(nullable = false)
+    private String redirectUrl;
+
+    /**
      * Expiration date/time of the authentication code.
      * 
      * After this time, the code is no longer valid.

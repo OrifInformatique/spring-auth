@@ -76,7 +76,7 @@ public class AuthCodeTest {
         
         assert !retrievedAuthCode.isEmpty();
     }
-
+assert authCode.getId().equals(TEST_codeId);
     @Test
     void getAuthCodeFromUserWithNoCode() {
         Optional<User> user = userRepository.findByLogin("test.user@test.com");
@@ -94,6 +94,8 @@ public class AuthCodeTest {
         authCode.setCreatedAt(Instant.now());
         
         authCodeRepository.save(authCode);
+
+        
 
         authCodeRepository.deleteExpiredCodes();
 
