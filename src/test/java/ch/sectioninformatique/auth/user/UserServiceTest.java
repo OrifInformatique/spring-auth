@@ -1,9 +1,11 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import ch.sectioninformatique.auth.auth.AuthCode;
+import ch.sectioninformatique.auth.auth.AuthCodeRepository;
 import ch.sectioninformatique.auth.auth.AuthExceptions;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
@@ -52,6 +56,9 @@ public class UserServiceTest {
 
     @Mock
     private RoleRepository roleRepository;
+
+    @Mock
+    private AuthCodeRepository authCodeRepository;
 
     @Mock
     private UserMapper userMapper;
@@ -509,5 +516,28 @@ public class UserServiceTest {
             () -> userService.deleteUser(userId, false)
         );
         assertEquals("user@test.com", exception.getLogin());
+    }
+
+
+    /**
+     * Test : generates, hashes, and store AuthCode
+     * Verify the method to create and store AuthCode works
+     * 
+     * Test Data:
+     * - user's login (user@test.com)
+     * - AuthCode
+     */
+
+    public void generateAndStoreAuthCode_Success(){
+
+        String userLogin = "user@test.com";
+        String redirectUrl = "redirectUrl";
+
+        String code = userService.generateAndStoreAuthCode(userLogin, redirectUrl);
+
+        List<AuthCode> authCode = authCodeRepository.findByUserLogin(userLogin);
+
+        assertTrue(!authCode.isEmpty());
+        assertTrue(!code.isEmpty());
     }
 }
