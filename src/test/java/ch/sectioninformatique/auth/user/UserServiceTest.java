@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ch.sectioninformatique.auth.auth.AuthCode;
 import ch.sectioninformatique.auth.auth.AuthCodeRepository;
+import ch.sectioninformatique.auth.auth.AuthCodeService;
 import ch.sectioninformatique.auth.auth.AuthExceptions;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
@@ -71,6 +72,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @InjectMocks
+    private AuthCodeService authCodeService;
 
     @BeforeEach
     void setUp() {
@@ -533,11 +537,36 @@ public class UserServiceTest {
         String userLogin = "user@test.com";
         String redirectUrl = "redirectUrl";
 
-        String code = userService.generateAndStoreAuthCode(userLogin, redirectUrl);
+        String code = authCodeService.generateAndStoreAuthCode(userLogin, redirectUrl);
 
         List<AuthCode> authCode = authCodeRepository.findByUserLogin(userLogin);
 
         assertTrue(!authCode.isEmpty());
         assertTrue(!code.isEmpty());
+    }
+
+    /**
+     * Test : retrieve and delete a code
+     * Verify that the code is found, and deleted, and return a JWT
+     * 
+     * Test data:
+     * - a user's login
+     * - A redirect Url
+     */
+
+    public void retrieveAndDelete_Success(){
+        String userLogin = "user@test.com";
+        String redirectUrl = "redirectUrl";
+
+        authCodeService.generateAndStoreAuthCode(userLogin, redirectUrl);
+        List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
+        String code = authCodes.get(0).getCode();
+
+        String jwt = authCodeService.retrieveAndDeleteAuthCode(code, userLogin, redirectUrl);
+
+        //Assert
+        assertTrue(!authCodes.isEmpty());
+        assertEquals(authCodes.get(0).getCode(), code, "The given code isn't valid. The given code is : " + code + ". The first code is :" + authCodes.get(0).getCode());
+
     }
 }

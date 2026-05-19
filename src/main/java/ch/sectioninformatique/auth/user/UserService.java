@@ -3,16 +3,13 @@ package ch.sectioninformatique.auth.user;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.sectioninformatique.auth.auth.AuthCode;
-import ch.sectioninformatique.auth.auth.AuthCodeRepository;
 import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
 import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidRefreshTokenException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
@@ -76,11 +71,6 @@ public class UserService {
     private final UserMapper userMapper;
 
     private final RefreshTokenRepository refreshTokenRepository;
-
-    private final AuthCodeRepository authCodeRepository;
-
-    @Value("${SECURITY_AUTHENTICATION_CODES_LIFETIME}")
-    private Duration lifetime;
 
 
     /**
@@ -172,7 +162,7 @@ public class UserService {
      * @param stringToHash The raw string to hash.
      * @return The Base64-encoded SHA-256 hash of the string.
      */
-    private String hash(String stringToHash) {
+    public String hash(String stringToHash) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(stringToHash.getBytes(StandardCharsets.UTF_8));
@@ -697,41 +687,5 @@ public class UserService {
 
         userRepository.save(user);
     }
-
-
-
-/**
- * Generates, hashes, and stores a new AuthCode in database.
- * This method:
- * -Clear expired codes with authCodeRepository.deleteExpiredCodes()
- * -Creates new AuthCode and hashes it
- * -Store the hashed code in the database
- * 
- * @param userLogin the user's login
- * @param redirectUrl the redirect url
- * @return the non-hasshed code
- */
-
-public String generateAndStoreAuthCode(String userLogin, String redirectUrl){
-    
-    authCodeRepository.deleteExpiredCodes();
-
-    String code = UUID.randomUUID().toString();
-    String hash = hash(code);
-
-    Instant expiredAt = Instant.now().plus(lifetime);
-    
-    AuthCode authCode = new AuthCode();
-    authCode.setCode(hash);
-    authCode.setUserLogin(userLogin);
-    authCode.setRedirectUrl(redirectUrl);
-    authCode.setCreatedAt(Instant.now());
-    authCode.setExpiresAt(expiredAt);
-    
-    authCodeRepository.save(authCode);
-    
-    return code;
-
-}
 
 }

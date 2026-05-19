@@ -37,4 +37,18 @@ public class AuthExceptions {
             return "error.security.refresh.token.invalid";
         }
     }
+
+
+    public static class AuthCodeNotFoundException extends AppException implements MessageKeyProvider{
+
+        public AuthCodeNotFoundException(String login){
+            super(HttpStatus.NOT_FOUND);
+        }
+
+        @Override
+        public String getMessageKey(){
+            return "error.authcode.not.found";
+        }
+
+    }
 }
