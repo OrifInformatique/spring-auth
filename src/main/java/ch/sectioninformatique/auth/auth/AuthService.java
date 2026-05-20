@@ -1,15 +1,18 @@
 package ch.sectioninformatique.auth.auth;
+import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
+
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ch.sectioninformatique.auth.auth.AuthExceptions.AuthCodeNotFoundException;
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
+
 import ch.sectioninformatique.auth.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class AuthCodeService {
+public class AuthService {
 
+    private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
     private final AuthCodeRepository authCodeRepository;
-    private final UserAuthenticationProvider userAuthenticationProvider;
 
     @Value("${SECURITY_AUTHENTICATION_CODES_LIFETIME}")
     private Duration lifetime;
@@ -40,33 +43,19 @@ public class AuthCodeService {
      * 
      * @return a JWT token
      */
-    public String retrieveAndDeleteAuthCode(String code, String userLogin, String redirectUrl){
+    public String retrieveAndDeleteAuthCode(String code, String userLogin){
 
-        AuthCode matched = null;
+
         authCodeRepository.deleteExpiredCodes();
-        List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
+        Optional<AuthCode> authCode = authCodeRepository.findByCodeAndUserLogin(code, userLogin);
         
-        if(authCodes.isEmpty()){
-            throw new AuthCodeNotFoundException(userLogin);
+        if(authCode.isEmpty()){
+            throw new AuthCodeNotFoundException();
         }
-
-        for(AuthCode authCode : authCodes){
-            if(authCode.getCode().equals(code)){
-                matched = authCode;
-                authCodeRepository.delete(authCode);
-
-                break;
-            }
-        }
-
-        if(matched == null){
-            throw new AuthCodeNotFoundException(userLogin);
-        }
-
         UserDto user = userService.findByLogin(userLogin);
+            String jwt = userAuthenticationProvider.createToken(user);
+            return jwt;
 
-        String jwt = userAuthenticationProvider.createToken(user);
-        return jwt;
     }
     
     /**
