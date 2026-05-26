@@ -1,11 +1,9 @@
 package ch.sectioninformatique.auth.user;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +17,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ch.sectioninformatique.auth.auth.AuthCode;
 import ch.sectioninformatique.auth.auth.AuthCodeRepository;
-import ch.sectioninformatique.auth.auth.AuthCodeService;
 import ch.sectioninformatique.auth.auth.AuthExceptions;
+import ch.sectioninformatique.auth.auth.AuthService;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
@@ -58,8 +55,6 @@ public class UserServiceTest {
     @Mock
     private RoleRepository roleRepository;
 
-    @Mock
-    private AuthCodeRepository authCodeRepository;
 
     @Mock
     private UserMapper userMapper;
@@ -73,8 +68,6 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    @InjectMocks
-    private AuthCodeService authCodeService;
 
     @BeforeEach
     void setUp() {
@@ -106,7 +99,7 @@ public class UserServiceTest {
         String login = "john@test.com";
         String password = "password123";
         User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, false, null);
-        UserDto expectedDto = new UserDto(1L, "John", "Doe", login, null, false, "USER", null);
+        UserDto expectedDto = new UserDto(1L, "John", "Doe", login,null, false, "USER", null);
         
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
@@ -218,7 +211,7 @@ public class UserServiceTest {
         user.setPassword("hashedPassword");
         user.setMainRole(new Role());
 
-        UserDto expectedDto = new UserDto(1L, "New", "User", login, null, false, "USER", null);
+        UserDto expectedDto = new UserDto(1L, "New", "User", login, null,  false, "USER", null);
         Role userRole = new Role();
         userRole.setId(1L);
         userRole.setName(RoleEnum.USER);
@@ -314,7 +307,7 @@ public class UserServiceTest {
         managerRole.setName(RoleEnum.MANAGER);
         user.setMainRole(userRole);
 
-        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null, false, "ROLE_MANAGER",
+        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null,false, "ROLE_MANAGER",
                 null);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -522,51 +515,4 @@ public class UserServiceTest {
         assertEquals("user@test.com", exception.getLogin());
     }
 
-
-    /**
-     * Test : generates, hashes, and store AuthCode
-     * Verify the method to create and store AuthCode works
-     * 
-     * Test Data:
-     * - user's login (user@test.com)
-     * - AuthCode
-     */
-
-    public void generateAndStoreAuthCode_Success(){
-
-        String userLogin = "user@test.com";
-        String redirectUrl = "redirectUrl";
-
-        String code = authCodeService.generateAndStoreAuthCode(userLogin, redirectUrl);
-
-        List<AuthCode> authCode = authCodeRepository.findByUserLogin(userLogin);
-
-        assertTrue(!authCode.isEmpty());
-        assertTrue(!code.isEmpty());
-    }
-
-    /**
-     * Test : retrieve and delete a code
-     * Verify that the code is found, and deleted, and return a JWT
-     * 
-     * Test data:
-     * - a user's login
-     * - A redirect Url
-     */
-
-    public void retrieveAndDelete_Success(){
-        String userLogin = "user@test.com";
-        String redirectUrl = "redirectUrl";
-
-        authCodeService.generateAndStoreAuthCode(userLogin, redirectUrl);
-        List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
-        String code = authCodes.get(0).getCode();
-
-        String jwt = authCodeService.retrieveAndDeleteAuthCode(code, userLogin, redirectUrl);
-
-        //Assert
-        assertTrue(!authCodes.isEmpty());
-        assertEquals(authCodes.get(0).getCode(), code, "The given code isn't valid. The given code is : " + code + ". The first code is :" + authCodes.get(0).getCode());
-
-    }
 }

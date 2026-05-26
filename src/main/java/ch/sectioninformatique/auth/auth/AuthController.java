@@ -4,7 +4,9 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,6 @@ import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
-
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -301,12 +302,17 @@ public class AuthController {
          */
         @PreAuthorize("isAuthenticated()")
         @GetMapping("/redirect-after-login")
-        public ResponseEntity<?> redirectAfterLogin() {
-                return ResponseEntity.ok(Map.of(
+        public ResponseEntity<?> redirectAfterLogin(HttpSession session) {
+                String code = (String) session.getAttribute("code");
+
+                return ResponseEntity.ok(
+                        Map.of(
                                 "message",
                                 messageSource.getMessage(
                                                 "message.login.success",
                                                 null,
-                                                LocaleContextHolder.getLocale())));
+                                                LocaleContextHolder.getLocale()),
+                                "code", code));
+                        
         }
 }

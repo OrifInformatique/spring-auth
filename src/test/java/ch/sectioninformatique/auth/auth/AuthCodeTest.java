@@ -30,7 +30,6 @@ public class AuthCodeTest {
     private final String TEST_code = "ThisIsATestCode";
     private final String TEST_userLogin = "test.admin@test.com";
     private final Instant TEST_expiresAt = Instant.now().plusSeconds(30); // Expires in 30 seconds
-    private final Instant TEST_createdAt = Instant.now();
     private final String TEST_redirectURL = "NotARealURL";
 
     @Autowired
@@ -48,7 +47,6 @@ public class AuthCodeTest {
     @Test
     void createAuthCode() {
         authCodeRepository.deleteAll();
-        Instant now = Instant.now();
         Instant expiredAt = Instant.now().plusSeconds(30);
 
         AuthCode authCode = new AuthCode();
@@ -56,7 +54,6 @@ public class AuthCodeTest {
         authCode.setUserLogin(TEST_userLogin);
         authCode.setRedirectUrl(TEST_redirectURL);
         authCode.setExpiresAt(expiredAt);
-        authCode.setCreatedAt(now);
         authCodeRepository.save(authCode);
 
         Optional<AuthCode> retrievedAuthCode = authCodeRepository.findById(authCode.getId()); 
@@ -64,7 +61,6 @@ public class AuthCodeTest {
 
         assertEquals(TEST_userLogin, retrievedAuthCode.get().getUserLogin());
         assertEquals(TEST_code, retrievedAuthCode.get().getCode());
-        assertEquals(now.truncatedTo(ChronoUnit.MICROS), retrievedAuthCode.get().getCreatedAt().truncatedTo(ChronoUnit.MICROS));
         assertEquals(expiredAt.truncatedTo(ChronoUnit.MICROS), retrievedAuthCode.get().getExpiresAt().truncatedTo(ChronoUnit.MICROS));
         assertEquals(TEST_redirectURL, retrievedAuthCode.get().getRedirectUrl());        
     }
@@ -83,8 +79,8 @@ public class AuthCodeTest {
         authCode.setCode(TEST_code);
         authCode.setUserLogin(TEST_userLogin);
         authCode.setExpiresAt(TEST_expiresAt);
-        authCode.setRedirectUrl(TEST_redirectURL);;
-        authCode.setCreatedAt(TEST_createdAt);
+        authCode.setRedirectUrl(TEST_redirectURL);
+
         authCodeRepository.save(authCode);
 
         AuthCode secondCode = new AuthCode();
@@ -92,7 +88,6 @@ public class AuthCodeTest {
         secondCode.setUserLogin(TEST_userLogin);
         secondCode.setExpiresAt(TEST_expiresAt);
         secondCode.setRedirectUrl(TEST_redirectURL);
-        secondCode.setCreatedAt(TEST_createdAt);
         authCodeRepository.save(secondCode);
 
         List<AuthCode> retrievedAuthCode = authCodeRepository.findByUserLogin(TEST_userLogin);
@@ -134,7 +129,7 @@ public class AuthCodeTest {
         authCode.setUserLogin("test.manager@test.com");
         authCode.setRedirectUrl(TEST_redirectURL);
         authCode.setExpiresAt(Instant.now().minusSeconds(5)); 
-        authCode.setCreatedAt(Instant.now());
+
         
         authCodeRepository.save(authCode);
 

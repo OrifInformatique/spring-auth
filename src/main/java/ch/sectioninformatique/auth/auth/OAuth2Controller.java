@@ -1,25 +1,23 @@
 package ch.sectioninformatique.auth.auth;
 
+import ch.sectioninformatique.auth.AuthApplication;
 import java.io.IOException;
-import java.util.Objects;
 import java.time.Duration;
-import java.time.Instant;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Controller handling OAuth2 authentication flows.
@@ -48,6 +49,8 @@ import ch.sectioninformatique.auth.user.UserService;
 @RestController
 public class OAuth2Controller {
 
+    private final AuthApplication authApplication;
+
     // Name of the Session attribute used to store the frontend redirect URL during login initiation.
     private static final String REDIRECT_URL_SESSION_KEY = "OAUTH2_RETURN_URL";
 
@@ -59,12 +62,16 @@ public class OAuth2Controller {
     @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
     private Duration refreshTokenLifetime;
 
-    // A custom provider used to generate JWT tokens for authenticated users.
-    private final UserAuthenticationProvider userAuthenticationProvider;
+    // Service responsible for creating or deleting authcodes.
+    private final AuthService authService;
     // Service responsible for creating or retrieving users in the local database.
     private final UserService userService;
     // MessageSource for internationalized messages, used for error handling and logging.
     private final MessageSource messageSource;
+
+    //Custom provider to creates tokens
+    private final UserAuthenticationProvider userAuthenticationProvider;
+
     // Logger for debugging and monitoring the OAuth2 authentication flow.
     private static final Logger log = LoggerFactory.getLogger(OAuth2Controller.class);
 
@@ -75,13 +82,16 @@ public class OAuth2Controller {
      * @param userService                Service for users management
      * @param messageSource              MessageSource for internationalization of messages
      */
-    public OAuth2Controller(UserAuthenticationProvider userAuthenticationProvider,
+    public OAuth2Controller(AuthService authCodeSerivce,
                             UserService userService,
-                            MessageSource messageSource) {
+                            MessageSource messageSource,
+                            UserAuthenticationProvider authenticationProvider, AuthApplication authApplication) {
         
-        this.userAuthenticationProvider = userAuthenticationProvider;
+        this.userAuthenticationProvider = authenticationProvider;
+        this.authService = authCodeSerivce;
         this.userService = userService;
         this.messageSource = messageSource;
+        this.authApplication = authApplication;
     }
 
     /**
@@ -186,32 +196,15 @@ public class OAuth2Controller {
         // Create or get Azure user in local database
         userDto = userService.getOrCreateAzureUser(userDto);
 
-        // Generate a JWT token and refresh token using the UserAuthenticationProvider
-        String accessToken = userAuthenticationProvider.createToken(userDto);
-        String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
+        // Generate a authCode using the AuthCodeService
+        String code = authService.generateAndStoreAuthCode(email, DEFAULT_REDIRECT_URL);
         
-        // Set the access token in the response header for client-side use
-        userDto.setToken(accessToken);
-        response.setHeader("Authorization", "Bearer " + accessToken);
-
-        // Store refresh token in database with expiration
-        userService.storeRefreshToken(userDto.getLogin(), refreshToken,
-                        Instant.now().plus(refreshTokenLifetime));
-
-        // Create secure HTTP-only cookie for the refresh token
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
-                        .httpOnly(true)
-                        .secure(true)
-                        .path("/auth/refresh")
-                        .maxAge(refreshTokenLifetime)
-                        .sameSite("None")
-                        .build();
-
-        response.addHeader("Set-Cookie", cookie.toString());
-
         // Retrieve redirect URL from session, or use default
         HttpSession session = request.getSession(false);
         String redirectUrl = DEFAULT_REDIRECT_URL;
+
+        // Set the code as attribute for the sessionauthApplication
+        session.setAttribute("code", code);
 
         if (session != null) {
             String storedUrl = (String) session.getAttribute(REDIRECT_URL_SESSION_KEY);
@@ -241,6 +234,30 @@ public class OAuth2Controller {
      * 
      */
     @GetMapping("/token")
-    public void getToken() {
+    public ResponseEntity<?> getToken(@RequestBody AuthCodeDto authCodeDto) {
+
+        log.error("UserLogin : {}", authCodeDto.getLogin());
+        log.error("Auth Code : {}", authCodeDto.getCode());
+
+        String jwt = authService.retrieveAndDeleteAuthCode(authCodeDto.getCode(), authCodeDto.getLogin());
+        UserDto user = userService.findByLogin(authCodeDto.getLogin()); 
+        String refreshToken = userAuthenticationProvider.createRefreshToken(user);
+
+        user.setToken(jwt);
+
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/auth/refresh")
+                    .maxAge(refreshTokenLifetime)
+                    .sameSite("None")
+                    .build();
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .body(user);
+                
     }
+            
 }

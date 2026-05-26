@@ -41,7 +41,7 @@ public class AuthExceptions {
 
     public static class AuthCodeNotFoundException extends AppException implements MessageKeyProvider{
 
-        public AuthCodeNotFoundException(String login){
+        public AuthCodeNotFoundException(){
             super(HttpStatus.NOT_FOUND);
         }
 

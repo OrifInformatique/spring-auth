@@ -1,21 +1,21 @@
 package ch.sectioninformatique.auth.auth;
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ch.sectioninformatique.auth.auth.AuthExceptions.AuthCodeNotFoundException;
+import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
-
 import ch.sectioninformatique.auth.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 
 @RequiredArgsConstructor
 @Service
@@ -25,9 +25,12 @@ public class AuthService {
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
     private final AuthCodeRepository authCodeRepository;
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${SECURITY_AUTHENTICATION_CODES_LIFETIME}")
     private Duration lifetime;
+
+
 
     /**
      * Methods to retrieve and delete a code.
@@ -45,16 +48,25 @@ public class AuthService {
      */
     public String retrieveAndDeleteAuthCode(String code, String userLogin){
 
-
-        authCodeRepository.deleteExpiredCodes();
-        Optional<AuthCode> authCode = authCodeRepository.findByCodeAndUserLogin(code, userLogin);
+        log.error("Login : {}", userLogin);
+        authCodeRepository.deleteExpiredCodes(); 
+        List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
         
-        if(authCode.isEmpty()){
-            throw new AuthCodeNotFoundException();
+
+        log.error("List reçue : {}", authCodes.size());
+        log.error("premiere index : {}", authCodes.get(0).getCode());
+        
+        for (AuthCode authCode : authCodes){
+            if(userService.hash(code).equals(authCode.getCode())){
+                log.error("code correspondant");
+                authCodeRepository.delete(authCode);
+                UserDto user = userService.findByLogin(userLogin);
+                String jwt = userAuthenticationProvider.createToken(user);
+                return jwt;
+            }
         }
-        UserDto user = userService.findByLogin(userLogin);
-            String jwt = userAuthenticationProvider.createToken(user);
-            return jwt;
+
+        throw new AuthCodeNotFoundException();
 
     }
     
@@ -71,21 +83,21 @@ public class AuthService {
      */
     public String generateAndStoreAuthCode(String userLogin, String redirectUrl){   
     
-    authCodeRepository.deleteExpiredCodes();
+        authCodeRepository.deleteExpiredCodes();
 
         String code = UUID.randomUUID().toString();
         String hash = userService.hash(code);
-
+        log.error("Hashed code : {}", hash);
+        
         Instant expiredAt = Instant.now().plus(lifetime);
         
-        AuthCode authCode = new AuthCode();
+        AuthCode authCode =  new AuthCode();
         authCode.setCode(hash);
         authCode.setUserLogin(userLogin);
         authCode.setRedirectUrl(redirectUrl);
-        authCode.setCreatedAt(Instant.now());
         authCode.setExpiresAt(expiredAt);
         
-        authCodeRepository.save(authCode);
+        AuthCode savedCode = authCodeRepository.save(authCode);
         
         return code;
 

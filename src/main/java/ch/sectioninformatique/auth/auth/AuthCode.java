@@ -1,6 +1,9 @@
 package ch.sectioninformatique.auth.auth;
 
 import java.time.Instant;
+import java.util.Date;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -65,5 +68,7 @@ public class AuthCode {
     /**
      * Timestamp when the authentication code was created.
      */
-    private Instant createdAt = Instant.now();
+    @CreationTimestamp
+    @Column(updatable = false, name = "created_at")
+    private Date createdAt;
 }
