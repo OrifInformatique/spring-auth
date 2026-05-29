@@ -263,6 +263,23 @@ public class UserService {
     }
 
     /**
+     * Finds a user by it's id.
+     * 
+     * @param userId The id of the user
+     * @return a UserDto
+     * @throws UserNotFoundException if the user is not found
+     */
+
+    public UserDto findById(Long id){
+        Optional<User> optionalUser = userRepository.findById(id);
+
+        User user = optionalUser
+            .orElseThrow(() -> {return new UserNotFoundException(id.toString());});
+
+        return userMapper.toUserDto(user);
+    }
+
+    /**
      * Retrieves all users who are not soft-deleted in the system.
      *
      * @return List of all User entities, excluding soft-deleted

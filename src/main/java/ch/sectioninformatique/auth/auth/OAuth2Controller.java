@@ -202,6 +202,7 @@ public class OAuth2Controller {
         HttpSession session = request.getSession(false);
         String redirectUrl = DEFAULT_REDIRECT_URL;
 
+
         if (session != null) {
             String storedUrl = (String) session.getAttribute(REDIRECT_URL_SESSION_KEY);
             if (storedUrl != null && !storedUrl.isEmpty()) {
@@ -223,8 +224,10 @@ public class OAuth2Controller {
         // Generate a authCode using the AuthCodeService
         String code = authService.generateAndStoreAuthCode(email, redirectUrl);
 
-        // Set the code as attribute for the sessionauthApplication
-        session.setAttribute("code", code);
+        Long id = userDto.getId();
+        redirectUrl += "&authCode=" + code;
+        redirectUrl += "&userId=" + id.toString();
+
 
         response.sendRedirect(redirectUrl);
     }
@@ -237,10 +240,14 @@ public class OAuth2Controller {
      * 
      */
     @PostMapping("/token")
-    public ResponseEntity<?> getToken(@RequestBody AuthCodeDto authCodeDto) {
+    public ResponseEntity<?> getToken(@RequestBody AuthCodeDto dto) {
 
-        String jwt = authService.retrieveAndDeleteAuthCode(authCodeDto.getCode(), authCodeDto.getLogin());
-        UserDto user = userService.findByLogin(authCodeDto.getLogin()); 
+        log.error("AuthCode : {}", dto.code());
+
+        UserDto user = userService.findById(dto.id());
+        log.error("Retrieved login : {}", user.getLogin());
+
+        String jwt = authService.retrieveAndDeleteAuthCode(dto.code(), user.getLogin());
         String refreshToken = userAuthenticationProvider.createRefreshToken(user);
 
         user.setToken(jwt);

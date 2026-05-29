@@ -1,14 +1,8 @@
 package ch.sectioninformatique.auth.auth;
 
+public record AuthCodeDto( 
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class AuthCodeDto {
-
-    private String login;
-    private String code;
-    
-}
+    Long id,
+    String code
+)
+{}
