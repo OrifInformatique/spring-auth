@@ -197,15 +197,10 @@ public class OAuth2Controller {
         // Create or get Azure user in local database
         userDto = userService.getOrCreateAzureUser(userDto);
 
-        // Generate a authCode using the AuthCodeService
-        String code = authService.generateAndStoreAuthCode(email, DEFAULT_REDIRECT_URL);
         
         // Retrieve redirect URL from session, or use default
         HttpSession session = request.getSession(false);
         String redirectUrl = DEFAULT_REDIRECT_URL;
-
-        // Set the code as attribute for the sessionauthApplication
-        session.setAttribute("code", code);
 
         if (session != null) {
             String storedUrl = (String) session.getAttribute(REDIRECT_URL_SESSION_KEY);
@@ -224,6 +219,13 @@ public class OAuth2Controller {
         }
 
         log.debug("Redirecting to client application with access and refresh tokens: {}", redirectUrl);
+
+        // Generate a authCode using the AuthCodeService
+        String code = authService.generateAndStoreAuthCode(email, redirectUrl);
+
+        // Set the code as attribute for the sessionauthApplication
+        session.setAttribute("code", code);
+
         response.sendRedirect(redirectUrl);
     }
 
