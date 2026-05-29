@@ -1,6 +1,5 @@
 package ch.sectioninformatique.auth.auth;
 
-import ch.sectioninformatique.auth.AuthApplication;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
@@ -17,11 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.sectioninformatique.auth.AuthApplication;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
@@ -233,11 +234,8 @@ public class OAuth2Controller {
      *
      * 
      */
-    @GetMapping("/token")
+    @PostMapping("/token")
     public ResponseEntity<?> getToken(@RequestBody AuthCodeDto authCodeDto) {
-
-        log.error("UserLogin : {}", authCodeDto.getLogin());
-        log.error("Auth Code : {}", authCodeDto.getCode());
 
         String jwt = authService.retrieveAndDeleteAuthCode(authCodeDto.getCode(), authCodeDto.getLogin());
         UserDto user = userService.findByLogin(authCodeDto.getLogin()); 

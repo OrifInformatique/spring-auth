@@ -51,10 +51,10 @@ public class AuthService {
         log.error("Login : {}", userLogin);
         authCodeRepository.deleteExpiredCodes(); 
         List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
-        
 
-        log.error("List reçue : {}", authCodes.size());
-        log.error("premiere index : {}", authCodes.get(0).getCode());
+        if(authCodes.isEmpty()){
+            throw new AuthCodeNotFoundException();
+        }
         
         for (AuthCode authCode : authCodes){
             if(userService.hash(code).equals(authCode.getCode())){
