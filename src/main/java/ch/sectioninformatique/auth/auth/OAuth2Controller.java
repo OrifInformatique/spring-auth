@@ -251,6 +251,8 @@ public class OAuth2Controller {
         String refreshToken = userAuthenticationProvider.createRefreshToken(user);
 
         user.setToken(jwt);
+        log.error("JWT : {}", jwt);
+        log.error("refresh_token : {}", refreshToken);
 
         ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
                     .httpOnly(true)
