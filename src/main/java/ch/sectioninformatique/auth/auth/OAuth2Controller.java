@@ -211,15 +211,17 @@ public class OAuth2Controller {
                 // Clean up the session attribute after use
                 session.removeAttribute(REDIRECT_URL_SESSION_KEY);
                 log.debug("Using stored redirect URL from session: {}", redirectUrl);
+            } else {
+                log.debug("No redirect url was found in session");
             }
+        } else {
+            log.debug("No session was found");
         }
 
         // Ensure redirectUrl includes loginType parameter if not already present
         if (!redirectUrl.contains("loginType=")) {
             redirectUrl += (redirectUrl.contains("?") ? "&" : "?") + "loginType=azure";
         }
-
-        log.debug("Redirecting to client application with access and refresh tokens: {}", redirectUrl);
 
         // Generate a authCode using the AuthCodeService
         String code = authService.generateAndStoreAuthCode(email, redirectUrl);
@@ -228,7 +230,7 @@ public class OAuth2Controller {
         redirectUrl += "&authCode=" + code;
         redirectUrl += "&userId=" + id.toString();
 
-
+        log.debug("Redirecting to client application with auth code");
         response.sendRedirect(redirectUrl);
     }
 
@@ -242,10 +244,10 @@ public class OAuth2Controller {
     @PostMapping("/token")
     public ResponseEntity<?> getToken(@RequestBody AuthCodeDto dto) {
 
-        log.error("AuthCode : {}", dto.code());
+        log.debug("Received auth code to exchange for JWT tokens");
 
         UserDto user = userService.findById(dto.id());
-        log.error("Retrieved login : {}", user.getLogin());
+        log.debug("Retrieved login : {}", user.getLogin());
 
         String jwt = authService.retrieveAndDeleteAuthCode(dto.code(), user.getLogin());
         String refreshToken = userAuthenticationProvider.createRefreshToken(user);

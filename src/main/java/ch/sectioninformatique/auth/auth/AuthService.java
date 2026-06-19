@@ -14,12 +14,10 @@ import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class AuthService {
 
     private final UserAuthenticationProvider userAuthenticationProvider;
@@ -48,17 +46,18 @@ public class AuthService {
      */
     public String retrieveAndDeleteAuthCode(String code, String userLogin){
 
-        log.error("Login : {}", userLogin);
+        log.debug("Retrieving and deleting auth code for user: {}", userLogin);
         authCodeRepository.deleteExpiredCodes(); 
         List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
 
         if(authCodes.isEmpty()){
+            log.debug("No auth codes found for user: {}", userLogin);
             throw new AuthCodeNotFoundException();
         }
         
         for (AuthCode authCode : authCodes){
             if(userService.hash(code).equals(authCode.getCode())){
-                log.error("code correspondant");
+                log.debug("Found matching auth code for user: {}", userLogin);
                 authCodeRepository.delete(authCode);
                 UserDto user = userService.findByLogin(userLogin);
                 String jwt = userAuthenticationProvider.createToken(user);
@@ -87,7 +86,7 @@ public class AuthService {
 
         String code = UUID.randomUUID().toString();
         String hash = userService.hash(code);
-        log.error("Hashed code : {}", hash);
+        log.debug("Hashed auth code for user: {}", userLogin);
         
         Instant expiredAt = Instant.now().plus(lifetime);
         
@@ -97,10 +96,9 @@ public class AuthService {
         authCode.setRedirectUrl(redirectUrl);
         authCode.setExpiresAt(expiredAt);
         
-        AuthCode savedCode = authCodeRepository.save(authCode);
+        authCodeRepository.save(authCode);
+        log.debug("Auth code saved for user: {}", userLogin);
         
         return code;
-
     }
-
 }
