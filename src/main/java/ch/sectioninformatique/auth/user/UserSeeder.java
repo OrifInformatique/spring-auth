@@ -2,6 +2,9 @@ package ch.sectioninformatique.auth.user;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -34,6 +37,9 @@ public class UserSeeder implements CommandLineRunner {
 	/** Repository for role data access */
 	private final RoleRepository roleRepository;
 
+	/** Logger for seeding operations */
+	private static final Logger log = LoggerFactory.getLogger(UserSeeder.class);
+
 	/**
 	 * Constructs a new UserSeeder with the required dependencies.
 	 *
@@ -62,9 +68,9 @@ public class UserSeeder implements CommandLineRunner {
 	 */
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("Starting User Seeding...");
+		log.info("Starting User Seeding...");
 		loadUserData();
-		System.out.println("User Seeding completed.");
+		log.info("User Seeding completed.");
 	}
 
 	/**
@@ -160,7 +166,7 @@ public class UserSeeder implements CommandLineRunner {
 
 			userRepository.saveAll(Arrays.asList(user0, user1, user2, user3, user4, user5, user6, user7));
 		} else {
-			System.out.println("Users table not empty - Skipping user seeding");
+			log.info("Users table not empty - Skipping user seeding");
 		}
 	}
 }

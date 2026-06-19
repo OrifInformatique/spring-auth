@@ -190,6 +190,7 @@ public class SecurityConfig {
                             .requestMatchers("/oauth2/login/**").permitAll()
                             .requestMatchers("/oauth2/authorization/**").permitAll()
                             .requestMatchers("/oauth2/success").authenticated()
+                            .requestMatchers("/oauth2/token").permitAll()
                             .requestMatchers("/oauth2/error").permitAll()
                             .requestMatchers("/login/oauth2/code/**").permitAll()
                             .anyRequest().authenticated();

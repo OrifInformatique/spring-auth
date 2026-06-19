@@ -4,24 +4,24 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import jakarta.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,8 +31,8 @@ import ch.sectioninformatique.auth.app.exceptions.AppException;
 import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
-
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -69,6 +69,9 @@ public class AuthController {
         @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}")
         private Duration refreshTokenLifetime;
 
+        /** Logger for auth operations */
+	private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
         /**
          * Authenticates a user with provided credentials and issues JWT access and
          * refresh tokens.
@@ -86,6 +89,8 @@ public class AuthController {
         @PostMapping("/login")
         public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
                 UserDto userDto = userService.login(credentialsDto);
+
+                log.debug("Standard (credentials) login successful");
 
                 String accessToken = userAuthenticationProvider.createToken(userDto);
                 String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
@@ -293,12 +298,16 @@ public class AuthController {
          */
         @PreAuthorize("isAuthenticated()")
         @GetMapping("/redirect-after-login")
-        public ResponseEntity<?> redirectAfterLogin() {
-                return ResponseEntity.ok(Map.of(
+        public ResponseEntity<?> redirectAfterLogin(HttpSession session) {
+
+                return ResponseEntity.ok(
+                        Map.of(
                                 "message",
                                 messageSource.getMessage(
                                                 "message.login.success",
                                                 null,
-                                                LocaleContextHolder.getLocale())));
+                                                LocaleContextHolder.getLocale())
+                ));
+                        
         }
 }

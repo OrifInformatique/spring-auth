@@ -1,5 +1,8 @@
 package ch.sectioninformatique.auth.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +38,9 @@ public class TestUserSeeder implements CommandLineRunner {
 	/** Repository for role data access */
 	private final RoleRepository roleRepository;
 
+	/** Logger for seeding operations */
+	private static final Logger log = LoggerFactory.getLogger(TestUserSeeder.class);
+
 	/**
 	 * Constructs a new UserSeeder with the required dependencies.
 	 *
@@ -63,9 +69,9 @@ public class TestUserSeeder implements CommandLineRunner {
 	 */
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("Starting User Seeding...");
+		log.info("Starting User Seeding...");
 		loadUserData();
-		System.out.println("User Seeding completed.");
+		log.info("User Seeding completed.");
 	}
 
 	/**
@@ -130,7 +136,7 @@ public class TestUserSeeder implements CommandLineRunner {
 				.mainRole(adminRole)
 				.build();			userRepository.saveAll(Arrays.asList(testUser, testManager, testAdmin, testAdmin2));
 		} else {
-			System.out.println("Users table not empty - Skipping user seeding");
+			log.info("Users table not empty - Skipping user seeding");
 		}
 	}
 }

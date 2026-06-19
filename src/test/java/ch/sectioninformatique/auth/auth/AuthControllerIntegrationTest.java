@@ -26,6 +26,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -56,6 +58,7 @@ import jakarta.servlet.http.Cookie;
  * the authentication endpoints.
  */
 @SpringBootTest(classes = AuthApplication.class)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class AuthControllerIntegrationTest {
@@ -201,6 +204,9 @@ public class AuthControllerIntegrationTest {
 
         @Autowired
         private UserService userService;
+
+        @Autowired
+        private AuthService authService;
 
         @Autowired
         private UserRepository userRepository;
@@ -1703,4 +1709,112 @@ public class AuthControllerIntegrationTest {
                                         }
                                 });
         }
+
+        /**
+         * Test : GET /oauth2/success
+         * verify if the success endpoints works correctly.
+         * 
+         * Expected behavior:
+         * - success
+         * - message success login
+         * - auth code generate
+         * 
+          */
+        @Test
+        @Transactional
+        public void login_oauth2_success() throws Exception{
+                mockMvc.perform(get("/oauth2/success")
+                                .with(oauth2Login().attributes(attrs -> {
+                        attrs.put("email", "user@test.com");
+                        attrs.put("given_name", "User");
+                        attrs.put("family_name", "Test");
+                })))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(result -> {
+                        String redirected = result.getResponse().getRedirectedUrl();
+                        assertNotNull(redirected);
+                        assertTrue(redirected.contains("/auth/redirect-after-login?loginType=azure"));
+                });
+        }
+
+
+        @Test
+        @Transactional
+        public void get_token_with_authCode() throws Exception{
+                
+                String authCode = authService.generateAndStoreAuthCode("test.user@test.com", "redirectUrl");
+                        var userDto = userService.findByLogin("test.user@test.com");
+                        Long id = userDto.getId();
+
+                        performRequest(
+                                "POST",
+                                "/oauth2/token",
+                                "{\"id\":" + id + ", \"code\":\"" + authCode + "\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "get-token-with-authcode",
+                                request -> {
+                                        try{
+                                                request.andExpect(jsonPath("$.token").exists());
+                                        }catch (Exception e){
+                                                throw new RuntimeException(e);
+                                        }
+                                }
+
+                        );
+        }
+
+        @Test
+        @Transactional
+        public void getTokenWithAuthCode_withWrongLogin_ShouldReturn404() throws Exception{
+                
+                String authCode = authService.generateAndStoreAuthCode("not.a@login.com", "redirectUrl");
+                
+                        // Use a non-existing id to simulate wrong login (no user for provided id)
+                        Long nonExistingId = -1L;
+
+                        performRequest(
+                                "POST",
+                                "/oauth2/token",
+                                "{\"id\":" + nonExistingId + ", \"code\":\"" + authCode + "\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                404,
+                                "get-token-with-auth-code-wrong-login",
+                                request -> {
+                                        // No specific message assertion: only status 404 is required
+                                }
+                        );
+                
+        }
+
+        @Test
+        @Transactional
+        public void getTokenWithAuthCode_withWrongCode_ShouldReturn404() throws Exception{
+
+                String wrongCode = "ThisIsNotACode";
+                        var userDto = userService.findByLogin("test.user@test.com");
+                        Long id = userDto.getId();
+
+                        performRequest(
+                                "POST",
+                                "/oauth2/token",
+                                "{\"id\":" + id + ", \"code\":\"" + wrongCode + "\"}",
+                                null,
+                                MediaType.APPLICATION_JSON,
+                                404,
+                                "get-token-with-auth-code-wrong-code",
+                                request -> {
+                                        try{
+                                                request.andExpect(jsonPath("$.message")
+                                        .value(message("error.authcode.not.found")));
+                                        } catch(Exception e){
+                                                throw new RuntimeException(e);
+                                        }
+                                }
+                        );
+        }
+        
+
 }

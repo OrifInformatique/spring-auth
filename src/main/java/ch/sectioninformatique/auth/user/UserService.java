@@ -1,13 +1,24 @@
 package ch.sectioninformatique.auth.user;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 
+import org.hibernate.Session;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
+import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidRefreshTokenException;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
 import ch.sectioninformatique.auth.auth.RefreshToken;
@@ -16,35 +27,18 @@ import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
 import ch.sectioninformatique.auth.security.RoleRepository;
-import jakarta.persistence.EntityManager;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.PersistenceContext;
-
-import org.springframework.transaction.annotation.Isolation;
-
-import org.hibernate.Session;
-
-import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
-import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidRefreshTokenException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.HashAlgorithmUnavailableException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
+import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyManagerException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyRegularException;
-import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
-import ch.sectioninformatique.auth.security.SecurityExceptions.HashAlgorithmUnavailableException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
-import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
-import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service class for managing user-related operations.
@@ -108,7 +102,7 @@ public class UserService {
      */
     @Transactional
     public void storeRefreshToken(String userLogin, String refreshToken, Instant expiresAt) {
-        String hashed = hashRefreshToken(refreshToken);
+        String hashed = hash(refreshToken);
 
         // remove previous token if rotation enabled
         refreshTokenRepository.deleteByUserLogin(userLogin);
@@ -130,7 +124,7 @@ public class UserService {
      * @throws InvalidRefreshTokenException if the token is invalid or expired
      */
     public void assertValidRefreshToken(String userLogin, String refreshToken) {
-        String hashedRefreshToken = hashRefreshToken(refreshToken);
+        String hashedRefreshToken = hash(refreshToken);
         boolean valid = refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
                 .filter(stored -> hashedRefreshToken.equals(stored.getTokenHash()))
                 .filter(stored -> stored.getExpiresAt().isAfter(Instant.now()))
@@ -158,20 +152,20 @@ public class UserService {
     }
 
     /**
-     * Hashes a refresh token using SHA-256 before storing it in the database.
+     * Hashes a string using SHA-256 before storing it in the database.
      * This provides an extra layer of security by ensuring that even if the
-     * database is compromised, the raw tokens cannot be retrieved.
+     * database is compromised, the raw string cannot be retrieved.
      * 
-     * Storing hashed tokens prevents the raw token from being exposed in case
+     * Storing hashed string prevents the raw string from being exposed in case
      * of a database compromise.
      *
-     * @param token The raw refresh token to hash.
-     * @return The Base64-encoded SHA-256 hash of the token.
+     * @param stringToHash The raw string to hash.
+     * @return The Base64-encoded SHA-256 hash of the string.
      */
-    private String hashRefreshToken(String token) {
+    public String hash(String stringToHash) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            byte[] hash = digest.digest(stringToHash.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
             throw new HashAlgorithmUnavailableException();
@@ -266,6 +260,23 @@ public class UserService {
                 userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
 
         return userDto;
+    }
+
+    /**
+     * Finds a user by it's id.
+     * 
+     * @param userId The id of the user
+     * @return a UserDto
+     * @throws UserNotFoundException if the user is not found
+     */
+
+    public UserDto findById(Long id){
+        Optional<User> optionalUser = userRepository.findById(id);
+
+        User user = optionalUser
+            .orElseThrow(() -> {return new UserNotFoundException(id.toString());});
+
+        return userMapper.toUserDto(user);
     }
 
     /**
@@ -693,4 +704,5 @@ public class UserService {
 
         userRepository.save(user);
     }
+
 }
