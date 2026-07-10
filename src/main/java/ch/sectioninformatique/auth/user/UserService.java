@@ -701,7 +701,7 @@ public class UserService {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setLogin(userDto.getLogin());
-        user.setMainRole(userDto.getMainRole());
+        user.setMainRole(roleRepository.findByName(RoleEnum.valueOf(userDto.getMainRole())).orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER)));
 
         userRepository.save(user);
     }
