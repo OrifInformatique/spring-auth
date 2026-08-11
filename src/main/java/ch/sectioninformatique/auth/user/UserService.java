@@ -201,7 +201,7 @@ public class UserService {
         user.setPassword(encodedPassword);
 
         // Add default USER role
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
+        Role userRole = roleRepository.findByName(RoleEnum.valueOf(userDto.mainRole()))
                 .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
 
         user.setMainRole(userRole);
@@ -701,6 +701,7 @@ public class UserService {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setLogin(userDto.getLogin());
+        user.setMainRole(roleRepository.findByName(RoleEnum.valueOf(userDto.getMainRole())).orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER)));
 
         userRepository.save(user);
     }

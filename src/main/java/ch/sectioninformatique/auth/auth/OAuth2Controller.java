@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -29,6 +27,7 @@ import ch.sectioninformatique.auth.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller handling OAuth2 authentication flows.
@@ -48,6 +47,7 @@ import jakarta.servlet.http.HttpSession;
  */
 @RequestMapping("/oauth2")
 @RestController
+@Slf4j
 public class OAuth2Controller {
 
     private final AuthApplication authApplication;
@@ -72,9 +72,6 @@ public class OAuth2Controller {
 
     //Custom provider to creates tokens
     private final UserAuthenticationProvider userAuthenticationProvider;
-
-    // Logger for debugging and monitoring the OAuth2 authentication flow.
-    private static final Logger log = LoggerFactory.getLogger(OAuth2Controller.class);
 
     /**
      * Constructs a new Oauth2Controller with the required dependencies.
@@ -268,5 +265,4 @@ public class OAuth2Controller {
             .body(user);
                 
     }
-            
 }

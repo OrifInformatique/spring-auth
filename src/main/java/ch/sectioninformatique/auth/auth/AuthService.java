@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,21 +12,20 @@ import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthService {
 
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
     private final AuthCodeRepository authCodeRepository;
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${SECURITY_AUTHENTICATION_CODES_LIFETIME}")
     private Duration lifetime;
-
-
 
     /**
      * Methods to retrieve and delete a code.
@@ -66,7 +63,6 @@ public class AuthService {
         }
 
         throw new AuthCodeNotFoundException();
-
     }
     
     /**
