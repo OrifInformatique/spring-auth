@@ -251,7 +251,7 @@ public class UserController {
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{userId}/{hardDelete}")
+    @DeleteMapping({"/{userId}","/{userId}/{hardDelete}"})
     public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable(required = false) Boolean hardDelete) {
         String resultMessage = "";
 
