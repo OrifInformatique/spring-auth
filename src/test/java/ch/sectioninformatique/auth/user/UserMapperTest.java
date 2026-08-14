@@ -1,19 +1,22 @@
 package ch.sectioninformatique.auth.user;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
 import ch.sectioninformatique.auth.security.RoleEnum;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.Arrays;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for {@link UserMapper}.
@@ -96,7 +99,8 @@ class UserMapperTest {
             "Jane",
             "Smith",
             "janesmith",
-            "password123".toCharArray()
+            "password123".toCharArray(),
+            "ADMIN"
         );
 
         // When

@@ -17,9 +17,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ch.sectioninformatique.auth.auth.AuthCodeRepository;
 import ch.sectioninformatique.auth.auth.AuthExceptions;
-import ch.sectioninformatique.auth.auth.AuthService;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
@@ -201,7 +199,7 @@ public class UserServiceTest {
         // Arrange
         String login = "newuser@test.com";
         String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray());
+        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray(),"USER");
         
         User user = new User();
         user.setId(1L);
@@ -253,7 +251,7 @@ public class UserServiceTest {
         // Arrange
         String login = "existing@test.com";
         String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray());
+        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray(), "USER");
         
         User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, false, null);
         
