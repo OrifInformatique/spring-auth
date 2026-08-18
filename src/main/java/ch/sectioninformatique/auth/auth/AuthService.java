@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +23,9 @@ public class AuthService {
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserService userService;
     private final AuthCodeRepository authCodeRepository;
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${SECURITY_AUTHENTICATION_CODES_LIFETIME}")
     private Duration lifetime;
-
-
 
     /**
      * Methods to retrieve and delete a code.
@@ -48,17 +43,18 @@ public class AuthService {
      */
     public String retrieveAndDeleteAuthCode(String code, String userLogin){
 
-        log.error("Login : {}", userLogin);
+        log.debug("Retrieving and deleting auth code for user: {}", userLogin);
         authCodeRepository.deleteExpiredCodes(); 
         List<AuthCode> authCodes = authCodeRepository.findByUserLogin(userLogin);
 
         if(authCodes.isEmpty()){
+            log.debug("No auth codes found for user: {}", userLogin);
             throw new AuthCodeNotFoundException();
         }
         
         for (AuthCode authCode : authCodes){
             if(userService.hash(code).equals(authCode.getCode())){
-                log.error("code correspondant");
+                log.debug("Found matching auth code for user: {}", userLogin);
                 authCodeRepository.delete(authCode);
                 UserDto user = userService.findByLogin(userLogin);
                 String jwt = userAuthenticationProvider.createToken(user);
@@ -67,7 +63,6 @@ public class AuthService {
         }
 
         throw new AuthCodeNotFoundException();
-
     }
     
     /**
@@ -87,7 +82,7 @@ public class AuthService {
 
         String code = UUID.randomUUID().toString();
         String hash = userService.hash(code);
-        log.error("Hashed code : {}", hash);
+        log.debug("Hashed auth code for user: {}", userLogin);
         
         Instant expiredAt = Instant.now().plus(lifetime);
         
@@ -97,10 +92,9 @@ public class AuthService {
         authCode.setRedirectUrl(redirectUrl);
         authCode.setExpiresAt(expiredAt);
         
-        AuthCode savedCode = authCodeRepository.save(authCode);
+        authCodeRepository.save(authCode);
+        log.debug("Auth code saved for user: {}", userLogin);
         
         return code;
-
     }
-
 }

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -29,6 +27,7 @@ import ch.sectioninformatique.auth.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller handling OAuth2 authentication flows.
@@ -48,6 +47,7 @@ import jakarta.servlet.http.HttpSession;
  */
 @RequestMapping("/oauth2")
 @RestController
+@Slf4j
 public class OAuth2Controller {
 
     private final AuthApplication authApplication;
@@ -72,9 +72,6 @@ public class OAuth2Controller {
 
     //Custom provider to creates tokens
     private final UserAuthenticationProvider userAuthenticationProvider;
-
-    // Logger for debugging and monitoring the OAuth2 authentication flow.
-    private static final Logger log = LoggerFactory.getLogger(OAuth2Controller.class);
 
     /**
      * Constructs a new Oauth2Controller with the required dependencies.
@@ -211,15 +208,17 @@ public class OAuth2Controller {
                 // Clean up the session attribute after use
                 session.removeAttribute(REDIRECT_URL_SESSION_KEY);
                 log.debug("Using stored redirect URL from session: {}", redirectUrl);
+            } else {
+                log.debug("No redirect url was found in session");
             }
+        } else {
+            log.debug("No session was found");
         }
 
         // Ensure redirectUrl includes loginType parameter if not already present
         if (!redirectUrl.contains("loginType=")) {
             redirectUrl += (redirectUrl.contains("?") ? "&" : "?") + "loginType=azure";
         }
-
-        log.debug("Redirecting to client application with access and refresh tokens: {}", redirectUrl);
 
         // Generate a authCode using the AuthCodeService
         String code = authService.generateAndStoreAuthCode(email, redirectUrl);
@@ -228,7 +227,7 @@ public class OAuth2Controller {
         redirectUrl += "&authCode=" + code;
         redirectUrl += "&userId=" + id.toString();
 
-
+        log.debug("Redirecting to client application with auth code");
         response.sendRedirect(redirectUrl);
     }
 
@@ -242,10 +241,10 @@ public class OAuth2Controller {
     @PostMapping("/token")
     public ResponseEntity<?> getToken(@RequestBody AuthCodeDto dto) {
 
-        log.debug("AuthCode : {}", dto.code());
+        log.debug("Received auth code to exchange for JWT tokens");
 
-        UserDto user = userService.findByLogin(dto.login());
-        log.info("Retrieved login : {}", user.getLogin());
+        UserDto user = userService.findById(dto.id());
+        log.debug("Retrieved login : {}", user.getLogin());
 
         String jwt = authService.retrieveAndDeleteAuthCode(dto.code(), user.getLogin());
         String refreshToken = userAuthenticationProvider.createRefreshToken(user);
@@ -266,5 +265,4 @@ public class OAuth2Controller {
             .body(user);
                 
     }
-            
 }

@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Size;
  * @param lastName  The user's last name
  * @param login     The user's login email
  * @param password  The user's password as a character array
+ * @param mainRole  The user's main role
  */
 public record SignUpDto(
         @NotBlank() 
@@ -40,5 +41,7 @@ public record SignUpDto(
 
         @NotNull() 
         @Size(min = 8, max = 72)
-        char[] password
+        char[] password,
+
+        String mainRole
 ) {}

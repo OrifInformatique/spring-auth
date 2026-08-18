@@ -17,7 +17,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import ch.sectioninformatique.auth.auth.AuthCodeRepository;
 import ch.sectioninformatique.auth.auth.AuthExceptions;
+import ch.sectioninformatique.auth.auth.AuthService;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
