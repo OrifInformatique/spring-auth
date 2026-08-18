@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -1724,6 +1723,7 @@ public class AuthControllerIntegrationTest {
         @Test
         @Transactional
         public void login_oauth2_success() throws Exception{
+
                 mockMvc.perform(get("/oauth2/success")
                         .with(oauth2Login().attributes(attrs -> {
                     attrs.put("email", "user@test.com");
@@ -1731,8 +1731,14 @@ public class AuthControllerIntegrationTest {
                     attrs.put("family_name", "Test");
                 })))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/auth/redirect-after-login?loginType=azure"));
-        }
+                .andExpect(result ->{
+                        String redirectUrl = result.getResponse().getRedirectedUrl();
+
+                        assertTrue(redirectUrl.contains("/auth/redirect-after-login"));
+                        assertTrue(redirectUrl.contains("?loginType=azure"));
+                        assertTrue(redirectUrl.contains("&authCode="));
+        });
+}
 
 
         @Test

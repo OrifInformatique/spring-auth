@@ -242,17 +242,15 @@ public class OAuth2Controller {
     @PostMapping("/token")
     public ResponseEntity<?> getToken(@RequestBody AuthCodeDto dto) {
 
-        log.error("AuthCode : {}", dto.code());
+        log.debug("AuthCode : {}", dto.code());
 
-        UserDto user = userService.findById(dto.id());
-        log.error("Retrieved login : {}", user.getLogin());
+        UserDto user = userService.findByLogin(dto.login());
+        log.info("Retrieved login : {}", user.getLogin());
 
         String jwt = authService.retrieveAndDeleteAuthCode(dto.code(), user.getLogin());
         String refreshToken = userAuthenticationProvider.createRefreshToken(user);
 
         user.setToken(jwt);
-        log.error("JWT : {}", jwt);
-        log.error("refresh_token : {}", refreshToken);
 
         ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
                     .httpOnly(true)

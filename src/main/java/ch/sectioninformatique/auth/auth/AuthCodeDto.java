@@ -2,7 +2,7 @@ package ch.sectioninformatique.auth.auth;
 
 public record AuthCodeDto( 
 
-    Long id,
+    String login,
     String code
 )
 {}

@@ -58,13 +58,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdDeleted(@Param("id") Long id);
 
     /**
+     * Returns a deleted user from his login
+     */
+    @Query("SELECT u FROM User u WHERE u.login = :login AND u.deleted = true")
+    Optional<User> findByLoginDeleted(@Param("login") String login);
+
+    /**
     * Permanently delete a user from the database,
     * bypassing any soft delete mechanisms.
     */
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM users WHERE id = :id", nativeQuery = true)
-    void deletePermanentlyById(Long id);
+    @Query(value = "DELETE FROM users WHERE login = :login", nativeQuery = true)
+    void deletePermanentByLogin(String login);
 
     /**
      * Checks if a user with the given login username exists.

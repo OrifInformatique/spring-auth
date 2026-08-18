@@ -324,9 +324,9 @@ public class UserService {
      * @throws UserNotFoundException if the user is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto restoreDeletedUser(Long userId) {
-        User user = userRepository.findByIdDeleted(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    public UserDto restoreDeletedUser(String login) {
+        User user = userRepository.findByLoginDeleted(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
         user.setDeleted(false);
         userRepository.save(user);
         return userMapper.toUserDto(user);
@@ -347,9 +347,9 @@ public class UserService {
      * @throws RoleNotFoundException if the role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto promoteToManager(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    public UserDto promoteToManager(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
             throw new UserAlreadyManagerException(user.getLogin());
@@ -382,9 +382,9 @@ public class UserService {
      * @throws RoleNotFoundException if the user role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto revokeManagerRole(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    public UserDto revokeManagerRole(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new UserAlreadyRegularException(user.getLogin());
@@ -417,9 +417,9 @@ public class UserService {
      * @throws RoleNotFoundException if the admin role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto promoteToAdmin(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    public UserDto promoteToAdmin(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
             throw new UserAlreadyAdminException(user.getLogin());
@@ -448,9 +448,9 @@ public class UserService {
      * @throws RoleNotFoundException if the manager role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto downgradeAdminRole(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    public UserDto downgradeAdminRole(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new UserHasLowerRightsException(user.getLogin());
@@ -483,9 +483,9 @@ public class UserService {
      * @throws RoleNotFoundException if the user role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto revokeAdminRole(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    public UserDto revokeAdminRole(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         if (user.getMainRole().getName().equals(RoleEnum.USER)) {
             throw new UserAlreadyRegularException(user.getLogin());
@@ -545,10 +545,10 @@ public class UserService {
      * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deleteUser(Long userId, boolean hardDelete) {
+    public UserDto deleteUser(String login, boolean hardDelete) {
         // Get the user to delete
-        User userToDelete = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User userToDelete = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         // Get the authenticated user (the actor)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -565,7 +565,7 @@ public class UserService {
 
         // Delete the user
         if(hardDelete){
-            userRepository.deletePermanentlyById(userId);
+            userRepository.deletePermanentByLogin(userToDelete.getLogin());
         }
         else{
             userRepository.delete(userToDelete);
@@ -586,10 +586,10 @@ public class UserService {
      * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deletePermanentUser(Long userId) {
+    public UserDto deletePermanentUser(String userLogin) {
         // Get the user to delete
-        User userToDelete = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User userToDelete = userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new UserNotFoundException(userLogin));
 
         // Get the authenticated user (the actor)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -605,7 +605,7 @@ public class UserService {
         }
 
         // Delete the user
-        userRepository.deletePermanentlyById(userId);
+        userRepository.deletePermanentByLogin(userToDelete.getLogin());
         return userMapper.toUserDto(userToDelete);
     }
 
@@ -692,11 +692,11 @@ public class UserService {
      */
 
     @Transactional
-    public void updateUser(Long userId, UserDto userDto) {
+    public void updateUser(String userLogin, UserDto userDto) {
 
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User user = userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new UserNotFoundException(userLogin));
 
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
