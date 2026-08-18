@@ -684,7 +684,7 @@ public class AuthControllerIntegrationTest {
                 String rawPassword = "testPassword";
                 String requestBody =
                                 "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\""
-                                                + rawPassword + "\"}";
+                                                + rawPassword + "\", \"mainRole\": \"USER\"}";
 
                 performRequest(
                                 "POST",

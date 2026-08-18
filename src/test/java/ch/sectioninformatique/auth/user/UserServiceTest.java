@@ -201,7 +201,7 @@ public class UserServiceTest {
         // Arrange
         String login = "newuser@test.com";
         String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray());
+        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray(), "USER");
         
         User user = new User();
         user.setId(1L);
@@ -253,7 +253,7 @@ public class UserServiceTest {
         // Arrange
         String login = "existing@test.com";
         String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray());
+        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray(), "USER");
         
         User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, false, null);
         

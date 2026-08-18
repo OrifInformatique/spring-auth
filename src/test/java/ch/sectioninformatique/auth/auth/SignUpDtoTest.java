@@ -84,7 +84,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "john.doe@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -115,7 +116,8 @@ public class SignUpDtoTest {
             "Jean-Pierre",
             "O'Connor",
             "jp.oconnor@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -146,7 +148,8 @@ public class SignUpDtoTest {
             "François",
             "Müller",
             "francois.muller@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -177,7 +180,8 @@ public class SignUpDtoTest {
             "",
             "Doe",
             "john.doe@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -209,7 +213,8 @@ public class SignUpDtoTest {
             "John",
             "",
             "john.doe@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -241,7 +246,8 @@ public class SignUpDtoTest {
             "John123",  // Contains numbers
             "Doe",
             "john.doe@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -273,7 +279,8 @@ public class SignUpDtoTest {
             "John",
             "Doe@",  // Contains @
             "john.doe@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -305,7 +312,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "not-an-email",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -337,7 +345,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -369,7 +378,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "john.doe@example.com",
-            null
+            null,
+            "USER"
         );
 
         // Act
@@ -401,7 +411,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "john.doe@example.com",
-            "Pass1!".toCharArray()  // Only 6 characters
+            "Pass1!".toCharArray(),  // Only 6 characters
+            "USER"
         );
 
         // Act
@@ -434,7 +445,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "john.doe@example.com",
-            longPassword.toCharArray()
+            longPassword.toCharArray(),
+            "USER"
         );
 
         // Act
@@ -466,7 +478,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "john.doe@example.com",
-            "Pass123!".toCharArray()  // Exactly 8 characters
+            "Pass123!".toCharArray(),  // Exactly 8 characters
+            "USER"
         );
 
         // Act
@@ -498,7 +511,8 @@ public class SignUpDtoTest {
             "John",
             "Doe",
             "john.doe@example.com",
-            maxPassword.toCharArray()
+            maxPassword.toCharArray(),
+            "USER"
         );
 
         // Act
@@ -529,7 +543,8 @@ public class SignUpDtoTest {
             "",           // Blank first name
             "Doe123",     // Invalid last name
             "not-email",  // Invalid email
-            "short".toCharArray()  // Too short password
+            "short".toCharArray(),  // Too short password
+            "USER"
         );
 
         // Act
@@ -560,7 +575,7 @@ public class SignUpDtoTest {
         String lastName = "Doe";
         String email = "john.doe@example.com";
         char[] password = "Password123!".toCharArray();
-        SignUpDto signUp = new SignUpDto(firstName, lastName, email, password);
+        SignUpDto signUp = new SignUpDto(firstName, lastName, email, password, "USER");
 
         // Assert
         assertEquals(firstName, signUp.firstName());
@@ -590,7 +605,8 @@ public class SignUpDtoTest {
             "   ",
             "Doe",
             "john.doe@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
@@ -621,7 +637,8 @@ public class SignUpDtoTest {
             "Mary Anne",
             "De La Cruz",
             "mary.delacruz@example.com",
-            "Password123!".toCharArray()
+            "Password123!".toCharArray(),
+            "USER"
         );
 
         // Act
