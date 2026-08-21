@@ -319,7 +319,7 @@ public class UserService {
     /**
      * Restore a soft deleted user
      * 
-     * @param userId The ID of the user to restore
+     * @param login The login (username) of the user to restore
      * @return UserDto containing the restored user's information
      * @throws UserNotFoundException if the user is not found
      */
@@ -339,7 +339,7 @@ public class UserService {
      * - Checks if the user is already an manager or admin
      * - Removes existing roles and assigns the manager role
      *
-     * @param userId The ID of the user to promote
+     * @param login The login (username) of the user to promote
      * @return UserDto containing the updated user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserAlreadyManagerException if the user is alreydy a manager
@@ -374,7 +374,7 @@ public class UserService {
      * - Checks if the user is already a regular user or admin
      * - Removes existing roles and assigns the user role
      *
-     * @param userId The ID of the user to revoke the manager role from
+     * @param login The login (username) of the user to revoke the manager role from
      * @return UserDto containing the updated user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserAlreadyRegularException if the user is already a regular user
@@ -410,7 +410,7 @@ public class UserService {
      * - Checks if the user is already an admin
      * - Removes existing roles and assigns the admin role
      *
-     * @param userId The ID of the user to promote
+     * @param login The login (username) of the user to promote
      * @return UserDto containing the updated user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserAlreadyAdminException if the user is already an admin
@@ -440,7 +440,7 @@ public class UserService {
      * - Checks if the user is already a manager or has lower rights
      * - Removes existing roles and assigns the manager role
      *
-     * @param userId The ID of the user to downgrade
+     * @param login The login (username) of the user to downgrade
      * @return UserDto containing the updated user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserHasLowerRightsException if the user has lower rights than admin
@@ -475,7 +475,7 @@ public class UserService {
      * - Checks if the user is already a regular user or manager
      * - Removes existing roles and assigns the user role
      *
-     * @param userId The ID of the user to revoke the admin role from
+     * @param login The login (username) of the user to revoke the admin role from
      * @return UserDto containing the updated user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserAlreadyRegularException if the user is already a regular user
@@ -538,7 +538,7 @@ public class UserService {
      * - Checks if the authenticated user has sufficient permissions
      * - Soft-deletes the user
      *
-     * @param userId The ID of the user to delete
+     * @param login The login (username) of the user to delete
      * @param hardDelete If true, the user will be permanently deleted instead of soft-deleted
      * @return UserDto containing the deleted user's information
      * @throws UserNotFoundException if the user is not found
@@ -580,16 +580,16 @@ public class UserService {
      * - Checks if the authenticated user has sufficient permissions
      * - Permanently deletes the user
      *
-     * @param userId The ID of the user to permanently delete
+     * @param login The login (username) of the user to permanently delete
      * @return UserDto containing the deleted user's information
      * @throws UserNotFoundException if the user is not found
      * @throws UserHasLowerRightsException if the authenticated user lacks permissions
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deletePermanentUser(String userLogin) {
+    public UserDto deletePermanentUser(String login) {
         // Get the user to delete
-        User userToDelete = userRepository.findByLogin(userLogin)
-                .orElseThrow(() -> new UserNotFoundException(userLogin));
+        User userToDelete = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         // Get the authenticated user (the actor)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -661,18 +661,18 @@ public class UserService {
      * This operation is typically used during logout or when a user's
      * authentication needs to be invalidated across all sessions.
      *
-     * @param userLogin The login/username of the user whose tokens should be deleted
+     * @param login The login (username) of the user whose tokens should be deleted
      * @throws UserNotFoundException if the user is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void deleteRefreshTokens(String userLogin) {
-        log.debug("Deleting refresh tokens for user: {}", userLogin);
+    public void deleteRefreshTokens(String login) {
+        log.debug("Deleting refresh tokens for user: {}", login);
         
         // Verify user exists before deleting tokens
-        userRepository.findByLogin(userLogin)
-                .orElseThrow(() -> new UserNotFoundException(userLogin));
+        userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
         
-        refreshTokenRepository.deleteByUserLogin(userLogin);
+        refreshTokenRepository.deleteByUserLogin(login);
     }
 
      /**
@@ -686,17 +686,17 @@ public class UserService {
      * 
      * Note: This method does not allow updating the user's roles or password. Separate methods should be used for those operations.
      * 
-     * @param userId The ID of the user to update
+     * @param login The login (username) of the user to update
      * @param userDto The new user information to update
      * @throws UserNotFoundException if the user is not found
      */
 
     @Transactional
-    public void updateUser(String userLogin, UserDto userDto) {
+    public void updateUser(String login, UserDto userDto) {
 
 
-        User user = userRepository.findByLogin(userLogin)
-                .orElseThrow(() -> new UserNotFoundException(userLogin));
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
 
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
