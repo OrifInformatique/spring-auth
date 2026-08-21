@@ -117,7 +117,7 @@ public class UserController {
     /**
      * Restore a user that was soft deleted
      * 
-     * @param userId The ID of the user to restore
+     * @param login The login (username) of the user to restore
      * @return ResponseEntity with success message or error details
      */
     @PutMapping("/{login}/restore")
@@ -138,7 +138,7 @@ public class UserController {
      * - Validates the user exists and isn't already a manager
      * - Returns success/error message
      *
-     * @param userId The ID of the user to promote
+     * @param login The login (username) of the user to promote to manager
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:update')")
@@ -161,7 +161,7 @@ public class UserController {
      * - Validates the user exists and isn't an admin
      * - Returns success/error message
      *
-     * @param userId The ID of the user to revoke manager role from
+     * @param login The login (username) of the user to revoke manager role from
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:update')")
@@ -183,7 +183,7 @@ public class UserController {
      * - Validates the user exists and isn't already a admin
      * - Returns success/error message
      *
-     * @param userId The ID of the user to promote to admin
+     * @param login The login (username) of the user to promote to admin
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -204,7 +204,7 @@ public class UserController {
      * - Validates the user exists and isn't already a regular user
      * - Returns success/error message
      *
-     * @param userId The ID of the user to revoke admin role from
+     * @param login The login (username) of the user to revoke admin role from
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -225,7 +225,7 @@ public class UserController {
      * - Validates the user exists and is currently a admin
      * - Returns success/error message
      *
-     * @param userId The ID of the admin to downgrade
+     * @param login The login (username) of the admin to downgrade
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -246,7 +246,7 @@ public class UserController {
      * - Validates the authenticated user has sufficient permissions
      * - Returns success/error message
      *
-     * @param userId The ID of the user to delete
+     * @param login The login (username) of the user to delete
      * @param hardDelete A boolean for soft or hard delete (default: false)
      * @return ResponseEntity with success message or error details
      */
@@ -277,8 +277,20 @@ public class UserController {
                 deletedUser.getLogin()));
     }
 
-    @PutMapping("/{login}")
+    /**
+     * Method to update a user's information.
+     * This endpoint:
+     * - Requires the 'user:update' authority
+     * - Validates the user exists
+     * - Updates the user's information based on the provided UserDto
+     * - Returns success/error message
+     *
+     * @param login The login (username) of the user to update
+     * @param userDto The DTO containing the updated user information
+     * @return ResponseEntity with success message or error details
+     */
     @PreAuthorize("hasAuthority('user:update')")
+    @PutMapping("/{login}")
     public ResponseEntity<?> updateUser(@PathVariable String login, @RequestBody UserDto userDto) {
         userService.updateUser(login, userDto);
         return ResponseEntity.ok().body("User updated successfully");
