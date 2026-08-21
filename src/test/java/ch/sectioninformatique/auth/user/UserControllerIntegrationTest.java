@@ -350,7 +350,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "GET",
-                                "/users/all",
+                                "/users/",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -629,7 +629,7 @@ public class UserControllerIntegrationTest {
                 // First, soft delete the user using the DELETE endpoint
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId() + "/0",
+                                "/users/" + userDto.getLogin() + "/false",
                                 null,
                                 adminToken,
                                 MediaType.APPLICATION_JSON,
@@ -641,7 +641,7 @@ public class UserControllerIntegrationTest {
                 // Then restore the user
                 performRequest(
                                 "PUT",
-                                "/users/" + userDto.getId() + "/restore",
+                                "/users/" + userDto.getLogin() + "/restore",
                                 null,
                                 adminToken,
                                 MediaType.APPLICATION_JSON,
@@ -684,7 +684,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId() + "/true",
+                                "/users/" + userDto.getLogin() + "/true",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -730,7 +730,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + userDto.getId() + "/promote-manager",
+                                "/users/" + userDto.getLogin() + "/promote-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -896,11 +896,11 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                String fakeUserId = "9999";
+                String fakeUserLogin = "Not.A@Login.com";
 
                 performRequest(
                                 "PUT",
-                                "/users/" + fakeUserId + "/promote-manager",
+                                "/users/" + fakeUserLogin + "/promote-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -909,7 +909,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value(message("error.user.not.found", fakeUserId)));
+                                                                .value(message("error.user.not.found", fakeUserLogin)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -941,7 +941,7 @@ public class UserControllerIntegrationTest {
                 String token = userAuthenticationProvider.createToken(adminDto);
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/promote-manager",
+                                "/users/" + managerDto.getLogin() + "/promote-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -982,7 +982,7 @@ public class UserControllerIntegrationTest {
                 String token = userAuthenticationProvider.createToken(adminDto);
                 performRequest(
                                 "PUT",
-                                "/users/" + adminDto.getId() + "/promote-manager",
+                                "/users/" + adminDto.getLogin() + "/promote-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1027,7 +1027,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                "/users/" + managerDto.getLogin() + "/revoke-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1074,7 +1074,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                "/users/" + managerDto.getLogin() + "/revoke-manager",
                                 null,
                                 null,
                                 MediaType.APPLICATION_JSON,
@@ -1114,7 +1114,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                "/users/" + managerDto.getLogin() + "/revoke-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1156,7 +1156,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/revoke-manager",
+                                "/users/" + managerDto.getLogin() + "/revoke-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1196,7 +1196,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/9999/revoke-manager",
+                                "/users/Not.A@Login.com/revoke-manager",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1205,7 +1205,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value(message("error.user.not.found", "9999")));
+                                                                .value(message("error.user.not.found", "Not.A@Login.com")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1240,7 +1240,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/promote-admin",
+                                "/users/" + managerDto.getLogin() + "/promote-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1286,7 +1286,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/promote-admin",
+                                "/users/" + managerDto.getLogin() + "/promote-admin",
                                 null,
                                 null,
                                 MediaType.APPLICATION_JSON,
@@ -1326,7 +1326,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/promote-admin",
+                                "/users/" + managerDto.getLogin() + "/promote-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1368,7 +1368,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + managerDto.getId() + "/promote-admin",
+                                "/users/" + managerDto.getLogin() + "/promote-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1406,11 +1406,11 @@ public class UserControllerIntegrationTest {
 
                 String token = userAuthenticationProvider.createToken(adminDto);
 
-                String fakeUserId = "9999";
+                String fakeUserLogin = "Not.a@Login.com";
 
                 performRequest(
                                 "PUT",
-                                "/users/" + fakeUserId + "/promote-admin",
+                                "/users/" + fakeUserLogin + "/promote-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1419,7 +1419,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value(message("error.user.not.found", fakeUserId)));
+                                                                .value(message("error.user.not.found", fakeUserLogin)));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1451,7 +1451,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminDto.getId() + "/promote-admin",
+                                "/users/" + adminDto.getLogin() + "/promote-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1496,7 +1496,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                "/users/" + adminToRevokeDto.getLogin() + "/revoke-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1541,7 +1541,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                "/users/" + adminToRevokeDto.getLogin() + "/revoke-admin",
                                 null,
                                 null,
                                 MediaType.APPLICATION_JSON,
@@ -1582,7 +1582,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                "/users/" + adminToRevokeDto.getLogin() + "/revoke-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1625,7 +1625,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToRevokeDto.getId() + "/revoke-admin",
+                                "/users/" + adminToRevokeDto.getLogin() + "/revoke-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1666,7 +1666,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/9999/revoke-admin",
+                                "/users/Not.A@Login.com/revoke-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1675,7 +1675,7 @@ public class UserControllerIntegrationTest {
                                 request -> {
                                         try {
                                                 request.andExpect(jsonPath("$.message")
-                                                                .value(message("error.user.not.found", "9999")));
+                                                                .value(message("error.user.not.found", "Not.A@Login.com")));
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
@@ -1710,7 +1710,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToDowngradeDto.getId() + "/downgrade-admin",
+                                "/users/" + adminToDowngradeDto.getLogin() + "/downgrade-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1756,7 +1756,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToDowngradeDto.getId() + "/downgrade-admin",
+                                "/users/" + adminToDowngradeDto.getLogin() + "/downgrade-admin",
                                 null,
                                 null,
                                 MediaType.APPLICATION_JSON,
@@ -1797,7 +1797,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "PUT",
-                                "/users/" + adminToDowngradeDto.getId() + "/downgrade-admin",
+                                "/users/" + adminToDowngradeDto.getLogin() + "/downgrade-admin",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1843,7 +1843,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId() + "/0",
+                                "/users/" + userDto.getLogin() + "/0",
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
@@ -1889,7 +1889,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getLogin(),
                                 null,
                                 null,
                                 MediaType.APPLICATION_JSON,
@@ -1930,7 +1930,7 @@ public class UserControllerIntegrationTest {
 
                 performRequest(
                                 "DELETE",
-                                "/users/" + userDto.getId(),
+                                "/users/" + userDto.getLogin(),
                                 null,
                                 token,
                                 MediaType.APPLICATION_JSON,
