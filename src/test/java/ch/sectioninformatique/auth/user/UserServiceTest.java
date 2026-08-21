@@ -201,7 +201,7 @@ public class UserServiceTest {
         // Arrange
         String login = "newuser@test.com";
         String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray());
+        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray(), "USER");
         
         User user = new User();
         user.setId(1L);
@@ -253,7 +253,7 @@ public class UserServiceTest {
         // Arrange
         String login = "existing@test.com";
         String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray());
+        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray(), "USER");
         
         User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, false, null);
         
@@ -310,17 +310,17 @@ public class UserServiceTest {
         UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null,false, "ROLE_MANAGER",
                 null);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
         when(roleRepository.findByName(RoleEnum.MANAGER)).thenReturn(Optional.of(managerRole));
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toUserDto(user)).thenReturn(expectedDto);
 
         // Act
-        UserDto result = userService.promoteToManager(userId);
+        UserDto result = userService.promoteToManager(user.getLogin());
 
         // Assert
         assertEquals(expectedDto, result);
-        verify(userRepository).findById(userId);
+        verify(userRepository).findByLogin(user.getLogin());
         verify(roleRepository).findByName(RoleEnum.MANAGER);
         verify(userRepository).save(user);
     }
@@ -341,15 +341,15 @@ public class UserServiceTest {
     @Test
     void promoteToManager_UserNotFound_ThrowsRuntimeException() {
         // Arrange
-        Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        String login = "Not.a@login.com";
+        when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
         // Act & Assert
         UserExceptions.UserNotFoundException exception = assertThrows(
             UserExceptions.UserNotFoundException.class,
-            () -> userService.promoteToManager(userId)
+            () -> userService.promoteToManager(login)
         );
-        assertEquals("1", exception.getLoginOrId());
+        assertEquals("Not.a@login.com", exception.getLoginOrId());
     }
 
     /**
@@ -382,12 +382,12 @@ public class UserServiceTest {
         managerRole.setName(RoleEnum.MANAGER);
         user.setMainRole(managerRole);
         
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
 
         // Act & Assert
         UserExceptions.UserAlreadyManagerException exception = assertThrows(
             UserExceptions.UserAlreadyManagerException.class,
-            () -> userService.promoteToManager(userId)
+            () -> userService.promoteToManager(user.getLogin())
         );
         assertEquals("john@test.com", exception.getLogin());
     }
@@ -442,16 +442,16 @@ public class UserServiceTest {
         UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, false,
                 "ROLE_MANAGER", null);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
+        when(userRepository.findByLogin(userToDelete.getLogin())).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
         when(userRepository.findByLogin("manager@test.com")).thenReturn(Optional.of(authenticatedUser));
 
         // Act
-        userService.deleteUser(userId, false);
+        userService.deleteUser(userToDelete.getLogin(), false);
 
         // Assert
-        verify(userRepository).findById(userId);
+        verify(userRepository).findByLogin(userToDelete.getLogin());
         verify(userRepository).findByLogin("manager@test.com");
         verify(userRepository).delete(userToDelete);
     }
@@ -502,7 +502,7 @@ public class UserServiceTest {
         UserDto authenticatedUserDto = new UserDto(3L, "Regular", "User", "user@test.com", null, false, "USER",
                 null);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(userToDelete));
+        when(userRepository.findByLogin(userToDelete.getLogin())).thenReturn(Optional.of(userToDelete));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
         when(userRepository.findByLogin("user@test.com")).thenReturn(Optional.of(authenticatedUser));
@@ -510,7 +510,7 @@ public class UserServiceTest {
         // Act & Assert
         SecurityExceptions.UserHasLowerRightsException exception = assertThrows(
             SecurityExceptions.UserHasLowerRightsException.class,
-            () -> userService.deleteUser(userId, false)
+            () -> userService.deleteUser(userToDelete.getLogin(), false)
         );
         assertEquals("user@test.com", exception.getLogin());
     }

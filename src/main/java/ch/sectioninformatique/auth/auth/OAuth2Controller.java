@@ -243,7 +243,7 @@ public class OAuth2Controller {
 
         log.debug("Received auth code to exchange for JWT tokens");
 
-        UserDto user = userService.findById(dto.id());
+        UserDto user = userService.findByLogin(dto.login());
         log.debug("Retrieved login : {}", user.getLogin());
 
         String jwt = authService.retrieveAndDeleteAuthCode(dto.code(), user.getLogin());

@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -685,7 +684,7 @@ public class AuthControllerIntegrationTest {
                 String rawPassword = "testPassword";
                 String requestBody =
                                 "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\""
-                                                + rawPassword + "\"}";
+                                                + rawPassword + "\", \"mainRole\": \"USER\"}";
 
                 performRequest(
                                 "POST",
@@ -1724,19 +1723,22 @@ public class AuthControllerIntegrationTest {
         @Test
         @Transactional
         public void login_oauth2_success() throws Exception{
+
                 mockMvc.perform(get("/oauth2/success")
-                                .with(oauth2Login().attributes(attrs -> {
-                        attrs.put("email", "user@test.com");
-                        attrs.put("given_name", "User");
-                        attrs.put("family_name", "Test");
+                        .with(oauth2Login().attributes(attrs -> {
+                    attrs.put("email", "user@test.com");
+                    attrs.put("given_name", "User");
+                    attrs.put("family_name", "Test");
                 })))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(result -> {
-                        String redirected = result.getResponse().getRedirectedUrl();
-                        assertNotNull(redirected);
-                        assertTrue(redirected.contains("/auth/redirect-after-login?loginType=azure"));
-                });
-        }
+                .andExpect(result ->{
+                        String redirectUrl = result.getResponse().getRedirectedUrl();
+
+                        assertTrue(redirectUrl.contains("/auth/redirect-after-login"));
+                        assertTrue(redirectUrl.contains("?loginType=azure"));
+                        assertTrue(redirectUrl.contains("&authCode="));
+        });
+}
 
 
         @Test
@@ -1744,49 +1746,51 @@ public class AuthControllerIntegrationTest {
         public void get_token_with_authCode() throws Exception{
                 
                 String authCode = authService.generateAndStoreAuthCode("test.user@test.com", "redirectUrl");
-                        var userDto = userService.findByLogin("test.user@test.com");
-                        Long id = userDto.getId();
 
-                        performRequest(
-                                "POST",
-                                "/oauth2/token",
-                                "{\"id\":" + id + ", \"code\":\"" + authCode + "\"}",
-                                null,
-                                MediaType.APPLICATION_JSON,
-                                200,
-                                "get-token-with-authcode",
-                                request -> {
-                                        try{
-                                                request.andExpect(jsonPath("$.token").exists());
-                                        }catch (Exception e){
-                                                throw new RuntimeException(e);
-                                        }
+                performRequest(
+                        "POST",
+                        "/oauth2/token",
+                        "{\"login\":\"test.user@test.com\", \"code\":\"" + authCode + "\"}",
+                        null,
+                        MediaType.APPLICATION_JSON,
+                        200,
+                        "get-token-with-authcode",
+                        request -> {
+                                try{
+                                        request.andExpect(jsonPath("$.token").exists());
+                                }catch (Exception e){
+                                        throw new RuntimeException(e);
                                 }
-
-                        );
+                        }
+                        
+                        
+                );
         }
 
         @Test
         @Transactional
-        public void getTokenWithAuthCode_withWrongLogin_ShouldReturn404() throws Exception{
+        public void getTokenWithAuthCode_withWronLogin_ShouldReturn404() throws Exception{
                 
                 String authCode = authService.generateAndStoreAuthCode("not.a@login.com", "redirectUrl");
                 
-                        // Use a non-existing id to simulate wrong login (no user for provided id)
-                        Long nonExistingId = -1L;
-
-                        performRequest(
-                                "POST",
-                                "/oauth2/token",
-                                "{\"id\":" + nonExistingId + ", \"code\":\"" + authCode + "\"}",
-                                null,
-                                MediaType.APPLICATION_JSON,
-                                404,
-                                "get-token-with-auth-code-wrong-login",
-                                request -> {
-                                        // No specific message assertion: only status 404 is required
-                                }
-                        );
+                performRequest(
+                        "POST",
+                        "/oauth2/token",
+                        "{\"login\":\"not.a@login.com\", \"code\":\"" + authCode + "\"}",
+                        null,
+                        MediaType.APPLICATION_JSON,
+                        404,
+                        "get-token-with-auth-code-wrong-login",
+                        request -> {
+                                try{
+                                        request.andExpect(jsonPath("$.message")
+                                        .value(message("error.user.not.found", "not.a@login.com")));
+                        } catch (Exception e){
+                                throw new RuntimeException(e);
+                        }
+                }
+                        
+                );
                 
         }
 
@@ -1795,25 +1799,25 @@ public class AuthControllerIntegrationTest {
         public void getTokenWithAuthCode_withWrongCode_ShouldReturn404() throws Exception{
 
                 String wrongCode = "ThisIsNotACode";
-                        var userDto = userService.findByLogin("test.user@test.com");
-                        Long id = userDto.getId();
 
-                        performRequest(
-                                "POST",
-                                "/oauth2/token",
-                                "{\"id\":" + id + ", \"code\":\"" + wrongCode + "\"}",
-                                null,
-                                MediaType.APPLICATION_JSON,
-                                404,
-                                "get-token-with-auth-code-wrong-code",
-                                request -> {
-                                        try{
-                                                request.andExpect(jsonPath("$.message")
-                                        .value(message("error.authcode.not.found")));
-                                        } catch(Exception e){
-                                                throw new RuntimeException(e);
-                                        }
+                performRequest(
+                        "POST",
+                        "/oauth2/token",
+                        "{\"login\":\"test.user@test.com\", \"code\":\"" + wrongCode + "\"}",
+                        null,
+                        MediaType.APPLICATION_JSON,
+                        404,
+                        "get-token-with-auth-code-wrong-code",
+                        request -> {
+                                try{
+                                        request.andExpect(jsonPath("$.message")
+                                .value(message("error.authcode.not.found")));
+                                } catch(Exception e){
+                                        throw new RuntimeException(e);
                                 }
-                        );
+                        }
+                );
         }
+        
+
 }

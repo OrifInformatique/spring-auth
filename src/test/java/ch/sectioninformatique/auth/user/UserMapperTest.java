@@ -96,7 +96,8 @@ class UserMapperTest {
             "Jane",
             "Smith",
             "janesmith",
-            "password123".toCharArray()
+            "password123".toCharArray(),
+            "USER"
         );
 
         // When

@@ -117,13 +117,13 @@ public class UserController {
     /**
      * Restore a user that was soft deleted
      * 
-     * @param userId The ID of the user to restore
+     * @param login The login (username) of the user to restore
      * @return ResponseEntity with success message or error details
      */
-    @PutMapping("/{userId}/restore")
+    @PutMapping("/{login}/restore")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<?> restoreDeletedUser(@PathVariable Long userId) {
-        userService.restoreDeletedUser(userId);
+    public ResponseEntity<?> restoreDeletedUser(@PathVariable String login) {
+        userService.restoreDeletedUser(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.restored",
                 null,
@@ -138,14 +138,14 @@ public class UserController {
      * - Validates the user exists and isn't already a manager
      * - Returns success/error message
      *
-     * @param userId The ID of the user to promote
+     * @param login The login (username) of the user to promote to manager
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:update')")
-    @PutMapping("/{userId}/promote-manager")
-    public ResponseEntity<?> promoteToManager(@PathVariable Long userId) {
+    @PutMapping("/{login}/promote-manager")
+    public ResponseEntity<?> promoteToManager(@PathVariable String login) {
 
-        userService.promoteToManager(userId);
+        userService.promoteToManager(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.promoted.manager",
                 null,
@@ -161,14 +161,14 @@ public class UserController {
      * - Validates the user exists and isn't an admin
      * - Returns success/error message
      *
-     * @param userId The ID of the user to revoke manager role from
+     * @param login The login (username) of the user to revoke manager role from
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:update')")
-    @PutMapping("/{userId}/revoke-manager")
-    public ResponseEntity<?> revokeManagerRole(@PathVariable Long userId) {
+    @PutMapping("/{login}/revoke-manager")
+    public ResponseEntity<?> revokeManagerRole(@PathVariable String login) {
 
-        userService.revokeManagerRole(userId);
+        userService.revokeManagerRole(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.revoked.manager",
                 null,
@@ -183,13 +183,13 @@ public class UserController {
      * - Validates the user exists and isn't already a admin
      * - Returns success/error message
      *
-     * @param userId The ID of the user to promote to admin
+     * @param login The login (username) of the user to promote to admin
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{userId}/promote-admin")
-    public ResponseEntity<?> promoteToAdmin(@PathVariable Long userId) {
-        userService.promoteToAdmin(userId);
+    @PutMapping("/{login}/promote-admin")
+    public ResponseEntity<?> promoteToAdmin(@PathVariable String login) {
+        userService.promoteToAdmin(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.promoted.admin",
                 null,
@@ -204,13 +204,13 @@ public class UserController {
      * - Validates the user exists and isn't already a regular user
      * - Returns success/error message
      *
-     * @param userId The ID of the user to revoke admin role from
+     * @param login The login (username) of the user to revoke admin role from
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{userId}/revoke-admin")
-    public ResponseEntity<?> revokeAdminRole(@PathVariable Long userId) {
-        userService.revokeAdminRole(userId);
+    @PutMapping("/{login}/revoke-admin")
+    public ResponseEntity<?> revokeAdminRole(@PathVariable String login) {
+        userService.revokeAdminRole(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.revoked.admin",
                 null,
@@ -225,13 +225,13 @@ public class UserController {
      * - Validates the user exists and is currently a admin
      * - Returns success/error message
      *
-     * @param userId The ID of the admin to downgrade
+     * @param login The login (username) of the admin to downgrade
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{userId}/downgrade-admin")
-    public ResponseEntity<?> downgradeAdminRole(@PathVariable Long userId) {
-        userService.downgradeAdminRole(userId);
+    @PutMapping("/{login}/downgrade-admin")
+    public ResponseEntity<?> downgradeAdminRole(@PathVariable String login) {
+        userService.downgradeAdminRole(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.downgraded.admin",
                 null,
@@ -246,20 +246,20 @@ public class UserController {
      * - Validates the authenticated user has sufficient permissions
      * - Returns success/error message
      *
-     * @param userId The ID of the user to delete
+     * @param login The login (username) of the user to delete
      * @param hardDelete A boolean for soft or hard delete (default: false)
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{userId}/{hardDelete}")
-    public ResponseEntity<?> delete(@PathVariable Long userId, @PathVariable(required = false) Boolean hardDelete) {
+    @DeleteMapping("/{login}/{hardDelete}")
+    public ResponseEntity<?> delete(@PathVariable String login, @PathVariable(required = false) Boolean hardDelete) {
         String resultMessage = "";
 
         // If hardDelete parameter is null, default to false (soft delete)
         boolean isHardDelete = hardDelete != null ? hardDelete : false;
         
         // Perform the delete operation and get the deleted user's information
-        UserDto deletedUser = userService.deleteUser(userId, isHardDelete);
+        UserDto deletedUser = userService.deleteUser(login, isHardDelete);
 
         // Determine the appropriate message based on the type of deletion performed
         if (isHardDelete) {
@@ -277,10 +277,22 @@ public class UserController {
                 deletedUser.getLogin()));
     }
 
-    @PutMapping("/{id}")
+    /**
+     * Method to update a user's information.
+     * This endpoint:
+     * - Requires the 'user:update' authority
+     * - Validates the user exists
+     * - Updates the user's information based on the provided UserDto
+     * - Returns success/error message
+     *
+     * @param login The login (username) of the user to update
+     * @param userDto The DTO containing the updated user information
+     * @return ResponseEntity with success message or error details
+     */
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        userService.updateUser(id, userDto);
+    @PutMapping("/{login}")
+    public ResponseEntity<?> updateUser(@PathVariable String login, @RequestBody UserDto userDto) {
+        userService.updateUser(login, userDto);
         return ResponseEntity.ok().body("User updated successfully");
     }
 }
