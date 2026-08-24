@@ -1,24 +1,25 @@
 package ch.sectioninformatique.auth.security;
 
+import java.io.IOException;
+import java.util.Map;
+
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.stereotype.Component;
-import org.springframework.lang.NonNull;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * JWT Authentication Filter for processing JWT tokens in incoming requests.
@@ -84,6 +85,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Extract the JWT token (everything after "Bearer ")
         String token = header.substring(7).trim();
+
+        log.debug("Token reçus : {}", token);
 
         try {
             // Validate the token and set Authentication object in the SecurityContext

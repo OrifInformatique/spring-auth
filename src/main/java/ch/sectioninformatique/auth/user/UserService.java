@@ -72,6 +72,31 @@ public class UserService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
+    /** Method to get a list of users by their login
+     * 
+     * @param usersLogin the list of users's login
+     * @return a list of UserDto
+     */
+
+    public List<UserDto> getUsers(List<String> usersLogin){
+
+        List<UserDto> users = new ArrayList<>();
+
+        for(String login : usersLogin){
+            
+            try{
+                Optional<User> user = userRepository.findByLogin(login);
+
+                if(!user.isEmpty()){
+                    users.add(userMapper.toUserDto(user.get()));
+                }
+            } catch (UserNotFoundException e){
+                log.debug("No user found with the login or id : {}", login);
+            }
+        }
+        return users;
+    }
+
 
     /**
      * Authenticates a user with their credentials.
