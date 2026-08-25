@@ -86,8 +86,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Extract the JWT token (everything after "Bearer ")
         String token = header.substring(7).trim();
 
-        log.debug("Token reçus : {}", token);
-
         try {
             // Validate the token and set Authentication object in the SecurityContext
             SecurityContextHolder.getContext().setAuthentication(
