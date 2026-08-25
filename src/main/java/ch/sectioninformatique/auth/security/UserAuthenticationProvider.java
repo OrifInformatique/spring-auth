@@ -1,11 +1,12 @@
 package ch.sectioninformatique.auth.security;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
-import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,8 +19,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserService;
 import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
+import ch.sectioninformatique.auth.user.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -215,6 +216,7 @@ public class UserAuthenticationProvider {
                 .mainRole(decoded.getClaim("mainRole").asString())
                 .permissions(decoded.getClaim("permissions").asList(String.class))
                 .build();
+                          
         List<String> allRoles = new ArrayList<>();
         allRoles.add(user.getMainRole());
         List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
