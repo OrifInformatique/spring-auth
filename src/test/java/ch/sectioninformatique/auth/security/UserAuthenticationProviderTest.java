@@ -11,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserService;
 import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
-import ch.sectioninformatique.auth.app.exceptions.GlobalExceptionHandler;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -33,9 +32,6 @@ class UserAuthenticationProviderTest {
     @Mock
     private UserService userService;
 
-    @Mock
-    private GlobalExceptionHandler globalExceptionHandler;
-
     private UserAuthenticationProvider authenticationProvider;
 
     private static final String TEST_SECRET_KEY = "test-secret-key";
@@ -45,7 +41,7 @@ class UserAuthenticationProviderTest {
 
     @BeforeEach
     void setUp() {
-        authenticationProvider = new UserAuthenticationProvider(globalExceptionHandler, userService);
+        authenticationProvider = new UserAuthenticationProvider(userService);
         // Use reflection to set the secret key
         try {
             java.lang.reflect.Field accessField = UserAuthenticationProvider.class.getDeclaredField("secretAccessKey");
