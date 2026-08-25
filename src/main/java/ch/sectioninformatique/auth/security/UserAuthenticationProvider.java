@@ -18,7 +18,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import ch.sectioninformatique.auth.app.exceptions.GlobalExceptionHandler;
 import ch.sectioninformatique.auth.user.UserDto;
 import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
 import ch.sectioninformatique.auth.user.UserService;
@@ -39,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Component
 public class UserAuthenticationProvider {
-
-    private final GlobalExceptionHandler globalExceptionHandler;
 
     /**
      * Secret key for JWT access token signing and verification, configured via environment variable.
@@ -204,9 +201,6 @@ public class UserAuthenticationProvider {
      *         authorities
      */
     public Authentication validateToken(String token) {
-
-        log.debug("Token reçus : {}", token);
-
         Algorithm algorithm = Algorithm.HMAC256(secretAccessKey);
 
         JWTVerifier verifier = JWT.require(algorithm)
@@ -215,7 +209,6 @@ public class UserAuthenticationProvider {
         DecodedJWT decoded = verifier.verify(token);
         log.debug("Token verified for subject: {}", decoded.getSubject());
 
-
         UserDto user = UserDto.builder()
                 .login(decoded.getSubject())
                 .firstName(decoded.getClaim("firstName").asString())
@@ -223,7 +216,7 @@ public class UserAuthenticationProvider {
                 .mainRole(decoded.getClaim("mainRole").asString())
                 .permissions(decoded.getClaim("permissions").asList(String.class))
                 .build();
-                    
+                          
         List<String> allRoles = new ArrayList<>();
         allRoles.add(user.getMainRole());
         List<SimpleGrantedAuthority> authorities = buildAuthorities(allRoles, user.getPermissions());
