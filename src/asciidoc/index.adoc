@@ -335,7 +335,7 @@ include::auth/refresh-invalid-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 ==== 1.3.2 Error Response - 400 - Bad Request
-These are example outputs for the `GET /auth/refresh` endpoint for bad request.
+These are example outputs for the `POST /auth/refresh` endpoint for bad request.
 
 ===== 1.3.2.1 Empty Body
 This is an example output when the request body is unexpectedly provided.
@@ -352,24 +352,24 @@ It returns a 400 Bad Request error.
 This is an example output for the `PUT /auth/update-password` endpoint.
 
 .request
-include::auth/logout/http-request.adoc[]
+include::auth/update-password/http-request.adoc[]
 
 .response
-include::auth/logout/http-response.adoc[]
+include::auth/update-password/http-response.adoc[]
 
 Updates the password for the authenticated user.
 
 ==== 1.4.1 Error Response - 401 - Unauthorized
-These are example outputs for the `POST /auth/logout` endpoint for unauthorized access.
+These are example outputs for the `PUT /auth/update-password` endpoint for unauthorized access.
 
 ===== 1.4.1.1 Missing Token
 This is an example output when the token is missing in the request.
 
 .request
-include::auth/logout-missing-token/http-request.adoc[]
+include::auth/update-password-missing-token/http-request.adoc[]
 
 .response
-include::auth/logout-missing-token/http-response.adoc[]
+include::auth/update-password-missing-token/http-response.adoc[]
 
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
@@ -512,7 +512,7 @@ include::users/deleted/http-response.adoc[]
 It gives informations about all soft-deleted users.
 
 === 2.5 Promote User to Manager
-This is an example output for the `PUT /users/{userId}/promote-manager` endpoint.
+This is an example output for the `PUT /users/{userLogin}/promote-manager` endpoint.
 
 .request
 include::users/promote-manager/http-request.adoc[]
@@ -523,9 +523,8 @@ include::users/promote-manager/http-response.adoc[]
 It promotes a user to the "MANAGER" role.
 
 ==== 2.5.1 Error Response - 401 - Unauthorized
-These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for unauthorized access.
+These are example outputs for the `PUT /users/{userLogin}/promote-manager` endpoint for unauthorized access.
 
-===== 2.5.1.1 Missing Authorization Header
 ===== 2.5.1.1 Missing Authorization Header
 This is an example output when the Authorization header is missing in the request.
 
@@ -538,7 +537,6 @@ include::users/promote-manager-missing-authorization/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that full authentication is required.
 
 ===== 2.5.1.2 Malformed Token
-===== 2.5.1.2 Malformed Token
 This is an example output when the token provided is malformed.
 
 .request
@@ -550,10 +548,8 @@ include::users/promote-manager-malformed-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 ==== 2.5.2 Error Response - 403 - Forbidden
-==== 2.5.2 Error Response - 403 - Forbidden
-These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for forbidden access.
+These are example outputs for the `PUT /users/{userLogin}/promote-manager` endpoint for forbidden access.
 
-===== 2.5.2.1 Non-Admin User - Promote User to Manager
 ===== 2.5.2.1 Non-Admin User - Promote User to Manager
 This is an example output when a non-admin user attempts to promote a user to manager.
 
@@ -566,10 +562,8 @@ include::users/promote-manager-non-admin/http-response.adoc[]
 It returns a 403 Forbidden error indicating that access is denied.
 
 ==== 2.5.3 Error Response - 404 - Not Found
-==== 2.5.3 Error Response - 404 - Not Found
-These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for not found errors.
+These are example outputs for the `PUT /users/{userLogin}/promote-manager` endpoint for not found errors.
 
-===== 2.5.3.1 User Not Found
 ===== 2.5.3.1 User Not Found
 This is an example output when the user to be promoted is not found.    
 
@@ -582,10 +576,8 @@ include::users/promote-manager-user-not-found/http-response.adoc[]
 It returns a 404 Not Found error indicating that the user was not found.
 
 ==== 2.5.4 Error Response - 409 - Conflict
-==== 2.5.4 Error Response - 409 - Conflict
-These are example outputs for the `PUT /users/{userId}/promote-manager` endpoint for conflict errors.
+These are example outputs for the `PUT /users/{userLogin}/promote-manager` endpoint for conflict errors.
 
-===== 2.5.4.1 User Already Manager
 ===== 2.5.4.1 User Already Manager
 This is an example output when the user to be promoted is already a manager.
 
@@ -598,7 +590,6 @@ include::users/promote-manager-user-already-manager/http-response.adoc[]
 It returns a 409 Conflict error indicating that the user is already a manager.
 
 ===== 2.5.4.2 User Already Admin
-===== 2.5.4.2 User Already Admin
 This is an example output when the user to be promoted is already an admin.
 
 .request
@@ -610,7 +601,7 @@ include::users/promote-manager-user-already-admin/http-response.adoc[]
 It returns a 409 Conflict error indicating that the user is already an admin.
 
 === 2.6 Revoke Manager to User
-This is an example output for the `PUT /users/{userId}/revoke-manager` endpoint.
+This is an example output for the `PUT /users/{userLogin}/revoke-manager` endpoint.
 
 .request
 include::users/revoke-manager/http-request.adoc[]
@@ -621,7 +612,7 @@ include::users/revoke-manager/http-response.adoc[]
 It revokes a manager to "USER" role.
 
 ==== 2.6.1 Error Response - 401 - Unauthorized
-These are example outputs for the `PUT /users/{userId}/revoke-manager` endpoint for unauthorized access.
+These are example outputs for the `PUT /users/{userLogin}/revoke-manager` endpoint for unauthorized access.
 
 ===== 2.6.1.1 Missing Authorization Header
 This is an example output when the Authorization header is missing in the request.
@@ -646,7 +637,7 @@ include::users/revoke-manager-malformed-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 ==== 2.6.2 Error Response - 403 - Forbidden
-These are example outputs for the `PUT /users/{userId}/revoke-manager` endpoint for forbidden access.
+These are example outputs for the `PUT /users/{userLogin}/revoke-manager` endpoint for forbidden access.
 
 ===== 2.6.2.1 Non-Admin User
 This is an example output when a non-admin user tries to revoke a manager role.
@@ -660,7 +651,7 @@ include::users/revoke-manager-non-admin/http-response.adoc[]
 It returns a 403 Forbidden error indicating that access is denied.
 
 ==== 2.6.3 Error Response - 404 - Not Found
-These are example outputs for the `PUT /users/{userId}/revoke-manager` endpoint
+These are example outputs for the `PUT /users/{userLogin}/revoke-manager` endpoint
 
 ===== 2.6.3.1 User Not Found
 This is an example output when the user to be revoked is not found.
@@ -674,7 +665,7 @@ include::users/revoke-manager-user-not-found/http-response.adoc[]
 It returns a 404 Not Found error indicating that the user was not found.
 
 === 2.7 Promote to Admin
-This is an example output for the `PUT /users/{userId}/promote-admin` endpoint.
+This is an example output for the `PUT /users/{userLogin}/promote-admin` endpoint.
 
 .request
 include::users/promote-admin/http-request.adoc[]
@@ -685,7 +676,7 @@ include::users/promote-admin/http-response.adoc[]
 It promotes a user or manager to "ADMIN" role.
 
 ==== 2.7.1 Error Response - 401 - Unauthorized
-These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for unauthorized access.
+These are example outputs for the `PUT /users/{userLogin}/promote-admin` endpoint for unauthorized access.
 
 ===== 2.7.1.1 Missing Authorization Header
 This is an example output when the Authorization header is missing in the request.
@@ -707,7 +698,7 @@ include::users/promote-admin-malformed-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 ==== 2.7.2 Error Response - 403 - Forbidden
-These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for forbidden access.
+These are example outputs for the `PUT /users/{userLogin}/promote-admin` endpoint for forbidden access.
 
 ===== 2.7.2.1 Non-Admin User
 This is an example output when a non-admin user tries to promote a user to admin.
@@ -720,7 +711,7 @@ include::users/promote-admin-non-admin/http-response.adoc[]
 It returns a 403 Forbidden error indicating that access is denied.
 
 ==== 2.7.3 Error Response - 404 - Not Found
-These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for not found errors.
+These are example outputs for the `PUT /users/{userLogin}/promote-admin` endpoint for not found errors.
 
 ===== 2.7.3.1 User Not Found
 This is an example output when the user to be promoted is not found.
@@ -733,7 +724,7 @@ include::users/promote-admin-user-not-found/http-response.adoc[]
 It returns a 404 Not Found error indicating that the user was not found.
 
 ==== 2.7.4 Error Response - 409 - Conflict
-These are example outputs for the `PUT /users/{userId}/promote-admin` endpoint for conflict errors.
+These are example outputs for the `PUT /users/{userLogin}/promote-admin` endpoint for conflict errors.
 
 ===== 2.7.4.1 User Already Admin
 This is an example output when the user to be promoted is already an admin.
@@ -746,7 +737,7 @@ include::users/promote-admin-user-already-admin/http-response.adoc[]
 It returns a 409 Conflict error indicating that the user is already an admin.
 
 === 2.8 Revoke Admin to User
-This is an example output for the `PUT /users/{userId}/revoke-admin` endpoint.
+This is an example output for the `PUT /users/{userLogin}/revoke-admin` endpoint.
 
 .request
 include::users/revoke-admin/http-request.adoc[]
@@ -757,7 +748,7 @@ include::users/revoke-admin/http-response.adoc[]
 It revokes a admin to "USER" role.
 
 ==== 2.8.1 Error Response - 401 - Unauthorized
-These are example outputs for the `PUT /users/{userId}/revoke-admin` endpoint for unauthorized access.
+These are example outputs for the `PUT /users/{userLogin}/revoke-admin` endpoint for unauthorized access.
 
 ===== 2.8.1.1 Missing Authorization Header
 .request
@@ -779,7 +770,7 @@ include::users/revoke-admin-malformed-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 ==== 2.8.2 Error Response - 403 - Forbidden
-These are example outputs for the `PUT /users/{userId}/revoke-admin` endpoint for forbidden access.
+These are example outputs for the `PUT /users/{userLogin}/revoke-admin` endpoint for forbidden access.
 
 ===== 2.8.2.1 Non-Admin User
 This is an example output when a non-admin user tries to revoke an admin role.
@@ -793,7 +784,7 @@ include::users/revoke-admin-non-admin/http-response.adoc[]
 It returns a 403 Forbidden error indicating that access is denied.
 
 ==== 2.8.3 Error Response - 404 - Not Found
-These are example outputs for the `PUT /users/{userId}/revoke-admin` endpoint for not found errors.
+These are example outputs for the `PUT /users/{userLogin}/revoke-admin` endpoint for not found errors.
 
 ===== 2.8.3.1 User Not Found
 This is an example output when the user to be revoked is not found.
@@ -807,7 +798,7 @@ include::users/revoke-admin-user-not-found/http-response.adoc[]
 It returns a 404 Not Found error indicating that the user was not found.
 
 === 2.9 Downgrade Admin to Manager
-This is an example output for the `PUT /users/{userId}/downgrade-admin` endpoint.
+This is an example output for the `PUT /users/{userLogin}/downgrade-admin` endpoint.
 
 .request
 include::users/downgrade-admin/http-request.adoc[]
@@ -818,7 +809,7 @@ include::users/downgrade-admin/http-response.adoc[]
 It downgrades a admin to "MANAGER" role.
 
 ==== 2.9.1 Error Response - 401 - Unauthorized
-These are example outputs for the `PUT /users/{userId}/downgrade-admin` endpoint for unauthorized access.
+These are example outputs for the `PUT /users/{userLogin}/downgrade-admin` endpoint for unauthorized access.
 
 ===== 2.9.1.1 Missing Authorization Header
 This is an example output when the Authorization header is missing in the request.
@@ -843,7 +834,7 @@ include::users/downgrade-admin-malformed-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 === 2.10 Delete User
-This is an example output for the `DELETE /users/{userId}` endpoint.
+This is an example output for the `DELETE /users/{userLogin}/0` endpoint.
 
 .request
 include::users/delete/http-request.adoc[]
@@ -854,7 +845,7 @@ include::users/delete/http-response.adoc[]
 It deletes a user.
 
 ==== 2.10.1 Error Response - 401 - Unauthorized
-These are example outputs for the `DELETE /users/{userId}` endpoint for unauthorized access.
+These are example outputs for the `DELETE /users/{userLogin}/0` endpoint for unauthorized access.
 
 ===== 2.10.1.1 Missing Authorization Header
 This is an example output when the Authorization header is missing in the request.
@@ -879,7 +870,7 @@ include::users/delete-malformed-token/http-response.adoc[]
 It returns a 401 Unauthorized error indicating that the token is invalid.
 
 === 2.11 Delete User (For Restore)
-This is an example output for the `DELETE /users/{userId}` endpoint - soft delete.
+This is an example output for the `DELETE /users/{userLogin}/0` endpoint - soft delete.
 
 .request
 include::users/delete-for-restore/http-request.adoc[]
@@ -890,7 +881,7 @@ include::users/delete-for-restore/http-response.adoc[]
 It soft-deletes a user, allowing them to be restored later.
 
 === 2.12 Permanently Delete User
-This is an example output for the `DELETE /users/{userId}/permanent` endpoint.
+This is an example output for the `DELETE /users/{userLogin}/1` endpoint.
 
 .request
 include::users/delete-permanent/http-request.adoc[]
@@ -901,7 +892,7 @@ include::users/delete-permanent/http-response.adoc[]
 It permanently deletes a user from the database.
 
 === 2.13 Restore Deleted User
-This is an example output for the `PUT /users/{userId}/restore` endpoint.
+This is an example output for the `PUT /users/{userLogin}/restore` endpoint.
 
 .request
 include::users/restore/http-request.adoc[]
