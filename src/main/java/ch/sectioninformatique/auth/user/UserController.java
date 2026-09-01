@@ -230,7 +230,16 @@ public class UserController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{login}/downgrade-admin")
-    public ResponseEntity<?> downgradeAdminRole(@PathVariable String login) {
+    public ResponseEntity<?> downgradeAdminRole(@PathVariable String login, @AuthenticationPrincipal UserDto currentUser) {
+
+        if (currentUser.getLogin().equals(login)) {
+            return ResponseEntity.badRequest().body(messageSource.getMessage(
+                    "message.user.downgrade.self",
+                    null,
+                    LocaleContextHolder.getLocale()
+            ));
+        }
+
         userService.downgradeAdminRole(login);
         return ResponseEntity.ok().body(messageSource.getMessage(
                 "message.user.downgraded.admin",
