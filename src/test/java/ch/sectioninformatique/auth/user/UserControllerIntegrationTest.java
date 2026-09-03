@@ -15,6 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.TestSecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +50,9 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import org.springframework.restdocs.snippet.Snippet;
+
+import ch.sectioninformatique.auth.RestDocsSnippets;
 
 /**
  * Integration tests for the UserController.
@@ -56,6 +63,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
  * The tests use MockMvc to perform HTTP requests and verify responses.
  */
 @SpringBootTest(classes = AuthApplication.class)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class UserControllerIntegrationTest {
@@ -83,7 +91,8 @@ public class UserControllerIntegrationTest {
                         MediaType contentType,
                         int expectedStatus,
                         String docsFileName,
-                        Consumer<ResultActions> script) throws Exception {
+                        Consumer<ResultActions> script,
+                        Snippet... snippets) throws Exception {
 
                 var requestType = get(endpoint);
 
@@ -112,6 +121,7 @@ public class UserControllerIntegrationTest {
                 // Set content type
                 requestType.contentType(contentType);
                 requestType.locale(LocaleContextHolder.getLocale());
+                requestType.session(new MockHttpSession());
 
                 // Perform request
                 var request = mockMvc.perform(requestType)
@@ -122,9 +132,8 @@ public class UserControllerIntegrationTest {
                         script.accept(request);
                 }
 
-                // Generate a REST Docs snippet for the request/response pair
                 request.andDo(document("users/" + docsFileName, preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint())));
+                                preprocessResponse(prettyPrint()), snippets));
 
         }
 
@@ -149,11 +158,15 @@ public class UserControllerIntegrationTest {
         @BeforeEach
         public void setUp() {
                 LocaleContextHolder.setLocale(Locale.FRANCE);
+                SecurityContextHolder.clearContext();
+                TestSecurityContextHolder.clearContext();
         }
 
         @AfterEach
         public void tearDown() {
                 LocaleContextHolder.resetLocaleContext();
+                SecurityContextHolder.clearContext();
+                TestSecurityContextHolder.clearContext();
         }
 
         private String message(String key, Object... args) {
@@ -201,7 +214,8 @@ public class UserControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.userResponse());
         }
 
         /**
@@ -386,7 +400,8 @@ public class UserControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.userListResponse());
         }
 
         /**
@@ -551,7 +566,8 @@ public class UserControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.userListResponse());
         }
 
         /**
@@ -598,7 +614,8 @@ public class UserControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.userListResponse());
         }
 
         /**
@@ -1944,5 +1961,83 @@ public class UserControllerIntegrationTest {
                                                 throw new RuntimeException(e);
                                         }
                                 });
+        }
+
+        /**
+         * Test: GET /users/{login} - Retrieve a user by login.
+         */
+        @Test
+        @Transactional
+        public void getByLogin_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+                String token = userAuthenticationProvider.createToken(userDto);
+
+                performRequest(
+                                "GET",
+                                "/users/" + userDto.getLogin(),
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "get-by-login",
+                                request -> {
+                                        try {
+                                                request.andExpect(jsonPath("$.login").value("test.user@test.com"))
+                                                                .andExpect(jsonPath("$.firstName").value("Test"));
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                },
+                                RestDocsSnippets.userResponse());
+        }
+
+        /**
+         * Test: GET /users/{login} - User not found.
+         */
+        @Test
+        @Transactional
+        public void getByLogin_userNotFound_shouldReturnNotFound() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                performRequest(
+                                "GET",
+                                "/users/not.a@login.com",
+                                null,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                404,
+                                "get-by-login-not-found",
+                                null);
+        }
+
+        /**
+         * Test: PUT /users/{login} - Update user profile fields.
+         */
+        @Test
+        @Transactional
+        public void updateUser_withRealData_shouldReturnSuccess() throws Exception {
+                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+                UserDto userDto = userService.findByLogin("test.user@test.com");
+                String token = userAuthenticationProvider.createToken(adminDto);
+
+                String requestBody = "{\"firstName\":\"Updated\",\"lastName\":\"User\",\"login\":\"test.user@test.com\",\"mainRole\":\"USER\"}";
+
+                performRequest(
+                                "PUT",
+                                "/users/" + userDto.getLogin(),
+                                requestBody,
+                                token,
+                                MediaType.APPLICATION_JSON,
+                                200,
+                                "update",
+                                request -> {
+                                        try {
+                                                request.andExpect(content().string("User updated successfully"));
+                                        } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                        }
+                                },
+                                RestDocsSnippets.userUpdateRequest());
         }
 }
