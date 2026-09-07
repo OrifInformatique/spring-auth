@@ -30,9 +30,9 @@ Summary:
 
 ## Diagram 2: tests and contracts
 
-Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 2. Tests et contrats »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 2. Tests and contracts »**)
 
-![MockMvc tests and JSON contracts](process/export/restdocs-generation-2.-Tests-et-contrats.png)
+![MockMvc tests and JSON contracts](process/export/restdocs-generation-2.-Tests-and-contracts.png)
 
 Classes involved:
 
@@ -56,9 +56,9 @@ target/generated-snippets/auth/login/response-fields.adoc
 
 ## Diagram 3: Asciidoctor assembly
 
-Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 3. Assemblage Asciidoctor »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 3. Asciidoctor assembly »**)
 
-![Asciidoctor assembly](process/export/restdocs-generation-3.-Assemblage-Asciidoctor.png)
+![Asciidoctor assembly](process/export/restdocs-generation-3.-Asciidoctor-assembly.png)
 
 At the top of `index.adoc`:
 
