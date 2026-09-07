@@ -779,10 +779,9 @@ mvn verify              # Run tests + integration tests
 
 API documentation is automatically generated using **Spring REST Docs** and **AsciiDoc**:
 
-1. Integration tests capture HTTP requests/responses as snippets (saved to `target/generated-snippets/`)
-2. `src/asciidoc/index.adoc` includes those snippets through the `{snippets}` attribute
-3. Field contracts (`requestFields` / `responseFields`) fail the tests if the payload shape drifts
-4. The Asciidoctor Maven plugin generates HTML during `mvn package`
+1. Integration tests capture HTTP requests/responses as snippets (saved to `src/asciidoc/`)
+2. AsciiDoc templates combine snippets into comprehensive documentation
+3. Maven plugin generates HTML documentation during the build process
 
 **Generated documentation locations:**
 - **Snippets:** `target/generated-snippets/` (raw test output)

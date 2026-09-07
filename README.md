@@ -30,20 +30,13 @@ This project provides an authentication API to be used by other applications to 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-Java and Maven are **not required on the host** if you use Docker.
+The Spring Boot version currently used in this project is 3.3.5.
 
-- [Docker](https://docs.docker.com/engine/install/) and Compose
-- Optional on the host: [Java / openJDK 21](https://adoptium.net/fr/temurin/releases/), [Maven 3.9](https://maven.apache.org/docs/history.html), [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
+The project's environment must contain these tools. Make sure that your Windows or WSL environnment variables contain the path to Java.
 
-#### Java / Maven in Docker (recommended on this server)
-
-```bash
-scripts/java-env.sh up
-scripts/java-env.sh mvn test-compile
-scripts/java-env.sh shell
-```
-
-This starts MariaDB plus a container with **JDK 21** and **Maven 3.9**. The project directory is mounted in `/app`.
+- [Java / openJDK 21](https://adoptium.net/fr/temurin/releases/)
+- [Maven 3.9](https://maven.apache.org/docs/history.html)
+- [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
 
 #### Docker (optional)
 
