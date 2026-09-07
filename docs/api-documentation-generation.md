@@ -1,54 +1,52 @@
-# Génération de la documentation API (Spring REST Docs)
+# API documentation generation (Spring REST Docs)
 
-Document annexe du [README](../README.md). Il décrit **comment** la documentation HTTP de spring-auth est produite, vérifiée et publiée.
+Annex to the [README](../README.md). It describes **how** spring-auth HTTP documentation is produced, verified, and published.
 
-La doc consommable par les intégrateurs reste [index.html](index.html) (HTML) et [src/asciidoc/index.adoc](../src/asciidoc/index.adoc) (modèle AsciiDoc).
+Consumer-facing documentation remains [index.html](index.html) (HTML) and [src/asciidoc/index.adoc](../src/asciidoc/index.adoc) (AsciiDoc template).
 
-## Vue d'ensemble du pipeline
+## Pipeline overview
 
-Librairie : **Spring REST Docs** (`spring-restdocs-mockmvc` 3.0.1).
+Library: **Spring REST Docs** (`spring-restdocs-mockmvc` 3.0.1).
 
-Source : [process/restdocs-pipeline.drawio](process/restdocs-pipeline.drawio)
+Source: [process/restdocs-pipeline.drawio](process/restdocs-pipeline.drawio)
 
-![Pipeline REST Docs](process/export/restdocs-pipeline.png)
+![REST Docs pipeline](process/export/restdocs-pipeline.png)
 
-Les tests **ne créent pas** `index.adoc` : seul le modèle AsciiDoc est maintenu à la main. Les extraits HTTP proviennent des tests.
+Tests **do not** generate `index.adoc`: only the AsciiDoc template is maintained by hand. HTTP examples come from the tests.
 
-## Schéma 1 : processus parent
+## Diagram 1: parent process
 
-Source : [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 1. Generation documentation »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 1. Generation documentation »**)
 
-![Processus parent : génération documentation](process/export/restdocs-generation-1.-Generation-documentation.png)
+![Parent process: documentation generation](process/export/restdocs-generation-1.-Generation-documentation.png)
 
-Étapes résumées :
+Summary:
 
-1. Lancer les tests d'intégration avec `document(...)` et, sur les happy paths, des contrats JSON (`RestDocsSnippets`).
-2. Si un champ JSON ne correspond plus au contrat, le test échoue : pas de HTML reconstruit à partir d'exemples obsolètes.
-3. Si les tests passent, Asciidoctor assemble `index.adoc` et les snippets.
-4. Maven écrit le HTML dans `target/generated-snippets-html/`.
-5. Selon le contexte d'exécution, `docs/index.html` est mis à jour ou non (voir ci-dessous).
+1. Run integration tests with `document(...)` and, on happy paths, JSON contracts (`RestDocsSnippets`).
+2. If a JSON field no longer matches the contract, the test fails: no HTML rebuilt from stale examples.
+3. If tests pass, Asciidoctor assembles `index.adoc` and the snippets.
+4. Maven writes HTML to `target/generated-snippets-html/`.
+5. Depending on the execution context, `docs/index.html` is updated or not (see below).
 
+## Diagram 2: tests and contracts
 
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 2. Tests et contrats »**)
 
-## Schéma 2 : tests et contrats
+![MockMvc tests and JSON contracts](process/export/restdocs-generation-2.-Tests-et-contrats.png)
 
-Source : [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 2. Tests et contrats »**)
-
-![Tests MockMvc et contrats JSON](process/export/restdocs-generation-2.-Tests-et-contrats.png)
-
-Classes concernées :
+Classes involved:
 
 - `AuthControllerIntegrationTest`
 - `UserControllerIntegrationTest`
-- `RestDocsSnippets` (contrats `requestFields` / `responseFields` centralisés)
+- `RestDocsSnippets` (centralized `requestFields` / `responseFields` contracts)
 
-Configuration :
+Configuration:
 
 ```java
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 ```
 
-Chaque appel `document("auth/…" ou "users/…", …, snippets)` produit un dossier sous `target/generated-snippets/`, par exemple :
+Each `document("auth/…" or "users/…", …, snippets)` call produces a folder under `target/generated-snippets/`, for example:
 
 ```
 target/generated-snippets/auth/login/http-request.adoc
@@ -56,15 +54,13 @@ target/generated-snippets/auth/login/request-fields.adoc
 target/generated-snippets/auth/login/response-fields.adoc
 ```
 
+## Diagram 3: Asciidoctor assembly
 
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 3. Assemblage Asciidoctor »**)
 
-## Schéma 3 : assemblage Asciidoctor
+![Asciidoctor assembly](process/export/restdocs-generation-3.-Assemblage-Asciidoctor.png)
 
-Source : [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 3. Assemblage Asciidoctor »**)
-
-![Assemblage Asciidoctor](process/export/restdocs-generation-3.-Assemblage-Asciidoctor.png)
-
-En tête de `index.adoc` :
+At the top of `index.adoc`:
 
 ```adoc
 ifndef::snippets[]
@@ -72,53 +68,49 @@ ifndef::snippets[]
 endif::[]
 ```
 
-Puis des includes du type :
+Then includes such as:
 
 ```adoc
 include::{snippets}/auth/login/http-request.adoc[]
 ```
 
-Le plugin Maven `asciidoctor-maven-plugin` (phase `prepare-package`) lit `src/asciidoc/index.adoc` et écrit le HTML dans `target/generated-snippets-html/` (`pom.xml`, attribut Maven `<snippets>`).
+The Maven plugin `asciidoctor-maven-plugin` (phase `prepare-package`) reads `src/asciidoc/index.adoc` and writes HTML to `target/generated-snippets-html/` (`pom.xml`, Maven attribute `<snippets>`).
 
-## Schéma 4 : isolation des tests (401)
+## Diagram 4: test isolation (401)
 
-Source : [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 4. Isolation tests 401 »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 4. Isolation tests 401 »**)
 
-![Isolation des tests 401](process/export/restdocs-generation-4.-Isolation-tests-401.png)
+![Test isolation 401](process/export/restdocs-generation-4.-Isolation-tests-401.png)
 
-Processus à part, lié à la fiabilité de la suite de tests (donc à la doc), pas à la génération HTML elle-même.
+Separate process, related to test suite reliability (and therefore documentation), not HTML generation itself.
 
-Correctifs associés dans `SecurityConfig` et les tests :
+Related fixes in `SecurityConfig` and tests:
 
-- `@AfterEach` : `SecurityContextHolder.clearContext()`
-- Deux `SecurityFilterChain` (API JWT stateless vs OAuth2 avec session)
-- `requestCache` désactivé sur la chaîne API
-- `JwtAuthFilter` non enregistré comme filtre servlet (`FilterRegistrationBean` désactivé)
+- `@AfterEach`: `SecurityContextHolder.clearContext()`
+- Two `SecurityFilterChain` beans (stateless JWT API vs OAuth2 with session)
+- `requestCache` disabled on the API chain
+- `JwtAuthFilter` not registered as a servlet filter (`FilterRegistrationBean` disabled)
 
+## Where does the HTML land?
 
+| Command / context | Snippets | HTML output | `docs/index.html` updated? |
+|---|---|---|---|
+| `scripts/java-env.sh mvn test` | Yes | No | No |
+| `scripts/java-env.sh mvn package` | Yes | `target/generated-snippets-html/` | No (unless copied manually) |
+| `mvn clean package` on the host | Yes | `target/` | No (unless copied / committed) |
+| `docker compose up` (`app` service, `./docs` volume) | Yes | mapped to `./docs/` | **Yes** (direct volume write) |
 
-## Où le HTML atterrit-il ?
-
-
-| Commande / contexte                                  | Snippets | HTML produit                      | `docs/index.html` mis à jour ?           |
-| ---------------------------------------------------- | -------- | --------------------------------- | ---------------------------------------- |
-| `scripts/java-env.sh mvn test`                       | Oui      | Non                               | Non                                      |
-| `scripts/java-env.sh mvn package`                    | Oui      | `target/generated-snippets-html/` | Non (sauf copie manuelle)                |
-| `mvn clean package` sur l'hôte                       | Oui      | `target/`                         | Non (sauf copie / commit)                |
-| `docker compose up` (service `app`, volume `./docs`) | Oui      | mappé vers `./docs/`              | **Oui** (écriture directe sur le volume) |
-
-
-Le volume Compose du service `app` :
+Compose volume on the `app` service:
 
 ```yaml
 - ./docs:/app/target/generated-snippets-html
 ```
 
-Sans ce volume (conteneur `java` du profil `workspace`), regénérer la doc ne modifie que `target/`. Pour versionner `docs/index.html`, il faut ensuite **committer** le fichier.
+Without this volume (`java` container, `workspace` profile), regenerating docs only changes `target/`. To version `docs/index.html`, you must **commit** the file afterward.
 
-## Commandes usuelles
+## Common commands
 
-Environnement de build recommandé (JDK 21 + Maven 3.9 + MariaDB, sans Java sur l'hôte) :
+Recommended build environment (JDK 21 + Maven 3.9 + MariaDB, no Java on the host):
 
 ```bash
 scripts/java-env.sh up
@@ -126,27 +118,25 @@ scripts/java-env.sh mvn -Dspring.profiles.active=test verify
 scripts/java-env.sh mvn clean package
 ```
 
-Vérifier les snippets :
+Inspect snippets:
 
 ```bash
 ls target/generated-snippets/auth/login/
 ```
 
-Ouvrir le HTML local :
+Open HTML locally:
 
 ```bash
-# généré par Maven
+# generated by Maven
 xdg-open target/generated-snippets-html/index.html
 
-# version commitée dans le repo
+# committed copy in the repo
 xdg-open docs/index.html
 ```
 
+## Regenerate PNG exports
 
-
-## Regénérer les exports PNG
-
-Depuis la racine du projet (Docker requis) :
+From the project root (Docker required):
 
 ```bash
 for f in restdocs-pipeline restdocs-generation; do
@@ -158,16 +148,23 @@ done
 cp docs/process/export/restdocs-pipeline-Pipeline-REST-Docs.png docs/process/export/restdocs-pipeline.png
 ```
 
-Options : `-t` fond transparent, `-s 2` échelle 2×. Éditer les `.drawio` avec [diagrams.net](https://app.diagrams.net/) ou l'extension Draw.io Integration.
+Options: `-t` transparent background, `-s 2` scale 2×. Edit `.drawio` files with [diagrams.net](https://app.diagrams.net/) or the Draw.io Integration extension.
 
-## Règle de maintenance
+## Maintenance rule
 
-Toute modification du pipeline ou des processus détaillés doit mettre à jour les fichiers Draw.io (`restdocs-pipeline.drawio`, `restdocs-generation.drawio`) **et** les PNG dans `process/export/` **dans le même commit** que le code ou la doc texte.
+Any change to the pipeline or detailed processes must update the Draw.io files (`restdocs-pipeline.drawio`, `restdocs-generation.drawio`) **and** the PNGs in `process/export/` **in the same commit** as the code or text documentation.
 
-Après changement d'API :
+After an API change:
 
-1. Adapter les tests et `RestDocsSnippets` si le JSON change.
-2. Regénérer snippets + HTML (`verify` puis `package`).
-3. Mettre à jour `docs/index.html` si la doc publiée doit suivre.
-4. Mettre à jour ce document ou le Draw.io si le flux change.
+1. Update tests and `RestDocsSnippets` if JSON payloads change.
+2. Regenerate snippets and HTML (`verify` then `package`).
+3. Update `docs/index.html` if published documentation must follow.
+4. Update this document or the Draw.io diagrams if the flow changes.
 
+## Keeping documentation in sync manually
+
+| File | Role | When to edit |
+|---|---|---|
+| `src/asciidoc/index.adoc` | Structure and snippet includes | New documented endpoint, new section |
+| Integration tests + `document(...)` | HTTP snippets | New endpoint, request/response change |
+| `RestDocsSnippets` | JSON field contracts | Field added, removed, or renamed |

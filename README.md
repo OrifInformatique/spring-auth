@@ -189,7 +189,7 @@ Published pages:
 - AsciiDoc template: [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
 - GitHub Pages: [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
 
-## API documentation generation (annexe)
+## API documentation generation (annex)
 
 For the full pipeline (snippets, `{snippets}`, Docker volumes, what is committed vs ephemeral) and **Draw.io flowcharts**, see:
 
