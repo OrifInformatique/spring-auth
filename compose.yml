@@ -1,24 +1,6 @@
-# Don't forget to run
+# Don't forget to run 
 # `docker compose up` with `ENVIRONMENT=base` set in `.env`
-# the first time you run this project!
-
-x-spring-env: &spring-env
-  SPRING_PROFILES_ACTIVE: "${ENVIRONMENT}"
-  PORT: "${PORT}"
-  DEV_SPRING_DATASOURCE_URL: "${DEV_SPRING_DATASOURCE_URL}"
-  TEST_SPRING_DATASOURCE_URL: "${TEST_SPRING_DATASOURCE_URL}"
-  SPRING_DATASOURCE_URL: "${DEV_SPRING_DATASOURCE_URL}"
-  SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
-  SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
-  SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY: "${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}"
-  SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY: "${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}"
-  SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME: "${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME}"
-  SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME: "${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}"
-  SECURITY_AUTHENTICATION_CODES_LIFETIME: "${SECURITY_AUTHENTICATION_CODES_LIFETIME}"
-  AZURE_REDIRECT_BASE_URL: "${AZURE_REDIRECT_BASE_URL}"
-  AZURE_TENANT_ID: "${AZURE_TENANT_ID}"
-  AZURE_CLIENT_ID: "${AZURE_CLIENT_ID}"
-  AZURE_CLIENT_SECRET: "${AZURE_CLIENT_SECRET}"
+# the first time you run this project!"
 
 services:
   app:
@@ -26,42 +8,30 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: "${ENVIRONMENT}"
+      target: "${ENVIRONMENT}" # Use the environment variable to target the desired stage
     volumes:
-      - ./target:/app/target
+      - ./src/asciidoc:/app/target/generated-snippets
       - ./docs:/app/target/generated-snippets-html
+      - ./target:/app/target
     environment:
-      <<: *spring-env
+      # Pass environment variables to the container and the Spring Boot app
+      SPRING_PROFILES_ACTIVE: "${ENVIRONMENT}"
+      PORT: "${PORT}"
+      # Prod database SPRING_DATASOURCE_URL has to be set in the production environment
+      DEV_SPRING_DATASOURCE_URL: "${DEV_SPRING_DATASOURCE_URL}"
+      TEST_SPRING_DATASOURCE_URL: "${TEST_SPRING_DATASOURCE_URL}"
+      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY: "${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}"
+      SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY: "${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}"
+      SECURITY_AUTHENTICATION_CODES_LIFETIME: "${SECURITY_AUTHENTICATION_CODES_LIFETIME}"
     ports:
       - "${PORT}:${PORT}"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
-      - spring_network
-      - shared_network
-
-  # JDK 21 + Maven 3.9, no Java install on the host.
-  # Usage:
-  #   docker compose --profile workspace up -d db java
-  #   docker compose --profile workspace exec java mvn -v
-  java:
-    profiles: ["workspace"]
-    image: maven:3.9.9-eclipse-temurin-21
-    container_name: spring-auth-java
-    working_dir: /app
-    volumes:
-      - .:/app
-      - spring-auth-m2:/root/.m2
-    environment:
-      <<: *spring-env
-      MAVEN_OPTS: "-Djava.awt.headless=true"
-    command: ["sleep", "infinity"]
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - spring_network
+      - spring_network # application network to let Spring app talk to the database
+      - shared_network # shared network to let Spring app talk to other services like spring-auth
 
   db:
     container_name: "spring-auth-mariadb"
@@ -74,19 +44,15 @@ services:
     networks:
       - spring_network
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 20s
+      retries: 5
 
 networks:
   spring_network:
     driver: bridge
 
   shared_network:
-    name: shared_network
+    name: shared_network # force name without project prefix to be accessible by other projects
     driver: bridge
-
-volumes:
-  spring-auth-m2:
