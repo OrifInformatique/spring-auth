@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.8</version>
+        <version>4.0.1</version>
         <relativePath />
         <!-- lookup parent from repository -->
     </parent>
@@ -29,10 +29,10 @@
         <url />
     </scm>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <spring-restdocs.version>3.0.1</spring-restdocs.version>
-        <!-- Match Spring Boot 3 -->
+        <spring-restdocs.version>4.0.1</spring-restdocs.version>
+        <!-- Match Spring Boot 4 -->
     </properties>
     <dependencies>
         <dependency>
@@ -139,6 +139,18 @@
             <artifactId>spring-restdocs-mockmvc</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restdocs</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -150,7 +162,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.44</version>
+                            <version>1.18.48</version>
                         </path>
                         <path>
                             <groupId>org.mapstruct</groupId>
@@ -190,7 +202,7 @@
                     <dependency>
                         <groupId>org.springframework.restdocs</groupId>
                         <artifactId>spring-restdocs-asciidoctor</artifactId>
-                        <version>${spring-restdocs.version}</version>
+                        <version>3.0.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
