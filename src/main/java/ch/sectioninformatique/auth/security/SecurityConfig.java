@@ -3,8 +3,10 @@ package ch.sectioninformatique.auth.security;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,7 +18,9 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 import lombok.RequiredArgsConstructor;
@@ -24,19 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Spring Security configuration for the application.
- * Configures:
- * - JWT-based authentication and authorization
- * - OAuth2 login with custom success/failure handling
- * - CORS settings from application properties
- * - Exception handling for authentication and access denied events
- * - Session management (currently IF_REQUIRED)
- * 
- * Security Features:
- * - Secure endpoints with proper authorization rules
- * - Stateless session management for REST APIs
- * - Proper handling of cross-origin requests
- * - Environment-aware logging (sensitive data only logged in dev/test)
- * - Comprehensive OAuth2 error handling and logging
+ * Two filter chains keep JWT APIs isolated from the OAuth2 browser flow:
+ * - /auth/** and /users/** are stateless (JWT, no session RequestCache)
+ * - /oauth2/** and /login/** use sessions for the Azure authorization code flow
  */
 @Configuration
 @EnableWebSecurity
@@ -99,60 +93,74 @@ public class SecurityConfig {
         return activeProfiles.length == 0;
     }
 
+    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
+
     /**
-     * Configures the Spring Security filter chain.
-     * 
-     * Configuration includes:
-     * - Exception handling using custom UserAuthenticationEntryPoint and AccessDeniedHandler
-     * - JWT authentication filter added before BasicAuthenticationFilter
-     * - CSRF protection disabled (suitable for stateless APIs)
-     * - Session management policy set to IF_REQUIRED
-     * - CORS configuration using allowed origins, methods, and headers from
-     * properties
-     * - OAuth2 login with custom success and failure handlers
-     * - Authorization rules for public endpoints and secured endpoints
-     *
-     * @param http the HttpSecurity object to configure
-     * @return the configured SecurityFilterChain
-     * @throws Exception if an error occurs during configuration
+     * Prevents JwtAuthFilter from also being registered as a servlet Filter.
+     * It must run only inside the API SecurityFilterChain, after the security context
+     * is loaded and before authorization. A second servlet registration would mark the
+     * filter as already executed (OncePerRequestFilter) or overwrite the context.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.debug("Configuring SecurityFilterChain");
+    public FilterRegistrationBean<JwtAuthFilter> jwtAuthFilterRegistration(JwtAuthFilter filter) {
+        FilterRegistrationBean<JwtAuthFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
+    /**
+     * JWT API chain: /auth/** and /users/**.
+     * Stateless, no RequestCache (avoids MockMvc/session replay of a previous 401
+     * as GET ...?continue without the Authorization header).
+     */
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+        log.debug("Configuring API SecurityFilterChain");
         http
-                .exceptionHandling(customizer -> {
-                    log.debug("Configuring exception handling with UserAuthenticationEntryPoint");
-                    customizer
-                            .authenticationEntryPoint(userAuthenticationEntryPoint)
-                            .accessDeniedHandler(accessDeniedHandler);
-                })
-                .addFilterBefore(jwtAuthFilter, BasicAuthenticationFilter.class)
-                .csrf(csrf -> {
-                    log.debug("Disabling CSRF protection");
-                    csrf.disable();
-                })
-                .sessionManagement(customizer -> {
-                    log.debug("Setting session creation policy to IF_REQUIRED");
-                    customizer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
-                })
-                .cors(cors -> {
-                    log.debug("Configuring CORS");
-                    cors.configurationSource(request -> {
-                        var corsConfig = new CorsConfiguration();
-                        corsConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
-                        corsConfig.setAllowedMethods(Arrays.asList(allowedMethods));
-                        corsConfig.setAllowedHeaders(Arrays.asList(allowedHeaders));
-                        corsConfig.setAllowCredentials(true);
-                        return corsConfig;
-                    });
-                })
+                .securityMatcher(new OrRequestMatcher(
+                        PATH.matcher("/auth/**"),
+                        PATH.matcher("/users/**")))
+                .exceptionHandling(customizer -> customizer
+                        .authenticationEntryPoint(userAuthenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .addFilterAfter(jwtAuthFilter, SecurityContextHolderFilter.class)
+                .csrf(csrf -> csrf.disable())
+                .requestCache(cache -> cache.disable())
+                .sessionManagement(customizer -> customizer
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(request -> corsConfiguration()))
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated());
+        return http.build();
+    }
+
+    /**
+     * OAuth2 browser chain (Azure authorization code) plus remaining paths.
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
+        log.debug("Configuring OAuth2 SecurityFilterChain");
+        http
+                .exceptionHandling(customizer -> customizer
+                        .authenticationEntryPoint(userAuthenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .addFilterAfter(jwtAuthFilter, SecurityContextHolderFilter.class)
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(customizer -> customizer
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .cors(cors -> cors.configurationSource(request -> corsConfiguration()))
                 .oauth2Login(oauth2 -> {
                     log.debug("Configuring OAuth2 login");
                     oauth2
                             .failureHandler((request, response, exception) -> {
                                 log.error("OAuth2 authentication failed: {}", exception.getMessage());
-                                
-                                // Log full details only in development/test environments
+
                                 if (isDevelopmentOrTest()) {
                                     log.debug("OAuth2 authentication failure details:", exception);
                                     Throwable cause = exception.getCause();
@@ -165,12 +173,11 @@ public class SecurityConfig {
                                         }
                                     }
                                 }
-                                
+
                                 response.sendRedirect("/oauth2/error");
                             })
                             .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService()))
                             .successHandler((request, response, authentication) -> {
-                                // Only log authentication object in dev/test (it may contain user details)
                                 if (isDevelopmentOrTest()) {
                                     log.debug("OAuth2 authentication successful: {}", authentication);
                                 } else {
@@ -179,30 +186,32 @@ public class SecurityConfig {
                                 response.sendRedirect("/oauth2/success");
                             });
                 })
-                .authorizeHttpRequests(requests -> {
-                    log.debug("Configuring HTTP request authorization rules");
-                    requests
-                            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
-                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/oauth2/login").permitAll()
-                            .requestMatchers("/oauth2/login/**").permitAll()
-                            .requestMatchers("/oauth2/authorization/**").permitAll()
-                            .requestMatchers("/oauth2/success").authenticated()
-                            .requestMatchers(HttpMethod.POST,"/oauth2/token").permitAll()
-                            .requestMatchers("/oauth2/error").permitAll()
-                            .requestMatchers("/login/oauth2/code/**").permitAll()
-                            .anyRequest().authenticated();
-                    log.debug("HTTP request authorization rules configured");
-                });
-
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/oauth2/login").permitAll()
+                        .requestMatchers("/oauth2/login/**").permitAll()
+                        .requestMatchers("/oauth2/authorization/**").permitAll()
+                        .requestMatchers("/oauth2/success").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/oauth2/token").permitAll()
+                        .requestMatchers("/oauth2/error").permitAll()
+                        .requestMatchers("/login/oauth2/code/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated());
         return http.build();
+    }
+
+    private CorsConfiguration corsConfiguration() {
+        var corsConfig = new CorsConfiguration();
+        corsConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
+        corsConfig.setAllowedMethods(Arrays.asList(allowedMethods));
+        corsConfig.setAllowedHeaders(Arrays.asList(allowedHeaders));
+        corsConfig.setAllowCredentials(true);
+        return corsConfig;
     }
 
     /**
      * Configures the OAuth2UserService used by Spring Security.
-     * 
+     *
      * Responsibilities:
      * - Loads user details from the OAuth2 provider using DefaultOAuth2UserService
      * - Converts provider-specific user information into a Spring Security OAuth2User
@@ -219,14 +228,13 @@ public class SecurityConfig {
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
         return request -> {
             OAuth2User user = delegate.loadUser(request);
-            
-            // Only log user attributes in development/test environments
+
             if (isDevelopmentOrTest()) {
                 log.debug("OAuth2 user loaded with attributes: {}", user.getAttributes());
             } else {
                 log.info("OAuth2 user loaded successfully");
             }
-            
+
             return user;
         };
     }

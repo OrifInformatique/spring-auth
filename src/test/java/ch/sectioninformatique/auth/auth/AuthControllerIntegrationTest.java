@@ -22,10 +22,16 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static ch.sectioninformatique.auth.RestDocsSensitiveDataMasking.maskSensitiveData;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import org.springframework.restdocs.snippet.Snippet;
+
+import ch.sectioninformatique.auth.RestDocsSnippets;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.TestSecurityContextHolder;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -87,7 +93,8 @@ public class AuthControllerIntegrationTest {
                         MediaType contentType,
                         int expectedStatus,
                         String docsFileName,
-                        Consumer<ResultActions> script) throws Exception {
+                        Consumer<ResultActions> script,
+                        Snippet... snippets) throws Exception {
 
                 var requestType = get(endpoint);
 
@@ -126,9 +133,9 @@ public class AuthControllerIntegrationTest {
                         script.accept(request);
                 }
 
-                // Generate a REST Docs snippet for the request/response pair
-                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint())));
+                // Generate REST Docs snippets from the real HTTP exchange
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(maskSensitiveData(), prettyPrint()),
+                                preprocessResponse(maskSensitiveData(), prettyPrint()), snippets));
 
         }
 
@@ -145,7 +152,8 @@ public class AuthControllerIntegrationTest {
                         int expectedStatus,
                         String docsFileName,
                         Cookie cookie,
-                        Consumer<ResultActions> script) throws Exception {
+                        Consumer<ResultActions> script,
+                        Snippet... snippets) throws Exception {
 
                 var requestType = get(endpoint);
 
@@ -188,9 +196,8 @@ public class AuthControllerIntegrationTest {
                         script.accept(request);
                 }
 
-                // Generate a REST Docs snippet for the request/response pair
-                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint())));
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(maskSensitiveData(), prettyPrint()),
+                                preprocessResponse(maskSensitiveData(), prettyPrint()), snippets));
 
         }
 
@@ -238,6 +245,8 @@ public class AuthControllerIntegrationTest {
         @AfterEach
         public void tearDown() {
                 LocaleContextHolder.resetLocaleContext();
+                SecurityContextHolder.clearContext();
+                TestSecurityContextHolder.clearContext();
         }
 
         private String message(String key, Object... args) {
@@ -302,7 +311,9 @@ public class AuthControllerIntegrationTest {
                                 MediaType.APPLICATION_JSON,
                                 200,
                                 "login",
-                                null);
+                                null,
+                                RestDocsSnippets.loginRequest(),
+                                RestDocsSnippets.userResponse());
         }
 
         /**
@@ -728,7 +739,9 @@ public class AuthControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.registerRequest(),
+                                RestDocsSnippets.userResponse());
         }
 
         /**
@@ -1277,7 +1290,8 @@ public class AuthControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.refreshResponse());
         }
 
         /**
@@ -1471,7 +1485,9 @@ public class AuthControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.passwordUpdateRequest(),
+                                RestDocsSnippets.messageResponse());
         }
 
         /**
@@ -1590,7 +1606,8 @@ public class AuthControllerIntegrationTest {
                                         } catch (Exception e) {
                                                 throw new RuntimeException(e);
                                         }
-                                });
+                                },
+                                RestDocsSnippets.messageResponse());
         }
 
         /**
@@ -1761,9 +1778,9 @@ public class AuthControllerIntegrationTest {
                                 }catch (Exception e){
                                         throw new RuntimeException(e);
                                 }
-                        }
-                        
-                        
+                        },
+                        RestDocsSnippets.oauth2TokenRequest(),
+                        RestDocsSnippets.userResponse()
                 );
         }
 

@@ -9,8 +9,18 @@
 
 This project provides an authentication API to be used by other applications to identify their users.
 
+## Documentation
+
+| Document | Scope |
+| -------- | ----- |
+| **This README** | Setup, Docker, Maven, OAuth2 overview |
+| [docs/process-documentation.md](docs/process-documentation.md) | Application architecture, modules, security, database, test execution |
+| [docs/api-documentation-generation.md](docs/api-documentation-generation.md) | Spring REST Docs pipeline (snippets, Asciidoctor, Docker volumes) |
+| [docs/index.html](docs/index.html) | Generated API reference (endpoints, request/response examples) |
+
 # Table of Contents
 - [Spring authenticator](#spring-authenticator)
+- [Documentation](#documentation)
 - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -19,20 +29,20 @@ This project provides an authentication API to be used by other applications to 
     - [Run dev environment using docker](#run-dev-environment-using-docker)
     - [Run test environment using docker](#run-test-environment-using-docker)
     - [Do actions from within Docker (CLI)](#do-actions-from-within-docker-cli)
-  - [What's next ?](#whats-next)
-  - [Microsoft Entra Azure AD oAuth2](#microsoft-entra-azure-ad-oauth2)
+  - [Maven package](#maven-package)
   - [Commands cheat-sheet](#commands-cheat-sheet)
+  - [Microsoft Entra Azure AD oAuth2](#microsoft-entra-azure-ad-oauth2)
     - [Simplified sequence diagram](#simplified-sequence-diagram)
-  - [Spring REST Docs](#spring-rest-docs)
+  - [API documentation](#api-documentation)
 - [Sources](#sources)
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-The Spring Boot version currently used in this project is 3.3.5.
+The Spring Boot version currently used in this project is 3.5.8.
 
-The project's environment must contain these tools. Make sure that your Windows or WSL environnment variables contain the path to Java.
+The project's environment must contain these tools. Make sure that your Windows or WSL environment variables contain the path to Java.
 
 - [Java / openJDK 21](https://adoptium.net/fr/temurin/releases/)
 - [Maven 3.9](https://maven.apache.org/docs/history.html)
@@ -40,13 +50,13 @@ The project's environment must contain these tools. Make sure that your Windows 
 
 #### Docker (optional)
 
-It is recommanded to develop the app using docker.
+It is recommended to develop the app using Docker.
 This is not a hard requirement but it's highly encouraged.
 For more info, head to the [Docker section](#docker) of this documentation.
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Docker-compose](https://docs.docker.com/compose/)
-- On linux or WSL (allready included in Docker Desktop): [Docker-buildx](https://github.com/docker/buildx)
+- On Linux or WSL (already included in Docker Desktop): [Docker-buildx](https://github.com/docker/buildx)
 
 ### Environment variables and application properties
 
@@ -74,7 +84,7 @@ The `application.properties` file located in the root folder is git ignored and 
 ## Docker
 
 In this app, we use docker-compose, a Docker wrapper.
-It allows you and other programmers to work in a same development or testing environment, starting a database container and a Spring Boot app container wich are working together.
+It allows you and other programmers to work in the same development or testing environment, starting a database container and a Spring Boot app container that work together.
 
 The main commands you'll have to use are described in the [commands cheat-sheet](#commands-cheat-sheet) sub-section.
 
@@ -83,7 +93,7 @@ First, you need to build the containers :
 
 1. Make sure `ENVIRONMENT=dev` is set in `.env` !
 2. Open a terminal and go to your root folder
-3. If needed, reset containers and volumes (datas) with `docker compose down -v`
+3. If needed, reset containers and volumes (data) with `docker compose down -v`
 4. Use the command `docker compose build`
 5. Now that the containers have been built, you can start them with `docker compose up`
 
@@ -93,7 +103,7 @@ the command `docker compose build` you can also use the short `docker compose up
 ### Run test environment using docker
 1. Make sure `ENVIRONMENT=test` is set in `.env` !
 2. Open a terminal and go to your root folder
-3. If needed, reset containers and volumes (datas) with `docker compose down -v`
+3. If needed, reset containers and volumes (data) with `docker compose down -v`
 4. In the root folder, use the command `docker compose build`
 5. Now that the containers have been built, you can start them with `docker compose up`
 
@@ -132,7 +142,7 @@ run in background
 stop containers
 `docker compose down`
 
-stop containers and delete volumes, wich are containing app datas
+stop containers and delete volumes, which contain application data
 `docker compose down -v`
 
 Enter a container with shell
@@ -165,20 +175,19 @@ Check if the project's structure is valid
 </p>
 
 
+## API documentation
+
+HTTP documentation is generated automatically from integration tests (Spring REST Docs) and published as [docs/index.html](docs/index.html). JWT and refresh-token values are replaced by placeholders in snippets before HTML is built (`RestDocsSensitiveDataMasking`). For the full pipeline, see [docs/api-documentation-generation.md](docs/api-documentation-generation.md).
+
+Quick start:
+
+```bash
+scripts/java-env.sh mvn -Dspring.profiles.active=test verify
+scripts/java-env.sh mvn clean package
+```
+
+GitHub Pages: [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
+
 ## Sources
 
 [Microsoft oAuth2 grant flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
-
----
-
-## Spring REST Docs
-
-The application contains an automated documentation from the Spring REST Docs package. The documentation is created when running the application in test environment.
-
-It creates an index.adoc file in the "src/asciidoc" folder and an index.html page in the "docs" folder.
-
-Link to the generated index.adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
-
-Link to the generated index.html : [docs/index.html](docs/index.html)
-
-Link to the doc on GitHub : [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
