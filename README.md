@@ -177,7 +177,7 @@ Check if the project's structure is valid
 
 ## API documentation
 
-HTTP documentation is generated automatically from integration tests (Spring REST Docs) and published as [docs/index.html](docs/index.html). For the full pipeline, see [docs/api-documentation-generation.md](docs/api-documentation-generation.md).
+HTTP documentation is generated automatically from integration tests (Spring REST Docs) and published as [docs/index.html](docs/index.html). JWT and refresh-token values are replaced by placeholders in snippets before HTML is built (`RestDocsSensitiveDataMasking`). For the full pipeline, see [docs/api-documentation-generation.md](docs/api-documentation-generation.md).
 
 Quick start:
 

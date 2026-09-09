@@ -43,6 +43,7 @@ Classes involved:
 - `AuthControllerIntegrationTest`
 - `UserControllerIntegrationTest`
 - `RestDocsSnippets` (centralized `requestFields` / `responseFields` contracts)
+- `RestDocsSensitiveDataMasking` (masks JWT and refresh-token values in snippets)
 
 Configuration:
 
@@ -57,6 +58,31 @@ target/generated-snippets/auth/login/http-request.adoc
 target/generated-snippets/auth/login/request-fields.adoc
 target/generated-snippets/auth/login/response-fields.adoc
 ```
+
+Each `document(...)` call also applies `maskSensitiveData()` before `prettyPrint()` so that snippets and `index.html` never contain real JWT or cookie values (see below).
+
+## Sensitive data masking
+
+Integration tests use real JWT tokens (signed with the test secret from `application-test.properties`). Without masking, those values would be copied verbatim into `target/generated-snippets/` and `docs/index.html`.
+
+`RestDocsSensitiveDataMasking` is an `OperationPreprocessor` applied in both integration test helpers:
+
+```java
+preprocessRequest(maskSensitiveData(), prettyPrint())
+preprocessResponse(maskSensitiveData(), prettyPrint())
+```
+
+| Location | Example before | Placeholder after |
+|---|---|---|
+| `Authorization` header | `Bearer eyJhbGci...` | `Bearer <access-token>` |
+| `Cookie` / `Set-Cookie` | `refresh_token=eyJhbGci...` | `refresh_token=<refresh-token>` |
+| JSON `token` / `accessToken` | `"eyJhbGci..."` | `"<jwt-access-token>"` |
+
+Malformed examples used in 401 tests (for example `this.is.not.a.valid.token`) are left unchanged.
+
+Unit tests: `RestDocsSensitiveDataMaskingTest`.
+
+After changing masking rules, regenerate snippets and HTML (`verify` then `package`) and commit `docs/index.html` if it is versioned.
 
 ## Diagram 3: Asciidoctor assembly
 
@@ -172,3 +198,4 @@ After an API change:
 | `src/asciidoc/index.adoc` | Structure and snippet includes | New documented endpoint, new section |
 | Integration tests + `document(...)` | HTTP snippets | New endpoint, request/response change |
 | `RestDocsSnippets` | JSON field contracts | Field added, removed, or renamed |
+| `RestDocsSensitiveDataMasking` | Token/cookie placeholders in snippets | New sensitive header or JSON field to mask |

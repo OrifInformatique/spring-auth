@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
+import static ch.sectioninformatique.auth.RestDocsSensitiveDataMasking.maskSensitiveData;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -132,8 +133,8 @@ public class UserControllerIntegrationTest {
                         script.accept(request);
                 }
 
-                request.andDo(document("users/" + docsFileName, preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint()), snippets));
+                request.andDo(document("users/" + docsFileName, preprocessRequest(maskSensitiveData(), prettyPrint()),
+                                preprocessResponse(maskSensitiveData(), prettyPrint()), snippets));
 
         }
 

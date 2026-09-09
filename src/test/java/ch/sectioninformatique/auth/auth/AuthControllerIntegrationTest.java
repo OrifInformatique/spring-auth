@@ -22,6 +22,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static ch.sectioninformatique.auth.RestDocsSensitiveDataMasking.maskSensitiveData;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -133,8 +134,8 @@ public class AuthControllerIntegrationTest {
                 }
 
                 // Generate REST Docs snippets from the real HTTP exchange
-                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint()), snippets));
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(maskSensitiveData(), prettyPrint()),
+                                preprocessResponse(maskSensitiveData(), prettyPrint()), snippets));
 
         }
 
@@ -195,8 +196,8 @@ public class AuthControllerIntegrationTest {
                         script.accept(request);
                 }
 
-                request.andDo(document("auth/" + docsFileName, preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint()), snippets));
+                request.andDo(document("auth/" + docsFileName, preprocessRequest(maskSensitiveData(), prettyPrint()),
+                                preprocessResponse(maskSensitiveData(), prettyPrint()), snippets));
 
         }
 
