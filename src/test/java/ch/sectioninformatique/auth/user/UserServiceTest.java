@@ -75,6 +75,9 @@ public class UserServiceTest {
 
     @AfterEach
     void tearDown() {
+        // Remove the mock SecurityContext from the thread-local so it does not
+        // leak into later test classes running in the same Surefire JVM/thread
+        // (a mock context makes JwtAuthFilter.setAuthentication() a silent no-op).
         SecurityContextHolder.clearContext();
     }
 
