@@ -1,8 +1,12 @@
 # API documentation generation (Spring REST Docs)
 
-Annex to the [README](../README.md). It describes **how** spring-auth HTTP documentation is produced, verified, and published.
+Companion guide to the [README](../README.md). It describes **how** spring-auth HTTP documentation is produced, verified, and published.
 
-Consumer-facing documentation remains [index.html](index.html) (HTML) and [src/asciidoc/index.adoc](../src/asciidoc/index.adoc) (AsciiDoc template).
+See also:
+
+- [process-documentation.md](process-documentation.md): application structure, security, database, test execution (environment profiles, Docker)
+- [index.html](index.html): consumer-facing API reference (HTML)
+- [src/asciidoc/index.adoc](../src/asciidoc/index.adoc): AsciiDoc template (structure and snippet includes)
 
 ## Pipeline overview
 
@@ -16,7 +20,7 @@ Tests **do not** generate `index.adoc`: only the AsciiDoc template is maintained
 
 ## Diagram 1: parent process
 
-Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 1. Generation documentation »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **"1. Generation documentation"**)
 
 ![Parent process: documentation generation](process/export/restdocs-generation-1.-Generation-documentation.png)
 
@@ -30,7 +34,7 @@ Summary:
 
 ## Diagram 2: tests and contracts
 
-Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 2. Tests and contracts »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **"2. Tests and contracts"**)
 
 ![MockMvc tests and JSON contracts](process/export/restdocs-generation-2.-Tests-and-contracts.png)
 
@@ -56,7 +60,7 @@ target/generated-snippets/auth/login/response-fields.adoc
 
 ## Diagram 3: Asciidoctor assembly
 
-Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 3. Asciidoctor assembly »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **"3. Asciidoctor assembly"**)
 
 ![Asciidoctor assembly](process/export/restdocs-generation-3.-Asciidoctor-assembly.png)
 
@@ -78,7 +82,7 @@ The Maven plugin `asciidoctor-maven-plugin` (phase `prepare-package`) reads `src
 
 ## Diagram 4: test isolation (401)
 
-Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **« 4. Isolation tests 401 »**)
+Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page **"4. Isolation tests 401"**)
 
 ![Test isolation 401](process/export/restdocs-generation-4.-Isolation-tests-401.png)
 

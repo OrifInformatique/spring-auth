@@ -1,5 +1,7 @@
 # Application Documentation
 
+Companion guide to the [README](../README.md). Describes application **structure, architecture, and processes**. Setup instructions stay in the README; API endpoint reference and the REST Docs pipeline are covered in separate companion documents (see [section 6](#6-additional-resources)).
+
 ## Table of Contents
 
 - [Application Documentation](#application-documentation)
@@ -26,14 +28,10 @@
     - [1.15 External Integrations (Microsoft Entra ID / Azure AD)](#115-external-integrations-microsoft-entra-id--azure-ad)
       - [1.15.1 OAuth2 Integration (Azure AD)](#1151-oauth2-integration-azure-ad)
       - [1.15.2 OAuth2 Scopes and Claims](#1152-oauth2-scopes-and-claims)
-  - [2. API Endpoints Summary](#2-api-endpoints-summary)
-    - [2.1 Authentication Endpoints (`/auth`)](#21-authentication-endpoints-auth)
-    - [2.2 OAuth2 Endpoints (`/oauth2`)](#22-oauth2-endpoints-oauth2)
-    - [2.3 User Management Endpoints (`/users`)](#23-user-management-endpoints-users)
-  - [3. Testing and Documentation](#3-testing-and-documentation)
+  - [2. API reference](#2-api-reference)
+  - [3. Testing](#3-testing)
     - [3.1 Environment Profiles](#31-environment-profiles)
     - [3.2 Test Execution](#32-test-execution)
-    - [3.3 API Documentation Generation](#33-api-documentation-generation)
   - [4. Security Architecture](#4-security-architecture)
     - [4.1 Authentication Flow](#41-authentication-flow)
     - [4.2 Role-Based Access Control](#42-role-based-access-control)
@@ -55,11 +53,11 @@ Recommended Mermaid Preview Tool [Markdown Preview Mermaid Support](https://mark
 
 This document describes the **structure, components, and processes** of the spring-auth application, including configuration files, folder organization, and module responsibilities.
 
-This application powers an **authentication system** wich can be used by client applications, providing:
+This application powers an **authentication system** that client applications can use, providing:
 
-- Secure registration, authentication and authorization
-- Users list management
-- Users role management (gobal role, shared between all client applications)
+- Secure registration, authentication, and authorization
+- User list management
+- User role management (global role, shared across all client applications)
 
 ![app interactions](frontend_backend_auth_architecture.png)  
 _Illustrates interactions between the frontend and backend of the client app, using the `spring-auth` API._
@@ -68,7 +66,7 @@ _Illustrates interactions between the frontend and backend of the client app, us
 
 ## 1. spring-auth
 
-### 1.1 General Informations
+### 1.1 General Information
 
 `spring-auth` is a standalone Spring Boot application that provides registration, authentication and authorization services. It manages users credentials, roles, and permissions globally, shared between multiple client applications. It also integrates with Microsoft Azure AD for OAuth2 authentication.
 
@@ -143,7 +141,7 @@ Contains test classes for unit and integration tests.
 - **`java`** – Test classes corresponding to the application’s source code
 - **`resources`** – Test-specific configuration or data
 
-> _Testing frameworks, execution instructions, and coverage details will be added once the Java modules are finalized._
+> Test execution and environment profiles are described in [section 3](#3-testing). API documentation generation is covered in [api-documentation-generation.md](api-documentation-generation.md).
 
 ---
 
@@ -608,8 +606,7 @@ Exceptions are organized within container classes for better organization:
 | File                                 | Description                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------ |
 | `TestUserSeeder.java`                | Specialized seeder that creates `User` entities only in test mode.                   |
-| `UserControllerIntegrationTest.java` | Tests the methods in `UserController` and saves the results in data files.          |
-| `UserControllerDocTest.java`         | Generates the documentation of the methods in `UserController` from the data files. |
+| `UserControllerIntegrationTest.java` | Integration tests for user endpoints; also generates REST Docs snippets via `document(...)`. |
 | `UserDtoTest.java`                   | Tests the `UserDto` object.                                                          |
 | `UserMapperTest.java`                | Tests the `UserMapper` interface.                                                    |
 | `UserServiceTest.java`               | Tests the `UserService` class.                                                       |
@@ -692,46 +689,19 @@ Example claims that can be extracted from the Azure token:
 
 ---
 
-## 2. API Endpoints Summary
+## 2. API reference
 
-### 2.1 Authentication Endpoints (`/auth`)
+Endpoint documentation is **generated automatically** from integration tests (Spring REST Docs) during `mvn verify` / `mvn package`. Do not maintain a manual endpoint summary here: it would drift from the code.
 
-| Method | Endpoint             | Auth Required | Description                                    |
-| ------ | -------------------- | ------------- | ---------------------------------------------- |
-| POST   | `/auth/login`        | No            | Authenticate user and receive JWT tokens       |
-| POST   | `/auth/register`     | Yes           | Register a new user account                    |
-| POST   | `/auth/refresh`      | Yes           | Refresh access token using refresh token       |
-| PUT    | `/auth/update-password` | Yes        | Update current user's password                 |
-| POST   | `/auth/logout`       | Yes           | Logout and invalidate refresh tokens            |
-
-### 2.2 OAuth2 Endpoints (`/oauth2`)
-
-| Method | Endpoint                       | Auth Required | Description                              |
-| ------ | ------------------------------ | ------------- | ---------------------------------------- |
-| GET    | `/oauth2/login/azure`          | No            | Initiate OAuth2 authentication flow      |
-| GET    | `/oauth2/authorization/azure`  | No            | Redirect to Microsoft login page         |
-| GET    | `/oauth2/success`              | Yes           | Callback endpoint after Azure login      |
-
-### 2.3 User Management Endpoints (`/users`)
-
-| Method | Endpoint                        | Permission Required | Description                                  |
-| ------ | ------------------------------- | ------------------- | -------------------------------------------- |
-| GET    | `/users/me`                     | Authenticated       | Get current authenticated user info          |
-| GET    | `/users/all`                    | `user:read`         | Get all active users                         |
-| GET    | `/users/all-with-deleted`       | `user:read`         | Get all users including soft-deleted         |
-| GET    | `/users/deleted`                | `user:read`         | Get only soft-deleted users                  |
-| PUT    | `/users/{userId}/restore`       | `user:update`       | Restore a soft-deleted user                  |
-| PUT    | `/users/{userId}/promote-manager` | `user:update`     | Promote user to MANAGER role                 |
-| PUT    | `/users/{userId}/revoke-manager` | `user:update`      | Revoke MANAGER role from user                |
-| PUT    | `/users/{userId}/promote-admin` | `ADMIN` role        | Promote user to ADMIN role                   |
-| PUT    | `/users/{userId}/revoke-admin` | `ADMIN` role         | Revoke ADMIN role from user                  |
-| PUT    | `/users/{userId}/downgrade-admin` | `ADMIN` role       | Downgrade admin to MANAGER role              |
-| DELETE | `/users/{userId}`               | `user:delete`       | Soft delete a user (marks as deleted)        |
-| DELETE | `/users/{userId}/permanent`     | `user:delete`       | Permanently delete a user from database      |
+| Resource | Role |
+| -------- | ---- |
+| [index.html](index.html) | Published API reference (HTML) |
+| [api-documentation-generation.md](api-documentation-generation.md) | How snippets, Asciidoctor, and Docker volumes produce that HTML |
+| [src/asciidoc/index.adoc](../src/asciidoc/index.adoc) | AsciiDoc template (structure and `{snippets}` includes) |
 
 ---
 
-## 3. Testing and Documentation
+## 3. Testing
 
 ### 3.1 Environment Profiles
 
@@ -751,8 +721,7 @@ ENVIRONMENT=dev  # or test, or prod
 The application uses **JUnit 5** and **Spring Boot Test** for testing:
 
 - **Unit Tests:** Test individual components in isolation
-- **Integration Tests:** Test complete request/response flows with database interactions
-- **Documentation Tests:** Generate API documentation using Spring REST Docs
+- **Integration Tests:** Test complete request/response flows with database interactions (also feed Spring REST Docs; see [api-documentation-generation.md](api-documentation-generation.md))
 
 **Run tests using Docker Compose:**
 ```bash
@@ -766,7 +735,7 @@ docker compose up --build
 This will:
 - Build the application with Maven
 - Run the complete test suite (`mvn verify`)
-- Generate test reports and API documentation snippets
+- Generate REST Docs snippets under `target/generated-snippets/`
 - Create the database schema for testing
 
 **Run tests locally with Maven (without Docker):**
@@ -775,33 +744,7 @@ mvn test                 # Run tests only
 mvn verify              # Run tests + integration tests
 ```
 
-### 3.3 API Documentation Generation
-
-API documentation is automatically generated using **Spring REST Docs** and **AsciiDoc**:
-
-1. Integration tests capture HTTP requests/responses as snippets (saved to `src/asciidoc/`)
-2. AsciiDoc templates combine snippets into comprehensive documentation
-3. Maven plugin generates HTML documentation during the build process
-
-**Generated documentation locations:**
-- **Snippets:** `target/generated-snippets/` (raw test output)
-- **HTML Documentation:** `docs/index.html` (final API documentation)
-
-**Generate documentation using Docker:**
-```bash
-# Set environment to test
-ENVIRONMENT=test
-
-# Build and run tests to generate docs
-docker compose up --build
-
-# Documentation will be available in docs/index.html
-```
-
-**Generate documentation with Maven:**
-```bash
-mvn clean package
-```
+For assembling snippets into HTML, Docker volume mapping, and what to commit, see [api-documentation-generation.md](api-documentation-generation.md).
 
 ---
 
@@ -868,12 +811,15 @@ Users can be soft-deleted (marked as inactive) or permanently deleted:
 
 ## 6. Additional Resources
 
-- **Main README:** [README.md](../README.md) - Setup and installation guide
-- **API Documentation:** `target/generated-snippets-html/index.html` - Auto-generated API docs
-- **Docker Compose:** `compose.yml` - Container orchestration configuration
-- **Database Schema:** `init.sql` - Database initialization script
+| Resource | Description |
+| -------- | ----------- |
+| [README.md](../README.md) | Setup, Docker, Maven, OAuth2 overview |
+| [index.html](index.html) | Published API reference (generated from tests) |
+| [api-documentation-generation.md](api-documentation-generation.md) | REST Docs pipeline, commands, Draw.io diagrams |
+| `compose.yml` | Container orchestration configuration |
+| `init.sql` | Database initialization script |
 
 ---
 
-**Last Updated:** December 2025  
+**Last Updated:** September 2025  
 **Version:** 1.2.0-SNAPSHOT
