@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.restdocs.operation.OperationRequest;
 import org.springframework.restdocs.operation.OperationRequestFactory;
 import org.springframework.restdocs.operation.OperationResponse;
 import org.springframework.restdocs.operation.OperationResponseFactory;
+import org.springframework.restdocs.operation.RequestCookie;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
 class RestDocsSensitiveDataMaskingTest {
@@ -38,7 +40,7 @@ class RestDocsSensitiveDataMaskingTest {
 
         OperationRequest masked = preprocessor.preprocess(request);
 
-        assertEquals("Bearer <access-token>", masked.getHeaders().getFirst("Authorization"));
+        assertEquals("Bearer {access-token}", masked.getHeaders().getFirst("Authorization"));
     }
 
     @Test
@@ -54,7 +56,7 @@ class RestDocsSensitiveDataMaskingTest {
 
         OperationRequest masked = preprocessor.preprocess(request);
 
-        assertEquals("refresh_token=<refresh-token>; Path=/auth/refresh; HttpOnly",
+        assertEquals("refresh_token={refresh-token}; Path=/auth/refresh; HttpOnly",
                 masked.getHeaders().getFirst("Cookie"));
     }
 
@@ -67,9 +69,24 @@ class RestDocsSensitiveDataMaskingTest {
         OperationResponse masked = preprocessor.preprocess(response);
 
         String maskedBody = masked.getContentAsString();
-        assertEquals("{\n  \"token\" : \"<jwt-access-token>\",\n"
-                + "  \"accessToken\" : \"<jwt-access-token>\"\n}", maskedBody);
+        assertEquals("{\n  \"token\" : \"{jwt-access-token}\",\n"
+                + "  \"accessToken\" : \"{jwt-access-token}\"\n}", maskedBody);
         assertFalse(maskedBody.contains(SAMPLE_JWT));
+    }
+
+    @Test
+    void masksRequestCookieCollection() {
+        OperationRequest request = requestFactory.create(
+                URI.create("http://localhost/auth/refresh"),
+                HttpMethod.POST,
+                new byte[0],
+                new HttpHeaders(),
+                Collections.emptyList(),
+                List.of(new RequestCookie("refresh_token", SAMPLE_JWT)));
+
+        OperationRequest masked = preprocessor.preprocess(request);
+
+        assertEquals("{refresh-token}", masked.getCookies().iterator().next().getValue());
     }
 
     @Test

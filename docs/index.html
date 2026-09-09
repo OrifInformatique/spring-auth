@@ -738,7 +738,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=<refresh-token>; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 3 Oct 2026 07:10:32 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 9 Oct 2026 13:38:24 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -746,14 +746,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 514
+Content-Length: 221
 
 {
   "id" : 1,
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "<jwt-access-token>",
+  "token" : "{jwt-access-token}",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ "ROLE_USER", "user:read" ]
@@ -804,10 +804,10 @@ X-Frame-Options: DENY
 Content-Length: 201
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.489829299",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.249126041",
   "fieldErrors" : {
     "login" : "ne doit pas être vide"
   }
@@ -854,10 +854,10 @@ X-Frame-Options: DENY
 Content-Length: 203
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.711245804",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.458743633",
   "fieldErrors" : {
     "password" : "ne doit pas être nul"
   }
@@ -905,10 +905,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.409667922",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.134034007",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -947,13 +947,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 337
+Content-Length: 339
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;ch.sectioninformatique.auth.user.UserDto&gt; ch.sectioninformatique.auth.auth.AuthController.login(ch.sectioninformatique.auth.auth.CredentialsDto)",
-  "timestamp" : "2026-09-03T07:10:32.4403758"
+  "timestamp" : "2026-09-09T13:38:24.693980481",
+  "status" : 400,
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -995,10 +995,10 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
   "message" : "JSON parse error: Unexpected end-of-input: expected close marker for Object (start marker at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1])",
-  "timestamp" : "2026-09-03T07:10:32.239382124"
+  "timestamp" : "2026-09-09T13:38:24.480850632",
+  "status" : 400,
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -1043,10 +1043,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.263008138",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:31.982465511",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1094,10 +1094,10 @@ X-Frame-Options: DENY
 Content-Length: 137
 
 {
-  "status" : 401,
-  "error" : "Unauthorized",
   "message" : "Identifiants invalides",
-  "timestamp" : "2026-09-03T07:10:32.432116264"
+  "timestamp" : "2026-09-09T13:38:24.681296619",
+  "status" : 401,
+  "error" : "Unauthorized"
 }</code></pre>
 </div>
 </div>
@@ -1145,13 +1145,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 181
+Content-Length: 180
 
 {
-  "status" : 415,
-  "error" : "Unsupported Media Type",
   "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "timestamp" : "2026-09-03T07:10:32.091656291"
+  "timestamp" : "2026-09-09T13:38:24.36746595",
+  "status" : 415,
+  "error" : "Unsupported Media Type"
 }</code></pre>
 </div>
 </div>
@@ -1202,10 +1202,10 @@ X-Frame-Options: DENY
 Content-Length: 137
 
 {
-  "status" : 401,
-  "error" : "Unauthorized",
   "message" : "Identifiants invalides",
-  "timestamp" : "2026-09-03T07:10:32.224146488"
+  "timestamp" : "2026-09-09T13:38:24.468918934",
+  "status" : 401,
+  "error" : "Unauthorized"
 }</code></pre>
 </div>
 </div>
@@ -1250,10 +1250,10 @@ X-Frame-Options: DENY
 Content-Length: 137
 
 {
-  "status" : 401,
-  "error" : "Unauthorized",
   "message" : "Identifiants invalides",
-  "timestamp" : "2026-09-03T07:10:32.453598029"
+  "timestamp" : "2026-09-09T13:38:24.706447439",
+  "status" : 401,
+  "error" : "Unauthorized"
 }</code></pre>
 </div>
 </div>
@@ -1273,7 +1273,7 @@ Content-Length: 137
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Content-Length: 143
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -1295,7 +1295,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Location: /auth/users/test.newuser@test.com
-Set-Cookie: refresh_token=<refresh-token>; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 3 Oct 2026 07:10:32 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 9 Oct 2026 13:38:24 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1303,14 +1303,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 528
+Content-Length: 227
 
 {
   "id" : 6,
   "firstName" : "Test",
   "lastName" : "NewUser",
   "login" : "test.newuser@test.com",
-  "token" : "<jwt-access-token>",
+  "token" : "{jwt-access-token}",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ "ROLE_USER", "user:read" ]
@@ -1363,10 +1363,10 @@ X-Frame-Options: DENY
 Content-Length: 205
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.255672377",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:31.974032612",
   "fieldErrors" : {
     "firstName" : "ne doit pas être vide"
   }
@@ -1415,10 +1415,10 @@ X-Frame-Options: DENY
 Content-Length: 219
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.244120327",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:31.963693985",
   "fieldErrors" : {
     "lastName" : "{validation.signup.lastName.required}"
   }
@@ -1464,13 +1464,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 199
+Content-Length: 201
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.419180887",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.1423724",
   "fieldErrors" : {
     "login" : "ne doit pas être vide"
   }
@@ -1519,10 +1519,10 @@ X-Frame-Options: DENY
 Content-Length: 203
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.405338482",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.130208357",
   "fieldErrors" : {
     "password" : "ne doit pas être nul"
   }
@@ -1572,10 +1572,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.955344571",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.701623297",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1617,10 +1617,10 @@ X-Frame-Options: DENY
 Content-Length: 337
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;ch.sectioninformatique.auth.user.UserDto&gt; ch.sectioninformatique.auth.auth.AuthController.register(ch.sectioninformatique.auth.auth.SignUpDto)",
-  "timestamp" : "2026-09-03T07:10:32.696559085"
+  "timestamp" : "2026-09-09T13:38:24.950501462",
+  "status" : 400,
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -1662,10 +1662,10 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
   "message" : "JSON parse error: Unexpected end-of-input: expected close marker for Object (start marker at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1])",
-  "timestamp" : "2026-09-03T07:10:32.137730166"
+  "timestamp" : "2026-09-09T13:38:24.413902245",
+  "status" : 400,
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -1712,10 +1712,10 @@ X-Frame-Options: DENY
 Content-Length: 240
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.630571039",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.383604038",
   "fieldErrors" : {
     "firstName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
   }
@@ -1765,10 +1765,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.959542897",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:32.706865481",
   "fieldErrors" : {
     "lastName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
   }
@@ -1818,10 +1818,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-09T13:38:24.271844179",
   "status" : 400,
   "error" : "Bad Request",
-  "message" : "Échec de la validation",
-  "timestamp" : "2026-09-03T07:10:31.992555544",
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1874,13 +1874,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 180
+Content-Length: 181
 
 {
-  "status" : 415,
-  "error" : "Unsupported Media Type",
   "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "timestamp" : "2026-09-03T07:10:32.12521697"
+  "timestamp" : "2026-09-09T13:38:24.400469355",
+  "status" : 415,
+  "error" : "Unsupported Media Type"
 }</code></pre>
 </div>
 </div>
@@ -1904,7 +1904,7 @@ Content-Length: 180
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Content-Length: 111
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -1934,10 +1934,10 @@ X-Frame-Options: DENY
 Content-Length: 158
 
 {
-  "status" : 409,
-  "error" : "Conflict",
   "message" : "L'utilisateur existe déjà: test.user@test.com",
-  "timestamp" : "2026-09-03T07:10:32.101938212"
+  "timestamp" : "2026-09-09T13:38:24.377692446",
+  "status" : 409,
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -1958,7 +1958,7 @@ Content-Length: 158
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/register HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Content-Length: 128
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -2010,7 +2010,7 @@ Content-Length: 88
 Content-Type: application/json;charset=UTF-8
 Accept-Language: fr-fr
 Host: localhost:8080
-Cookie: refresh_token=<refresh-token></code></pre>
+Cookie: refresh_token={refresh-token}</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -2020,7 +2020,7 @@ Cookie: refresh_token=<refresh-token></code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=<refresh-token>; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 3 Oct 2026 07:10:32 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 9 Oct 2026 13:38:24 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2028,10 +2028,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 335
+Content-Length: 42
 
 {
-  "accessToken" : "<jwt-access-token>"
+  "accessToken" : "{jwt-access-token}"
 }</code></pre>
 </div>
 </div>
@@ -2144,8 +2144,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2210,7 +2210,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Content-Length: 70
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -2305,7 +2305,7 @@ Content-Length: 66
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /auth/update-password HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2327,10 +2327,10 @@ X-Frame-Options: DENY
 Content-Length: 312
 
 {
-  "status" : 400,
-  "error" : "Bad Request",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;?&gt; ch.sectioninformatique.auth.auth.AuthController.updatePassword(ch.sectioninformatique.auth.auth.PasswordUpdateDto)",
-  "timestamp" : "2026-09-03T07:10:32.003056093"
+  "timestamp" : "2026-09-09T13:38:24.281916367",
+  "status" : 400,
+  "error" : "Bad Request"
 }</code></pre>
 </div>
 </div>
@@ -2350,7 +2350,7 @@ Content-Length: 312
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /auth/logout HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2362,7 +2362,7 @@ Host: localhost:8080</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token=<refresh-token>; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2447,8 +2447,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2474,7 +2474,7 @@ Host: localhost:8080
 
 {
   "login" : "test.user@test.com",
-  "code" : "4d18895a-e10e-4ee9-bba4-096eeae14874"
+  "code" : "6eb3869a-5a45-4516-8c44-849da36414c0"
 }</code></pre>
 </div>
 </div>
@@ -2485,8 +2485,8 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Authorization: Bearer <access-token>
-Set-Cookie: refresh_token=<refresh-token>; Path=/auth/refresh; Max-Age=2592000; Expires=Sat, 3 Oct 2026 07:10:32 GMT; Secure; HttpOnly; SameSite=None
+Authorization: Bearer {access-token}
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 9 Oct 2026 13:38:24 GMT; Secure; HttpOnly; SameSite=None
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2494,14 +2494,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 514
+Content-Length: 221
 
 {
   "id" : 1,
   "firstName" : "Test",
   "lastName" : "User",
   "login" : "test.user@test.com",
-  "token" : "<jwt-access-token>",
+  "token" : "{jwt-access-token}",
   "deleted" : false,
   "mainRole" : "USER",
   "permissions" : [ "ROLE_USER", "user:read" ]
@@ -2526,7 +2526,7 @@ Host: localhost:8080
 
 {
   "login" : "not.a@login.com",
-  "code" : "935b4bad-6441-4331-a2b3-82a1775c97db"
+  "code" : "319463ca-acc4-43d7-827b-d6372c396f9b"
 }</code></pre>
 </div>
 </div>
@@ -2547,10 +2547,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: not.a@login.com",
-  "timestamp" : "2026-09-03T07:10:32.325242749"
+  "timestamp" : "2026-09-09T13:38:24.566326428",
+  "status" : 404,
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -2589,10 +2589,10 @@ X-Frame-Options: DENY
 Content-Length: 162
 
 {
-  "status" : 404,
-  "error" : "Not Found",
   "message" : "Aucun code d''authentification n''a été trouvé.",
-  "timestamp" : "2026-09-03T07:10:32.488805121"
+  "timestamp" : "2026-09-09T13:38:24.739263384",
+  "status" : 404,
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -2614,7 +2614,7 @@ Content-Length: 162
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2717,8 +2717,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2736,7 +2736,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/me HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2749,8 +2749,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Le jeton a expiré"
+  "message" : "Le jeton a expiré",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2767,7 +2767,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/ HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2897,8 +2897,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2916,7 +2916,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -2929,8 +2929,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Le jeton a expiré"
+  "message" : "Le jeton a expiré",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -2950,7 +2950,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/all-with-deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3024,7 +3024,7 @@ Content-Length: 970
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/deleted HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3062,7 +3062,7 @@ Content-Length: 3
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.user@test.com/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3156,8 +3156,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3181,7 +3181,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3227,7 +3227,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/Not.A@Login.com/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3249,10 +3249,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.A@Login.com",
-  "timestamp" : "2026-09-03T07:10:31.683134043"
+  "timestamp" : "2026-09-09T13:38:23.955358023",
+  "status" : 404,
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3276,7 +3276,7 @@ Content-Length: 152
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.manager@test.com/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3295,13 +3295,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 164
+Content-Length: 166
 
 {
-  "status" : 409,
-  "error" : "Conflict",
   "message" : "L'utilisateur est déjà manager: test.manager@test.com",
-  "timestamp" : "2026-09-03T07:10:31.6330806"
+  "timestamp" : "2026-09-09T13:38:23.905520871",
+  "status" : 409,
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -3319,7 +3319,7 @@ Content-Length: 164
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.admin@test.com/promote-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3341,10 +3341,10 @@ X-Frame-Options: DENY
 Content-Length: 162
 
 {
-  "status" : 409,
-  "error" : "Conflict",
   "message" : "L'utilisateur est déjà admin: test.admin@test.com",
-  "timestamp" : "2026-09-03T07:10:31.500649614"
+  "timestamp" : "2026-09-09T13:38:23.766591544",
+  "status" : 409,
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -3364,7 +3364,7 @@ Content-Length: 162
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.manager@test.com/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3458,8 +3458,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3483,7 +3483,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.manager@test.com/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3529,7 +3529,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/Not.A@Login.com/revoke-manager HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3551,10 +3551,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.A@Login.com",
-  "timestamp" : "2026-09-03T07:10:31.431137432"
+  "timestamp" : "2026-09-09T13:38:23.698554345",
+  "status" : 404,
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3574,7 +3574,7 @@ Content-Length: 152
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.manager@test.com/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3665,8 +3665,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3690,7 +3690,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.manager@test.com/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3736,7 +3736,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/Not.a@Login.com/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3755,13 +3755,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 151
 
 {
-  "status" : 404,
-  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.a@Login.com",
-  "timestamp" : "2026-09-03T07:10:31.591249875"
+  "timestamp" : "2026-09-09T13:38:23.86165832",
+  "status" : 404,
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -3785,7 +3785,7 @@ Content-Length: 152
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.admin@test.com/promote-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3807,10 +3807,10 @@ X-Frame-Options: DENY
 Content-Length: 162
 
 {
-  "status" : 409,
-  "error" : "Conflict",
   "message" : "L'utilisateur est déjà admin: test.admin@test.com",
-  "timestamp" : "2026-09-03T07:10:31.509338762"
+  "timestamp" : "2026-09-09T13:38:23.774484625",
+  "status" : 409,
+  "error" : "Conflict"
 }</code></pre>
 </div>
 </div>
@@ -3830,7 +3830,7 @@ Content-Length: 162
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.admin2@test.com/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3921,8 +3921,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -3946,7 +3946,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.admin2@test.com/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -3992,7 +3992,7 @@ Content-Length: 88
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/Not.A@Login.com/revoke-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4011,13 +4011,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 152
+Content-Length: 151
 
 {
-  "status" : 404,
-  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.A@Login.com",
-  "timestamp" : "2026-09-03T07:10:31.483648752"
+  "timestamp" : "2026-09-09T13:38:23.75318347",
+  "status" : 404,
+  "error" : "Not Found"
 }</code></pre>
 </div>
 </div>
@@ -4037,7 +4037,7 @@ Content-Length: 152
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.admin2@test.com/downgrade-admin HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4131,8 +4131,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -4152,7 +4152,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/test.user@test.com/0 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4174,8 +4174,8 @@ X-Frame-Options: DENY
 Content-Length: 99
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "Utilisateur supprimé avec succès"
+  "message" : "Utilisateur supprimé avec succès",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4249,8 +4249,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "error" : "INVALID_TOKEN",
-  "message" : "Jeton JWT invalide"
+  "message" : "Jeton JWT invalide",
+  "error" : "INVALID_TOKEN"
 }</code></pre>
 </div>
 </div>
@@ -4270,7 +4270,7 @@ Content-Length: 67
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/test.user@test.com/false HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4292,8 +4292,8 @@ X-Frame-Options: DENY
 Content-Length: 99
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "Utilisateur supprimé avec succès"
+  "message" : "Utilisateur supprimé avec succès",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4311,7 +4311,7 @@ Content-Length: 99
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/test.user@test.com/true HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4333,8 +4333,8 @@ X-Frame-Options: DENY
 Content-Length: 102
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "Utilisateur supprimé définitivement"
+  "message" : "Utilisateur supprimé définitivement",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4352,7 +4352,7 @@ Content-Length: 102
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.user@test.com/restore HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: en-us
 Host: localhost:8080</code></pre>
 </div>
@@ -4390,7 +4390,7 @@ Utilisateur restauré avec succès</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/test.user@test.com HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4434,7 +4434,7 @@ Content-Length: 205
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/not.a@login.com HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Accept-Language: fr-fr
 Host: localhost:8080</code></pre>
 </div>
@@ -4471,7 +4471,7 @@ Utilisateur non trouvé: {0}</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.user@test.com HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer <access-token>
+Authorization: Bearer {access-token}
 Content-Length: 109
 Accept-Language: fr-fr
 Host: localhost:8080
@@ -4513,7 +4513,7 @@ User updated successfully</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-09-03 06:49:48 UTC
+Last updated 2026-09-03 07:40:48 UTC
 </div>
 </div>
 </body>

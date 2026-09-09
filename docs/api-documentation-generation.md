@@ -74,9 +74,11 @@ preprocessResponse(maskSensitiveData(), prettyPrint())
 
 | Location | Example before | Placeholder after |
 |---|---|---|
-| `Authorization` header | `Bearer eyJhbGci...` | `Bearer <access-token>` |
-| `Cookie` / `Set-Cookie` | `refresh_token=eyJhbGci...` | `refresh_token=<refresh-token>` |
-| JSON `token` / `accessToken` | `"eyJhbGci..."` | `"<jwt-access-token>"` |
+| `Authorization` header | `Bearer eyJhbGci...` | `Bearer {access-token}` |
+| `Cookie` / `Set-Cookie` | `refresh_token=eyJhbGci...` | `refresh_token={refresh-token}` |
+| JSON `token` / `accessToken` | `"eyJhbGci..."` | `"{jwt-access-token}"` |
+
+Curly braces are used instead of angle brackets so placeholders remain visible in HTML (`<access-token>` would be swallowed as a tag inside `<code>` blocks).
 
 Malformed examples used in 401 tests (for example `this.is.not.a.valid.token`) are left unchanged.
 
