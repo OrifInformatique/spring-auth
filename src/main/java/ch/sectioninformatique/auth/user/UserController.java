@@ -210,43 +210,9 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{login}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable String login) {
-        userService.revokeAdminRole(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.revoked.admin",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
+        return userService.revokeAdminRole(login);
     }
 
-    /**
-     * Downgrades a admin to a regular manager role.
-     * This endpoint:
-     * - Requires 'ADMIN' role
-     * - Validates the user exists and is currently a admin
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the admin to downgrade
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{login}/downgrade-admin")
-    public ResponseEntity<?> downgradeAdminRole(@PathVariable String login, @AuthenticationPrincipal UserDto currentUser) {
-
-        if (currentUser.getLogin().equals(login)) {
-            return ResponseEntity.badRequest().body(messageSource.getMessage(
-                    "message.user.downgrade.self",
-                    null,
-                    LocaleContextHolder.getLocale()
-            ));
-        }
-
-        userService.downgradeAdminRole(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.downgraded.admin",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-    }
 
     /**
      * Method to soft or hard delete users.
