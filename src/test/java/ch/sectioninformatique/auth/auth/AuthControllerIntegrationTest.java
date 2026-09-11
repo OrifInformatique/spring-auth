@@ -1746,11 +1746,12 @@ public class AuthControllerIntegrationTest {
         public void get_token_with_authCode() throws Exception{
                 
                 String authCode = authService.generateAndStoreAuthCode("test.user@test.com", "redirectUrl");
+                Long id = userService.findByLogin("test.user@test.com").getId();
 
                 performRequest(
                         "POST",
                         "/oauth2/token",
-                        "{\"login\":\"test.user@test.com\", \"code\":\"" + authCode + "\"}",
+                        "{\"id\":\"" + id +  "\", \"code\":\"" + authCode + "\"}",
                         null,
                         MediaType.APPLICATION_JSON,
                         200,
@@ -1776,7 +1777,7 @@ public class AuthControllerIntegrationTest {
                 performRequest(
                         "POST",
                         "/oauth2/token",
-                        "{\"login\":\"not.a@login.com\", \"code\":\"" + authCode + "\"}",
+                        "{\"id\":\"9999999999\", \"code\":\"" + authCode + "\"}",
                         null,
                         MediaType.APPLICATION_JSON,
                         404,
@@ -1784,7 +1785,7 @@ public class AuthControllerIntegrationTest {
                         request -> {
                                 try{
                                         request.andExpect(jsonPath("$.message")
-                                        .value(message("error.user.not.found", "not.a@login.com")));
+                                        .value(message("error.user.not.found", "9999999999")));
                         } catch (Exception e){
                                 throw new RuntimeException(e);
                         }
@@ -1803,7 +1804,7 @@ public class AuthControllerIntegrationTest {
                 performRequest(
                         "POST",
                         "/oauth2/token",
-                        "{\"login\":\"test.user@test.com\", \"code\":\"" + wrongCode + "\"}",
+                        "{\"id\":\"1\", \"code\":\"" + wrongCode + "\"}",
                         null,
                         MediaType.APPLICATION_JSON,
                         404,
