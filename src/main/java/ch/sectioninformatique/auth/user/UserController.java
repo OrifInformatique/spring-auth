@@ -251,7 +251,7 @@ public class UserController {
      * @return a UserDto of the user
      */
     @PreAuthorize("hasAuthority('user:read')")
-    @GetMapping("/{login}")
+    @GetMapping("/{login:.+@.+}")
     public ResponseEntity<?> getUserByLogin(@PathVariable String login){
         try{
             UserDto user = userService.findByLogin(login);
