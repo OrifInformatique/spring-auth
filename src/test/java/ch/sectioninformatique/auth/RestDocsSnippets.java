@@ -58,7 +58,7 @@ public final class RestDocsSnippets {
 
         public static Snippet oauth2TokenRequest() {
                 return requestFields(
-                                fieldWithPath("login").description("Email of the authenticated user"),
+                                fieldWithPath("id").description("User identifier"),
                                 fieldWithPath("code").description("One-time authentication code issued after OAuth2 login"));
         }
 
