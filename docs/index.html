@@ -738,7 +738,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:31:41 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:43:45 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -804,10 +804,10 @@ X-Frame-Options: DENY
 Content-Length: 201
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:40.468264294",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:44.240536808",
+  "status" : 400,
   "fieldErrors" : {
     "login" : "ne doit pas être vide"
   }
@@ -854,10 +854,10 @@ X-Frame-Options: DENY
 Content-Length: 203
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:42.736740991",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:46.542503141",
+  "status" : 400,
   "fieldErrors" : {
     "password" : "ne doit pas être nul"
   }
@@ -905,10 +905,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:38.955285732",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:42.875827856",
+  "status" : 400,
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -950,10 +950,10 @@ X-Frame-Options: DENY
 Content-Length: 339
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:42.218995675",
+  "error" : "Bad Request",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;ch.sectioninformatique.auth.user.UserDto&gt; ch.sectioninformatique.auth.auth.AuthController.login(ch.sectioninformatique.auth.auth.CredentialsDto)",
-  "error" : "Bad Request"
+  "timestamp" : "2026-09-18T12:43:45.883530114",
+  "status" : 400
 }</code></pre>
 </div>
 </div>
@@ -995,10 +995,10 @@ X-Frame-Options: DENY
 Content-Length: 307
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:40.150235716",
+  "error" : "Bad Request",
   "message" : "JSON parse error: Unexpected end-of-input: expected close marker for Object (start marker at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN])",
-  "error" : "Bad Request"
+  "timestamp" : "2026-09-18T12:43:43.960661585",
+  "status" : 400
 }</code></pre>
 </div>
 </div>
@@ -1043,10 +1043,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:36.046522215",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:39.883787053",
+  "status" : 400,
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1094,10 +1094,10 @@ X-Frame-Options: DENY
 Content-Length: 137
 
 {
-  "status" : 401,
-  "timestamp" : "2026-09-18T12:31:41.940937333",
+  "error" : "Unauthorized",
   "message" : "Identifiants invalides",
-  "error" : "Unauthorized"
+  "timestamp" : "2026-09-18T12:43:45.569747872",
+  "status" : 401
 }</code></pre>
 </div>
 </div>
@@ -1148,10 +1148,10 @@ X-Frame-Options: DENY
 Content-Length: 181
 
 {
-  "status" : 415,
-  "timestamp" : "2026-09-18T12:31:38.070016897",
+  "error" : "Unsupported Media Type",
   "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "error" : "Unsupported Media Type"
+  "timestamp" : "2026-09-18T12:43:42.009575753",
+  "status" : 415
 }</code></pre>
 </div>
 </div>
@@ -1202,10 +1202,10 @@ X-Frame-Options: DENY
 Content-Length: 137
 
 {
-  "status" : 401,
-  "timestamp" : "2026-09-18T12:31:39.773014571",
+  "error" : "Unauthorized",
   "message" : "Identifiants invalides",
-  "error" : "Unauthorized"
+  "timestamp" : "2026-09-18T12:43:43.657328963",
+  "status" : 401
 }</code></pre>
 </div>
 </div>
@@ -1250,10 +1250,10 @@ X-Frame-Options: DENY
 Content-Length: 137
 
 {
-  "status" : 401,
-  "timestamp" : "2026-09-18T12:31:42.606062708",
+  "error" : "Unauthorized",
   "message" : "Identifiants invalides",
-  "error" : "Unauthorized"
+  "timestamp" : "2026-09-18T12:43:46.325905069",
+  "status" : 401
 }</code></pre>
 </div>
 </div>
@@ -1295,7 +1295,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Location: /auth/users/test.newuser@test.com
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:31:43 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:43:48 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1363,10 +1363,10 @@ X-Frame-Options: DENY
 Content-Length: 205
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:35.910465054",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:39.791135223",
+  "status" : 400,
   "fieldErrors" : {
     "firstName" : "ne doit pas être vide"
   }
@@ -1415,10 +1415,10 @@ X-Frame-Options: DENY
 Content-Length: 219
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:35.296040195",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:39.309633463",
+  "status" : 400,
   "fieldErrors" : {
     "lastName" : "{validation.signup.lastName.required}"
   }
@@ -1467,10 +1467,10 @@ X-Frame-Options: DENY
 Content-Length: 201
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:39.549323453",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:43.395167518",
+  "status" : 400,
   "fieldErrors" : {
     "login" : "ne doit pas être vide"
   }
@@ -1519,10 +1519,10 @@ X-Frame-Options: DENY
 Content-Length: 203
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:38.737022136",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:42.687267198",
+  "status" : 400,
   "fieldErrors" : {
     "password" : "ne doit pas être nul"
   }
@@ -1572,10 +1572,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:44.440594039",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:48.761904089",
+  "status" : 400,
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1617,10 +1617,10 @@ X-Frame-Options: DENY
 Content-Length: 337
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:44.297045788",
+  "error" : "Bad Request",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;ch.sectioninformatique.auth.user.UserDto&gt; ch.sectioninformatique.auth.auth.AuthController.register(ch.sectioninformatique.auth.auth.SignUpDto)",
-  "error" : "Bad Request"
+  "timestamp" : "2026-09-18T12:43:48.596630253",
+  "status" : 400
 }</code></pre>
 </div>
 </div>
@@ -1662,10 +1662,10 @@ X-Frame-Options: DENY
 Content-Length: 307
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:39.116285804",
+  "error" : "Bad Request",
   "message" : "JSON parse error: Unexpected end-of-input: expected close marker for Object (start marker at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN])",
-  "error" : "Bad Request"
+  "timestamp" : "2026-09-18T12:43:43.044550661",
+  "status" : 400
 }</code></pre>
 </div>
 </div>
@@ -1712,10 +1712,10 @@ X-Frame-Options: DENY
 Content-Length: 240
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:41.693242649",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:45.327369251",
+  "status" : 400,
   "fieldErrors" : {
     "firstName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
   }
@@ -1765,10 +1765,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:44.606259602",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:48.921712145",
+  "status" : 400,
   "fieldErrors" : {
     "lastName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
   }
@@ -1818,10 +1818,10 @@ X-Frame-Options: DENY
 Content-Length: 239
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:36.523870537",
-  "message" : "Échec de la validation",
   "error" : "Bad Request",
+  "message" : "Échec de la validation",
+  "timestamp" : "2026-09-18T12:43:40.254996911",
+  "status" : 400,
   "fieldErrors" : {
     "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
@@ -1874,13 +1874,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 181
+Content-Length: 180
 
 {
-  "status" : 415,
-  "timestamp" : "2026-09-18T12:31:38.610312612",
+  "error" : "Unsupported Media Type",
   "message" : "Content-Type 'text/plain;charset=UTF-8' is not supported",
-  "error" : "Unsupported Media Type"
+  "timestamp" : "2026-09-18T12:43:42.54264786",
+  "status" : 415
 }</code></pre>
 </div>
 </div>
@@ -1934,10 +1934,10 @@ X-Frame-Options: DENY
 Content-Length: 158
 
 {
-  "status" : 409,
-  "timestamp" : "2026-09-18T12:31:38.222707153",
+  "error" : "Conflict",
   "message" : "L'utilisateur existe déjà: test.user@test.com",
-  "error" : "Conflict"
+  "timestamp" : "2026-09-18T12:43:42.168452956",
+  "status" : 409
 }</code></pre>
 </div>
 </div>
@@ -2020,7 +2020,7 @@ Cookie: refresh_token={refresh-token}</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:31:38 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:43:42 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2144,8 +2144,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2327,10 +2327,10 @@ X-Frame-Options: DENY
 Content-Length: 312
 
 {
-  "status" : 400,
-  "timestamp" : "2026-09-18T12:31:36.994245588",
+  "error" : "Bad Request",
   "message" : "Required request body is missing: public org.springframework.http.ResponseEntity&lt;?&gt; ch.sectioninformatique.auth.auth.AuthController.updatePassword(ch.sectioninformatique.auth.auth.PasswordUpdateDto)",
-  "error" : "Bad Request"
+  "timestamp" : "2026-09-18T12:43:40.884168553",
+  "status" : 400
 }</code></pre>
 </div>
 </div>
@@ -2447,8 +2447,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2474,7 +2474,7 @@ Host: localhost:8080
 
 {
   "id" : "1",
-  "code" : "380c7fff-da9a-4cf8-81d5-59da8df3b9fd"
+  "code" : "8258e5d7-5d5d-4b33-933e-7da0c8f44baf"
 }</code></pre>
 </div>
 </div>
@@ -2486,7 +2486,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Authorization: Bearer {access-token}
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:31:42 GMT; Secure; HttpOnly; SameSite=None
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Sun, 18 Oct 2026 12:43:46 GMT; Secure; HttpOnly; SameSite=None
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2526,7 +2526,7 @@ Host: localhost:8080
 
 {
   "id" : "9999999999",
-  "code" : "5cd6e951-724d-46f6-a3f6-f06438c9426d"
+  "code" : "dc930f85-0441-4b12-adb9-fcb9b11d631b"
 }</code></pre>
 </div>
 </div>
@@ -2544,13 +2544,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 147
+Content-Length: 146
 
 {
-  "status" : 404,
-  "timestamp" : "2026-09-18T12:31:41.119885485",
+  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: 9999999999",
-  "error" : "Not Found"
+  "timestamp" : "2026-09-18T12:43:44.88318249",
+  "status" : 404
 }</code></pre>
 </div>
 </div>
@@ -2589,10 +2589,10 @@ X-Frame-Options: DENY
 Content-Length: 162
 
 {
-  "status" : 404,
-  "timestamp" : "2026-09-18T12:31:43.300923265",
+  "error" : "Not Found",
   "message" : "Aucun code d''authentification n''a été trouvé.",
-  "error" : "Not Found"
+  "timestamp" : "2026-09-18T12:43:47.129333066",
+  "status" : 404
 }</code></pre>
 </div>
 </div>
@@ -2717,8 +2717,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2749,8 +2749,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Le jeton a expiré",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Le jeton a expiré"
 }</code></pre>
 </div>
 </div>
@@ -2897,8 +2897,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -2929,8 +2929,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Le jeton a expiré",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Le jeton a expiré"
 }</code></pre>
 </div>
 </div>
@@ -3156,8 +3156,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3249,10 +3249,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "timestamp" : "2026-09-18T12:32:05.853028637",
+  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.A@Login.com",
-  "error" : "Not Found"
+  "timestamp" : "2026-09-18T12:44:13.767508768",
+  "status" : 404
 }</code></pre>
 </div>
 </div>
@@ -3298,10 +3298,10 @@ X-Frame-Options: DENY
 Content-Length: 166
 
 {
-  "status" : 409,
-  "timestamp" : "2026-09-18T12:32:04.933010871",
+  "error" : "Conflict",
   "message" : "L'utilisateur est déjà manager: test.manager@test.com",
-  "error" : "Conflict"
+  "timestamp" : "2026-09-18T12:44:12.517462159",
+  "status" : 409
 }</code></pre>
 </div>
 </div>
@@ -3341,10 +3341,10 @@ X-Frame-Options: DENY
 Content-Length: 162
 
 {
-  "status" : 409,
-  "timestamp" : "2026-09-18T12:32:02.836552234",
+  "error" : "Conflict",
   "message" : "L'utilisateur est déjà admin: test.admin@test.com",
-  "error" : "Conflict"
+  "timestamp" : "2026-09-18T12:44:10.345937234",
+  "status" : 409
 }</code></pre>
 </div>
 </div>
@@ -3458,8 +3458,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3551,10 +3551,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "timestamp" : "2026-09-18T12:32:01.651324309",
+  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.A@Login.com",
-  "error" : "Not Found"
+  "timestamp" : "2026-09-18T12:44:09.060419787",
+  "status" : 404
 }</code></pre>
 </div>
 </div>
@@ -3665,8 +3665,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -3758,10 +3758,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "timestamp" : "2026-09-18T12:32:04.388600172",
+  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.a@Login.com",
-  "error" : "Not Found"
+  "timestamp" : "2026-09-18T12:44:11.974581754",
+  "status" : 404
 }</code></pre>
 </div>
 </div>
@@ -3807,10 +3807,10 @@ X-Frame-Options: DENY
 Content-Length: 162
 
 {
-  "status" : 409,
-  "timestamp" : "2026-09-18T12:32:02.978727759",
+  "error" : "Conflict",
   "message" : "L'utilisateur est déjà admin: test.admin@test.com",
-  "error" : "Conflict"
+  "timestamp" : "2026-09-18T12:44:10.553078791",
+  "status" : 409
 }</code></pre>
 </div>
 </div>
@@ -3921,8 +3921,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -4014,10 +4014,10 @@ X-Frame-Options: DENY
 Content-Length: 152
 
 {
-  "status" : 404,
-  "timestamp" : "2026-09-18T12:32:02.551839251",
+  "error" : "Not Found",
   "message" : "Utilisateur non trouvé: Not.A@Login.com",
-  "error" : "Not Found"
+  "timestamp" : "2026-09-18T12:44:10.019728176",
+  "status" : 404
 }</code></pre>
 </div>
 </div>
@@ -4131,8 +4131,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -4174,8 +4174,8 @@ X-Frame-Options: DENY
 Content-Length: 99
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "Utilisateur supprimé avec succès"
+  "message" : "Utilisateur supprimé avec succès",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4249,8 +4249,8 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 67
 
 {
-  "message" : "Jeton JWT invalide",
-  "error" : "INVALID_TOKEN"
+  "error" : "INVALID_TOKEN",
+  "message" : "Jeton JWT invalide"
 }</code></pre>
 </div>
 </div>
@@ -4292,8 +4292,8 @@ X-Frame-Options: DENY
 Content-Length: 99
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "Utilisateur supprimé avec succès"
+  "message" : "Utilisateur supprimé avec succès",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
@@ -4333,8 +4333,8 @@ X-Frame-Options: DENY
 Content-Length: 102
 
 {
-  "deletedUserLogin" : "test.user@test.com",
-  "message" : "Utilisateur supprimé définitivement"
+  "message" : "Utilisateur supprimé définitivement",
+  "deletedUserLogin" : "test.user@test.com"
 }</code></pre>
 </div>
 </div>
