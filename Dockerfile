@@ -1,5 +1,5 @@
 # Base stage
-FROM maven:3.9.9-amazoncorretto-21-alpine AS base
+FROM maven:3.9-amazoncorretto-25-alpine AS base
 WORKDIR /app
 
 # Copy only the POM file first
