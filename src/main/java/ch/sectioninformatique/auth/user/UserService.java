@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.Session;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,6 +70,8 @@ public class UserService {
 
     /** Repository for role data access */
     private final RoleRepository roleRepository;
+
+    private final MessageSource messageSource;
 
     /** Mapper for converting between User entities and DTOs */
     private final UserMapper userMapper;
@@ -486,7 +491,7 @@ public class UserService {
      * @throws RoleNotFoundException if the user role is not found
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto revokeAdminRole(String login) {
+    public ResponseEntity<?> revokeAdminRole(String login) {
         assertNotSelfAdminRoleChange(login);
 
         User user = userRepository.findByLogin(login)
@@ -505,8 +510,11 @@ public class UserService {
 
         user.setMainRole(userRole);
         userRepository.save(user);
-
-        return userMapper.toUserDto(user);
+        return ResponseEntity.ok().body(messageSource.getMessage(
+                "message.user.revoked.admin",
+                null,
+                LocaleContextHolder.getLocale()
+        ));
     }
 
     /**

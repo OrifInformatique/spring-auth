@@ -204,9 +204,10 @@ public class UserController {
 
     /**
      * Revokes the admin role from a user.
+     * 
      * This endpoint:
      * - Requires 'ADMIN' role
-     * - Validates the user exists and isn't already a regular user
+     * - Calls the userService to revoke the admin role from the specified user
      * - Returns success/error message
      *
      * @param login The login (username) of the user to revoke admin role from
@@ -215,34 +216,9 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{login}/revoke-admin")
     public ResponseEntity<?> revokeAdminRole(@PathVariable String login) {
-        userService.revokeAdminRole(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.revoked.admin",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
+        return userService.revokeAdminRole(login);
     }
 
-    /**
-     * Downgrades a admin to a regular manager role.
-     * This endpoint:
-     * - Requires 'ADMIN' role
-     * - Validates the user exists and is currently a admin
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the admin to downgrade
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{login}/downgrade-admin")
-    public ResponseEntity<?> downgradeAdminRole(@PathVariable String login) {
-        userService.downgradeAdminRole(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.downgraded.admin",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-    }
 
     /**
      * Get a user by his login
