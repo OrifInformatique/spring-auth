@@ -1,10 +1,9 @@
 package ch.sectioninformatique.auth;
 
+import org.springframework.restdocs.payload.JsonFieldType;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.snippet.Snippet;
 
 /**
@@ -67,7 +66,8 @@ public final class RestDocsSnippets {
                                 fieldWithPath("firstName").description("Updated first name"),
                                 fieldWithPath("lastName").description("Updated last name"),
                                 fieldWithPath("login").description("Updated email login"),
-                                fieldWithPath("mainRole").description("Updated main role"));
+                                fieldWithPath("mainRole").description("Updated main role"),
+                                fieldWithPath("deleted").description("Indicates whether the user is deleted"));
         }
 
         private static org.springframework.restdocs.payload.FieldDescriptor[] userFields(String prefix,
