@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +18,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ch.sectioninformatique.auth.auth.AuthCodeRepository;
 import ch.sectioninformatique.auth.auth.AuthExceptions;
-import ch.sectioninformatique.auth.auth.AuthService;
 import ch.sectioninformatique.auth.auth.CredentialsDto;
 import ch.sectioninformatique.auth.auth.SignUpDto;
 import ch.sectioninformatique.auth.security.Role;
@@ -72,6 +71,14 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Remove the mock SecurityContext from the thread-local so it does not
+        // leak into later test classes running in the same Surefire JVM/thread
+        // (a mock context makes JwtAuthFilter.setAuthentication() a silent no-op).
+        SecurityContextHolder.clearContext();
     }
 
     /**

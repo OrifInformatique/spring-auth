@@ -35,6 +35,7 @@ import ch.sectioninformatique.auth.security.RoleRepository;
 import ch.sectioninformatique.auth.security.SecurityExceptions.HashAlgorithmUnavailableException;
 import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
 import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
+import ch.sectioninformatique.auth.user.UserExceptions.CannotModifyOwnAdminRoleException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyManagerException;
@@ -456,6 +457,8 @@ public class UserService {
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto downgradeAdminRole(String login) {
+        assertNotSelfAdminRoleChange(login);
+
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new UserNotFoundException(login));
 
@@ -491,22 +494,7 @@ public class UserService {
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseEntity<?> revokeAdminRole(String login) {
-        
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-            
-                UserDto currentUser = (UserDto) authentication.getPrincipal();
-                if (currentUser.getLogin().equals(login)) {
-        
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                        "message",
-                            messageSource.getMessage(
-                                "message.user.downgrade.self",
-                                null,
-                                LocaleContextHolder.getLocale())));
-                    }
-
+        assertNotSelfAdminRoleChange(login);
 
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new UserNotFoundException(login));
@@ -529,6 +517,24 @@ public class UserService {
                 null,
                 LocaleContextHolder.getLocale()
         ));
+    }
+
+    /**
+     * Guards against an admin removing the admin role from their own account.
+     * The check is case-insensitive and covers every code path that strips the
+     * admin role (downgrade to manager, revoke to user).
+     *
+     * @param login The login (username) of the user targeted by the role change
+     * @throws CannotModifyOwnAdminRoleException if {@code login} identifies the authenticated user
+     */
+    private void assertNotSelfAdminRoleChange(String login) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDto principal)) {
+            return;
+        }
+        if (login != null && login.equalsIgnoreCase(principal.getLogin())) {
+            throw new CannotModifyOwnAdminRoleException(login);
+        }
     }
 
     /**

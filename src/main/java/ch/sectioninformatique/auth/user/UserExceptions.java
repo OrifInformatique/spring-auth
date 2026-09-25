@@ -130,4 +130,23 @@ public class UserExceptions {
         }
     }
 
+    /**
+     * Thrown when an admin attempts to remove the admin role from their own account.
+     */
+    public static class CannotModifyOwnAdminRoleException extends LoginBasedException {
+        public CannotModifyOwnAdminRoleException(String login) {
+            super(HttpStatus.BAD_REQUEST, login);
+        }
+
+        @Override
+        public String getMessageKey() {
+            return "error.user.cannot.modify.own.admin.role";
+        }
+
+        @Override
+        public Object[] getMessageArgs() {
+            return super.getMessageArgs();
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
+
 
 
 /**
@@ -38,6 +42,7 @@ public class UserController {
     /** Service for handling user-related operations */
     private final UserService userService;
     private final MessageSource messageSource;
+
 
     /**
      * Constructs a new UserController with the required service.
@@ -215,6 +220,28 @@ public class UserController {
 
 
     /**
+     * Get a user by his login
+     * 
+     * @param login the user's login
+     * @return a UserDto of the user
+     */
+    @PreAuthorize("hasAuthority('user:read')")
+    @GetMapping("/{login:.+@.+}")
+    public ResponseEntity<?> getUserByLogin(@PathVariable String login){
+        try{
+            UserDto user = userService.findByLogin(login);
+            return ResponseEntity.ok(user);
+        } catch(UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageSource.getMessage(
+                "error.user.not.found",
+                null,
+                LocaleContextHolder.getLocale()
+            ));
+        }
+    }
+    
+
+    /**
      * Method to soft or hard delete users.
      * This endpoint:
      * - Requires the 'user:delete' authority
@@ -226,7 +253,7 @@ public class UserController {
      * @return ResponseEntity with success message or error details
      */
     @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping("/{login}/{hardDelete}")
+    @DeleteMapping({"/{login}","/{login}/{hardDelete}"})
     public ResponseEntity<?> delete(@PathVariable String login, @PathVariable(required = false) Boolean hardDelete) {
         String resultMessage = "";
 
