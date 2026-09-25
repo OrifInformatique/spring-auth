@@ -204,9 +204,10 @@ public class UserController {
 
     /**
      * Revokes the admin role from a user.
+     * 
      * This endpoint:
      * - Requires 'ADMIN' role
-     * - Validates the user exists and isn't already a regular user
+     * - Calls the userService to revoke the admin role from the specified user
      * - Returns success/error message
      *
      * @param login The login (username) of the user to revoke admin role from
