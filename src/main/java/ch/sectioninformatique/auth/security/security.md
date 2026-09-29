@@ -15,7 +15,7 @@ SECURITY Documentation of Spring-Auth
   * [doFilterInternal()](#dofilterinternal)
   * [JWT errors](#jwt-errors)
   * [Unexpected errors](#unexpected-errors)
-  * [Internationalization](#internationalization)
+  * [Internationalization](#internationalization-1)
   * [Security context](#security-context)
 
 * [PermissionEnum.java](#permissionenumjava)
@@ -59,7 +59,7 @@ SECURITY Documentation of Spring-Auth
 * [UserAuthenticationEntryPoint.java](#userauthenticationentrypointjava)
 
   * [commence()](#commence)
-  * [Internationalization](#internationalization)
+  * [Internationalization](#internationalization-2)
   * [Error response](#error-response)
 
 * [UserAuthenticationProvider.java](#userauthenticationproviderjava)
