@@ -1,5 +1,6 @@
 package ch.sectioninformatique.auth.security;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,18 +10,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.RestClientAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.cors.CorsConfiguration;
 
 import lombok.RequiredArgsConstructor;
@@ -176,6 +185,7 @@ public class SecurityConfig {
 
                                 response.sendRedirect("/oauth2/error");
                             })
+                            .tokenEndpoint(token -> token.accessTokenResponseClient(accessTokenResponseClient()))
                             .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService()))
                             .successHandler((request, response, authentication) -> {
                                 if (isDevelopmentOrTest()) {
@@ -207,6 +217,42 @@ public class SecurityConfig {
         corsConfig.setAllowedHeaders(Arrays.asList(allowedHeaders));
         corsConfig.setAllowCredentials(true);
         return corsConfig;
+    }
+
+    /**
+     * Configures the client used to exchange the Azure authorization code for tokens.
+     *
+     * The default client reuses pooled HTTPS connections to the token endpoint. When a
+     * pooled connection sits idle for a few minutes, it can be silently dropped on the
+     * network path (Docker NAT, firewall, Azure idle timeout), so the next login hangs
+     * on the dead connection and fails with an I/O error, while an immediate retry works.
+     *
+     * This client uses HttpURLConnection, whose idle keep-alive connections expire after
+     * a few seconds, so a stale connection is never reused. Explicit timeouts make a
+     * network failure surface quickly. Message converters and error handler are the
+     * same as Spring Security's defaults.
+     *
+     * @return the OAuth2AccessTokenResponseClient used for the authorization code grant
+     */
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
+
+        RestClient restClient = RestClient.builder()
+                .requestFactory(requestFactory)
+                .messageConverters(converters -> {
+                    converters.clear();
+                    converters.add(new FormHttpMessageConverter());
+                    converters.add(new OAuth2AccessTokenResponseHttpMessageConverter());
+                })
+                .defaultStatusHandler(new OAuth2ErrorResponseErrorHandler())
+                .build();
+
+        RestClientAuthorizationCodeTokenResponseClient client = new RestClientAuthorizationCodeTokenResponseClient();
+        client.setRestClient(restClient);
+        return client;
     }
 
     /**
