@@ -60,7 +60,7 @@ public class User implements UserDetails {
     /**
      * User's last name.
      */
-    @Column(nullable = false, name = "last_name")
+    @Column(nullable = true, name = "last_name")
     private String lastName;
 
     /**

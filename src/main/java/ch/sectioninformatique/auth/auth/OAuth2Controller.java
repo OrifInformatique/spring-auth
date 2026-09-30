@@ -185,6 +185,11 @@ public class OAuth2Controller {
             return;
         }
 
+        // Fallback to 'name' if 'given_name' is not available
+        if (Objects.isNull(givenName)) {
+            givenName = principal.getAttribute("name");
+        }
+
         UserDto userDto = UserDto.builder()
                 .login(email)
                 .firstName(givenName)
