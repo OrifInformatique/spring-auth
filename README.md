@@ -40,12 +40,12 @@ This project provides an authentication API to be used by other applications to 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-The Spring Boot version currently used in this project is 3.5.8.
+The Spring Boot version currently used in this project is 4.0.
 
 The project's environment must contain these tools. Make sure that your Windows or WSL environment variables contain the path to Java.
 
-- [Java / openJDK 21](https://adoptium.net/fr/temurin/releases/)
-- [Maven 3.9](https://maven.apache.org/docs/history.html)
+- [Java / openJDK 25](https://adoptium.net/fr/temurin/releases/)
+- [Maven 3.9](https://maven.apache.org/docs/history.html) (or the provided Maven wrapper `./mvnw`)
 - [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
 
 #### Docker (optional)
@@ -116,8 +116,8 @@ You're now using the container's terminal.
 
 ## Maven package
 
-### Package the project in a .jpa archive
-As the tests are meant to run in a Docker environment, we have to skip them when creating a .jpa archive.
+### Package the project in a .jar archive
+The tests need the MariaDB test database, so they are usually skipped when creating a .jar archive outside Docker.
 
 Use this command :
 
@@ -175,16 +175,33 @@ Check if the project's structure is valid
 </p>
 
 
+## API overview
+
+| Endpoint | Description |
+| -------- | ----------- |
+| `POST /auth/login` | Log in with login and password |
+| `POST /auth/refresh` | Get a new access token with the refresh token cookie |
+| `POST /auth/logout` | Revoke the refresh token |
+| `GET /oauth2/login/azure` | Start a Microsoft login |
+| `POST /oauth2/token` | Exchange the code received after a Microsoft login for tokens |
+| `GET /users/me`, `PUT /users/me/password` | Current user, change own password |
+| `GET /users`, `GET /users/{login}` | List and read users |
+| `POST /users`, `PUT /users/{login}` | Create and update users |
+| `PUT /users/{login}/role` | Change the role of a user |
+| `DELETE /users/{login}`, `POST /users/{login}/restore` | Delete (soft by default) and restore users |
+
 ## API documentation
 
 HTTP documentation is generated automatically from integration tests (Spring REST Docs) and published as [docs/index.html](docs/index.html). JWT and refresh-token values are replaced by placeholders in snippets before HTML is built (`RestDocsSensitiveDataMasking`). For the full pipeline, see [docs/api-documentation-generation.md](docs/api-documentation-generation.md).
 
-Quick start:
+Quick start (MariaDB test database reachable through `TEST_SPRING_DATASOURCE_URL`):
 
 ```bash
-scripts/java-env.sh mvn -Dspring.profiles.active=test verify
-scripts/java-env.sh mvn clean package
+./mvnw verify
+cp target/generated-snippets-html/index.html docs/index.html
 ```
+
+The build fails if the documentation no longer matches the API (undocumented endpoint, field or parameter, or reference to an example that no test produces).
 
 GitHub Pages: [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
 
