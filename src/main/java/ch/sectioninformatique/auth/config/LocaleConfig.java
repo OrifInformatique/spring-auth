@@ -7,13 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,12 +24,17 @@ import java.util.regex.Pattern;
  * Internationalization and localization configuration.
  *
  * This configuration provides a message source with automatic bundle discovery
- * under messages, a default French locale with locale switching through the
- * lang request parameter, and validation message resolution through the same
- * message source.
+ * under messages, a stateless locale resolution (lang request parameter, then
+ * Accept-Language header, then French by default), and validation message
+ * resolution through the same message source.
  */
 @Configuration
-public class LocaleConfig implements WebMvcConfigurer {
+public class LocaleConfig {
+
+    /** Locales for which message bundles exist. Any other requested locale falls back to the default. */
+    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.FRENCH, Locale.ENGLISH);
+    private static final Locale DEFAULT_LOCALE = Locale.FRANCE;
+    private static final String LANG_PARAMETER = "lang";
 
     // Constants for message resource discovery and basename resolution
     private static final String MESSAGE_RESOURCES_PATTERN = "classpath*:messages/**/*.properties";
@@ -54,6 +60,11 @@ public class LocaleConfig implements WebMvcConfigurer {
         messageSource.setBasenames(resolveMessageBasenames());
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(3600);
+        // Bundles only exist for supported locales: never depend on the server's system locale
+        messageSource.setFallbackToSystemLocale(false);
+        // Apply MessageFormat to every message, so that the escaped apostrophes ('')
+        // of the bundles are rendered the same way with or without arguments
+        messageSource.setAlwaysUseMessageFormat(true);
         return messageSource;
     }
 
@@ -118,18 +129,16 @@ public class LocaleConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Defines the default locale used for message resolution.
+     * Resolves the locale of each request without using the HTTP session, as the API is stateless.
      *
-     * Clients can override it per request with the lang query parameter,
-     * for example /api/some-endpoint?lang=en.
+     * Resolution order: the lang query parameter (e.g. /users/me?lang=en), then the
+     * Accept-Language header, then French. Only supported locales are accepted.
      *
-     * @return locale resolver configured with French as default locale
+     * @return the request locale resolver
      */
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.FRANCE);
-        return localeResolver;
+        return new LangParameterLocaleResolver();
     }
 
     /**
@@ -146,25 +155,26 @@ public class LocaleConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Creates an interceptor that switches locale based on the lang request
-     * parameter.
-     *
-     * @return locale change interceptor using the lang parameter
+     * Accept-Language resolver that lets the lang query parameter take precedence.
      */
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        interceptor.setParamName("lang");
-        return interceptor;
-    }
+    static class LangParameterLocaleResolver extends AcceptHeaderLocaleResolver {
 
-    /**
-     * Registers MVC interceptors related to localization.
-     *
-     * @param registry interceptor registry
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(localeChangeInterceptor());
+        LangParameterLocaleResolver() {
+            setSupportedLocales(SUPPORTED_LOCALES);
+            setDefaultLocale(DEFAULT_LOCALE);
+        }
+
+        @Override
+        public Locale resolveLocale(HttpServletRequest request) {
+            String lang = request.getParameter(LANG_PARAMETER);
+            if (StringUtils.hasText(lang)) {
+                Locale requested = StringUtils.parseLocale(lang);
+                if (requested != null && SUPPORTED_LOCALES.stream()
+                        .anyMatch(supported -> supported.getLanguage().equals(requested.getLanguage()))) {
+                    return requested;
+                }
+            }
+            return super.resolveLocale(request);
+        }
     }
 }

@@ -1,16 +1,17 @@
 package ch.sectioninformatique.auth.security;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-
-import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Validates CORS configuration at application startup.
@@ -22,34 +23,26 @@ import java.util.Set;
  * - Only necessary headers are allowed
  * - Environment-specific restrictions are enforced
  * 
- * Throws an application exception if configuration is invalid.
+ * Throws an application exception if configuration is invalid, which stops the startup.
  */
-@Configuration
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class CorsConfigurationValidator {
 
     private final Environment environment;
-
-    @Value("${cors.allowed-origins}")
-    private String[] allowedOrigins;
-
-    @Value("${cors.allowed-methods}")
-    private String[] allowedMethods;
-
-    @Value("${cors.allowed-headers}")
-    private String[] allowedHeaders;
+    private final CorsProperties corsProperties;
 
     /**
      * List of allowed HTTP methods for CORS
      */
-    private static final Set<String> ALLOWED_HTTP_METHODS = new HashSet<>(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
-    ));
+    private static final Set<String> ALLOWED_HTTP_METHODS = Set.of(
+            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD");
 
     /**
      * List of allowed headers for CORS (whitelist of common, safe headers)
      */
-    private static final Set<String> ALLOWED_HEADER_NAMES = new HashSet<>(Arrays.asList(
+    private static final Set<String> ALLOWED_HEADER_NAMES = Set.of(
             "Authorization",
             "Content-Type",
             "Accept",
@@ -61,12 +54,7 @@ public class CorsConfigurationValidator {
             "If-Unmodified-Since",
             "X-Requested-With",
             "X-CSRF-Token",
-            "X-API-Key"
-    ));
-
-    public CorsConfigurationValidator(Environment environment) {
-        this.environment = environment;
-    }
+            "X-API-Key");
 
     /**
      * Validates CORS configuration at application startup.
@@ -78,15 +66,15 @@ public class CorsConfigurationValidator {
     public void validateCorsConfiguration() {
         log.info("Validating CORS configuration...");
 
-        boolean isDevOrTest = isDevelopmentOrTest();
+        boolean isDevOrTest = environment.matchesProfiles("dev", "test");
 
         try {
             validateOrigins(isDevOrTest);
             validateMethods();
             validateHeaders();
-            log.info("✓ CORS configuration is valid and secure");
+            log.info("CORS configuration is valid");
         } catch (SecurityExceptions.CorsConfigurationException e) {
-            log.error("✗ CORS configuration validation failed: {}", e.getMessageKey());
+            log.error("CORS configuration validation failed: {}", e.getMessageKey());
             throw e;
         }
     }
@@ -101,10 +89,11 @@ public class CorsConfigurationValidator {
      * - Origins must not contain duplicate entries
      * 
      * @param isDevOrTest true if running in dev or test profile
-     * @throws IllegalArgumentException if origins are invalid
+     * @throws SecurityExceptions.CorsConfigurationException if origins are invalid
      */
     private void validateOrigins(boolean isDevOrTest) {
-        if (allowedOrigins == null || allowedOrigins.length == 0) {
+        List<String> allowedOrigins = corsProperties.allowedOrigins();
+        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             throw new SecurityExceptions.CorsConfigurationException(
                     "error.cors.allowed.origins.empty");
         }
@@ -120,7 +109,7 @@ public class CorsConfigurationValidator {
                     throw new SecurityExceptions.CorsConfigurationException(
                             "error.cors.origin.wildcard.production");
                 }
-                log.warn("⚠ Wildcard CORS origin '*' configured (allowed only in dev/test)");
+                log.warn("Wildcard CORS origin '*' configured (allowed only in dev/test)");
                 uniqueOrigins.add(origin);
                 continue;
             }
@@ -160,7 +149,7 @@ public class CorsConfigurationValidator {
                         origin);
             }
 
-            log.debug("✓ Origin validated: {}", origin);
+            log.debug("Origin validated: {}", origin);
         }
     }
 
@@ -173,10 +162,11 @@ public class CorsConfigurationValidator {
      * - No dangerous methods like TRACE, CONNECT
      * - No duplicate methods
      * 
-     * @throws IllegalArgumentException if methods are invalid
+     * @throws SecurityExceptions.CorsConfigurationException if methods are invalid
      */
     private void validateMethods() {
-        if (allowedMethods == null || allowedMethods.length == 0) {
+        List<String> allowedMethods = corsProperties.allowedMethods();
+        if (allowedMethods == null || allowedMethods.isEmpty()) {
             throw new SecurityExceptions.CorsConfigurationException(
                     "error.cors.allowed.methods.empty");
         }
@@ -201,7 +191,7 @@ public class CorsConfigurationValidator {
                         method);
             }
 
-            log.debug("✓ Method validated: {}", method);
+            log.debug("Method validated: {}", method);
         }
     }
 
@@ -216,10 +206,11 @@ public class CorsConfigurationValidator {
      * 
      * Note: Custom application headers (e.g., X-API-Key) can be added to the whitelist
      * 
-     * @throws IllegalArgumentException if headers are invalid
+     * @throws SecurityExceptions.CorsConfigurationException if headers are invalid
      */
     private void validateHeaders() {
-        if (allowedHeaders == null || allowedHeaders.length == 0) {
+        List<String> allowedHeaders = corsProperties.allowedHeaders();
+        if (allowedHeaders == null || allowedHeaders.isEmpty()) {
             throw new SecurityExceptions.CorsConfigurationException(
                     "error.cors.allowed.headers.empty");
         }
@@ -253,21 +244,5 @@ public class CorsConfigurationValidator {
 
             log.debug("Header validated: {}", header);
         }
-    }
-
-    /**
-     * Checks if the application is running in development or test mode.
-     * Validation is more permissive in these modes.
-     *
-     * @return true if running in dev or test profile, false if in production
-     */
-    private boolean isDevelopmentOrTest() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        for (String profile : activeProfiles) {
-            if (profile.equalsIgnoreCase("dev") || profile.equalsIgnoreCase("test")) {
-                return true;
-            }
-        }
-        return false;
     }
 }

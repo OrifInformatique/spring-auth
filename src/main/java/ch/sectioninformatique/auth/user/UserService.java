@@ -1,740 +1,288 @@
 package ch.sectioninformatique.auth.user;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Base64;
+import java.nio.CharBuffer;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
-import org.hibernate.Session;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidCredentialsException;
-import ch.sectioninformatique.auth.auth.AuthExceptions.InvalidRefreshTokenException;
-import ch.sectioninformatique.auth.auth.CredentialsDto;
-import ch.sectioninformatique.auth.auth.PasswordUpdateDto;
-import ch.sectioninformatique.auth.auth.RefreshToken;
-import ch.sectioninformatique.auth.auth.RefreshTokenRepository;
-import ch.sectioninformatique.auth.auth.SignUpDto;
-import ch.sectioninformatique.auth.security.Role;
-import ch.sectioninformatique.auth.security.RoleEnum;
-import ch.sectioninformatique.auth.security.RoleRepository;
-import ch.sectioninformatique.auth.security.SecurityExceptions.HashAlgorithmUnavailableException;
-import ch.sectioninformatique.auth.security.SecurityExceptions.RoleNotFoundException;
-import ch.sectioninformatique.auth.security.SecurityExceptions.UserHasLowerRightsException;
-import ch.sectioninformatique.auth.user.UserExceptions.CannotModifyOwnAdminRoleException;
-import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyAdminException;
+import ch.sectioninformatique.auth.role.Role;
+import ch.sectioninformatique.auth.role.RoleEnum;
+import ch.sectioninformatique.auth.role.RoleRepository;
+import ch.sectioninformatique.auth.security.SecurityExceptions.InsufficientRightsException;
+import ch.sectioninformatique.auth.user.UserExceptions.DeletedAccountException;
+import ch.sectioninformatique.auth.user.UserExceptions.InvalidCurrentPasswordException;
+import ch.sectioninformatique.auth.user.UserExceptions.RoleNotFoundException;
+import ch.sectioninformatique.auth.user.UserExceptions.SelfModificationForbiddenException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
-import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyManagerException;
-import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyRegularException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyHasRoleException;
 import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import ch.sectioninformatique.auth.user.dto.CreateUserDto;
+import ch.sectioninformatique.auth.user.dto.PasswordUpdateDto;
+import ch.sectioninformatique.auth.user.dto.UpdateUserDto;
+import ch.sectioninformatique.auth.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Service class for managing user-related operations.
- * This class provides functionality for:
- * - User authentication and registration
- * - User role management (promotion, revocation)
- * - User deletion
- * - Azure user integration
- * - User search and retrieval
+ * User management use cases.
+ *
+ * Endpoint-level permissions (user:read, user:update...) are checked by the controller.
+ * This service enforces the rules that depend on the data:
+ * - only an admin may act on an admin account or grant the admin role;
+ * - nobody may change their own role or delete their own account, so that the
+ *   application cannot be left without administrator by mistake.
+ *
+ * The acting user's role is always read from the database rather than from the access
+ * token, so that a role change takes effect immediately.
  */
-@RequiredArgsConstructor
-@Service
 @Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
-    /** EntityManager for database operations - injected via @PersistenceContext */
-    @PersistenceContext
-    private EntityManager entityManager;
+    private static final Sort BY_ID = Sort.by("id");
 
-    /** Repository for user data access */
     private final UserRepository userRepository;
-
-    /** Encoder for password hashing */
-    private final PasswordEncoder passwordEncoder;
-
-    /** Repository for role data access */
     private final RoleRepository roleRepository;
-
-    private final MessageSource messageSource;
-
-    /** Mapper for converting between User entities and DTOs */
+    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
-    private final RefreshTokenRepository refreshTokenRepository;
-
-
     /**
-     * Authenticates a user with their credentials.
-     *
-     * @param credentialsDto The user's login credentials
-     * @return UserDto containing the authenticated user's information
-     * @throws InvalidCredentialsException if the user is not found or the password is invalid (intentionally vague to prevent identification of user mail in use)
-     */
-    public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByLogin(credentialsDto.login())
-                .orElseThrow(() -> new InvalidCredentialsException());
-
-        if (!passwordEncoder.matches(new String(credentialsDto.password()), user.getPassword())) {
-            throw new InvalidCredentialsException();
-        }
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Stores a refresh token for a user, optionally rotating the previous token.
-     * 
-     * The token is hashed before being saved in the database. Previous tokens
-     * are removed to enforce token rotation.
-     *
-     * @param userLogin    The login/username of the user.
-     * @param refreshToken The raw refresh token to store.
-     * @param expiresAt    The expiration timestamp of the refresh token.
-     */
-    @Transactional
-    public void storeRefreshToken(String userLogin, String refreshToken, Instant expiresAt) {
-        String hashed = hash(refreshToken);
-
-        // remove previous token if rotation enabled
-        refreshTokenRepository.deleteByUserLogin(userLogin);
-        refreshTokenRepository.flush(); // ensure delete is executed before insert
-
-        RefreshToken token = new RefreshToken();
-        token.setUserLogin(userLogin);
-        token.setTokenHash(hashed);
-        token.setExpiresAt(expiresAt);
-
-        refreshTokenRepository.save(token);
-    }
-
-    /**
-     * Validates a refresh token and throws if it is invalid or expired.
-     *
-     * @param userLogin    The login/username of the user.
-     * @param refreshToken The raw refresh token to validate.
-     * @throws InvalidRefreshTokenException if the token is invalid or expired
-     */
-    public void assertValidRefreshToken(String userLogin, String refreshToken) {
-        String hashedRefreshToken = hash(refreshToken);
-        boolean valid = refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
-                .filter(stored -> hashedRefreshToken.equals(stored.getTokenHash()))
-                .filter(stored -> stored.getExpiresAt().isAfter(Instant.now()))
-                .isPresent();
-
-        if (!valid) {
-            throw new InvalidRefreshTokenException();
-        }
-    }
-
-    /**
-     * Revokes a refresh token for a given user.
-     * 
-     * Once revoked, the token cannot be used to obtain new access tokens.
-     *
-     * @param userLogin The login/username of the user whose token should be
-     *                  revoked.
-     */
-    public void revokeRefreshToken(String userLogin) {
-        refreshTokenRepository.findByUserLoginAndRevokedFalse(userLogin)
-                .ifPresent(token -> {
-                    token.setRevoked(true);
-                    refreshTokenRepository.save(token);
-                });
-    }
-
-    /**
-     * Hashes a string using SHA-256 before storing it in the database.
-     * This provides an extra layer of security by ensuring that even if the
-     * database is compromised, the raw string cannot be retrieved.
-     * 
-     * Storing hashed string prevents the raw string from being exposed in case
-     * of a database compromise.
-     *
-     * @param stringToHash The raw string to hash.
-     * @return The Base64-encoded SHA-256 hash of the string.
-     */
-    public String hash(String stringToHash) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(stringToHash.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new HashAlgorithmUnavailableException();
-        }
-    }
-
-    /**
-     * Registers a new user in the system.
-     * This method:
-     * - Checks if the login is already taken
-     * - Encodes the password
-     * - Assigns the default USER role
-     * - Saves the user to the database
-     *
-     * @param userDto The user registration data
-     * @return UserDto containing the created user's information
-     * @throws UserAlreadyExistsException if the login already exists 
-     * @throws RoleNotFoundException if the role isn't found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto register(SignUpDto userDto) {
-        Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
-                
-       optionalUser.ifPresent(user -> {
-            throw new UserAlreadyExistsException(user.getLogin());
-        });
-
-        // IMPORTANT: Encode the password BEFORE mapping, because the mapper's @AfterMapping
-        // clears the password array for security reasons
-        String encodedPassword = passwordEncoder.encode(new String(userDto.password()));
-        
-        User user = userMapper.signUpToUser(userDto);
-        user.setPassword(encodedPassword);
-
-        // Add default USER role
-        Role userRole = roleRepository.findByName(RoleEnum.valueOf(userDto.mainRole()))
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
-
-        user.setMainRole(userRole);
-
-        User savedUser = userRepository.save(user);
-        return userMapper.toUserDto(savedUser);
-    }
-
-    /**
-     * Update the User Password
-     * 
-     * @param login       The user email
-     * @param newPassword A password Dto who contain bothe the old password for verification and the new for update
-     * @throws InvalidCredentialsException if the user is not found or the old password is invalid
-     */
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void updatePassword(String login, PasswordUpdateDto passwords) {
-
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new InvalidCredentialsException());
-
-        if (!passwordEncoder.matches(new String(passwords.oldPassword()), user.getPassword())) {
-            throw new InvalidCredentialsException();
-        }
-
-        String encodedPassword = passwordEncoder.encode(new String(passwords.newPassword()));
-        user.setPassword(encodedPassword);
-    }
-
-    /**
-     * Finds a user by their login.
-     * This method includes detailed logging for debugging purposes.
-     *
-     * @param login The user's login
-     * @return UserDto containing the user's information
-     * @throws UserNotFoundException if the user is not found
+     * @param login user's login
+     * @return the active user with this login
+     * @throws UserNotFoundException if there is no active user with this login
      */
     public UserDto findByLogin(String login) {
-        log.debug("Searching for user with login: {}", login);
-
-        Optional<User> userOptional = userRepository.findByLoginAndDeletedFalse(login);
-        log.debug("User found in database: {}", userOptional.isPresent());
-
-        User user = userOptional
-                .orElseThrow(() -> {
-                    log.error("User not found with login: {}", login);
-                    return new UserNotFoundException(login);
-                });
-
-        log.debug("User details - ID: {}, FirstName: {}, LastName: {}, Roles: {}",
-                user.getId(), user.getFirstName(), user.getLastName(),
-                user.getMainRole());
-
-        UserDto userDto = userMapper.toUserDto(user);
-        log.debug("Mapped to UserDto - ID: {}, FirstName: {}, LastName: {}, Role: {}",
-                userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getMainRole());
-
-        return userDto;
+        return userMapper.toUserDto(getActiveUser(login));
     }
 
     /**
-     * Finds a user by it's id.
-     * 
-     * @param userId The id of the user
-     * @return a UserDto
-     * @throws UserNotFoundException if the user is not found
+     * @param status which users to return
+     * @return the matching users, ordered by id
      */
-
-    public UserDto findById(Long id){
-        Optional<User> optionalUser = userRepository.findById(id);
-
-        User user = optionalUser
-            .orElseThrow(() -> {return new UserNotFoundException(id.toString());});
-
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Retrieves all users who are not soft-deleted in the system.
-     *
-     * @return List of all User entities, excluding soft-deleted
-     */
-    public List<UserDto> allUsers() {
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("deletedFilter").setParameter("isDeleted", false);
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
+    public List<UserDto> findAll(UserStatus status) {
+        List<User> users = switch (status) {
+            case ACTIVE -> userRepository.findAllByDeleted(false, BY_ID);
+            case DELETED -> userRepository.findAllByDeleted(true, BY_ID);
+            case ALL -> userRepository.findAll(BY_ID);
+        };
         return users.stream().map(userMapper::toUserDto).toList();
     }
 
     /**
-     * Retrieves all users including soft-deleted ones.
+     * Creates a user. Granting the admin role requires the actor to be an admin.
      *
-     * @return List of all User entities including soft-deleted
+     * @param request    creation request; its password array is wiped once hashed
+     * @param actorLogin login of the authenticated user
+     * @return the created user
+     * @throws UserAlreadyExistsException  if the login is already used, even by a soft-deleted user
+     * @throws InsufficientRightsException if a non-admin tries to create an admin
      */
-    public List<UserDto> allWithDeletedUsers() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAllWithDeleted().forEach(users::add);
-        return users.stream().map(userMapper::toUserDto).toList();
-    }
-
-    /**
-     * Retrieves only soft-deleted users.
-     *
-     * @return List of soft-deleted User entities
-     */
-    public List<UserDto> deletedUsers() {
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("deletedFilter").setParameter("isDeleted", true);
-        List<User> users = new ArrayList<>();
-        userRepository.findAllDeleted().forEach(users::add);
-        return users.stream().map(userMapper::toUserDto).toList();
-    }
-
-    /**
-     * Restore a soft deleted user
-     * 
-     * @param login The login (username) of the user to restore
-     * @return UserDto containing the restored user's information
-     * @throws UserNotFoundException if the user is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto restoreDeletedUser(String login) {
-        User user = userRepository.findByLoginDeleted(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-        user.setDeleted(false);
-        userRepository.save(user);
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Promotes a user to the manager role.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already an manager or admin
-     * - Removes existing roles and assigns the manager role
-     *
-     * @param login The login (username) of the user to promote
-     * @return UserDto containing the updated user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserAlreadyManagerException if the user is alreydy a manager
-     * @throws UserAlreadyAdminException if the user is alreydy an admin
-     * @throws RoleNotFoundException if the role is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto promoteToManager(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new UserAlreadyManagerException(user.getLogin());
-        }
-
-        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new UserAlreadyAdminException(user.getLogin());
-        }
-
-        Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.MANAGER));
-
-        user.setMainRole(managerRole);
-        userRepository.save(user);
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Revokes the manager role from a user.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already a regular user or admin
-     * - Removes existing roles and assigns the user role
-     *
-     * @param login The login (username) of the user to revoke the manager role from
-     * @return UserDto containing the updated user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserAlreadyRegularException if the user is already a regular user
-     * @throws UserAlreadyAdminException if the user is an admin
-     * @throws RoleNotFoundException if the user role is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto revokeManagerRole(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new UserAlreadyRegularException(user.getLogin());
-        }
-
-        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new UserAlreadyAdminException(user.getLogin());
-        }
-
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
-
-        user.setMainRole(userRole);
-        userRepository.save(user);
-
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Promotes a user to the admin role.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already an admin
-     * - Removes existing roles and assigns the admin role
-     *
-     * @param login The login (username) of the user to promote
-     * @return UserDto containing the updated user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserAlreadyAdminException if the user is already an admin
-     * @throws RoleNotFoundException if the admin role is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto promoteToAdmin(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        if (user.getMainRole().getName().equals(RoleEnum.ADMIN)) {
-            throw new UserAlreadyAdminException(user.getLogin());
-        }
-
-        Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.ADMIN));
-
-        user.setMainRole(adminRole);
-        userRepository.save(user);
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Downgrades an admin to a manager role.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already a manager or has lower rights
-     * - Removes existing roles and assigns the manager role
-     *
-     * @param login The login (username) of the user to downgrade
-     * @return UserDto containing the updated user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserHasLowerRightsException if the user has lower rights than admin
-     * @throws UserAlreadyManagerException if the user is already a manager
-     * @throws RoleNotFoundException if the manager role is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto downgradeAdminRole(String login) {
-        assertNotSelfAdminRoleChange(login);
-
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new UserHasLowerRightsException(user.getLogin());
-        }
-        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new UserAlreadyManagerException(user.getLogin());
-        }
-
-        Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.MANAGER));
-
-        user.setMainRole(managerRole);
-        userRepository.save(user);
-
-        return userMapper.toUserDto(user);
-    }
-
-    /**
-     * Revokes the admin role from a user.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the user is already a regular user or manager
-     * - Removes existing roles and assigns the user role
-     *
-     * @param login The login (username) of the user to revoke the admin role from
-     * @return UserDto containing the updated user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserAlreadyRegularException if the user is already a regular user
-     * @throws UserAlreadyManagerException if the user is a manager
-     * @throws RoleNotFoundException if the user role is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public ResponseEntity<?> revokeAdminRole(String login) {
-        assertNotSelfAdminRoleChange(login);
-
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        if (user.getMainRole().getName().equals(RoleEnum.USER)) {
-            throw new UserAlreadyRegularException(user.getLogin());
-        }
-
-        if (user.getMainRole().getName().equals(RoleEnum.MANAGER)) {
-            throw new UserAlreadyManagerException(user.getLogin());
-        }
-
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
-
-        user.setMainRole(userRole);
-        userRepository.save(user);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.revoked.admin",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-    }
-
-    /**
-     * Guards against an admin removing the admin role from their own account.
-     * The check is case-insensitive and covers every code path that strips the
-     * admin role (downgrade to manager, revoke to user).
-     *
-     * @param login The login (username) of the user targeted by the role change
-     * @throws CannotModifyOwnAdminRoleException if {@code login} identifies the authenticated user
-     */
-    private void assertNotSelfAdminRoleChange(String login) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDto principal)) {
-            return;
-        }
-        if (login != null && login.equalsIgnoreCase(principal.getLogin())) {
-            throw new CannotModifyOwnAdminRoleException(login);
-        }
-    }
-
-    /**
-     * Checks if an actor can perform an action on a target based on their roles.
-     * The hierarchy is:
-     * - ADMIN can perform actions on all roles
-     * - MANGER can perform actions on USER and MANAGER roles
-     * - USER cannot perform actions on any role
-     *
-     * @param actorRole  The role of the actor performing the action
-     * @param targetRole The role of the target of the action
-     * @return true if the actor can perform the action, false otherwise
-     */
-    private boolean canPerformAction(RoleEnum actorRole, RoleEnum targetRole) {
-        switch (actorRole) {
-            case ADMIN:
-                return true;
-            case MANAGER:
-                if (targetRole == RoleEnum.ADMIN) {
-                    return false;
-                }
-                return true;
-            case USER:
-                return false;
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Soft-deletes a user from the system.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the authenticated user has sufficient permissions
-     * - Soft-deletes the user
-     *
-     * @param login The login (username) of the user to delete
-     * @param hardDelete If true, the user will be permanently deleted instead of soft-deleted
-     * @return UserDto containing the deleted user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserHasLowerRightsException if the authenticated user lacks permissions
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deleteUser(String login, boolean hardDelete) {
-        // Get the user to delete
-        User userToDelete = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        // Get the authenticated user (the actor)
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
-
-        // Get the full user entity for the authenticated user
-        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
-                .orElseThrow(() -> new UserNotFoundException(authenticatedUser.getLogin()));
-
-        // Check if the action is authorized
-        if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
-            throw new UserHasLowerRightsException(authenticatedUserEntity.getLogin());
-        }
-
-        // Delete the user
-        if(hardDelete){
-            userRepository.deletePermanentByLogin(userToDelete.getLogin());
-        }
-        else{
-            userRepository.delete(userToDelete);
-        }
-        return userMapper.toUserDto(userToDelete);
-    }
-
-    /**
-     * Permanently deletes a user from the system.
-     * This operation:
-     * - Verifies the user exists
-     * - Checks if the authenticated user has sufficient permissions
-     * - Permanently deletes the user
-     *
-     * @param login The login (username) of the user to permanently delete
-     * @return UserDto containing the deleted user's information
-     * @throws UserNotFoundException if the user is not found
-     * @throws UserHasLowerRightsException if the authenticated user lacks permissions
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto deletePermanentUser(String login) {
-        // Get the user to delete
-        User userToDelete = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        // Get the authenticated user (the actor)
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDto authenticatedUser = (UserDto) authentication.getPrincipal();
-
-        // Get the full user entity for the authenticated user
-        User authenticatedUserEntity = userRepository.findByLogin(authenticatedUser.getLogin())
-                .orElseThrow(() -> new UserNotFoundException(authenticatedUser.getLogin()));
-
-        // Check if the action is authorized
-        if (!canPerformAction(authenticatedUserEntity.getMainRole().getName(), userToDelete.getMainRole().getName())) {
-            throw new UserHasLowerRightsException(authenticatedUser.getLogin());
-        }
-
-        // Delete the user
-        userRepository.deletePermanentByLogin(userToDelete.getLogin());
-        return userMapper.toUserDto(userToDelete);
-    }
-
-    /**
-     * If a user is not registered in the database, creates a new user after Azure authentication.
-     * This method is used to integrate users authenticated via Azure AD into the local user management system.
-     * 
-     * This method:
-     * - Checks if the user already exists
-     * - If the user exists, returns his information as a UserDto
-     * - If he does not exist, creates a new user with Azure data
-     * - Assigns the default USER role
-     * - Generates a "random" password
-     * - Saves the user to the database
-     * - Returns the created user's information as a UserDto
-     *
-     * @param userDto The user data from Azure
-     * @return UserDto containing the local user's information
-     * @throws RoleNotFoundException if the default role is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserDto getOrCreateAzureUser(UserDto userDto) {
-        log.debug("Getting or creating Azure user: {}", userDto.getLogin());
-
-        // Check if user already exists
-        if (userRepository.existsByLogin(userDto.getLogin())) {
-            log.debug("User already exists: {}", userDto.getLogin());
-            return findByLogin(userDto.getLogin());
-        }
-
-        // Create new user
-        User user = User.builder()
-                .login(userDto.getLogin())
-                .firstName(userDto.getFirstName())
-                .lastName(userDto.getLastName())
-                .password(passwordEncoder.encode("AzureUser" + System.currentTimeMillis())) // "Random" password
-                .build();
-
-        // Add default USER role
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER));
-        user.setMainRole(userRole);
-
-        // Save the user
-        User savedUser = userRepository.save(user);
-        log.debug("New Azure user registered successfully: {}", savedUser.getLogin());
-
-        return userMapper.toUserDto(savedUser);
-    }
-
-    /**
-     * Deletes all refresh tokens associated with a user.
-     * This operation is typically used during logout or when a user's
-     * authentication needs to be invalidated across all sessions.
-     *
-     * @param login The login (username) of the user whose tokens should be deleted
-     * @throws UserNotFoundException if the user is not found
-     */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void deleteRefreshTokens(String login) {
-        log.debug("Deleting refresh tokens for user: {}", login);
-        
-        // Verify user exists before deleting tokens
-        userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-        
-        refreshTokenRepository.deleteByUserLogin(login);
-    }
-
-     /**
-     * Updates a user's information.
-     * 
-     * This operation:
-     * - Verifies the user exists
-     * - Updates the user's first name, last name, and login
-     * - Saves the updated user to the database
-     * - Returns the updated user's information as a UserDto
-     * 
-     * Note: This method does not allow updating the user's roles or password. Separate methods should be used for those operations.
-     * 
-     * @param login The login (username) of the user to update
-     * @param userDto The new user information to update
-     * @throws UserNotFoundException if the user is not found
-     */
-
     @Transactional
-    public void updateUser(String login, UserDto userDto) {
+    public UserDto create(CreateUserDto request, String actorLogin) {
+        RoleEnum role = request.mainRoleOrDefault();
+        assertCanManage(getActiveUser(actorLogin), role);
 
+        if (userRepository.existsByLogin(request.login())) {
+            throw new UserAlreadyExistsException(request.login());
+        }
 
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setLogin(userDto.getLogin());
-        user.setMainRole(roleRepository.findByName(RoleEnum.valueOf(userDto.getMainRole())).orElseThrow(() -> new RoleNotFoundException(RoleEnum.USER)));
-
-        userRepository.save(user);
+        User user = userMapper.toUser(request);
+        user.setPassword(hashAndWipe(request.password()));
+        user.setMainRole(getRole(role));
+        return userMapper.toUserDto(userRepository.save(user));
     }
 
+    /**
+     * Updates the identity fields of a user (first name, last name, login).
+     *
+     * @param login      current login of the user to update
+     * @param request    new values
+     * @param actorLogin login of the authenticated user
+     * @return the updated user
+     * @throws UserNotFoundException       if there is no active user with this login
+     * @throws UserAlreadyExistsException  if the new login is used by another user
+     * @throws InsufficientRightsException if a non-admin tries to update an admin
+     */
+    @Transactional
+    public UserDto update(String login, UpdateUserDto request, String actorLogin) {
+        User user = getActiveUser(login);
+        assertCanManage(getActiveUser(actorLogin), user.getMainRole().getName());
+
+        if (!request.login().equals(user.getLogin()) && userRepository.existsByLogin(request.login())) {
+            throw new UserAlreadyExistsException(request.login());
+        }
+
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setLogin(request.login());
+        return userMapper.toUserDto(user);
+    }
+
+    /**
+     * Assigns a role to a user. Only an admin can grant the admin role or change the
+     * role of an admin.
+     *
+     * @param login      login of the user whose role changes
+     * @param newRole    role to assign
+     * @param actorLogin login of the authenticated user
+     * @return the updated user
+     * @throws UserNotFoundException              if there is no active user with this login
+     * @throws SelfModificationForbiddenException if users target their own account
+     * @throws UserAlreadyHasRoleException        if the user already has this role
+     * @throws InsufficientRightsException        if a non-admin grants or removes the admin role
+     */
+    @Transactional
+    public UserDto changeRole(String login, RoleEnum newRole, String actorLogin) {
+        assertNotSelf(login, actorLogin);
+        User user = getActiveUser(login);
+        User actor = getActiveUser(actorLogin);
+
+        RoleEnum currentRole = user.getMainRole().getName();
+        if (currentRole == newRole) {
+            throw new UserAlreadyHasRoleException(login, newRole);
+        }
+        assertCanManage(actor, currentRole);
+        assertCanManage(actor, newRole);
+
+        user.setMainRole(getRole(newRole));
+        log.info("Role of user {} changed from {} to {} by {}", login, currentRole, newRole, actorLogin);
+        return userMapper.toUserDto(user);
+    }
+
+    /**
+     * Deletes a user, softly (restorable) by default.
+     *
+     * @param login      login of the user to delete
+     * @param permanent  true to remove the user from the database
+     * @param actorLogin login of the authenticated user
+     * @throws UserNotFoundException              if no user, soft-deleted or not, has this login
+     * @throws SelfModificationForbiddenException if users target their own account
+     * @throws InsufficientRightsException        if a non-admin tries to delete an admin
+     */
+    @Transactional
+    public void delete(String login, boolean permanent, String actorLogin) {
+        assertNotSelf(login, actorLogin);
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
+        assertCanManage(getActiveUser(actorLogin), user.getMainRole().getName());
+
+        if (permanent) {
+            userRepository.deletePermanentlyById(user.getId());
+        } else {
+            userRepository.delete(user);
+        }
+        log.info("User {} {} deleted by {}", login, permanent ? "permanently" : "softly", actorLogin);
+    }
+
+    /**
+     * Restores a soft-deleted user.
+     *
+     * @param login      login of the user to restore
+     * @param actorLogin login of the authenticated user
+     * @return the restored user
+     * @throws UserNotFoundException       if there is no soft-deleted user with this login
+     * @throws InsufficientRightsException if a non-admin tries to restore an admin
+     */
+    @Transactional
+    public UserDto restore(String login, String actorLogin) {
+        User user = userRepository.findByLoginAndDeletedTrue(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
+        assertCanManage(getActiveUser(actorLogin), user.getMainRole().getName());
+
+        user.setDeleted(false);
+        return userMapper.toUserDto(user);
+    }
+
+    /**
+     * Changes the password of a user after checking the current one.
+     *
+     * @param login   login of the user (always the authenticated user)
+     * @param request current and new passwords; both arrays are wiped after use
+     * @throws InvalidCurrentPasswordException if the current password is wrong
+     */
+    @Transactional
+    public void updatePassword(String login, PasswordUpdateDto request) {
+        try {
+            User user = getActiveUser(login);
+            if (!passwordEncoder.matches(CharBuffer.wrap(request.oldPassword()), user.getPassword())) {
+                throw new InvalidCurrentPasswordException();
+            }
+            user.setPassword(passwordEncoder.encode(CharBuffer.wrap(request.newPassword())));
+        } finally {
+            Arrays.fill(request.oldPassword(), '\0');
+            Arrays.fill(request.newPassword(), '\0');
+        }
+    }
+
+    /**
+     * Returns the local account of a user authenticated by Azure, creating it on first login
+     * with the USER role. Azure users authenticate through Azure only: their local password
+     * is a random value nobody knows.
+     *
+     * @param login     user's email given by Azure
+     * @param firstName first name given by Azure
+     * @param lastName  last name given by Azure, may be null
+     * @return the local user
+     * @throws DeletedAccountException if the account exists but is soft-deleted
+     */
+    @Transactional
+    public UserDto getOrCreateAzureUser(String login, String firstName, String lastName) {
+        return userRepository.findByLogin(login)
+                .map(existing -> {
+                    if (existing.isDeleted()) {
+                        throw new DeletedAccountException(login);
+                    }
+                    return userMapper.toUserDto(existing);
+                })
+                .orElseGet(() -> {
+                    User user = User.builder()
+                            .login(login)
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                            .mainRole(getRole(RoleEnum.USER))
+                            .build();
+                    log.info("New Azure user registered: {}", login);
+                    return userMapper.toUserDto(userRepository.save(user));
+                });
+    }
+
+    private User getActiveUser(String login) {
+        return userRepository.findByLoginAndDeletedFalse(login)
+                .orElseThrow(() -> new UserNotFoundException(login));
+    }
+
+    private Role getRole(RoleEnum role) {
+        return roleRepository.findByName(role).orElseThrow(() -> new RoleNotFoundException(role));
+    }
+
+    private String hashAndWipe(char[] password) {
+        try {
+            return passwordEncoder.encode(CharBuffer.wrap(password));
+        } finally {
+            Arrays.fill(password, '\0');
+        }
+    }
+
+    /**
+     * Only an admin may act on an admin account or grant the admin role.
+     */
+    private static void assertCanManage(User actor, RoleEnum targetRole) {
+        if (targetRole == RoleEnum.ADMIN && actor.getMainRole().getName() != RoleEnum.ADMIN) {
+            throw new InsufficientRightsException(actor.getLogin());
+        }
+    }
+
+    private static void assertNotSelf(String login, String actorLogin) {
+        if (login.equalsIgnoreCase(actorLogin)) {
+            throw new SelfModificationForbiddenException();
+        }
+    }
 }

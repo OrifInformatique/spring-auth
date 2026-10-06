@@ -1,9 +1,7 @@
 package ch.sectioninformatique.auth.security;
 
 import java.time.Duration;
-import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +21,7 @@ import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorH
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,6 +30,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,61 +48,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SecurityConfig {
 
-    /**
-     * Entry point for handling authentication failures.
-     * This component:
-     * - Provides custom responses for unauthenticated requests
-     * - Formats error messages in JSON
-     * - Sets appropriate HTTP status codes
-     */
+    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
+
+    /** Writes 401 responses for unauthenticated requests. */
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
 
-    /**
-     * Entry point for denied access failures
-     */
+    /** Writes 403 responses for authenticated requests lacking an authority. */
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
-    /**
-     * Filter for JWT token authentication.
-     * This component:
-     * - Validates JWT tokens in requests
-     * - Extracts user information from tokens
-     * - Sets up authentication context
-     */
+    /** Authenticates requests carrying a bearer access token. */
     private final JwtAuthFilter jwtAuthFilter;
 
-    /**
-     * Spring environment to check active profiles (dev, test, prod)
-     */
+    /** Used to log OAuth2 details only in dev and test profiles. */
     private final Environment environment;
 
-    @Value("${cors.allowed-origins}")
-    private String[] allowedOrigins; // Origins allowed for cross-origin requests, loaded from properties
-
-    @Value("${cors.allowed-methods}")
-    private String[] allowedMethods; // HTTP methods allowed for CORS requests
-
-    @Value("${cors.allowed-headers}")
-    private String[] allowedHeaders; // HTTP headers allowed for CORS requests
-
-    /**
-     * Checks if the application is running in development or test mode.
-     * Sensitive data (user emails, attributes) is only logged in these environments.
-     *
-     * @return true if running in dev or test profile, false if in production
-     */
-    private boolean isDevelopmentOrTest() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        for (String profile : activeProfiles) {
-            if (profile.equalsIgnoreCase("dev") || profile.equalsIgnoreCase("test")) {
-                return true;
-            }
-        }
-        // If no profile is set, default to development-like behavior for local development
-        return activeProfiles.length == 0;
-    }
-
-    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
+    private final CorsProperties corsProperties;
 
     /**
      * Prevents JwtAuthFilter from also being registered as a servlet Filter.
@@ -121,6 +81,9 @@ public class SecurityConfig {
      * JWT API chain: /auth/** and /users/**.
      * Stateless, no RequestCache (avoids MockMvc/session replay of a previous 401
      * as GET ...?continue without the Authorization header).
+     *
+     * Only the endpoints used to obtain tokens are public; fine-grained authorization
+     * is declared on controller methods with {@code @PreAuthorize}.
      */
     @Bean
     @Order(1)
@@ -138,11 +101,13 @@ public class SecurityConfig {
                 .requestCache(cache -> cache.disable())
                 .sessionManagement(customizer -> customizer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> cors.configurationSource(request -> corsConfiguration()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+                        // Landing page of the OAuth2 flow when no client redirect URL was given:
+                        // reached by a browser redirect, hence without access token
+                        .requestMatchers(HttpMethod.GET, "/auth/redirect-after-login").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated());
         return http.build();
@@ -163,7 +128,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(customizer -> customizer
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .cors(cors -> cors.configurationSource(request -> corsConfiguration()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2Login(oauth2 -> {
                     log.debug("Configuring OAuth2 login");
                     oauth2
@@ -173,8 +138,7 @@ public class SecurityConfig {
                                 if (isDevelopmentOrTest()) {
                                     log.debug("OAuth2 authentication failure details:", exception);
                                     Throwable cause = exception.getCause();
-                                    if (exception instanceof org.springframework.security.oauth2.core.OAuth2AuthenticationException) {
-                                        var oauth2Ex = (org.springframework.security.oauth2.core.OAuth2AuthenticationException) exception;
+                                    if (exception instanceof OAuth2AuthenticationException oauth2Ex) {
                                         log.debug("OAuth2 Error Code: {}", oauth2Ex.getError().getErrorCode());
                                         log.debug("OAuth2 Error Description: {}", oauth2Ex.getError().getDescription());
                                         if (cause != null) {
@@ -210,13 +174,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private CorsConfiguration corsConfiguration() {
-        var corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
-        corsConfig.setAllowedMethods(Arrays.asList(allowedMethods));
-        corsConfig.setAllowedHeaders(Arrays.asList(allowedHeaders));
+    /**
+     * CORS policy shared by both chains. Credentials are allowed because the refresh
+     * token travels in a cookie.
+     */
+    private CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowedOrigins(corsProperties.allowedOrigins());
+        corsConfig.setAllowedMethods(corsProperties.allowedMethods());
+        corsConfig.setAllowedHeaders(corsProperties.allowedHeaders());
         corsConfig.setAllowCredentials(true);
-        return corsConfig;
+        return request -> corsConfig;
+    }
+
+    /**
+     * Sensitive data (user emails, OAuth2 attributes) is only logged in dev and test.
+     */
+    private boolean isDevelopmentOrTest() {
+        return environment.matchesProfiles("dev", "test");
     }
 
     /**
