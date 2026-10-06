@@ -29,6 +29,9 @@ SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY=your-secret-access-key-here-change-in-produ
 SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY=your-secret-refresh-key-here-change-in-production
 SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME=5m
 SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME=30d
+# SameSite attribute of the refresh token cookie: Strict when the client application is served
+# from the same site as the API (ports do not matter), None for a client on another domain
+SECURITY_REFRESH_COOKIE_SAME_SITE=Strict
 
 # Authentication codes configuration
 # These codes are sent to the client application after OAuth2 login, to exchange for JWT tokens
