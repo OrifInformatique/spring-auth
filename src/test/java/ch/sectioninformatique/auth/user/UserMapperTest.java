@@ -1,157 +1,72 @@
 package ch.sectioninformatique.auth.user;
 
-import java.util.Arrays;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.test.context.ActiveProfiles;
 
-import ch.sectioninformatique.auth.auth.SignUpDto;
-import ch.sectioninformatique.auth.security.Role;
-import ch.sectioninformatique.auth.security.RoleEnum;
+import ch.sectioninformatique.auth.role.Role;
+import ch.sectioninformatique.auth.role.RoleEnum;
+import ch.sectioninformatique.auth.user.dto.CreateUserDto;
+import ch.sectioninformatique.auth.user.dto.UserDto;
 
 /**
- * Test class for {@link UserMapper}.
- * This class tests the conversion functionalities between different
- * user representations (User, UserDto, SignUpDto).
- * 
- * @author [Your name]
- * @version 1.0
+ * Tests of the MapStruct-generated {@link UserMapper}.
  */
-@SpringBootTest
-@ActiveProfiles("test")
 class UserMapperTest {
 
-    /**
-     * Test configuration to provide necessary beans.
-     * This internal configuration provides a UserMapper instance
-     * for testing purposes.
-     */
-    @Configuration
-    static class TestConfig {
-        /**
-         * Creates and returns a UserMapper instance for testing.
-         *
-         * @return A UserMapper instance
-         */
-        @org.springframework.context.annotation.Bean
-        public UserMapper userMapper() {
-            return UserMapper.INSTANCE;
-        }
-    }
+    private final UserMapper userMapper = new UserMapperImpl();
 
-    /** Mapper to test, injected by Spring */
-    @Autowired
-    private UserMapper userMapper;
-
-    /**
-     * Tests the conversion from User to UserDto.
-     * Verifies that:
-     * - All fields are correctly mapped
-     * - Role is properly converted
-     * - Permissions are initialized
-     */
     @Test
-    void testToUserDto() {
-        // Given
-        User user = new User();
-        user.setId(1L);
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setLogin("johndoe");
-        
+    void toUserDto_mapsIdentityRoleAndPermissionsButNeverThePassword() {
         Role role = new Role();
         role.setName(RoleEnum.MANAGER);
-        user.setMainRole(role);
+        User user = User.builder().id(1L).firstName("John").lastName("Doe").login("john.doe@test.com")
+                .password("hash").mainRole(role).build();
 
-        // When
-        UserDto userDto = userMapper.toUserDto(user);
+        UserDto dto = userMapper.toUserDto(user);
 
-        // Then
-        assertNotNull(userDto);
-        assertEquals(1L, userDto.getId());
-        assertEquals("John", userDto.getFirstName());
-        assertEquals("Doe", userDto.getLastName());
-        assertEquals("johndoe", userDto.getLogin());
-        assertEquals("MANAGER", userDto.getMainRole());
-        assertNotNull(userDto.getPermissions());
+        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getFirstName()).isEqualTo("John");
+        assertThat(dto.getLastName()).isEqualTo("Doe");
+        assertThat(dto.getLogin()).isEqualTo("john.doe@test.com");
+        assertThat(dto.getMainRole()).isEqualTo("MANAGER");
+        assertThat(dto.getPermissions())
+                .containsExactly("ROLE_MANAGER", "user:read", "user:update", "user:write");
+        assertThat(dto.getToken()).isNull();
+        assertThat(dto.isDeleted()).isFalse();
     }
 
-    /**
-     * Tests the conversion from SignUpDto to User.
-     * Verifies that:
-     * - Basic information is correctly mapped
-     * - Password is ignored as configured
-     * - Roles are initialized as an empty set
-     */
     @Test
-    void testSignUpToUser() {
-        // Given
-        SignUpDto signUpDto = new SignUpDto(
-            "Jane",
-            "Smith",
-            "janesmith",
-            "password123".toCharArray(),
-            "USER"
-        );
+    void toUserDto_userWithoutRole_hasNoRoleAndNoPermissions() {
+        UserDto dto = userMapper.toUserDto(User.builder().login("john.doe@test.com").build());
 
-        // When
-        User user = userMapper.signUpToUser(signUpDto);
-
-        // Then
-        assertNotNull(user);
-        assertEquals("Jane", user.getFirstName());
-        assertEquals("Smith", user.getLastName());
-        assertEquals("janesmith", user.getLogin());
-        assertNull(user.getPassword()); // Password should be ignored as per mapping
-        assertTrue(user.getMainRole().getName() == null); // Roles should be empty as per mapping
+        assertThat(dto.getMainRole()).isNull();
+        assertThat(dto.getPermissions()).isEmpty();
     }
 
-    /**
-     * Tests the conversion of authorities to permissions.
-     * Verifies that:
-     * - The permissions list is not null
-     * - All authorities are correctly converted
-     * - Order and number of elements are preserved
-     */
     @Test
-    void testAuthoritiesToPermissions() {
-        // Given
-        List<SimpleGrantedAuthority> authorities = Arrays.asList(
-            new SimpleGrantedAuthority("READ"),
-            new SimpleGrantedAuthority("WRITE"),
-            new SimpleGrantedAuthority("DELETE")
-        );
+    void toUser_copiesIdentityOnly() {
+        CreateUserDto request = new CreateUserDto("Jane", "Smith", "jane@test.com",
+                "Password123!".toCharArray(), RoleEnum.ADMIN);
 
-        // When
-        List<String> permissions = userMapper.authoritiesToPermissions(authorities);
+        User user = userMapper.toUser(request);
 
-        // Then
-        assertNotNull(permissions);
-        assertEquals(3, permissions.size());
-        assertTrue(permissions.containsAll(Arrays.asList("READ", "WRITE", "DELETE")));
+        assertThat(user.getFirstName()).isEqualTo("Jane");
+        assertThat(user.getLastName()).isEqualTo("Smith");
+        assertThat(user.getLogin()).isEqualTo("jane@test.com");
+        assertThat(user.getPassword()).isNull();
+        assertThat(user.getMainRole()).isNull();
+        assertThat(user.isDeleted()).isFalse();
     }
 
-    /**
-     * Tests the behavior of authority conversion with null input.
-     * Verifies that:
-     * - The method returns null when input is null
-     * - No exception is thrown
-     */
     @Test
-    void testAuthoritiesToPermissionsWithNull() {
-        // When
-        List<String> permissions = userMapper.authoritiesToPermissions(null);
-
-        // Then
-        assertNull(permissions);
+    void authoritiesToPermissions_isSortedAndNullSafe() {
+        assertThat(userMapper.authoritiesToPermissions(List.of(
+                new SimpleGrantedAuthority("user:write"), new SimpleGrantedAuthority("user:read"))))
+                .containsExactly("user:read", "user:write");
+        assertThat(userMapper.authoritiesToPermissions(null)).isEmpty();
     }
-} 
+}

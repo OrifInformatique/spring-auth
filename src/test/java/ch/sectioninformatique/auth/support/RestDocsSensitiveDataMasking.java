@@ -1,4 +1,4 @@
-package ch.sectioninformatique.auth;
+package ch.sectioninformatique.auth.support;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
