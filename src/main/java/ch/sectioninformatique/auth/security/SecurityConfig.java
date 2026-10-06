@@ -217,11 +217,11 @@ public class SecurityConfig {
 
         RestClient restClient = RestClient.builder()
                 .requestFactory(requestFactory)
-                .messageConverters(converters -> {
-                    converters.clear();
-                    converters.add(new FormHttpMessageConverter());
-                    converters.add(new OAuth2AccessTokenResponseHttpMessageConverter());
-                })
+                // No registerDefaults(): only these converters, tried first, plus the
+                // multipart form converter that Spring always appends
+                .configureMessageConverters(converters -> converters
+                        .addCustomConverter(new FormHttpMessageConverter())
+                        .addCustomConverter(new OAuth2AccessTokenResponseHttpMessageConverter()))
                 .defaultStatusHandler(new OAuth2ErrorResponseErrorHandler())
                 .build();
 
