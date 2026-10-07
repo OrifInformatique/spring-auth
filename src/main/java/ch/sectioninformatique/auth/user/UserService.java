@@ -331,7 +331,7 @@ public class UserService {
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserDto restoreDeletedUser(String login) {
-        User user = userRepository.findByLoginDeleted(login)
+        User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new UserNotFoundException(login));
         user.setDeleted(false);
         userRepository.save(user);
