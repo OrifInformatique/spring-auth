@@ -2,151 +2,66 @@ package ch.sectioninformatique.auth.user;
 
 import org.springframework.http.HttpStatus;
 
-import ch.sectioninformatique.auth.app.exceptions.AppException;
-import ch.sectioninformatique.auth.app.exceptions.MessageKeyProvider;
+import ch.sectioninformatique.auth.common.exception.AppException;
+import ch.sectioninformatique.auth.role.RoleEnum;
 
 /**
- * User-related exceptions for the user package.
+ * User management exceptions.
  */
-public class UserExceptions {
+public final class UserExceptions {
 
-    private abstract static class LoginBasedException extends AppException implements MessageKeyProvider {
-        private final String login;
-
-        protected LoginBasedException(HttpStatus status, String login) {
-            super(status);
-            this.login = login;
-        }
-
-        public String getLogin() {
-            return login;
-        }
-
-        @Override
-        public Object[] getMessageArgs() {
-            return new Object[] { login };
-        }
+    private UserExceptions() {
     }
 
-    /**
-     * Thrown when a user with the given login already exists.
-     */
-    public static class UserAlreadyExistsException extends LoginBasedException {
-        public UserAlreadyExistsException(String login) {
-            super(HttpStatus.CONFLICT, login);
-        }
-
-        @Override
-        public String getMessageKey() {
-            return "error.user.already.exists";
-        }
-
-        @Override
-        public Object[] getMessageArgs() {
-            return super.getMessageArgs();
-        }
-    }
-
-    /**
-     * Thrown when a user with the given login or ID is not found.
-     */
-    public static class UserNotFoundException extends AppException implements MessageKeyProvider {
-        private final String loginOrId;
-
+    /** Thrown when no user matches the given login or id. */
+    public static class UserNotFoundException extends AppException {
         public UserNotFoundException(String loginOrId) {
-            super(HttpStatus.NOT_FOUND);
-            this.loginOrId = loginOrId;
+            super(HttpStatus.NOT_FOUND, "error.user.not.found", loginOrId);
         }
+    }
 
-        public String getLoginOrId() {
-            return loginOrId;
+    /** Thrown when creating or renaming a user with a login that is already used. */
+    public static class UserAlreadyExistsException extends AppException {
+        public UserAlreadyExistsException(String login) {
+            super(HttpStatus.CONFLICT, "error.user.already.exists", login);
         }
+    }
 
-        @Override
-        public String getMessageKey() {
-            return "error.user.not.found";
+    /** Thrown when assigning a role the user already has. */
+    public static class UserAlreadyHasRoleException extends AppException {
+        public UserAlreadyHasRoleException(String login, RoleEnum role) {
+            super(HttpStatus.CONFLICT, "error.user.already.has.role", login, role.name());
         }
+    }
 
-        @Override
-        public Object[] getMessageArgs() {
-            return new Object[] { loginOrId };
+    /** Thrown when a role is missing from the database (roles are seeded at startup). */
+    public static class RoleNotFoundException extends AppException {
+        public RoleNotFoundException(RoleEnum role) {
+            super(HttpStatus.INTERNAL_SERVER_ERROR, "error.role.not.found", role.name());
         }
     }
 
     /**
-     * Thrown when attempting to promote a user to admin when they are already admin.
+     * Thrown when users try to change their own role or delete their own account,
+     * which could leave the application without any administrator.
      */
-    public static class UserAlreadyAdminException extends LoginBasedException {
-        public UserAlreadyAdminException(String login) {
-            super(HttpStatus.CONFLICT, login);
-        }
-
-        @Override
-        public String getMessageKey() {
-            return "error.user.already.admin";
-        }
-
-        @Override
-        public Object[] getMessageArgs() {
-            return super.getMessageArgs();
+    public static class SelfModificationForbiddenException extends AppException {
+        public SelfModificationForbiddenException() {
+            super(HttpStatus.FORBIDDEN, "error.user.self.modification.forbidden");
         }
     }
 
-    /**
-     * Thrown when attempting to promote a user to manager when they are already manager.
-     */
-    public static class UserAlreadyManagerException extends LoginBasedException {
-        public UserAlreadyManagerException(String login) {
-            super(HttpStatus.CONFLICT, login);
-        }
-
-        @Override
-        public String getMessageKey() {
-            return "error.user.already.manager";
-        }
-
-        @Override
-        public Object[] getMessageArgs() {
-            return super.getMessageArgs();
+    /** Thrown when the current password given to change a password is wrong. */
+    public static class InvalidCurrentPasswordException extends AppException {
+        public InvalidCurrentPasswordException() {
+            super(HttpStatus.BAD_REQUEST, "error.user.current.password.invalid");
         }
     }
 
-    /**
-     * Thrown when attempting to demote a user to regular when they are already regular.
-     */
-    public static class UserAlreadyRegularException extends LoginBasedException {
-        public UserAlreadyRegularException(String login) {
-            super(HttpStatus.CONFLICT, login);
-        }
-
-        @Override
-        public String getMessageKey() {
-            return "error.user.already.regular";
-        }
-
-        @Override
-        public Object[] getMessageArgs() {
-            return super.getMessageArgs();
+    /** Thrown when a soft-deleted user tries to log in through Azure. */
+    public static class DeletedAccountException extends AppException {
+        public DeletedAccountException(String login) {
+            super(HttpStatus.FORBIDDEN, "error.user.account.deleted", login);
         }
     }
-
-    /**
-     * Thrown when an admin attempts to remove the admin role from their own account.
-     */
-    public static class CannotModifyOwnAdminRoleException extends LoginBasedException {
-        public CannotModifyOwnAdminRoleException(String login) {
-            super(HttpStatus.BAD_REQUEST, login);
-        }
-
-        @Override
-        public String getMessageKey() {
-            return "error.user.cannot.modify.own.admin.role";
-        }
-
-        @Override
-        public Object[] getMessageArgs() {
-            return super.getMessageArgs();
-        }
-    }
-
 }

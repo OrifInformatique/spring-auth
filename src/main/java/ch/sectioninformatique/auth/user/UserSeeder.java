@@ -11,17 +11,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import ch.sectioninformatique.auth.security.Role;
-import ch.sectioninformatique.auth.security.RoleEnum;
-import ch.sectioninformatique.auth.security.RoleRepository;
+import ch.sectioninformatique.auth.role.Role;
+import ch.sectioninformatique.auth.role.RoleEnum;
+import ch.sectioninformatique.auth.role.RoleRepository;
 
 /**
- * Seeder class for initializing the database with default user data.
- * This class implements CommandLineRunner to execute the seeding process
- * when the application starts. It creates a set of predefined users with
- * different roles (USER, MANAGER, ADMIN) for testing and development purposes.
- * The seeder runs after the RoleSeeder (Order(2)) to ensure roles exist before
- * creating users.
+ * Creates demonstration users with every role when the database is empty.
+ * Only active in the dev profile, and runs after {@link ch.sectioninformatique.auth.role.RoleSeeder}.
  */
 @Component
 @Order(2)
@@ -55,49 +51,27 @@ public class UserSeeder implements CommandLineRunner {
 		this.roleRepository = roleRepository;
 	}
 
-	/**
-	 * Executes the seeding process when the application starts.
-	 * This method is called by Spring Boot after the application context is loaded.
-	 * It:
-	 * 1. Prints a start message
-	 * 2. Calls loadUserData() to create default users
-	 * 3. Prints a completion message
-	 *
-	 * @param args Command line arguments passed to the application
-	 * @throws Exception if an error occurs during the seeding process
-	 */
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) {
 		log.info("Starting User Seeding...");
 		loadUserData();
 		log.info("User Seeding completed.");
 	}
 
 	/**
-	 * Loads initial user data into the database.
-	 * Creates a set of predefined users with different roles if the database is empty.
-	 * The users include:
-	 * - A deleted user (ID 1)
-	 * - Regular users with USER role (John Doe, Alice Johnson, Dan Sergeant, etc.)
-	 * - An admin user with MANAGER role (Jane Smith)
-	 * - A super admin user with ADMIN role (Super Admin)
-	 * 
-	 * Each user is created with:
-	 * - Unique login (email format)
-	 * - Secure password (hashed)
-	 * - First and last name
-	 * - Appropriate role(s)
+	 * Creates regular users (USER), one manager (Jane Smith), one administrator
+	 * (Super Admin) and a user meant to be soft-deleted by hand, if no user exists yet.
 	 *
-	 * @throws RuntimeException if any required role (USER, MANAGER, ADMIN) is not found in the database
+	 * @throws IllegalStateException if a role has not been seeded
 	 */
 	private void loadUserData() {
 		if (this.userRepository.count() == 0) {
 			Role userRole = roleRepository.findByName(RoleEnum.USER)
-					.orElseThrow(() -> new RuntimeException("Role USER not found"));
+					.orElseThrow(() -> new IllegalStateException("Role USER not found"));
 			Role managerRole = roleRepository.findByName(RoleEnum.MANAGER)
-					.orElseThrow(() -> new RuntimeException("Role MANAGER not found"));
+					.orElseThrow(() -> new IllegalStateException("Role MANAGER not found"));
 			Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-					.orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+					.orElseThrow(() -> new IllegalStateException("Role ADMIN not found"));
 
 			// Create users with User.builder()
 			User user0 = User.builder()

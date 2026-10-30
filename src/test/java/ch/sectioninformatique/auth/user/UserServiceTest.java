@@ -1,525 +1,272 @@
 package ch.sectioninformatique.auth.user;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.nio.CharBuffer;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ch.sectioninformatique.auth.auth.AuthExceptions;
-import ch.sectioninformatique.auth.auth.CredentialsDto;
-import ch.sectioninformatique.auth.auth.SignUpDto;
-import ch.sectioninformatique.auth.security.Role;
-import ch.sectioninformatique.auth.security.RoleEnum;
-import ch.sectioninformatique.auth.security.RoleRepository;
-import ch.sectioninformatique.auth.security.SecurityExceptions;
+import ch.sectioninformatique.auth.role.Role;
+import ch.sectioninformatique.auth.role.RoleEnum;
+import ch.sectioninformatique.auth.role.RoleRepository;
+import ch.sectioninformatique.auth.security.SecurityExceptions.InsufficientRightsException;
+import ch.sectioninformatique.auth.user.UserExceptions.DeletedAccountException;
+import ch.sectioninformatique.auth.user.UserExceptions.InvalidCurrentPasswordException;
+import ch.sectioninformatique.auth.user.UserExceptions.SelfModificationForbiddenException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyExistsException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserAlreadyHasRoleException;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
+import ch.sectioninformatique.auth.user.dto.CreateUserDto;
+import ch.sectioninformatique.auth.user.dto.PasswordUpdateDto;
+import ch.sectioninformatique.auth.user.dto.UserDto;
 
 /**
- * Unit tests for {@link UserService}.
- * 
- * This test class uses Mockito to test the UserService business logic in isolation
- * without requiring a database or Spring context. Tests follow the Arrange-Act-Assert (AAA) pattern:
- * - Arrange: Set up test data and configure mock behaviors
- * - Act: Execute the method being tested
- * - Assert: Verify the results and mock interactions
- * 
- * Key areas tested:
- * - User authentication (login)
- * - User registration
- * - Role management (promote/revoke manager and admin)
- * - User deletion with permission checks
- * - Error handling and validation
+ * Unit tests of the business rules of {@link UserService}, with mocked repositories.
  */
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+// Lenient: the givenXxx() helpers stub every lookup a user may need, not only the ones a test uses
+@MockitoSettings(strictness = Strictness.LENIENT)
+class UserServiceTest {
+
+    private static final String ADMIN = "admin@test.com";
+    private static final String MANAGER = "manager@test.com";
+    private static final String USER = "user@test.com";
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
     private RoleRepository roleRepository;
 
+    // Real implementations: the service logic is tested together with the actual mapping and hashing
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+    private final UserMapper userMapper = new UserMapperImpl();
 
-    @Mock
-    private UserMapper userMapper;
-
-    @Mock
-    private SecurityContext securityContext;
-
-    @Mock
-    private Authentication authentication;
-
-    @InjectMocks
     private UserService userService;
-
 
     @BeforeEach
     void setUp() {
-        SecurityContextHolder.setContext(securityContext);
+        userService = new UserService(userRepository, roleRepository, passwordEncoder, userMapper);
     }
 
-    @AfterEach
-    void tearDown() {
-        // Remove the mock SecurityContext from the thread-local so it does not
-        // leak into later test classes running in the same Surefire JVM/thread
-        // (a mock context makes JwtAuthFilter.setAuthentication() a silent no-op).
-        SecurityContextHolder.clearContext();
+    private static Role role(RoleEnum name) {
+        Role role = new Role();
+        role.setName(name);
+        return role;
     }
 
-    /**
-     * Test: Successful login with valid credentials
-     * 
-     * Verifies that the login method correctly authenticates a user when provided
-     * with valid email and password credentials.
-     * 
-     * Arrange:
-     * - Mock user repository to return a user with hashed password
-     * - Mock password encoder to confirm password match
-     * - Mock user mapper to convert User entity to UserDto
-     * 
-     * Act:
-     * - Call userService.login() with valid credentials
-     * 
-     * Assert:
-     * - Returned UserDto matches expected data
-     * - Repository was queried for the user
-     * - Password was verified using encoder
-     */
+    private User givenActiveUser(String login, RoleEnum role) {
+        User user = User.builder().id(login.hashCode()).firstName("First").lastName("Last")
+                .login(login).password(passwordEncoder.encode("Password123!")).mainRole(role(role)).build();
+        when(userRepository.findByLoginAndDeletedFalse(login)).thenReturn(Optional.of(user));
+        return user;
+    }
+
+    private void givenRoleExists(RoleEnum name) {
+        when(roleRepository.findByName(name)).thenReturn(Optional.of(role(name)));
+    }
+
     @Test
-    void login_Successful_ReturnsUserDto() {
-        // Arrange
-        String login = "john@test.com";
-        String password = "password123";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null, false, null);
-        UserDto expectedDto = new UserDto(1L, "John", "Doe", login,null, false, "USER", null);
-        
-        when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
-        when(userMapper.toUserDto(user)).thenReturn(expectedDto);
+    void findByLogin_unknownUser_throwsNotFound() {
+        when(userRepository.findByLoginAndDeletedFalse("unknown@test.com")).thenReturn(Optional.empty());
 
-        // Act
-        UserDto result = userService.login(new CredentialsDto(login, password.toCharArray()));
-
-        // Assert
-        assertEquals(expectedDto, result);
-        verify(userRepository).findByLogin(login);
-        verify(passwordEncoder).matches(password, user.getPassword());
+        assertThatThrownBy(() -> userService.findByLogin("unknown@test.com"))
+                .isInstanceOf(UserNotFoundException.class);
     }
 
-    /**
-     * Test: Login fails when user doesn't exist
-     * 
-    * Verifies that the login method throws InvalidCredentialsException when attempting
-     * to authenticate with an email that doesn't exist in the database.
-     * 
-     * Arrange:
-     * - Mock user repository to return empty Optional (user not found)
-     * 
-     * Act & Assert:
-     * - Call userService.login() with non-existent email
-    * - Verify InvalidCredentialsException is thrown
-     * - Error message should not reveal whether user exists (security best practice)
-     */
     @Test
-    void login_UserNotFound_ThrowsInvalidCredentialsException() {
-        // Arrange
-        String login = "nonexistent@test.com";
-        String password = "password123";
-        
-        when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+    void create_hashesPasswordWipesItAndDefaultsToUserRole() {
+        givenActiveUser(MANAGER, RoleEnum.MANAGER);
+        givenRoleExists(RoleEnum.USER);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        char[] password = "NewUser123!".toCharArray();
 
-        // Act & Assert
-        assertThrows(
-            AuthExceptions.InvalidCredentialsException.class,
-            () -> userService.login(new CredentialsDto(login, password.toCharArray()))
-        );
+        UserDto created = userService.create(
+                new CreateUserDto("New", "User", "new@test.com", password, null), MANAGER);
+
+        assertThat(created.getMainRole()).isEqualTo("USER");
+        assertThat(password).containsOnly('\0');
+        verify(userRepository).save(argThat(user ->
+                passwordEncoder.matches("NewUser123!", user.getPassword())));
     }
 
-    /**
-     * Test: Login fails with incorrect password
-     * 
-    * Verifies that the login method throws InvalidCredentialsException when the password
-     * doesn't match the user's hashed password.
-     * 
-     * Arrange:
-     * - Mock user repository to return a user
-     * - Mock password encoder to return false (password mismatch)
-     * 
-     * Act & Assert:
-     * - Call userService.login() with wrong password
-    * - Verify InvalidCredentialsException is thrown
-     * - Error message should be same as user not found (security best practice)
-     */
     @Test
-    void login_InvalidPassword_ThrowsInvalidCredentialsException() {
-        // Arrange
-        String login = "john@test.com";
-        String password = "wrongpassword";
-        User user = new User(1L, "John", "Doe", login, "hashedPassword", null, null,false, null);
-        
-        when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
+    void create_existingLogin_throwsConflict() {
+        givenActiveUser(MANAGER, RoleEnum.MANAGER);
+        when(userRepository.existsByLogin(USER)).thenReturn(true);
 
-        // Act & Assert
-        assertThrows(
-            AuthExceptions.InvalidCredentialsException.class,
-            () -> userService.login(new CredentialsDto(login, password.toCharArray()))
-        );
+        assertThatThrownBy(() -> userService.create(
+                new CreateUserDto("New", "User", USER, "NewUser123!".toCharArray(), RoleEnum.USER), MANAGER))
+                .isInstanceOf(UserAlreadyExistsException.class);
+        verify(userRepository, never()).save(any());
     }
 
-    /**
-     * Test: Successful user registration
-     * 
-     * Verifies that a new user can be registered with valid information,
-     * their password is securely hashed, and they are assigned the USER role by default.
-     * 
-     * Arrange:
-     * - Mock repository to confirm login doesn't already exist
-     * - Mock password encoder to hash the password
-     * - Mock role repository to provide USER role
-     * - Mock mapper to convert SignUpDto to User entity and back to UserDto
-     * 
-     * Act:
-     * - Call userService.register() with valid sign-up data
-     * 
-     * Assert:
-     * - Returned UserDto matches expected data
-     * - Password was hashed before saving
-     * - User role was set to USER
-     * - User was saved to repository
-     */
     @Test
-    void register_Successful_ReturnsUserDto() {
-        // Arrange
-        String login = "newuser@test.com";
-        String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("New", "User", login, password.toCharArray(), "USER");
-        
-        User user = new User();
-        user.setId(1L);
-        user.setFirstName("New");
-        user.setLastName("User");
-        user.setLogin(login);
-        user.setPassword("hashedPassword");
-        user.setMainRole(new Role());
+    void create_adminByManager_throwsInsufficientRights() {
+        givenActiveUser(MANAGER, RoleEnum.MANAGER);
 
-        UserDto expectedDto = new UserDto(1L, "New", "User", login, null,  false, "USER", null);
-        Role userRole = new Role();
-        userRole.setId(1L);
-        userRole.setName(RoleEnum.USER);
-        
-        when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(password)).thenReturn("hashedPassword");
-        when(roleRepository.findByName(RoleEnum.USER)).thenReturn(Optional.of(userRole));
-        when(userMapper.signUpToUser(signUpDto)).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.toUserDto(user)).thenReturn(expectedDto);
-
-        // Act
-        UserDto result = userService.register(signUpDto);
-
-        // Assert
-        assertEquals(expectedDto, result);
-        verify(userRepository).findByLogin(login);
-        verify(passwordEncoder).encode(password);
-        verify(roleRepository).findByName(RoleEnum.USER);
-        verify(userRepository).save(user);
+        assertThatThrownBy(() -> userService.create(
+                new CreateUserDto("New", "Admin", "new@test.com", "NewUser123!".toCharArray(), RoleEnum.ADMIN), MANAGER))
+                .isInstanceOf(InsufficientRightsException.class);
     }
 
-    /**
-     * Test: Registration fails when email already exists
-     * 
-     * Verifies that attempting to register with an email that already exists
-    * throws UserAlreadyExistsException to prevent duplicate accounts.
-     * 
-     * Arrange:
-     * - Mock repository to return existing user with the same login
-     * 
-     * Act & Assert:
-     * - Call userService.register() with duplicate email
-    * - Verify UserAlreadyExistsException is thrown with login context
-     * - No new user is created
-     */
     @Test
-    void register_LoginExists_ThrowsUserAlreadyExistsException() {
-        // Arrange
-        String login = "existing@test.com";
-        String password = "password123";
-        SignUpDto signUpDto = new SignUpDto("Existing", "User", login, password.toCharArray(), "USER");
-        
-        User existingUser = new User(1L, "Existing", "User", login, "hashedPassword", null, null, false, null);
-        
-        when(userRepository.findByLogin(login)).thenReturn(Optional.of(existingUser));
+    void changeRole_managerPromotesUserToManager() {
+        User user = givenActiveUser(USER, RoleEnum.USER);
+        givenActiveUser(MANAGER, RoleEnum.MANAGER);
+        givenRoleExists(RoleEnum.MANAGER);
 
-        // Act & Assert
-        UserExceptions.UserAlreadyExistsException exception = assertThrows(
-            UserExceptions.UserAlreadyExistsException.class,
-            () -> userService.register(signUpDto)
-        );
-        assertEquals("existing@test.com", exception.getLogin());
+        UserDto updated = userService.changeRole(USER, RoleEnum.MANAGER, MANAGER);
+
+        assertThat(updated.getMainRole()).isEqualTo("MANAGER");
+        assertThat(user.getMainRole().getName()).isEqualTo(RoleEnum.MANAGER);
     }
 
-    /**
-     * Test: Successfully promote USER to MANAGER role
-     * 
-     * Verifies that an administrator can promote a regular user to manager role,
-     * granting them elevated permissions.
-     * 
-     * Arrange:
-     * - Mock repository to return a user with USER role
-     * - Mock role repository to provide MANAGER role
-     * - Mock repository save operation
-     * - Mock mapper to convert updated User to UserDto
-     * 
-     * Act:
-     * - Call userService.promoteToManager() with user ID
-     * 
-     * Assert:
-     * - User's role is changed to MANAGER
-     * - User is saved with new role
-     * - Returned UserDto reflects the promotion
-     */
     @Test
-    void promoteToManager_Successful_ReturnsUserDto() {
-        // Arrange
-        Long userId = 1L;
-        User user = new User();
-        user.setId(userId);
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setLogin("john@test.com");
-        user.setPassword("pass");
-        user.setMainRole(new Role());
-        
-        Role userRole = new Role();
-        userRole.setId(1L);
-        userRole.setName(RoleEnum.USER);
-        Role managerRole = new Role();
-        managerRole.setId(2L);
-        managerRole.setName(RoleEnum.MANAGER);
-        user.setMainRole(userRole);
+    void changeRole_managerCannotGrantAdmin() {
+        givenActiveUser(USER, RoleEnum.USER);
+        givenActiveUser(MANAGER, RoleEnum.MANAGER);
 
-        UserDto expectedDto = new UserDto(userId, "John", "Doe", "john@test.com", null,false, "ROLE_MANAGER",
-                null);
-
-        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
-        when(roleRepository.findByName(RoleEnum.MANAGER)).thenReturn(Optional.of(managerRole));
-        when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.toUserDto(user)).thenReturn(expectedDto);
-
-        // Act
-        UserDto result = userService.promoteToManager(user.getLogin());
-
-        // Assert
-        assertEquals(expectedDto, result);
-        verify(userRepository).findByLogin(user.getLogin());
-        verify(roleRepository).findByName(RoleEnum.MANAGER);
-        verify(userRepository).save(user);
+        assertThatThrownBy(() -> userService.changeRole(USER, RoleEnum.ADMIN, MANAGER))
+                .isInstanceOf(InsufficientRightsException.class);
     }
 
-    /**
-     * Test: Promotion fails when user doesn't exist
-     * 
-     * Verifies that attempting to promote a non-existent user throws
-     * a RuntimeException with an appropriate error message.
-     * 
-     * Arrange:
-     * - Mock repository to return empty Optional (user not found)
-     * 
-     * Act & Assert:
-     * - Call userService.promoteToManager() with non-existent user ID
-     * - Verify RuntimeException is thrown with message "User not found: 1"
-     */
     @Test
-    void promoteToManager_UserNotFound_ThrowsRuntimeException() {
-        // Arrange
-        String login = "Not.a@login.com";
-        when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+    void changeRole_managerCannotDemoteAdmin() {
+        givenActiveUser(ADMIN, RoleEnum.ADMIN);
+        givenActiveUser(MANAGER, RoleEnum.MANAGER);
 
-        // Act & Assert
-        UserExceptions.UserNotFoundException exception = assertThrows(
-            UserExceptions.UserNotFoundException.class,
-            () -> userService.promoteToManager(login)
-        );
-        assertEquals("Not.a@login.com", exception.getLoginOrId());
+        assertThatThrownBy(() -> userService.changeRole(ADMIN, RoleEnum.USER, MANAGER))
+                .isInstanceOf(InsufficientRightsException.class);
     }
 
-    /**
-     * Test: Promotion fails when user is already a manager
-     * 
-     * Verifies that attempting to promote a user who already has the MANAGER
-     * role throws a RuntimeException to prevent unnecessary operations.
-     * 
-     * Arrange:
-     * - Mock repository to return a user with MANAGER role
-     * 
-     * Act & Assert:
-     * - Call userService.promoteToManager() for user who is already manager
-     * - Verify RuntimeException is thrown with message indicating user is already manager
-     */
     @Test
-    void promoteToManager_AlreadyManager_ThrowsRuntimeException() {
-        // Arrange
-        Long userId = 1L;
-        User user = new User();
-        user.setId(userId);
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setLogin("john@test.com");
-        user.setPassword("pass");
-        user.setMainRole(new Role());
-        
-        Role managerRole = new Role();
-        managerRole.setId(2L);
-        managerRole.setName(RoleEnum.MANAGER);
-        user.setMainRole(managerRole);
-        
-        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
-
-        // Act & Assert
-        UserExceptions.UserAlreadyManagerException exception = assertThrows(
-            UserExceptions.UserAlreadyManagerException.class,
-            () -> userService.promoteToManager(user.getLogin())
-        );
-        assertEquals("john@test.com", exception.getLogin());
+    void changeRole_ofOwnAccount_isForbiddenWhateverTheCase() {
+        assertThatThrownBy(() -> userService.changeRole("Admin@Test.com", RoleEnum.USER, ADMIN))
+                .isInstanceOf(SelfModificationForbiddenException.class);
     }
 
-    /**
-     * Test: Successfully delete a user with proper permissions
-     * 
-     * Verifies that a user with sufficient permissions (MANAGER or ADMIN) can
-     * delete another user with lower or equal permissions.
-     * 
-     * Arrange:
-     * - Mock repository to return the user to be deleted (USER role)
-     * - Mock security context to provide authenticated user (MANAGER role)
-     * - Mock repository to return the authenticated user
-     * 
-     * Act:
-     * - Call userService.deleteUser() with target user ID
-     * 
-     * Assert:
-     * - User lookup was performed
-     * - Authenticated user was retrieved
-     * - User was deleted from repository
-     */
     @Test
-    void deleteUser_Successful_DeletesUser() {
-        // Arrange
-        Long userId = 2L;
-        User userToDelete = new User();
-        userToDelete.setId(userId);
-        userToDelete.setFirstName("John");
-        userToDelete.setLastName("Doe");
-        userToDelete.setLogin("john@test.com");
-        userToDelete.setPassword("pass");
-        userToDelete.setMainRole(new Role());
-        Role userRole = new Role();
-        userRole.setId(1L);
-        userRole.setName(RoleEnum.USER);
-        userToDelete.setMainRole(userRole);
-        
-        User authenticatedUser = new User();
-        authenticatedUser.setId(3L);
-        authenticatedUser.setFirstName("Manager");
-        authenticatedUser.setLastName("User");
-        authenticatedUser.setLogin("manager@test.com");
-        authenticatedUser.setPassword("pass");
-        authenticatedUser.setMainRole(new Role());
-        Role managerRole = new Role();
-        managerRole.setId(2L);
-        managerRole.setName(RoleEnum.MANAGER);
-        authenticatedUser.setMainRole(managerRole);
+    void changeRole_toCurrentRole_throwsConflict() {
+        givenActiveUser(USER, RoleEnum.USER);
+        givenActiveUser(ADMIN, RoleEnum.ADMIN);
 
-        UserDto authenticatedUserDto = new UserDto(3L, "Manager", "User", "manager@test.com", null, false,
-                "ROLE_MANAGER", null);
-
-        when(userRepository.findByLogin(userToDelete.getLogin())).thenReturn(Optional.of(userToDelete));
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
-        when(userRepository.findByLogin("manager@test.com")).thenReturn(Optional.of(authenticatedUser));
-
-        // Act
-        userService.deleteUser(userToDelete.getLogin(), false);
-
-        // Assert
-        verify(userRepository).findByLogin(userToDelete.getLogin());
-        verify(userRepository).findByLogin("manager@test.com");
-        verify(userRepository).delete(userToDelete);
+        assertThatThrownBy(() -> userService.changeRole(USER, RoleEnum.USER, ADMIN))
+                .isInstanceOf(UserAlreadyHasRoleException.class);
     }
 
-    /**
-     * Test: Delete fails when user has insufficient permissions
-     * 
-     * Verifies that a user with lower permissions cannot delete a user with
-     * higher or equal permissions. This prevents privilege escalation attacks.
-     * 
-     * Arrange:
-     * - Mock repository to return user to delete (MANAGER role)
-     * - Mock security context to provide authenticated user (USER role - lower permissions)
-     * - Mock repository to return the authenticated user
-     * 
-     * Act & Assert:
-     * - Call userService.deleteUser() as regular user attempting to delete manager
-     * - Verify RuntimeException is thrown with message about insufficient rights
-     */
     @Test
-    void deleteUser_Unauthorized_ThrowsRuntimeException() {
-        // Arrange
-        Long userId = 2L;
-        User userToDelete = new User();
-        userToDelete.setId(userId);
-        userToDelete.setFirstName("John");
-        userToDelete.setLastName("Doe");
-        userToDelete.setLogin("john@test.com");
-        userToDelete.setPassword("pass");
-        userToDelete.setMainRole(new Role());
-        Role managerRole = new Role();
-        managerRole.setId(2L);
-        managerRole.setName(RoleEnum.MANAGER);
-        userToDelete.setMainRole(managerRole);
-        
-        User authenticatedUser = new User();
-        authenticatedUser.setId(3L);
-        authenticatedUser.setFirstName("Regular");
-        authenticatedUser.setLastName("User");
-        authenticatedUser.setLogin("user@test.com");
-        authenticatedUser.setPassword("pass");
-        authenticatedUser.setMainRole(new Role());
-        Role userRole = new Role();
-        userRole.setId(1L);
-        userRole.setName(RoleEnum.USER);
-        authenticatedUser.setMainRole(userRole);
+    void changeRole_usesActorRoleFromDatabaseNotFromToken() {
+        // The actor was demoted to USER: even with an old MANAGER token, the database role applies
+        givenActiveUser(USER, RoleEnum.USER);
+        givenActiveUser(MANAGER, RoleEnum.USER);
 
-        UserDto authenticatedUserDto = new UserDto(3L, "Regular", "User", "user@test.com", null, false, "USER",
-                null);
-
-        when(userRepository.findByLogin(userToDelete.getLogin())).thenReturn(Optional.of(userToDelete));
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(authenticatedUserDto);
-        when(userRepository.findByLogin("user@test.com")).thenReturn(Optional.of(authenticatedUser));
-
-        // Act & Assert
-        SecurityExceptions.UserHasLowerRightsException exception = assertThrows(
-            SecurityExceptions.UserHasLowerRightsException.class,
-            () -> userService.deleteUser(userToDelete.getLogin(), false)
-        );
-        assertEquals("user@test.com", exception.getLogin());
+        assertThatThrownBy(() -> userService.changeRole(USER, RoleEnum.ADMIN, MANAGER))
+                .isInstanceOf(InsufficientRightsException.class);
     }
 
+    @Test
+    void delete_softByDefault() {
+        User user = givenActiveUser(USER, RoleEnum.USER);
+        when(userRepository.findByLogin(USER)).thenReturn(Optional.of(user));
+        givenActiveUser(ADMIN, RoleEnum.ADMIN);
+
+        userService.delete(USER, false, ADMIN);
+
+        verify(userRepository).delete(user);
+        verify(userRepository, never()).deletePermanentlyById(any());
+    }
+
+    @Test
+    void delete_permanent() {
+        User user = givenActiveUser(USER, RoleEnum.USER);
+        when(userRepository.findByLogin(USER)).thenReturn(Optional.of(user));
+        givenActiveUser(ADMIN, RoleEnum.ADMIN);
+
+        userService.delete(USER, true, ADMIN);
+
+        verify(userRepository).deletePermanentlyById(user.getId());
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    void delete_ownAccount_isForbidden() {
+        assertThatThrownBy(() -> userService.delete(ADMIN, false, ADMIN))
+                .isInstanceOf(SelfModificationForbiddenException.class);
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    void updatePassword_checksCurrentPasswordAndWipesBothArrays() {
+        User user = givenActiveUser(USER, RoleEnum.USER);
+        char[] oldPassword = "Password123!".toCharArray();
+        char[] newPassword = "BrandNew123!".toCharArray();
+
+        userService.updatePassword(USER, new PasswordUpdateDto(oldPassword, newPassword));
+
+        assertThat(passwordEncoder.matches(CharBuffer.wrap("BrandNew123!"), user.getPassword())).isTrue();
+        assertThat(oldPassword).containsOnly('\0');
+        assertThat(newPassword).containsOnly('\0');
+    }
+
+    @Test
+    void updatePassword_wrongCurrentPassword_throwsAndKeepsPassword() {
+        User user = givenActiveUser(USER, RoleEnum.USER);
+        String previousHash = user.getPassword();
+
+        assertThatThrownBy(() -> userService.updatePassword(USER,
+                new PasswordUpdateDto("Wrong123!".toCharArray(), "BrandNew123!".toCharArray())))
+                .isInstanceOf(InvalidCurrentPasswordException.class);
+        assertThat(user.getPassword()).isEqualTo(previousHash);
+    }
+
+    @Test
+    void getOrCreateAzureUser_existingUser_isReturnedUnchanged() {
+        User existing = givenActiveUser(USER, RoleEnum.MANAGER);
+        when(userRepository.findByLogin(USER)).thenReturn(Optional.of(existing));
+
+        UserDto user = userService.getOrCreateAzureUser(USER, "Other", "Name");
+
+        assertThat(user.getFirstName()).isEqualTo("First");
+        assertThat(user.getMainRole()).isEqualTo("MANAGER");
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void getOrCreateAzureUser_newUser_isCreatedWithUserRoleAndRandomPassword() {
+        when(userRepository.findByLogin("azure@test.com")).thenReturn(Optional.empty());
+        givenRoleExists(RoleEnum.USER);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserDto user = userService.getOrCreateAzureUser("azure@test.com", "Azure", null);
+
+        assertThat(user.getMainRole()).isEqualTo("USER");
+        assertThat(user.getLastName()).isNull();
+        verify(userRepository).save(argThat(saved ->
+                saved.getPassword() != null && !saved.getPassword().isBlank()));
+    }
+
+    @Test
+    void getOrCreateAzureUser_softDeletedUser_isRejected() {
+        User deleted = User.builder().login(USER).deleted(true).mainRole(role(RoleEnum.USER)).build();
+        when(userRepository.findByLogin(USER)).thenReturn(Optional.of(deleted));
+
+        assertThatThrownBy(() -> userService.getOrCreateAzureUser(USER, "First", "Last"))
+                .isInstanceOf(DeletedAccountException.class);
+    }
 }

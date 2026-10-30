@@ -10,7 +10,7 @@ See also:
 
 ## Pipeline overview
 
-Library: **Spring REST Docs** (`spring-restdocs-mockmvc` 3.0.1).
+Library: **Spring REST Docs** (`spring-restdocs-mockmvc`, version managed by Spring Boot).
 
 Source: [process/restdocs-pipeline.drawio](process/restdocs-pipeline.drawio)
 
@@ -26,8 +26,8 @@ Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page *
 
 Summary:
 
-1. Run integration tests with `document(...)` and, on happy paths, JSON contracts (`RestDocsSnippets`).
-2. If a JSON field no longer matches the contract, the test fails: no HTML rebuilt from stale examples.
+1. Run integration tests with `document(...)` and contracts (`RestDocsSnippets`): JSON fields, path and query parameters, headers and cookies.
+2. If a documented element no longer matches the contract, the test fails: no HTML rebuilt from stale examples.
 3. If tests pass, Asciidoctor assembles `index.adoc` and the snippets.
 4. Maven writes HTML to `target/generated-snippets-html/`.
 5. Depending on the execution context, `docs/index.html` is updated or not (see below).
@@ -40,10 +40,10 @@ Source: [restdocs-generation.drawio](process/restdocs-generation.drawio) (page *
 
 Classes involved:
 
-- `AuthControllerIntegrationTest`
-- `UserControllerIntegrationTest`
-- `RestDocsSnippets` (centralized `requestFields` / `responseFields` contracts)
-- `RestDocsSensitiveDataMasking` (masks JWT and refresh-token values in snippets)
+- `AuthControllerIntegrationTest`, `OAuth2ControllerIntegrationTest`, `UserControllerIntegrationTest`
+- `support/AbstractIntegrationTest` (base class, `document(...)` helper applying masking and pretty-printing)
+- `support/RestDocsSnippets` (centralized contracts: fields, parameters, headers, cookies)
+- `support/RestDocsSensitiveDataMasking` (masks JWT and refresh-token values in snippets)
 
 Configuration:
 
@@ -65,7 +65,7 @@ Each `document(...)` call also applies `maskSensitiveData()` before `prettyPrint
 
 Integration tests use real JWT tokens (signed with the test secret from `application-test.properties`). Without masking, those values would be copied verbatim into `target/generated-snippets/` and `docs/index.html`.
 
-`RestDocsSensitiveDataMasking` is an `OperationPreprocessor` applied in both integration test helpers:
+`RestDocsSensitiveDataMasking` is an `OperationPreprocessor` applied by `AbstractIntegrationTest.document(...)`:
 
 ```java
 preprocessRequest(maskSensitiveData(), prettyPrint())
@@ -127,8 +127,8 @@ Related fixes in `SecurityConfig` and tests:
 
 | Command / context | Snippets | HTML output | `docs/index.html` updated? |
 |---|---|---|---|
-| `scripts/java-env.sh mvn test` | Yes | No | No |
-| `scripts/java-env.sh mvn package` | Yes | `target/generated-snippets-html/` | No (unless copied manually) |
+| `./mvnw test` | Yes | No | No |
+| `./mvnw package` | Yes | `target/generated-snippets-html/` | No (unless copied manually) |
 | `mvn clean package` on the host | Yes | `target/` | No (unless copied / committed) |
 | `docker compose up` (`app` service, `./docs` volume) | Yes | mapped to `./docs/` | **Yes** (direct volume write) |
 
@@ -142,12 +142,11 @@ Without this volume (`java` container, `workspace` profile), regenerating docs o
 
 ## Common commands
 
-Recommended build environment (JDK 21 + Maven 3.9 + MariaDB, no Java on the host):
+The tests need a MariaDB test database (`TEST_SPRING_DATASOURCE_URL`); the Maven wrapper provides the required Maven version (the Asciidoctor plugin needs Maven 3.8.8 or later):
 
 ```bash
-scripts/java-env.sh up
-scripts/java-env.sh mvn -Dspring.profiles.active=test verify
-scripts/java-env.sh mvn clean package
+./mvnw verify            # tests + snippets + HTML in target/generated-snippets-html/
+cp target/generated-snippets-html/index.html docs/index.html
 ```
 
 Inspect snippets:
@@ -188,10 +187,20 @@ Any change to the pipeline or detailed processes must update the Draw.io files (
 
 After an API change:
 
-1. Update tests and `RestDocsSnippets` if JSON payloads change.
+1. Update tests and `RestDocsSnippets` if payloads, parameters, headers or cookies change.
 2. Regenerate snippets and HTML (`verify` then `package`).
 3. Update `docs/index.html` if published documentation must follow.
 4. Update this document or the Draw.io diagrams if the flow changes.
+
+## Safeguards against stale documentation
+
+Three automatic checks fail the build when the documentation no longer matches the API:
+
+| Check | Fails when |
+|---|---|
+| REST Docs contracts (`RestDocsSnippets`) | A documented field, parameter, header or cookie is missing from a request/response, or an undocumented field appears |
+| `ApiDocumentationCoverageTest` | An endpoint exists in a controller but `index.adoc` does not mention it as `` `METHOD /path` `` |
+| Asciidoctor `failIf` (`pom.xml`) | `index.adoc` includes a snippet that no test generated (renamed or removed test/endpoint) |
 
 ## Keeping documentation in sync manually
 

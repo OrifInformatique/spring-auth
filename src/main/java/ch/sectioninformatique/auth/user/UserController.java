@@ -1,301 +1,167 @@
 package ch.sectioninformatique.auth.user;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
-
-
+import ch.sectioninformatique.auth.user.dto.CreateUserDto;
+import ch.sectioninformatique.auth.user.dto.PasswordUpdateDto;
+import ch.sectioninformatique.auth.user.dto.RoleUpdateDto;
+import ch.sectioninformatique.auth.user.dto.UpdateUserDto;
+import ch.sectioninformatique.auth.user.dto.UserDto;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 /**
- * REST controller for managing user operations.
- * This controller provides endpoints for:
- * - User authentication and profile management
- * - User role management (promotion, revocation)
- * - User deletion
- * - User listing and retrieval
- * 
- * All endpoints are secured with appropriate authorization checks using Spring
- * Security's
- * 
- * @PreAuthorize annotations. The controller follows RESTful conventions and
- *               returns
- *               appropriate HTTP responses with success/error messages.
+ * The users resource. Users are identified by their login (email) in URLs.
+ *
+ * Every endpoint requires an access token; the permission required by each one is
+ * declared with {@code @PreAuthorize}. Rules depending on the target user (admin
+ * accounts, own account) are enforced by {@link UserService}.
  */
-@RequestMapping("/users")
 @RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    /** Service for handling user-related operations */
+
     private final UserService userService;
-    private final MessageSource messageSource;
-
 
     /**
-     * Constructs a new UserController with the required service.
-     *
-     * @param userService Service for handling user-related operations
-     */
-    public UserController(UserService userService, MessageSource messageSource) {
-        this.userService = userService;
-        this.messageSource = messageSource;
-    }
-
-    /**
-     * Retrieves the currently authenticated user's information.
-     * This endpoint:
-     * - Requires user authentication
-     * - Returns the user's profile information
-     * - Is accessible to all authenticated users
-     *
-     * @param currentUser The currently authenticated user, injected by Spring Security
-     * @return ResponseEntity containing the current user's DTO
+     * @param currentUser authenticated user
+     * @return 200 with the authenticated user, as currently stored (the access token
+     *         may carry outdated data, e.g. a role changed since login)
      */
     @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDto> authenticatedUser(@AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(currentUser);
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDto currentUser) {
+        return ResponseEntity.ok(userService.findByLogin(currentUser.getLogin()));
     }
 
     /**
-     * Retrieves all users in the system excluding soft-deleted ones.
-     * This endpoint:
-     * - Requires the 'user:read' authority
-     * - Returns a list of all users
-     * - Is typically used by administrators
+     * Changes the password of the authenticated user.
      *
-     * @return ResponseEntity containing a list of all users, without soft-deleted ones
+     * @param currentUser authenticated user
+     * @param request     current and new passwords
+     * @return 204 No Content
      */
-    @GetMapping("/")
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> updateOwnPassword(@AuthenticationPrincipal UserDto currentUser,
+            @RequestBody @Valid PasswordUpdateDto request) {
+        userService.updatePassword(currentUser.getLogin(), request);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * @param status ACTIVE (default), DELETED or ALL
+     * @return 200 with the matching users, ordered by id
+     */
+    @GetMapping
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<UserDto>> allUsers() {
-        List<UserDto> users = userService.allUsers();
-        
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDto>> getUsers(
+            @RequestParam(defaultValue = "ACTIVE") UserStatus status) {
+        return ResponseEntity.ok(userService.findAll(status));
     }
 
     /**
-     * Retrieves all users in the system including soft-deleted ones.
-     * This endpoint:
-     * - Requires the 'user:read' authority
-     * - Returns a list of all users
-     * - Is typically used by administrators
-     *
-     * @return ResponseEntity containing a list of all users, including soft-deleted ones
+     * @param login login of the user
+     * @return 200 with the active user having this login
      */
-    @GetMapping("/all-with-deleted")
+    @GetMapping("/{login}")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<UserDto>> allWithDeletedUsers() {
-        List<UserDto> users = userService.allWithDeletedUsers();
-        return ResponseEntity.ok(users); 
+    public ResponseEntity<UserDto> getUser(@PathVariable String login) {
+        return ResponseEntity.ok(userService.findByLogin(login));
     }
 
     /**
-     * Retrieves all soft-deleted users in the system.
-     * This endpoint:
-     * - Requires the 'user:read' authority
-     * - Returns a list of all soft-deleted users
-     * - Is typically used by administrators
+     * Creates a user.
      *
-     * @return ResponseEntity containing a list of all soft-deleted users
+     * @param request     new user's data
+     * @param currentUser authenticated user
+     * @return 201 with the created user and its URL in the Location header
      */
-    @GetMapping("/deleted")
-    @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<List<UserDto>> deletedUsers() {
-        List<UserDto> users = userService.deletedUsers();
-        return ResponseEntity.ok(users);
+    @PostMapping
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<UserDto> createUser(@RequestBody @Valid CreateUserDto request,
+            @AuthenticationPrincipal UserDto currentUser) {
+        UserDto created = userService.create(request, currentUser.getLogin());
+        URI location = UriComponentsBuilder.fromPath("/users/{login}")
+                .buildAndExpand(created.getLogin())
+                .toUri();
+        return ResponseEntity.created(location).body(created);
     }
 
     /**
-     * Restore a user that was soft deleted
-     * 
-     * @param login The login (username) of the user to restore
-     * @return ResponseEntity with success message or error details
-     */
-    @PutMapping("/{login}/restore")
-    @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<?> restoreDeletedUser(@PathVariable String login) {
-        userService.restoreDeletedUser(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.restored",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-    }
-
-    /**
-     * Promotes a user to the manager role.
-     * This endpoint:
-     * - Requires the 'user:update' authority
-     * - Validates the user exists and isn't already a manager
-     * - Returns success/error message
+     * Updates the first name, last name and login of a user.
      *
-     * @param login The login (username) of the user to promote to manager
-     * @return ResponseEntity with success message or error details
+     * @param login       current login of the user
+     * @param request     new values
+     * @param currentUser authenticated user
+     * @return 200 with the updated user
      */
-    @PreAuthorize("hasAuthority('user:update')")
-    @PutMapping("/{login}/promote-manager")
-    public ResponseEntity<?> promoteToManager(@PathVariable String login) {
-
-        userService.promoteToManager(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.promoted.manager",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-
-    }
-
-    /**
-     * Revokes the manager role from a user.
-     * This endpoint:
-     * - Requires the 'user:update' authority
-     * - Validates the user exists and isn't an admin
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the user to revoke manager role from
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasAuthority('user:update')")
-    @PutMapping("/{login}/revoke-manager")
-    public ResponseEntity<?> revokeManagerRole(@PathVariable String login) {
-
-        userService.revokeManagerRole(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.revoked.manager",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-    }
-
-    /**
-     * Promotes a user to the admin role.
-     * This endpoint:
-     * - Requires 'ADMIN' role
-     * - Validates the user exists and isn't already a admin
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the user to promote to admin
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{login}/promote-admin")
-    public ResponseEntity<?> promoteToAdmin(@PathVariable String login) {
-        userService.promoteToAdmin(login);
-        return ResponseEntity.ok().body(messageSource.getMessage(
-                "message.user.promoted.admin",
-                null,
-                LocaleContextHolder.getLocale()
-        ));
-    }
-
-    /**
-     * Revokes the admin role from a user.
-     * 
-     * This endpoint:
-     * - Requires 'ADMIN' role
-     * - Calls the userService to revoke the admin role from the specified user
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the user to revoke admin role from
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{login}/revoke-admin")
-    public ResponseEntity<?> revokeAdminRole(@PathVariable String login) {
-        return userService.revokeAdminRole(login);
-    }
-
-
-    /**
-     * Get a user by his login
-     * 
-     * @param login the user's login
-     * @return a UserDto of the user
-     */
-    @PreAuthorize("hasAuthority('user:read')")
-    @GetMapping("/{login:.+@.+}")
-    public ResponseEntity<?> getUserByLogin(@PathVariable String login){
-        try{
-            UserDto user = userService.findByLogin(login);
-            return ResponseEntity.ok(user);
-        } catch(UserNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageSource.getMessage(
-                "error.user.not.found",
-                null,
-                LocaleContextHolder.getLocale()
-            ));
-        }
-    }
-    
-
-    /**
-     * Method to soft or hard delete users.
-     * This endpoint:
-     * - Requires the 'user:delete' authority
-     * - Validates the authenticated user has sufficient permissions
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the user to delete
-     * @param hardDelete A boolean for soft or hard delete (default: false)
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasAuthority('user:delete')")
-    @DeleteMapping({"/{login}","/{login}/{hardDelete}"})
-    public ResponseEntity<?> delete(@PathVariable String login, @PathVariable(required = false) Boolean hardDelete) {
-        String resultMessage = "";
-
-        // If hardDelete parameter is null, default to false (soft delete)
-        boolean isHardDelete = hardDelete != null ? hardDelete : false;
-        
-        // Perform the delete operation and get the deleted user's information
-        UserDto deletedUser = userService.deleteUser(login, isHardDelete);
-
-        // Determine the appropriate message based on the type of deletion performed
-        if (isHardDelete) {
-            resultMessage = messageSource.getMessage("message.user.deleted.permanent", null, LocaleContextHolder.getLocale());
-        } else {
-            resultMessage = messageSource.getMessage("message.user.deleted", null, LocaleContextHolder.getLocale());
-        }
-
-        // Return a response containing the result message and the login of the deleted user
-        return ResponseEntity
-            .ok(Map.of(
-                "message",
-                resultMessage,
-                "deletedUserLogin",
-                deletedUser.getLogin()));
-    }
-
-    /**
-     * Method to update a user's information.
-     * This endpoint:
-     * - Requires the 'user:update' authority
-     * - Validates the user exists
-     * - Updates the user's information based on the provided UserDto
-     * - Returns success/error message
-     *
-     * @param login The login (username) of the user to update
-     * @param userDto The DTO containing the updated user information
-     * @return ResponseEntity with success message or error details
-     */
-    @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{login}")
-    public ResponseEntity<?> updateUser(@PathVariable String login, @RequestBody UserDto userDto) {
-        userService.updateUser(login, userDto);
-        return ResponseEntity.ok().body("User updated successfully");
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<UserDto> updateUser(@PathVariable String login,
+            @RequestBody @Valid UpdateUserDto request,
+            @AuthenticationPrincipal UserDto currentUser) {
+        return ResponseEntity.ok(userService.update(login, request, currentUser.getLogin()));
+    }
+
+    /**
+     * Changes the role of a user.
+     *
+     * @param login       login of the user
+     * @param request     new role
+     * @param currentUser authenticated user
+     * @return 200 with the updated user
+     */
+    @PutMapping("/{login}/role")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<UserDto> updateUserRole(@PathVariable String login,
+            @RequestBody @Valid RoleUpdateDto request,
+            @AuthenticationPrincipal UserDto currentUser) {
+        return ResponseEntity.ok(userService.changeRole(login, request.role(), currentUser.getLogin()));
+    }
+
+    /**
+     * Deletes a user. The deletion is soft (restorable) unless {@code permanent=true}.
+     *
+     * @param login       login of the user
+     * @param permanent   true to remove the user from the database
+     * @param currentUser authenticated user
+     * @return 204 No Content
+     */
+    @DeleteMapping("/{login}")
+    @PreAuthorize("hasAuthority('user:delete')")
+    public ResponseEntity<Void> deleteUser(@PathVariable String login,
+            @RequestParam(defaultValue = "false") boolean permanent,
+            @AuthenticationPrincipal UserDto currentUser) {
+        userService.delete(login, permanent, currentUser.getLogin());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Restores a soft-deleted user.
+     *
+     * @param login       login of the user
+     * @param currentUser authenticated user
+     * @return 200 with the restored user
+     */
+    @PostMapping("/{login}/restore")
+    @PreAuthorize("hasAuthority('user:update')")
+    public ResponseEntity<UserDto> restoreUser(@PathVariable String login,
+            @AuthenticationPrincipal UserDto currentUser) {
+        return ResponseEntity.ok(userService.restore(login, currentUser.getLogin()));
     }
 }

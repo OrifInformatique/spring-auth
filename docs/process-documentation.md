@@ -15,25 +15,19 @@ Companion guide to the [README](../README.md). Describes application **structure
     - [1.4 Source Structure (`src`)](#14-source-structure-src)
       - [1.4.1 `main`](#141-main)
       - [1.4.2 `test`](#142-test)
-    - [1.5 Main Java Modules (`main/java`)](#15-main-java-modules-mainjava)
-    - [1.6 Security Module (`main/java/security`)](#16-security-module-mainjavasecurity)
-    - [1.7 Auth Module (`main/java/auth`)](#17-auth-module-mainjavaauth)
-    - [1.8 Users Module (`main/java/user`)](#18-users-module-mainjavauser)
-    - [1.9 Configuration Module (`main/java/config`)](#19-configuration-module-mainjavaconfig)
-    - [1.10 Error and Exception Management (`main/java/app`)](#110-error-and-exception-management-mainjavaapp)
-    - [1.11 Test Structure (`test/java`)](#111-test-structure-testjava)
-    - [1.12 Security Tests (`test/java/security`)](#112-security-tests-testjavasecurity)
-    - [1.13 Authentication Tests (`test/java/auth`)](#113-authentication-tests-testjavaauth)
-    - [1.14 User Tests (`test/java/user`)](#114-user-tests-testjavauser)
-    - [1.15 External Integrations (Microsoft Entra ID / Azure AD)](#115-external-integrations-microsoft-entra-id--azure-ad)
-      - [1.15.1 OAuth2 Integration (Azure AD)](#1151-oauth2-integration-azure-ad)
-      - [1.15.2 OAuth2 Scopes and Claims](#1152-oauth2-scopes-and-claims)
+    - [1.5 Main Java Packages (`main/java`)](#15-main-java-packages-mainjava)
+    - [1.6 Request Processing](#16-request-processing)
+    - [1.7 Session Flows (`auth`)](#17-session-flows-auth)
+    - [1.8 User Management (`user`)](#18-user-management-user)
+    - [1.9 Error Handling (`common`)](#19-error-handling-common)
+    - [1.10 Test Structure (`test/java`)](#110-test-structure-testjava)
+    - [1.11 External Integrations (Microsoft Entra ID / Azure AD)](#111-external-integrations-microsoft-entra-id--azure-ad)
   - [2. API reference](#2-api-reference)
   - [3. Testing](#3-testing)
     - [3.1 Environment Profiles](#31-environment-profiles)
     - [3.2 Test Execution](#32-test-execution)
   - [4. Security Architecture](#4-security-architecture)
-    - [4.1 Authentication Flow](#41-authentication-flow)
+    - [4.1 Tokens](#41-tokens)
     - [4.2 Role-Based Access Control](#42-role-based-access-control)
     - [4.3 Password Security](#43-password-security)
   - [5. Database Schema](#5-database-schema)
@@ -79,8 +73,8 @@ graph TD
 
 **Tools & Dependencies:**
 
-- **Java / OpenJDK:** 21
-- **Spring Boot:** 3.5.8
+- **Java / OpenJDK:** 25
+- **Spring Boot:** 4.0
 - **Maven:** 3.9+
 - **MariaDB:** 11.4
 - **Docker Desktop** (in dev/test environment) : Latest
@@ -90,12 +84,12 @@ graph TD
 - **Spring Security:** Authentication and authorization framework
 - **Spring Data JPA:** Database access and ORM
 - **Spring OAuth2 Client:** Microsoft Entra ID (Azure AD) integration
-- **Auth0 Java-JWT (4.4.0):** JWT token generation and validation
-- **MapStruct (1.6.3):** Java bean mappings and DTO conversions
-- **Lombok (1.18.38):** Reduces boilerplate code
-- **Spring REST Docs (3.0.1):** API documentation generation
+- **Auth0 Java-JWT:** JWT token generation and validation
+- **MapStruct:** Java bean mappings and DTO conversions
+- **Lombok:** Reduces boilerplate code
+- **Spring REST Docs:** API documentation generated from the integration tests
 - **Jakarta Validation:** Bean validation and custom constraints
-- **Dotenv Java:** Environment variable management
+- **spring-dotenv (`springboot4-dotenv`):** loads the `.env` file when running outside Docker
 
 > **Note:** Detailed setup and run instructions are provided in the project's main [`README.md`](../README.md).
 
@@ -106,10 +100,10 @@ graph TD
 | File                     | Description                                                      |
 | ------------------------ | ---------------------------------------------------------------- |
 | `pom.xml`                | Defines project dependencies, plugins, and build configurations. |
-| `init.sql`               | SQL script to create and initialize the database schema.         |
+| `init.sql`               | Creates the `test_db` database next to the dev database in the MariaDB container. |
 | `Dockerfile`             | Defines Docker image build stages and application setup.         |
 | `compose.yml`            | Configures Docker environment and additional services.           |
-| `application.properties` | Global configuration properties for Spring Boot.                 |
+| `application.properties` | Local, git-ignored overrides of the Spring Boot configuration (copy of `application.properties-dist`). |
 | `.env`                   | Environment variables for local development and deployment.      |
 | `README.md`              | Project overview, setup instructions, and documentation links.   |
 
@@ -145,547 +139,203 @@ Contains test classes for unit and integration tests.
 
 ---
 
-### 1.5 Main Java Modules (`main/java`)
+### 1.5 Main Java Packages (`main/java`)
 
-| Module                     | Responsibility                                                                                |
-| -------------------------- | --------------------------------------------------------------------------------------------- |
-| `app`                      | Global error and exception handling used throughout the application.                          |
-| `auth`                     | Handles authorization processes such as login and registration.                               |
-| `security`                 | Security-related classes: JWT filters, password encoding, and authentication management.      |
-| `user`                     | Manages user profiles, roles, and permissions.                                                |
-| `AuthApplication.java` | Main Spring Boot entry point containing the `main()` method. Run the project from this class. |
+The code is organized **by feature**: each package groups the controller, service, repository, entities, DTOs and exceptions of one domain. Cross-cutting code lives in `common`, `config` and `security`.
+
+```
+ch.sectioninformatique.auth
+├── AuthApplication.java            Entry point (main method)
+├── auth/                           Sessions: login, refresh, logout
+│   ├── AuthController, AuthService, AuthExceptions
+│   ├── dto/                        CredentialsDto, TokenResponseDto, AuthCodeExchangeDto
+│   ├── token/                      RefreshToken (entity), RefreshTokenRepository,
+│   │                               RefreshTokenService, RefreshTokenCookieFactory
+│   └── oauth2/                     Azure login: OAuth2Controller, AuthCode (entity),
+│                                   AuthCodeRepository, AuthCodeService, RedirectUrlPolicy
+├── user/                           Users resource
+│   ├── User (entity), UserController, UserService, UserRepository,
+│   │   UserMapper, UserStatus, UserExceptions, UserSeeder (dev profile)
+│   ├── dto/                        UserDto, CreateUserDto, UpdateUserDto, RoleUpdateDto,
+│   │                               PasswordUpdateDto
+│   └── validation/                 @PasswordNotReused and its validator
+├── role/                           Role (entity), RoleEnum, PermissionEnum,
+│                                   RoleRepository, RoleSeeder
+├── security/                       SecurityConfig, JwtService, JwtAuthFilter,
+│                                   UserAuthenticationEntryPoint, CustomAccessDeniedHandler,
+│                                   CorsProperties, CorsConfigurationValidator,
+│                                   TokenHasher, SecurityExceptions
+├── common/
+│   ├── exception/                  AppException (base class), GlobalExceptionHandler
+│   └── web/                        ErrorResponse, ErrorResponseWriter
+└── config/                         LocaleConfig (i18n), PasswordConfig (BCrypt)
+```
+
+Dependencies go in one direction: `auth` uses `user`, `user` uses `role`, and every package may use `security`, `common` and `config`. The `user` package knows nothing about tokens.
+
+Localized messages are stored per feature in `src/main/resources/messages/<feature>/messages_{fr,en}.properties` and discovered automatically by `LocaleConfig`.
 
 ---
 
-### 1.6 Security Module (`main/java/security`)
+### 1.6 Request Processing
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant JwtAuthFilter
-    participant UserAuthenticationProvider
     participant Controller
     participant Service
 
-    Client->>JwtAuthFilter: HTTP request with JWT token
-    note right of JwtAuthFilter: Filter intercepts all requests
-    
-    alt Token present
-        JwtAuthFilter->>UserAuthenticationProvider: validateToken(token)
-        
-        alt Token valid
-            UserAuthenticationProvider->>JwtAuthFilter: Return Authentication object
-            JwtAuthFilter->>Controller: Forward authenticated request
-            Controller->>Service: Perform business logic
-            Service->>Controller: Return result
-            Controller->>Client: Return HTTP response
-        else Token invalid/expired
-            UserAuthenticationProvider-->>Client: 401 Unauthorized (Invalid JWT token)
-        end
-    else No token
-        JwtAuthFilter->>Controller: Forward unauthenticated request
-        
-        alt Public endpoint
-            Controller->>Client: Return HTTP response
-        else Protected endpoint
-            Controller-->>Client: 401 Unauthorized (Missing or invalid authentication token)
-        end
+    Client->>JwtAuthFilter: Request (Authorization: Bearer <access token>)
+    alt No bearer token
+        JwtAuthFilter->>Controller: Continue unauthenticated
+        Note over Controller: Protected endpoint: 401 from UserAuthenticationEntryPoint
+    else Valid token
+        JwtAuthFilter->>Controller: Continue with authenticated UserDto
+        Note over Controller: @PreAuthorize checks the permission (403 if missing)
+        Controller->>Service: Business logic (data-dependent rules)
+        Service-->>Controller: Result or AppException
+        Controller-->>Client: JSON response (errors via GlobalExceptionHandler)
+    else Invalid or expired token
+        JwtAuthFilter-->>Client: 401 with the reason (expired, invalid signature...)
     end
 ```
 
-_Sequence Diagram showing JWT authentication and request handling flow._
+Two security filter chains are configured in `SecurityConfig`:
 
-| File                                | Description                                                                    |
-| ----------------------------------- | ------------------------------------------------------------------------------ |
-| `CorsConfigurationValidator.java`   | Validates CORS configuration at startup to ensure security compliance.         |
-| `CustomAccessDeniedHandler.java`    | Handles authenticated but unauthorized requests (403 Forbidden).               |
-| `JwtAuthFilter.java`                | Authentication filter that processes JWT tokens for incoming requests.         |
-| `PermissionEnum.java`               | Enumeration defining available permissions (read, write, update, delete).      |
-| `Role.java`                         | Role entity class representing a user role in the database.                    |
-| `RoleEnum.java`                     | Enumeration defining roles (USER, MANAGER, ADMIN) and their permissions.       |
-| `RoleRepository.java`               | Interface for database operations related to roles.                            |
-| `RoleSeeder.java`                   | Seeds the database with predefined roles on application startup.               |
-| `SecurityConfig.java`               | Security configuration defining the filter chain and access rules.             |
-| `UserAuthenticationEntryPoint.java` | Handles unauthenticated access by returning a 401 Unauthorized response.       |
-| `UserAuthenticationProvider.java`   | Authentication provider for validating JWT tokens and user credentials.        |
+- `/auth/**` and `/users/**`: stateless, authenticated with the access token;
+- every other path (`/oauth2/**`, `/login/oauth2/**`): uses an HTTP session, only for the duration of the Azure login.
 
 ---
 
----
-
-### 1.7 Auth Module (`main/java/auth`)
+### 1.7 Session Flows (`auth`)
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant AuthController
-    participant UserService
-    participant PasswordEncoder
-    participant UserRepository
-    participant UserMapper
-    participant AuthProvider
-
-    Client->>AuthController: POST /auth/login with credentials
-    AuthController->>UserService: login(credentialsDto)
-    UserService->>UserRepository: findByLogin(login)
-    
-    alt User found
-        UserRepository->>UserService: Return User entity
-        UserService->>PasswordEncoder: matches(password, hashedPassword)
-        
-        alt Password valid
-            PasswordEncoder->>UserService: true
-            UserService->>UserMapper: toUserDto(user)
-            UserMapper->>UserService: Return UserDto
-            UserService->>AuthController: Return UserDto
-            AuthController->>AuthProvider: createToken(userDto)
-            AuthProvider->>AuthController: Return JWT token
-            AuthController->>AuthProvider: createRefreshToken(userDto)
-            AuthProvider->>AuthController: Return refresh token
-            AuthController->>Client: 200 OK with UserDto + tokens
-        else Password invalid
-            PasswordEncoder->>UserService: false
-            UserService-->>Client: 401 Unauthorized (error.authorisation.invalid.credentials)
-        end
-    else User not found
-        UserRepository-->>Client: 401 Unauthorized (error.authorisation.invalid.credentials)
-    end
-```
-
-_Sequence Diagram showing an example of the authentication flow._
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant template_frontback
     participant spring-auth
-    participant database
+    participant Database
 
-    Client->>template_frontback: /auth/login with credentials
-    template_frontback->>spring-auth: /auth/login with credentials
-    spring-auth->>database: store new refresh token
-    spring-auth-->>template_frontback: response with refresh token cookie
-    template_frontback->>Client: response with refresh token cookie
-    Client->>template_frontback: /auth/refresh with refresh token in body
-    template_frontback->>spring-auth: /auth/refresh with refresh token in body
-    spring-auth->>database: Check if token exist
-    database->>spring-auth: Confirm that token exist
-    spring-auth->>database: store new refresh token
-    spring-auth->>template_frontback: send new access token in body with new refresh token in cookie
-    template_frontback->>Client: send new access token in body with new refresh token in cookie
-    Client->>template_frontback: /users/... with access token
-```
-_Sequence Diagram showing an example of the refresh token workflow._
+    Client->>spring-auth: POST /auth/login {login, password}
+    spring-auth->>Database: check password (BCrypt), store refresh token hash
+    spring-auth-->>Client: 200 user + access token, Set-Cookie refresh_token
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant template_frontback
-    participant spring-auth
-    participant database
+    Client->>spring-auth: GET /users/... (Authorization: Bearer)
+    Note over Client,spring-auth: ... access token expires (401 "Token has expired")
 
-    Client->>template_frontback: POST /auth/logout (Authorization: Bearer)
-    template_frontback->>spring-auth: POST /auth/logout (Authorization: Bearer)
-    spring-auth->>database: delete all refresh tokens for user
-    spring-auth-->>template_frontback: 200 OK (Logged out)
-    template_frontback-->>Client: 200 OK
-```
-_Sequence Diagram showing the logout flow and token invalidation._
+    Client->>spring-auth: POST /auth/refresh (cookie refresh_token)
+    spring-auth->>Database: check hash, replace with the new token hash
+    spring-auth-->>Client: 200 {accessToken}, Set-Cookie new refresh_token
 
-| File                    | Description                                               |
-| ----------------------- | --------------------------------------------------------- |
-| `AuthController.java`   | Controller handling user authentication and registration. |
-| `CredentialsDto.java`   | Data Transfer Object (DTO) for login credentials.         |
-| `PasswordUpdateDto.java` | DTO for handling password update requests.               |
-| `RefreshRequestDto.java` | DTO for refresh token requests.                          |
-| `TokenResponseDto.java` | DTO for token responses (access token).                   |
-| `RefreshToken.java`     | Entity class for storing hashed refresh tokens.           |
-| `RefreshTokenRepository.java` | Repository for refresh token database operations.  |
-| `OAuth2Controller.java` | Controller handling OAuth2 authentication flows.          |
-| `PasswordConfig.java`   | Configuration class for password policies and encryption. |
-| `PasswordNotReused.java` | Custom validation constraint for password reuse checks.   |
-| `SignUpDto.java`        | DTO for registration functionalities.                     |
-
----
-
-### 1.8 Users Module (`main/java/user`)
-
-```mermaid
-classDiagram
-    %% =====================
-    %% Entities
-    %% =====================
-    class User {
-        +long id
-        +String firstName
-        +String lastName
-        +String login
-        +Date createdAt
-        +Date updatedAt
-        +Role mainRole
-        +Collection<GrantedAuthority> getAuthorities()
-        +String getUsername()
-        +boolean isAccountNonExpired()
-        +boolean isAccountNonLocked()
-        +boolean isCredentialsNonExpired()
-        +boolean isEnabled()
-        +Role getMainRole()
-        +void setMainRole(Role role)
-    }
-
-    class Role {
-        +long id
-        +RoleEnum name
-        +String description
-        +Date createdAt
-        +Date updatedAt
-        +Set<User> users
-    }
-
-    class RoleEnum {
-        <<enum>>
-        +USER
-        +MANAGER
-        +ADMIN
-        --
-        -Set<PermissionEnum> permissions
-        +Set<PermissionEnum> getPermissions()
-        +Set<SimpleGrantedAuthority> getGrantedAuthorities()
-    }
-
-    class PermissionEnum {
-        <<enum>>
-        +USER_READ("user:read")
-        +USER_WRITE("user:write")
-        +USER_UPDATE("user:update")
-        +USER_DELETE("user:delete")
-        --
-        -String permission
-        +String getPermission()
-    }
-
-    %% =====================
-    %% DTOs
-    %% =====================
-    class UserDto {
-        <<DTO>>
-        +Long id
-        +String firstName
-        +String lastName
-        +String login
-        +String token
-        +String refreshToken
-        +String mainRole = "USER"
-        +List<String> permissions = new ArrayList<>()
-    }
-
-    class SignUpDto {
-        <<DTO>>
-        +String firstName
-        +String lastName
-        +String login
-    }
-
-    %% =====================
-    %% Mapper
-    %% =====================
-    class UserMapper {
-        <<interface / singleton>>
-        +UserDto toUserDto(User user)
-        +User signUpToUser(SignUpDto signUpDto)
-        +List<String> authoritiesToPermissions(Collection<GrantedAuthority> authorities)
-    }
-
-    %% =====================
-    %% Relationships
-    %% =====================
-    User --> "0..1" Role : mainRole
-    Role --> "0..*" User : users
-    Role --> RoleEnum : uses
-    RoleEnum --> "0..*" PermissionEnum : defines
-    UserMapper ..> User : uses
-    UserMapper ..> UserDto : creates
-    UserMapper ..> SignUpDto : uses
-    User ..|> UserDetails
+    Client->>spring-auth: POST /auth/logout (Authorization: Bearer)
+    spring-auth->>Database: delete refresh token
+    spring-auth-->>Client: 204, cookie cleared
 ```
 
-_Class Diagram showing the `User`, `Role`, `UserDto`, and `SignUpDto` structure._
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant SecurityLayer
-    participant UserController
-    participant UserService
-    participant UserRepository
-    participant UserMapper
-
-    %% /users/me
-    Client->>SecurityLayer: /users/me
-    SecurityLayer->>UserController: Authorized UserDto extracted from token
-    UserController-->>Client: ResponseEntity<UserDto> (current authenticated user)
-
-    %% /users/all
-    Client->>SecurityLayer: /users/all
-    SecurityLayer->>UserController: Authorized request (requires user:read)
-    UserController->>UserService: allUsers()
-    UserService->>UserRepository: findAll()
-    UserRepository-->>UserService: List<User>
-    UserService-->>UserController: List<User>
-    UserController-->>Client: ResponseEntity<List<User>>
-
-    %% /users/{userId}/promote-manager
-    Client->>SecurityLayer: /users/{userId}/promote-manager
-    SecurityLayer->>UserController: Authorized request (requires user:update)
-    UserController->>UserService: promoteToManager(userId)
-    UserService->>UserRepository: findById(userId)
-    UserRepository-->>UserService: Found User
-    UserService->>UserRepository: save(user with updated manager role)
-    UserService->>UserMapper: toUserDto(user)
-    UserMapper-->>UserService: UserDto
-    UserService-->>UserController: UserDto
-    UserController-->>Client: ResponseEntity(message.user.promoted.manager)
-```
-
-_Sequence Diagram showing an example of the user management flow._
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant SecurityLayer
-    participant UserController
-    participant UserService
-    participant UserRepository
-
-    %% /users/{userId}/promote-admin
-    Client->>SecurityLayer: /users/{userId}/promote-admin
-    SecurityLayer->>UserController: Requires ADMIN role
-    UserController->>UserService: promoteToAdmin(userId)
-    UserService->>UserRepository: findById(userId)
-    UserRepository-->>UserService: User
-    UserService->>UserRepository: save(user with ADMIN role)
-    UserService-->>UserController: confirmation
-    UserController-->>Client: 200 OK (Admin role assigned)
-
-    %% /users/{userId}/revoke-admin and /downgrade-admin
-    Client->>SecurityLayer: /users/{userId}/revoke-admin or /downgrade-admin
-    SecurityLayer->>UserController: Requires ADMIN role
-    UserController->>UserService: revokeAdminRole or downgradeAdminRole (userId)
-    UserService->>UserRepository: findById(userId)
-    UserRepository-->>UserService: User
-    UserService->>UserRepository: save(user with downgraded role)
-    UserService-->>UserController: confirmation
-    UserController-->>Client: 200 OK (Admin role revoked/downgraded)
-```
-_Sequence Diagram showing admin role assignment and revocation._
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant SecurityLayer
-    participant UserController
-    participant UserService
-    participant UserRepository
-
-    %% Soft delete
-    Client->>SecurityLayer: DELETE /users/{userId}
-    SecurityLayer->>UserController: Requires user:delete
-    UserController->>UserService: deleteUser(userId)
-    UserService->>UserRepository: findById(userId)
-    UserRepository-->>UserService: User
-    UserService->>UserRepository: mark deleted_at
-    UserService-->>UserController: deleted user info
-    UserController-->>Client: 200 OK (soft deleted)
-
-    %% Restore
-    Client->>SecurityLayer: PUT /users/{userId}/restore
-    SecurityLayer->>UserController: Requires user:update
-    UserController->>UserService: restoreDeletedUser(userId)
-    UserService->>UserRepository: findById(userId)
-    UserRepository-->>UserService: User
-    UserService->>UserRepository: clear deleted_at
-    UserService-->>UserController: restored user info
-    UserController-->>Client: 200 OK (restored)
-
-    %% Permanent delete
-    Client->>SecurityLayer: DELETE /users/{userId}/permanent
-    SecurityLayer->>UserController: Requires user:delete
-    UserController->>UserService: deletePermanentUser(userId)
-    UserService->>UserRepository: deleteById(userId)
-    UserService-->>UserController: confirmation
-    UserController-->>Client: 200 OK (permanently deleted)
-```
-_Sequence Diagram showing soft delete, restore, and permanent delete._
-
-| File                  | Description                                                                        |
-| --------------------- | ---------------------------------------------------------------------------------- |
-| `User.java`           | Entity class representing a user in the system.                                    |
-| `UserController.java` | Handles HTTP requests related to users.                                            |
-| `UserDto.java`        | DTO for communication between backend and frontend.                                |
-| `UserMapper.java`     | Handles conversion between `User` entities and `UserDto` objects.                  |
-| `UserRepository.java` | Interface for database operations related to users.                                |
-| `UserSeeder.java`     | Seeds the database with test users for development.                                |
-| `UserService.java`    | Business logic for user functionalities (creation, update, role assignment, etc.). |
+| Class | Responsibility |
+| ----- | -------------- |
+| `AuthController` | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/redirect-after-login` |
+| `AuthService` | Credential check, OAuth2 code exchange, token issuance, refresh, logout |
+| `RefreshTokenService` | Issues (with rotation), verifies and revokes refresh tokens; stores SHA-256 hashes only |
+| `RefreshTokenCookieFactory` | Builds the HTTP-only `refresh_token` cookie (SameSite configurable with `SECURITY_REFRESH_COOKIE_SAME_SITE`) |
+| `OAuth2Controller` | Azure login flow (see [1.11](#111-external-integrations-microsoft-entra-id--azure-ad)) |
+| `AuthCodeService` | One-time, short-lived, hashed authentication codes |
+| `RedirectUrlPolicy` | Only accepts local paths and `cors.allowed-origins` as post-login redirect targets |
 
 ---
 
-### 1.9 Configuration Module (`main/java/config`)
+### 1.8 User Management (`user`)
 
-| File                | Description                                                         |
-| ------------------- | ------------------------------------------------------------------- |
-| `MapperConfig.java` | Fallback configuration to expose MapStruct mappers as Spring beans. |
+| Endpoint | Permission | Description |
+| -------- | ---------- | ----------- |
+| `GET /users/me` | authenticated | Current user |
+| `PUT /users/me/password` | authenticated | Change own password (204) |
+| `GET /users?status=ACTIVE\|DELETED\|ALL` | `user:read` | List users |
+| `GET /users/{login}` | `user:read` | Get a user |
+| `POST /users` | `user:write` | Create a user (201 + `Location`) |
+| `PUT /users/{login}` | `user:update` | Update first name, last name, login |
+| `PUT /users/{login}/role` | `user:update` | Change the role |
+| `DELETE /users/{login}?permanent=false` | `user:delete` | Soft (default) or permanent delete (204) |
+| `POST /users/{login}/restore` | `user:update` | Restore a soft-deleted user |
 
----
+Rules enforced by `UserService`, on top of the permissions:
 
-### 1.10 Error and Exception Management (`main/java/app`)
-
-**Errors:**
-
-| File                   | Description                                        |
-| ---------------------- | -------------------------------------------------- |
-| `errors/ErrorDto.java` | Record serving as Data Transfer Object for errors. |
-
-**Exceptions:**
-
-Exceptions are organized within container classes for better organization:
-
-| Container Class | Nested Exception | Description |
-| --- | --- | --- |
-| `AppException.java` | `AppException` | Base custom exception class for application-specific errors. |
-| `GlobalExceptionHandler.java` | | Global exception handler for REST API endpoints. |
-| `AuthExceptions.java` | `InvalidCredentialsException` | Thrown when login credentials are invalid. |
-| `SecurityExceptions.java` | `RoleNotFoundException` | Thrown when a requested role is not found in the database. |
-| `SecurityExceptions.java` | `SecurityException` | Security-related exceptions. |
-| `SecurityExceptions.java` | `UnauthorizedActionException` | Thrown when a user attempts an action without proper authorization. |
-| `SecurityExceptions.java` | `UserHasLowerRightsException` | Thrown when a user tries to modify another user with higher privileges. |
-| `UserExceptions.java` | `UserAlreadyExistsException` | Thrown when attempting to register with an existing login. |
-| `UserExceptions.java` | `UserNotFoundException` | Thrown when a requested user is not found in the database. |
-| `UserExceptions.java` | `UserAlreadyAdminException` | Thrown when attempting to promote a user who is already an admin. |
-| `UserExceptions.java` | `UserAlreadyManagerException` | Thrown when attempting to promote a user who is already a manager. |
-| `UserExceptions.java` | `UserAlreadyRegularException` | Thrown when attempting to downgrade a user who is already a regular user. |
+- only an `ADMIN` can grant the `ADMIN` role or act on an admin account;
+- nobody can change their own role or delete their own account;
+- the acting user's role is read from the database, so a role change is effective immediately.
 
 ---
 
-### 1.11 Test Structure (`test/java`)
+### 1.9 Error Handling (`common`)
 
-| Module/File                     | Description                                                                  |
-| ------------------------------- | ---------------------------------------------------------------------------- |
-| `security/`                     | Tests related to the security and authentication functionalities of the app. |
-| `auth/`                         | Tests related to the authentication endpoints of the app.                    |
-| `user/`                         | Tests related to the user management functionalities of the app.             |
-| `TemplateApplicationTests.java` | Loads the Spring application context for integration testing.                |
-| `TestConfigurationDebug.java`   | Tests the existence of the environment variables.                            |
+Business errors extend `AppException`, which carries an HTTP status and an i18n message key. They are grouped by feature in `AuthExceptions`, `UserExceptions` and `SecurityExceptions`.
 
----
-
-### 1.12 Security Tests (`test/java/security`)
-
-| File                                    | Description                                                    |
-| --------------------------------------- | -------------------------------------------------------------- |
-| `CustomAccessDeniedHandlerTest.java`    | Tests the custom 403 Forbidden response handler.               |
-| `PermissionEnumTest.java`               | Tests the permission enumeration values and getters.           |
-| `RoleEnumTest.java`                     | Tests the role enumeration and granted authorities.            |
-| `RoleTest.java`                         | Tests the `Role` entity class.                                 |
-| `UserAuthenticationEntryPointTest.java` | Tests the 401 Unauthorized entry point handler.                |
-| `UserAuthenticationProviderTest.java`   | Tests JWT token validation and authentication provider logic.  |
-
----
-
-### 1.13 Authentication Tests (`test/java/auth`)
-
-| File                                 | Description                                                               |
-| ------------------------------------ | ------------------------------------------------------------------------- |
-| `AuthControllerIntegrationTest.java` | Integration tests for authentication endpoints (login, register, etc.).   |
-| `CredentialsDtoTest.java`            | Tests the `CredentialsDto` validation and structure.                      |
-| `SignUpDtoTest.java`                 | Tests the `SignUpDto` validation constraints.                             |
-
----
-
-### 1.14 User Tests (`test/java/user`)
-
-| File                                 | Description                                                                          |
-| ------------------------------------ | ------------------------------------------------------------------------------------ |
-| `TestUserSeeder.java`                | Specialized seeder that creates `User` entities only in test mode.                   |
-| `UserControllerIntegrationTest.java` | Integration tests for user endpoints; also generates REST Docs snippets via `document(...)`. |
-| `UserDtoTest.java`                   | Tests the `UserDto` object.                                                          |
-| `UserMapperTest.java`                | Tests the `UserMapper` interface.                                                    |
-| `UserServiceTest.java`               | Tests the `UserService` class.                                                       |
-| `UserTest.java`                      | Tests the `User` entity.                                                             |
-
----
-
-### 1.15 External Integrations (Microsoft Entra ID / Azure AD)
-
-The `spring-auth` module supports hybrid authentication, combining:
-
-1. Microsoft Entra ID (Azure AD) for enterprise OAuth2/OpenID Connect login.
-
-2. A local JWT-based authentication system for internal API access and session management.
-
-This architecture enables secure single sign-on (SSO) via Azure, while maintaining full control over internal authorization, role assignment, and token refresh lifecycles.
-
-#### 1.15.1 OAuth2 Integration (Azure AD)
-
-When users log in via Microsoft Entra ID, the process follows the standard OAuth2 authorization code flow:
-
-1. Redirect to Microsoft Login
-
-   - Initiated by accessing /oauth2/authorization/azure.
-
-   - Managed automatically by Spring Security (configured in SecurityConfig).
-
-2. Successful Callback
-
-   - Handled by OAuth2Controller at /oauth2/success.
-
-   - Spring Security provides an OAuth2AuthenticationToken containing Azure user info.
-
-3. User Mapping
-
-   - The controller extracts attributes such as:
-
-     - email
-
-     - given_name
-
-     - family_name
-
-   - These are mapped into a local UserDto object.
-
-4. Local User Synchronization
-
-   - If the user doesn’t exist, they are created in the database via UserService.getOrCreateAzureUser().
-
-   - Azure users are assigned a default role (USER) and stored for local management.
-
-5. JWT Creation and Redirect
-
-   - A local JWT is created using UserAuthenticationProvider.createToken(user).
-
-   - The app redirects the browser to the frontend (http://localhost:{port}/oauth2/success) with the JWT token in the URL query parameters.
-
-#### 1.15.2 OAuth2 Scopes and Claims
-Azure AD provides the following standard OpenID Connect scopes in the ID token:
-
-| Scope       | Purpose                                                                 |
-| ----------- | ----------------------------------------------------------------------- |
-| `openid`    | Identifies the request as an OpenID Connect request.                    |
-| `profile`   | Grants access to basic profile information (name, preferred username).  |
-| `email`     | Grants access to the user's email address.                              |
-| `User.Read` | Allows reading the user's profile information from Microsoft Graph API. |
-
-These are appended as `SCOPE_`-prefixed authorities by `UserAuthenticationProvider.validateTokenStrongly()`.
-
-Example claims that can be extracted from the Azure token:
+`GlobalExceptionHandler` converts exceptions raised in controllers, and `ErrorResponseWriter` the errors raised in the security filters, into the same `ErrorResponse` body:
 
 ```json
 {
-  "sub": "e1b4d240-ef02-4f3d-8b60-8413d0b242a2",
-  "name": "John Doe",
-  "email": "john.doe@company.com",
-  "scp": "openid profile email User.Read"
+  "timestamp": "2026-10-06T10:39:21.285Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Échec de la validation",
+  "fieldErrors": { "login": "ne doit pas être vide" }
 }
 ```
+
+`fieldErrors` is only present for validation errors. Unexpected exceptions return a generic `500` message and are logged.
+
+---
+
+### 1.10 Test Structure (`test/java`)
+
+Test packages mirror the main packages. `support/` contains the shared test infrastructure.
+
+| Package / class | Type | Content |
+| --------------- | ---- | ------- |
+| `support/AbstractIntegrationTest` | base class | Full context, MockMvc, rolled-back transaction per test, REST Docs helper |
+| `support/TestUserSeeder`, `TestUsers` | data | Reference users of the test profile (user, manager, two admins, a soft-deleted user) |
+| `support/TestOAuth2ClientConfig` | config | Static Azure registration: tests never contact Azure |
+| `support/RestDocsSnippets` | contracts | Documented fields, parameters, headers and cookies |
+| `support/RestDocsSensitiveDataMasking` | docs | Masks tokens in generated snippets |
+| `auth/AuthControllerIntegrationTest` | integration | Login, refresh (rotation), logout, token errors, languages |
+| `auth/oauth2/OAuth2ControllerIntegrationTest` | integration | Azure flow, open-redirect protection, code exchange |
+| `auth/oauth2/AuthCodeServiceTest` | integration | Code hashing, single use, expiration |
+| `user/UserControllerIntegrationTest` | integration | Every `/users` endpoint and authorization rule |
+| `ApiDocumentationCoverageTest` | integration | Every endpoint must be described in `index.adoc` |
+| `user/UserServiceTest` | unit (Mockito) | Business rules of user management |
+| `security/JwtServiceTest`, `TokenHasherTest` | unit | Token creation and verification |
+| `security/CorsConfigurationValidatorTest`, `SecurityErrorHandlersTest` | unit | CORS startup checks, 401/403 bodies |
+| `auth/oauth2/RedirectUrlPolicyTest` | unit | Accepted and rejected redirect URLs |
+| `*DtoTest`, `UserDtoValidationTest` | unit | Bean Validation rules |
+| `role/RoleEnumTest`, `user/UserTest`, `user/UserMapperTest` | unit | Permission matrix, entity and mapping |
+
+---
+
+### 1.11 External Integrations (Microsoft Entra ID / Azure AD)
+
+Users can log in with their Microsoft account. Azure only authenticates them: roles, tokens and sessions are managed by spring-auth exactly as for a password login.
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Client app
+    participant spring-auth
+    participant Azure
+
+    Browser->>spring-auth: GET /oauth2/login/azure?redirectUrl=<client URL>
+    Note over spring-auth: redirectUrl checked by RedirectUrlPolicy, kept in session
+    spring-auth->>Azure: authorization code flow (Spring Security)
+    Azure-->>spring-auth: user authenticated
+    spring-auth->>spring-auth: GET /oauth2/success: create user on first login, generate one-time code
+    spring-auth-->>Browser: 302 <client URL>?loginType=azure&authCode=...&userId=...
+    Browser->>Client app: follow redirect
+    Client app->>spring-auth: POST /oauth2/token {userId, code}
+    spring-auth-->>Client app: user + access token, Set-Cookie refresh_token
+```
+
+Tokens never appear in URLs: only the one-time code (5 minutes by default, `SECURITY_AUTHENTICATION_CODES_LIFETIME`), stored hashed and deleted when used.
+
+The attributes `email` (required), `given_name` (or `name` as fallback) and `family_name` (optional) are read from the Azure user. The requested scopes are `openid`, `profile`, `email` and `User.Read`.
 
 ---
 
@@ -718,76 +368,59 @@ ENVIRONMENT=dev  # or test, or prod
 
 ### 3.2 Test Execution
 
-The application uses **JUnit 5** and **Spring Boot Test** for testing:
+The tests use **JUnit 5**, **Mockito**, **AssertJ** and **Spring Boot Test**:
 
-- **Unit Tests:** Test individual components in isolation
-- **Integration Tests:** Test complete request/response flows with database interactions (also feed Spring REST Docs; see [api-documentation-generation.md](api-documentation-generation.md))
+- **Unit tests** check one class in isolation, without Spring context (fast).
+- **Integration tests** send real HTTP requests through MockMvc to the full application, backed by the MariaDB test database. Each test runs in a transaction that is rolled back, so tests are independent. They also produce the REST Docs snippets (see [api-documentation-generation.md](api-documentation-generation.md)).
+
+The test profile is self-contained: secrets and Azure settings have test defaults in `src/test/resources/application-test.properties`, and no network access to Azure is needed. Only the database URL is required (`TEST_SPRING_DATASOURCE_URL`).
 
 **Run tests using Docker Compose:**
 ```bash
 # Set environment to test in .env file
 ENVIRONMENT=test
 
-# Run tests
+# Run tests and build the documentation
 docker compose up --build
 ```
 
-This will:
-- Build the application with Maven
-- Run the complete test suite (`mvn verify`)
-- Generate REST Docs snippets under `target/generated-snippets/`
-- Create the database schema for testing
-
-**Run tests locally with Maven (without Docker):**
+**Run tests locally with Maven (MariaDB reachable from the host):**
 ```bash
-mvn test                 # Run tests only
-mvn verify              # Run tests + integration tests
+TEST_SPRING_DATASOURCE_URL=jdbc:mariadb://localhost:3306/test_db ./mvnw test   # tests only
+TEST_SPRING_DATASOURCE_URL=jdbc:mariadb://localhost:3306/test_db ./mvnw verify # tests + HTML documentation
 ```
-
-For assembling snippets into HTML, Docker volume mapping, and what to commit, see [api-documentation-generation.md](api-documentation-generation.md).
 
 ---
 
 ## 4. Security Architecture
 
-### 4.1 Authentication Flow
+### 4.1 Tokens
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant SecurityFilter
-    participant JwtAuthFilter
-    participant AuthProvider
-    participant Controller
+| Token | Lifetime | Transport | Content | Storage |
+| ----- | -------- | --------- | ------- | ------- |
+| Access token | 5 min (`SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME`) | `Authorization: Bearer` header | login, names, role, permissions | not stored |
+| Refresh token | 30 days (`SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME`) | `refresh_token` HTTP-only cookie | login | SHA-256 hash, one per user |
+| Authentication code | 5 min (`SECURITY_AUTHENTICATION_CODES_LIFETIME`) | redirect URL query parameter | random UUID | SHA-256 hash, single use |
 
-    Client->>SecurityFilter: HTTP Request + JWT
-    SecurityFilter->>JwtAuthFilter: Filter Request
-    JwtAuthFilter->>AuthProvider: Validate Token
-    
-    alt Token Valid
-        AuthProvider->>JwtAuthFilter: Authentication Object
-        JwtAuthFilter->>Controller: Authorized Request
-        Controller->>Client: Response
-    else Token Invalid
-        AuthProvider->>Client: 401 Unauthorized
-    end
-```
+Access and refresh tokens are signed (HMAC-SHA256) with two different secrets, so one cannot be used in place of the other. Each refresh replaces the refresh token (rotation): a stolen refresh token stops working as soon as the legitimate client refreshes.
 
 ### 4.2 Role-Based Access Control
 
-The application implements a hierarchical role system:
+| Role | `user:read` | `user:write` | `user:update` | `user:delete` |
+| ---- | :---------: | :----------: | :-----------: | :-----------: |
+| `USER` | yes | | | |
+| `MANAGER` | yes | yes | yes | |
+| `ADMIN` | yes | yes | yes | yes |
 
-- **USER:** Basic permissions (`user:read` for own profile)
-- **MANAGER:** User permissions + user management (`user:read`, `user:write`, `user:update`)
-- **ADMIN:** All permissions including user deletion (`user:read`, `user:write`, `user:update`, `user:delete`)
+Permissions are checked on each endpoint with `@PreAuthorize`. Additional rules depending on the target user are listed in [1.8](#18-user-management-user).
 
 ### 4.3 Password Security
 
-- **BCrypt hashing** with configurable strength (default: 12)
-- **Password reuse validation** prevents updating to same password
-- **Secure password handling** using `char[]` instead of `String` in DTOs
-- **Minimum length:** 8 characters
-- **Maximum length:** 72 characters (BCrypt limitation)
+- **BCrypt hashing** (`PasswordConfig`)
+- **Length:** 8 to 72 characters (BCrypt only uses the first 72 bytes)
+- **Password reuse validation** prevents updating to the same password (`@PasswordNotReused`)
+- **`char[]` in DTOs**: passwords are wiped from memory once checked or hashed
+- **Same error for unknown login and wrong password**, so that the API does not reveal which accounts exist
 
 ---
 
@@ -795,17 +428,19 @@ The application implements a hierarchical role system:
 
 ### 5.1 Key Tables
 
-- **`users`:** Stores user accounts with credentials and profile information
-- **`roles`:** Defines available roles in the system
-- **`user_roles`:** Many-to-many relationship between users and roles
-- **`password_history`:** Tracks password changes for reuse prevention
+The schema is generated by Hibernate from the entities.
+
+- **`users`:** accounts (names, login, BCrypt password hash, `deleted` flag, `main_role_id`)
+- **`roles`:** the three roles, seeded at startup by `RoleSeeder`
+- **`refresh_tokens`:** hash and expiration of the current refresh token of each user
+- **`auth_codes`:** hash and expiration of pending Azure authentication codes
 
 ### 5.2 Soft Delete Pattern
 
-Users can be soft-deleted (marked as inactive) or permanently deleted:
-- Soft delete: Sets `deleted_at` timestamp, user remains in database
-- Permanent delete: Removes user record entirely
-- Soft-deleted users can be restored by administrators
+Users can be soft-deleted or permanently deleted:
+- Soft delete (default): sets `deleted = true`; the user can no longer log in and is hidden from `GET /users`, but keeps their login
+- Restore: `POST /users/{login}/restore` sets `deleted = false`
+- Permanent delete (`?permanent=true`): removes the user record
 
 ---
 
@@ -821,5 +456,5 @@ Users can be soft-deleted (marked as inactive) or permanently deleted:
 
 ---
 
-**Last Updated:** September 2025  
+**Last Updated:** October 2026  
 **Version:** 1.2.0-SNAPSHOT
