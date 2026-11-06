@@ -26,7 +26,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * The users resource. Users are identified by their login (email) in URLs.
+ * The users resource. Users are identified by their id in URLs.
  *
  * Every endpoint requires an access token; the permission required by each one is
  * declared with {@code @PreAuthorize}. Rules depending on the target user (admin
@@ -46,7 +46,7 @@ public class UserController {
      */
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.findByLogin(currentUser.getLogin()));
+        return ResponseEntity.ok(userService.findById(currentUser.getId()));
     }
 
     /**
@@ -59,7 +59,7 @@ public class UserController {
     @PutMapping("/me/password")
     public ResponseEntity<Void> updateOwnPassword(@AuthenticationPrincipal UserDto currentUser,
             @RequestBody @Valid PasswordUpdateDto request) {
-        userService.updatePassword(currentUser.getLogin(), request);
+        userService.updatePassword(currentUser.getId(), request);
         return ResponseEntity.noContent().build();
     }
 
@@ -75,13 +75,13 @@ public class UserController {
     }
 
     /**
-     * @param login login of the user
+     * @param id login of the user
      * @return 200 with the active user having this login
      */
-    @GetMapping("/{login}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<UserDto> getUser(@PathVariable String login) {
-        return ResponseEntity.ok(userService.findByLogin(login));
+    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     /**
@@ -147,7 +147,7 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id,
             @RequestParam(defaultValue = "false") boolean permanent,
             @AuthenticationPrincipal UserDto currentUser) {
-        userService.delete(login, permanent, currentUser.getLogin());
+        userService.delete(id, permanent, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 

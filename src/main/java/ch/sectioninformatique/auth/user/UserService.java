@@ -63,6 +63,15 @@ public class UserService {
     }
 
     /**
+     * @param id user's login
+     * @return the active user with this login
+     * @throws UserNotFoundException if there is no active user with this login
+     */
+    public UserDto findById(Long id) {
+        return userMapper.toUserDto(getActiveUser(id));
+    }
+
+    /**
      * @param status which users to return
      * @return the matching users, ordered by id
      */
@@ -79,15 +88,15 @@ public class UserService {
      * Creates a user. Granting the admin role requires the actor to be an admin.
      *
      * @param request    creation request; its password array is wiped once hashed
-     * @param actorLogin login of the authenticated user
+     * @param actorId id of the authenticated user
      * @return the created user
      * @throws UserAlreadyExistsException  if the login is already used, even by a soft-deleted user
      * @throws InsufficientRightsException if a non-admin tries to create an admin
      */
     @Transactional
-    public UserDto create(CreateUserDto request, String actorLogin) {
+    public UserDto create(CreateUserDto request, Long actorId) {
         RoleEnum role = request.mainRoleOrDefault();
-        assertCanManage(getActiveUser(actorLogin), role);
+        assertCanManage(getActiveUser(actorId), role);
 
         if (userRepository.existsByLogin(request.login())) {
             throw new UserAlreadyExistsException(request.login());
@@ -102,18 +111,18 @@ public class UserService {
     /**
      * Updates the identity fields of a user (first name, last name, login).
      *
-     * @param login      current login of the user to update
-     * @param request    new values
-     * @param actorLogin login of the authenticated user
+     * @param id        current id of the user to update
+     * @param request   new values
+     * @param actorId   id of the authenticated user
      * @return the updated user
      * @throws UserNotFoundException       if there is no active user with this login
      * @throws UserAlreadyExistsException  if the new login is used by another user
      * @throws InsufficientRightsException if a non-admin tries to update an admin
      */
     @Transactional
-    public UserDto update(String login, UpdateUserDto request, String actorLogin) {
-        User user = getActiveUser(login);
-        assertCanManage(getActiveUser(actorLogin), user.getMainRole().getName());
+    public UserDto update(Long id, UpdateUserDto request, Long actorId) {
+        User user = getActiveUser(id);
+        assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
         if (!request.login().equals(user.getLogin()) && userRepository.existsByLogin(request.login())) {
             throw new UserAlreadyExistsException(request.login());
@@ -129,9 +138,9 @@ public class UserService {
      * Assigns a role to a user. Only an admin can grant the admin role or change the
      * role of an admin.
      *
-     * @param login      login of the user whose role changes
-     * @param newRole    role to assign
-     * @param actorLogin login of the authenticated user
+     * @param id        id of the user whose role changes
+     * @param newRole   role to assign
+     * @param actorId   id of the authenticated user
      * @return the updated user
      * @throws UserNotFoundException              if there is no active user with this login
      * @throws SelfModificationForbiddenException if users target their own account
@@ -139,14 +148,14 @@ public class UserService {
      * @throws InsufficientRightsException        if a non-admin grants or removes the admin role
      */
     @Transactional
-    public UserDto changeRole(String login, RoleEnum newRole, String actorLogin) {
-        assertNotSelf(login, actorLogin);
-        User user = getActiveUser(login);
-        User actor = getActiveUser(actorLogin);
+    public UserDto changeRole(Long id, RoleEnum newRole, Long actorId) {
+        assertNotSelf(id, actorId);
+        User user = getActiveUser(id);
+        User actor = getActiveUser(actorId);
 
         RoleEnum currentRole = user.getMainRole().getName();
         if (currentRole == newRole) {
-            throw new UserAlreadyHasRoleException(login, newRole);
+            throw new UserAlreadyHasRoleException(id, newRole);
         }
         assertCanManage(actor, currentRole);
         assertCanManage(actor, newRole);
@@ -159,42 +168,42 @@ public class UserService {
     /**
      * Deletes a user, softly (restorable) by default.
      *
-     * @param login      login of the user to delete
-     * @param permanent  true to remove the user from the database
-     * @param actorLogin login of the authenticated user
+     * @param id            id of the user to delete
+     * @param permanent     true to remove the user from the database
+     * @param actorId       id of the authenticated user
      * @throws UserNotFoundException              if no user, soft-deleted or not, has this login
      * @throws SelfModificationForbiddenException if users target their own account
      * @throws InsufficientRightsException        if a non-admin tries to delete an admin
      */
     @Transactional
-    public void delete(String login, boolean permanent, String actorLogin) {
-        assertNotSelf(login, actorLogin);
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-        assertCanManage(getActiveUser(actorLogin), user.getMainRole().getName());
+    public void delete(long id, boolean permanent, long actorId) {
+        assertNotSelf(id, actorId);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
         if (permanent) {
             userRepository.deletePermanentlyById(user.getId());
         } else {
             userRepository.delete(user);
         }
-        log.info("User {} {} deleted by {}", login, permanent ? "permanently" : "softly", actorLogin);
+        log.info("User {} {} deleted by {}", id, permanent ? "permanently" : "softly", actorLogin);
     }
 
     /**
      * Restores a soft-deleted user.
      *
-     * @param login      login of the user to restore
-     * @param actorLogin login of the authenticated user
+     * @param id      id of the user to restore
+     * @param actorId id of the authenticated user
      * @return the restored user
      * @throws UserNotFoundException       if there is no soft-deleted user with this login
      * @throws InsufficientRightsException if a non-admin tries to restore an admin
      */
     @Transactional
-    public UserDto restore(String login, String actorLogin) {
-        User user = userRepository.findByLoginAndDeletedTrue(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
-        assertCanManage(getActiveUser(actorLogin), user.getMainRole().getName());
+    public UserDto restore(Long id, Long actorId) {
+        User user = userRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
         user.setDeleted(false);
         return userMapper.toUserDto(user);
@@ -203,14 +212,14 @@ public class UserService {
     /**
      * Changes the password of a user after checking the current one.
      *
-     * @param login   login of the user (always the authenticated user)
+     * @param actorId   login of the user (always the authenticated user)
      * @param request current and new passwords; both arrays are wiped after use
      * @throws InvalidCurrentPasswordException if the current password is wrong
      */
     @Transactional
-    public void updatePassword(String login, PasswordUpdateDto request) {
+    public void updatePassword(Long actorId, PasswordUpdateDto request) {
         try {
-            User user = getActiveUser(login);
+            User user = getActiveUser(actorId);
             if (!passwordEncoder.matches(CharBuffer.wrap(request.oldPassword()), user.getPassword())) {
                 throw new InvalidCurrentPasswordException();
             }
@@ -254,9 +263,9 @@ public class UserService {
                 });
     }
 
-    private User getActiveUser(String login) {
-        return userRepository.findByLoginAndDeletedFalse(login)
-                .orElseThrow(() -> new UserNotFoundException(login));
+    private User getActiveUser(Long actorId) {
+        return userRepository.findByIdAndDeletedFalse(actorId)
+                .orElseThrow(() -> new UserNotFoundException(actorId));
     }
 
     private Role getRole(RoleEnum role) {
@@ -280,8 +289,8 @@ public class UserService {
         }
     }
 
-    private static void assertNotSelf(String login, String actorLogin) {
-        if (login.equalsIgnoreCase(actorLogin)) {
+    private static void assertNotSelf(Long id, Long actorId) {
+        if (id.equals(actorId)) {
             throw new SelfModificationForbiddenException();
         }
     }
