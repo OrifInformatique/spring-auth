@@ -75,7 +75,7 @@ public class UserController {
     }
 
     /**
-     * @param id login of the user
+     * @param id id of the user
      * @return 200 with the active user having this login
      */
     @GetMapping("/{id}")
@@ -95,9 +95,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid CreateUserDto request,
             @AuthenticationPrincipal UserDto currentUser) {
-        UserDto created = userService.create(request, currentUser.getLogin());
-        URI location = UriComponentsBuilder.fromPath("/users/{login}")
-                .buildAndExpand(created.getLogin())
+        UserDto created = userService.create(request, currentUser.getId());
+        URI location = UriComponentsBuilder.fromPath("/users/{id}")
+                .buildAndExpand(created.getId())
                 .toUri();
         return ResponseEntity.created(location).body(created);
     }
@@ -154,14 +154,14 @@ public class UserController {
     /**
      * Restores a soft-deleted user.
      *
-     * @param login       login of the user
+     * @param id       id of the user
      * @param currentUser authenticated user
      * @return 200 with the restored user
      */
-    @PostMapping("/{login}/restore")
+    @PostMapping("/{id}/restore")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<UserDto> restoreUser(@PathVariable String login,
+    public ResponseEntity<UserDto> restoreUser(@PathVariable Long id,
             @AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.restore(login, currentUser.getLogin()));
+        return ResponseEntity.ok(userService.restore(id, currentUser.getId()));
     }
 }

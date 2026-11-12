@@ -57,10 +57,10 @@ public class UserService {
      * @param login user's login
      * @return the active user with this login
      * @throws UserNotFoundException if there is no active user with this login
-     */
     public UserDto findByLogin(String login) {
         return userMapper.toUserDto(getActiveUser(login));
     }
+    */
 
     /**
      * @param id user's login
@@ -161,7 +161,7 @@ public class UserService {
         assertCanManage(actor, newRole);
 
         user.setMainRole(getRole(newRole));
-        log.info("Role of user {} changed from {} to {} by {}", login, currentRole, newRole, actorLogin);
+        log.info("Role of user {} changed from {} to {} by {}", id, currentRole, newRole, actorId);
         return userMapper.toUserDto(user);
     }
 
@@ -179,7 +179,7 @@ public class UserService {
     public void delete(long id, boolean permanent, long actorId) {
         assertNotSelf(id, actorId);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException(Long.toString(id)));
         assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
         if (permanent) {
@@ -187,7 +187,7 @@ public class UserService {
         } else {
             userRepository.delete(user);
         }
-        log.info("User {} {} deleted by {}", id, permanent ? "permanently" : "softly", actorLogin);
+        log.info("User {} {} deleted by {}", id, permanent ? "permanently" : "softly", actorId);
     }
 
     /**
@@ -202,7 +202,7 @@ public class UserService {
     @Transactional
     public UserDto restore(Long id, Long actorId) {
         User user = userRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException(Long.toString(id)));
         assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
         user.setDeleted(false);
@@ -263,9 +263,10 @@ public class UserService {
                 });
     }
 
+    /* */
     private User getActiveUser(Long actorId) {
         return userRepository.findByIdAndDeletedFalse(actorId)
-                .orElseThrow(() -> new UserNotFoundException(actorId));
+                .orElseThrow(() -> new UserNotFoundException(Long.toString(actorId)));
     }
 
     private Role getRole(RoleEnum role) {

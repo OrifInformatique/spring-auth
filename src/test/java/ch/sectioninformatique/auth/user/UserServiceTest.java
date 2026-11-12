@@ -85,7 +85,7 @@ class UserServiceTest {
     void findByLogin_unknownUser_throwsNotFound() {
         when(userRepository.findByLoginAndDeletedFalse("unknown@test.com")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.findByLogin("unknown@test.com"))
+        assertThatThrownBy(() -> userService.findById("unknown@test.com"))
                 .isInstanceOf(UserNotFoundException.class);
     }
 
