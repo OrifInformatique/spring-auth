@@ -121,7 +121,7 @@ public class UserService {
      */
     @Transactional
     public UserDto update(Long id, UpdateUserDto request, Long actorId) {
-        User user = getActiveUser(id);
+        User user = getActiveUser(actorId);
         assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
         if (!request.login().equals(user.getLogin()) && userRepository.existsByLogin(request.login())) {

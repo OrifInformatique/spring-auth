@@ -105,33 +105,33 @@ public class UserController {
     /**
      * Updates the first name, last name and login of a user.
      *
-     * @param login       current login of the user
+     * @param id          id of the user
      * @param request     new values
      * @param currentUser authenticated user
      * @return 200 with the updated user
      */
-    @PutMapping("/{login}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<UserDto> updateUser(@PathVariable String login,
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
             @RequestBody @Valid UpdateUserDto request,
             @AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.update(login, request, currentUser.getLogin()));
+        return ResponseEntity.ok(userService.update(id, request, currentUser.getId()));
     }
 
     /**
      * Changes the role of a user.
      *
-     * @param login       login of the user
+     * @param id       id of the user
      * @param request     new role
      * @param currentUser authenticated user
      * @return 200 with the updated user
      */
-    @PutMapping("/{login}/role")
+    @PutMapping("/{id}/role")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<UserDto> updateUserRole(@PathVariable String login,
+    public ResponseEntity<UserDto> updateUserRole(@PathVariable Long id,
             @RequestBody @Valid RoleUpdateDto request,
             @AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.changeRole(login, request.role(), currentUser.getLogin()));
+        return ResponseEntity.ok(userService.changeRole(id, request.role(), currentUser.getId()));
     }
 
     /**
