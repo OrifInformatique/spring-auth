@@ -137,12 +137,12 @@ public class UserController {
     /**
      * Deletes a user. The deletion is soft (restorable) unless {@code permanent=true}.
      *
-     * @param id       login of the user
+     * @param id          ID of the user
      * @param permanent   true to remove the user from the database
      * @param currentUser authenticated user
      * @return 204 No Content
      */
-    @DeleteMapping("/{userId}?permanent={permanent}")
+    @DeleteMapping("/{id}?permanent={permanent}")
     @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id,
             @RequestParam(defaultValue = "false") boolean permanent,
