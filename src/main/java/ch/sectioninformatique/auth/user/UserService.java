@@ -201,7 +201,7 @@ public class UserService {
      */
     @Transactional
     public UserDto restore(Long id, Long actorId) {
-        User user = userRepository.findByIdAndDeletedFalse(id)
+        User user = userRepository.findByIdAndDeletedTrue(id)
                 .orElseThrow(() -> new UserNotFoundException(Long.toString(id)));
         assertCanManage(getActiveUser(actorId), user.getMainRole().getName());
 
