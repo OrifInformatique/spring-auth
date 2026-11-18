@@ -142,7 +142,7 @@ public class UserController {
      * @param currentUser authenticated user
      * @return 204 No Content
      */
-    @DeleteMapping("/{id}?permanent={permanent}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id,
             @RequestParam(defaultValue = "false") boolean permanent,
