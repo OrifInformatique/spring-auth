@@ -34,7 +34,7 @@ class JwtServiceTest {
 
     private static UserDto manager() {
         return UserDto.builder()
-                .login("manager@test.com").firstName("Jane").lastName("Smith")
+                .id(42L).login("manager@test.com").firstName("Jane").lastName("Smith")
                 .mainRole("MANAGER").permissions(List.of("user:read", "user:write", "user:update"))
                 .build();
     }
@@ -44,6 +44,7 @@ class JwtServiceTest {
         Authentication authentication = jwtService.validateAccessToken(jwtService.createAccessToken(manager()));
 
         UserDto principal = (UserDto) authentication.getPrincipal();
+        assertThat(principal.getId()).isEqualTo(42L);
         assertThat(principal.getLogin()).isEqualTo("manager@test.com");
         assertThat(principal.getFirstName()).isEqualTo("Jane");
         assertThat(principal.getMainRole()).isEqualTo("MANAGER");

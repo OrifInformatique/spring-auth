@@ -262,7 +262,7 @@ include::{snippets}/users/list-deleted/http-request.adoc[]
 include::{snippets}/users/list-deleted/http-response.adoc[]
 
 [[users-get]]
-=== `GET /users/{login}`
+=== `GET /users/{id}`
 
 Returns an active user. Requires `user:read`.
 
@@ -301,7 +301,7 @@ include::{snippets}/users/create-conflict/http-response.adoc[]
 include::{snippets}/users/create-admin-forbidden/http-response.adoc[]
 
 [[users-update]]
-=== `PUT /users/{login}`
+=== `PUT /users/{id}`
 
 Updates the first name, last name and login of a user. Requires `user:update`.
 The role cannot be changed here: see <<users-role>>.
@@ -312,7 +312,7 @@ include::{snippets}/users/update/request-fields.adoc[]
 include::{snippets}/users/update/http-response.adoc[]
 
 [[users-role]]
-=== `PUT /users/{login}/role`
+=== `PUT /users/{id}/role`
 
 Changes the role of a user. Requires `user:update`; granting or removing the `ADMIN` role requires the `ADMIN` role.
 
@@ -334,7 +334,7 @@ include::{snippets}/users/update-role-self/http-response.adoc[]
 include::{snippets}/users/update-role-conflict/http-response.adoc[]
 
 [[users-delete]]
-=== `DELETE /users/{login}`
+=== `DELETE /users/{id}`
 
 Deletes a user. Requires `user:delete`.
 By default the deletion is soft: the user can no longer log in but can be restored.
@@ -350,7 +350,7 @@ include::{snippets}/users/delete-permanent/http-request.adoc[]
 include::{snippets}/users/delete-permanent/http-response.adoc[]
 
 [[users-restore]]
-=== `POST /users/{login}/restore`
+=== `POST /users/{id}/restore`
 
 Restores a soft-deleted user. Requires `user:update`.
 
