@@ -83,6 +83,7 @@ public class JwtService {
                 .withJWTId(UUID.randomUUID().toString())
                 .withSubject(user.getLogin())
                 .withClaim(TYPE_CLAIM, ACCESS_TYPE)
+                .withClaim("id", user.getId())
                 .withIssuedAt(issuedAt)
                 .withExpiresAt(issuedAt.plus(accessTokenLifetime))
                 .withClaim("firstName", user.getFirstName())
@@ -130,6 +131,7 @@ public class JwtService {
         List<String> permissions = decoded.getClaim("permissions").asList(String.class);
 
         UserDto user = UserDto.builder()
+                .id(decoded.getClaim("id").asLong())
                 .login(decoded.getSubject())
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())
