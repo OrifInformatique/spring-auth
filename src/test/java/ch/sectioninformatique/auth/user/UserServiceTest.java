@@ -176,6 +176,14 @@ class UserServiceTest {
     }
 
     @Test
+    void userAlreadyHasRole_idIsPassedAsTextToAvoidNumberFormatting() {
+        // MessageFormat would render 1234 as "1,234" (en) or "1 234" (fr)
+        UserAlreadyHasRoleException exception = new UserAlreadyHasRoleException(1234L, RoleEnum.MANAGER);
+
+        assertThat(exception.getMessageArgs()).containsExactly("1234", "MANAGER");
+    }
+
+    @Test
     void changeRole_usesActorRoleFromDatabaseNotFromToken() {
         // The actor was demoted to USER: even with an old MANAGER token, the database role applies
         givenActiveUser(USER_ID, USER, RoleEnum.USER);

@@ -34,6 +34,7 @@ import ch.sectioninformatique.auth.user.dto.UserDto;
 public class JwtService {
 
     private static final String TYPE_CLAIM = "typ";
+    private static final String ID_CLAIM = "id";
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
 
@@ -83,7 +84,7 @@ public class JwtService {
                 .withJWTId(UUID.randomUUID().toString())
                 .withSubject(user.getLogin())
                 .withClaim(TYPE_CLAIM, ACCESS_TYPE)
-                .withClaim("id", user.getId())
+                .withClaim(ID_CLAIM, user.getId())
                 .withIssuedAt(issuedAt)
                 .withExpiresAt(issuedAt.plus(accessTokenLifetime))
                 .withClaim("firstName", user.getFirstName())
@@ -118,12 +119,15 @@ public class JwtService {
      *
      * @param token raw JWT
      * @return authenticated token holding the user and the authorities of their role
-     * @throws JWTVerificationException if the token is malformed, expired, badly signed
-     *                                  or does not carry a known role
+     * @throws JWTVerificationException if the token is malformed, expired, badly signed,
+     *                                  does not carry the user's id or a known role
      */
     public Authentication validateAccessToken(String token) {
         DecodedJWT decoded = JWT.require(accessAlgorithm)
                 .withClaim(TYPE_CLAIM, ACCESS_TYPE)
+                // The id must be a number: tokens issued before the id claim was added, or carrying
+                // a null id, are rejected (401) and the client refreshes them
+                .withClaim(ID_CLAIM, (claim, jwt) -> claim.asLong() != null)
                 .build()
                 .verify(token);
 
@@ -131,7 +135,7 @@ public class JwtService {
         List<String> permissions = decoded.getClaim("permissions").asList(String.class);
 
         UserDto user = UserDto.builder()
-                .id(decoded.getClaim("id").asLong())
+                .id(decoded.getClaim(ID_CLAIM).asLong())
                 .login(decoded.getSubject())
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())

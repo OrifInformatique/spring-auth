@@ -30,7 +30,8 @@ public final class UserExceptions {
     /** Thrown when assigning a role the user already has. */
     public static class UserAlreadyHasRoleException extends AppException {
         public UserAlreadyHasRoleException(Long id, RoleEnum role) {
-            super(HttpStatus.CONFLICT, "error.user.already.has.role", id, role.name());
+            // Passed as a string: MessageFormat would add a thousands separator to a number
+            super(HttpStatus.CONFLICT, "error.user.already.has.role", id.toString(), role.name());
         }
     }
 

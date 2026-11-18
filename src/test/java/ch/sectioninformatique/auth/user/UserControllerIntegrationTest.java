@@ -406,7 +406,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
             mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.MANAGER)), roleBody("MANAGER")))
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.message")
-                            .value(message("error.user.already.has.role", idOf(TestUsers.MANAGER), "MANAGER")))
+                            .value(message("error.user.already.has.role", idOf(TestUsers.MANAGER).toString(), "MANAGER")))
                     .andDo(document("users/update-role-conflict", RestDocsSnippets.errorResponse()));
         }
 
@@ -454,7 +454,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
             mockMvc.perform(as(TestUsers.ADMIN, get("/users/{id}", idOf(TestUsers.USER))))
                     .andExpect(status().isNotFound());
-            assertThat(userRepository.findByLoginAndDeletedTrue(TestUsers.USER)).isPresent();
+            assertThat(userRepository.findByIdAndDeletedTrue(idOf(TestUsers.USER))).isPresent();
 
             mockMvc.perform(as(TestUsers.MANAGER, post("/users/{id}/restore", idOf(TestUsers.USER))))
                     .andExpect(status().isOk())

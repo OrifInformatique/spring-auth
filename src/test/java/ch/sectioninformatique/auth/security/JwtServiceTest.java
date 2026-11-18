@@ -94,6 +94,23 @@ class JwtServiceTest {
     }
 
     @Test
+    void accessToken_withoutUserId_isRejected() {
+        // Tokens issued before the id claim was added must not produce a principal without id
+        String token = jwtService.createAccessToken(manager().toBuilder().id(null).build());
+
+        assertThatThrownBy(() -> jwtService.validateAccessToken(token)).isInstanceOf(InvalidClaimException.class);
+    }
+
+    @Test
+    void accessTokenIssuedBeforeIdClaimExisted_isRejected() {
+        String signingKey = Base64.getEncoder().encodeToString(ACCESS_SECRET.getBytes(StandardCharsets.UTF_8));
+        String token = JWT.create().withSubject("manager@test.com").withClaim("typ", "access")
+                .withClaim("mainRole", "MANAGER").sign(Algorithm.HMAC256(signingKey));
+
+        assertThatThrownBy(() -> jwtService.validateAccessToken(token)).isInstanceOf(InvalidClaimException.class);
+    }
+
+    @Test
     void correctlySignedTokenWithoutAccessType_isRejected() {
         String signingKey = Base64.getEncoder().encodeToString(ACCESS_SECRET.getBytes(StandardCharsets.UTF_8));
         String token = JWT.create().withSubject("manager@test.com").withClaim("mainRole", "ADMIN")

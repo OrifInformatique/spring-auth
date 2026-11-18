@@ -22,9 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** @return the active (not soft-deleted) user with this login */
     Optional<User> findByLoginAndDeletedFalse(String login);
 
-    /** @return the soft-deleted user with this login */
-    Optional<User> findByLoginAndDeletedTrue(String login);
-
     /** @return the active (not soft-deleted) user with this id */
     Optional<User> findByIdAndDeletedFalse(Long id);
 

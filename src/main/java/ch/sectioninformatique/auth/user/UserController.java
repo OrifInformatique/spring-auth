@@ -76,7 +76,7 @@ public class UserController {
 
     /**
      * @param id id of the user
-     * @return 200 with the active user having this login
+     * @return 200 with the active user having this id
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('user:read')")
