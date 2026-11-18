@@ -501,7 +501,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_soft_deleted_users">Soft-deleted users</a></li>
 </ul>
 </li>
-<li><a href="#users-get">4.4. <code>GET /users/{login}</code></a>
+<li><a href="#users-get">4.4. <code>GET /users/{id}</code></a>
 <ul class="sectlevel3">
 <li><a href="#_unknown_or_soft_deleted_user">Unknown or soft-deleted user</a></li>
 </ul>
@@ -513,20 +513,20 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_admin_created_by_a_non_admin">Admin created by a non-admin</a></li>
 </ul>
 </li>
-<li><a href="#users-update">4.6. <code>PUT /users/{login}</code></a></li>
-<li><a href="#users-role">4.7. <code>PUT /users/{login}/role</code></a>
+<li><a href="#users-update">4.6. <code>PUT /users/{id}</code></a></li>
+<li><a href="#users-role">4.7. <code>PUT /users/{id}/role</code></a>
 <ul class="sectlevel3">
 <li><a href="#_admin_role_granted_by_a_non_admin">Admin role granted by a non-admin</a></li>
 <li><a href="#_own_account">Own account</a></li>
 <li><a href="#_role_already_assigned">Role already assigned</a></li>
 </ul>
 </li>
-<li><a href="#users-delete">4.8. <code>DELETE /users/{login}</code></a>
+<li><a href="#users-delete">4.8. <code>DELETE /users/{id}</code></a>
 <ul class="sectlevel3">
 <li><a href="#_permanent_deletion">Permanent deletion</a></li>
 </ul>
 </li>
-<li><a href="#users-restore">4.9. <code>POST /users/{login}/restore</code></a></li>
+<li><a href="#users-restore">4.9. <code>POST /users/{id}/restore</code></a></li>
 </ul>
 </li>
 </ul>
@@ -634,7 +634,7 @@ X-Frame-Options: DENY
 Content-Length: 244
 
 {
-  "timestamp" : "2026-10-06T13:24:22.197022778Z",
+  "timestamp" : "2026-11-18T13:40:41.837850818Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Échec de la validation",
@@ -705,7 +705,7 @@ X-Frame-Options: DENY
 Content-Length: 161
 
 {
-  "timestamp" : "2026-10-06T13:24:21.978182773Z",
+  "timestamp" : "2026-11-18T13:40:41.608740361Z",
   "status" : 401,
   "error" : "Unauthorized",
   "message" : "Jeton d'authentification invalide ou manquant"
@@ -722,7 +722,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 134
 
 {
-  "timestamp" : "2026-10-06T13:24:21.797234798Z",
+  "timestamp" : "2026-11-18T13:40:41.450919379Z",
   "status" : 401,
   "error" : "Unauthorized",
   "message" : "Le jeton a expiré"
@@ -748,7 +748,7 @@ X-Frame-Options: DENY
 Content-Length: 180
 
 {
-  "timestamp" : "2026-10-06T13:24:20.297112864Z",
+  "timestamp" : "2026-11-18T13:40:39.985138186Z",
   "status" : 403,
   "error" : "Forbidden",
   "message" : "Vous n'avez pas les droits nécessaires pour effectuer cette action"
@@ -774,7 +774,7 @@ X-Frame-Options: DENY
 Content-Length: 179
 
 {
-  "timestamp" : "2026-10-06T13:24:20.182054697Z",
+  "timestamp" : "2026-11-18T13:40:39.870625102Z",
   "status" : 405,
   "error" : "Method Not Allowed",
   "message" : "La méthode HTTP POST n'est pas supportée pour cette URL"
@@ -886,7 +886,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Thu, 5 Nov 2026 13:24:22 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 18 Dec 2026 13:40:42 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1003,7 +1003,7 @@ X-Frame-Options: DENY
 Content-Length: 138
 
 {
-  "timestamp" : "2026-10-06T13:24:22.287770465Z",
+  "timestamp" : "2026-11-18T13:40:41.931421503Z",
   "status" : 401,
   "error" : "Unauthorized",
   "message" : "Identifiants invalides"
@@ -1039,7 +1039,7 @@ X-Frame-Options: DENY
 Content-Length: 244
 
 {
-  "timestamp" : "2026-10-06T13:24:22.197022778Z",
+  "timestamp" : "2026-11-18T13:40:41.837850818Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Échec de la validation",
@@ -1069,7 +1069,7 @@ X-Frame-Options: DENY
 Content-Length: 177
 
 {
-  "timestamp" : "2026-10-06T13:24:22.458647360Z",
+  "timestamp" : "2026-11-18T13:40:42.097290126Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Le corps de la requête est absent ou n'est pas un JSON valide"
@@ -1108,7 +1108,7 @@ X-Frame-Options: DENY
 Content-Length: 218
 
 {
-  "timestamp" : "2026-10-06T13:24:22.185961876Z",
+  "timestamp" : "2026-11-18T13:40:41.827572957Z",
   "status" : 415,
   "error" : "Unsupported Media Type",
   "message" : "Le type de contenu 'text/plain;charset=UTF-8' n'est pas supporté, utilisez application/json"
@@ -1154,7 +1154,7 @@ Content-Type: application/x-www-form-urlencoded</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Thu, 5 Nov 2026 13:24:21 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 18 Dec 2026 13:40:41 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1226,7 +1226,7 @@ X-Frame-Options: DENY
 Content-Length: 168
 
 {
-  "timestamp" : "2026-10-06T13:24:21.434634800Z",
+  "timestamp" : "2026-11-18T13:40:41.092592714Z",
   "status" : 401,
   "error" : "Unauthorized",
   "message" : "Le cookie du jeton de rafraîchissement est manquant"
@@ -1252,7 +1252,7 @@ X-Frame-Options: DENY
 Content-Length: 151
 
 {
-  "timestamp" : "2026-10-06T13:24:21.586847634Z",
+  "timestamp" : "2026-11-18T13:40:41.236536528Z",
   "status" : 401,
   "error" : "Unauthorized",
   "message" : "Jeton de rafraîchissement invalide"
@@ -1455,7 +1455,7 @@ Host: localhost:8080
 
 {
   "userId" : 1,
-  "code" : "9f92424a-4c59-45b4-a0f2-75a4fedf2632"
+  "code" : "c11e37bf-5fc4-4b93-a552-51369ab7104c"
 }</code></pre>
 </div>
 </div>
@@ -1491,7 +1491,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Thu, 5 Nov 2026 13:24:22 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token={refresh-token}; Path=/auth/refresh; Max-Age=2592000; Expires=Fri, 18 Dec 2026 13:40:42 GMT; Secure; HttpOnly; SameSite=Strict
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -1608,7 +1608,7 @@ X-Frame-Options: DENY
 Content-Length: 158
 
 {
-  "timestamp" : "2026-10-06T13:24:22.892291462Z",
+  "timestamp" : "2026-11-18T13:40:42.549430262Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Code d'authentification invalide ou expiré"
@@ -1638,7 +1638,7 @@ X-Frame-Options: DENY
 Content-Length: 157
 
 {
-  "timestamp" : "2026-10-06T13:24:22.479230803Z",
+  "timestamp" : "2026-11-18T13:40:42.131193592Z",
   "status" : 401,
   "error" : "Unauthorized",
   "message" : "La connexion Microsoft n'a pas pu aboutir"
@@ -1845,7 +1845,7 @@ X-Frame-Options: DENY
 Content-Length: 151
 
 {
-  "timestamp" : "2026-10-06T13:24:20.845240165Z",
+  "timestamp" : "2026-11-18T13:40:40.498755699Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Le mot de passe actuel est incorrect"
@@ -1871,7 +1871,7 @@ X-Frame-Options: DENY
 Content-Length: 254
 
 {
-  "timestamp" : "2026-10-06T13:24:20.749581695Z",
+  "timestamp" : "2026-11-18T13:40:40.406213400Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Échec de la validation",
@@ -2057,19 +2057,19 @@ Content-Length: 196
 </div>
 </div>
 <div class="sect2">
-<h3 id="users-get">4.4. <code>GET /users/{login}</code></h3>
+<h3 id="users-get">4.4. <code>GET /users/{id}</code></h3>
 <div class="paragraph">
 <p>Returns an active user. Requires <code>user:read</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/test.manager@test.com HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /users/2 HTTP/1.1
 Authorization: Bearer {access-token}
 Host: localhost:8080</code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /users/{login}</caption>
+<caption class="title">Table 1. /users/{id}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2082,8 +2082,8 @@ Host: localhost:8080</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>login</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Login (email) of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Id of the user</p></td>
 </tr>
 </tbody>
 </table>
@@ -2093,7 +2093,6 @@ Host: localhost:8080</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Content-Disposition: inline;filename=f.txt
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2122,7 +2121,6 @@ Content-Length: 228
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Content-Disposition: inline;filename=f.txt
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2130,13 +2128,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 155
+Content-Length: 145
 
 {
-  "timestamp" : "2026-10-06T13:24:19.910776361Z",
+  "timestamp" : "2026-11-18T13:40:39.602880473Z",
   "status" : 404,
   "error" : "Not Found",
-  "message" : "Utilisateur non trouvé : unknown@test.com"
+  "message" : "Utilisateur non trouvé : 999999"
 }</code></pre>
 </div>
 </div>
@@ -2211,7 +2209,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Location: /users/created@test.com
+Location: /users/6
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2340,15 +2338,15 @@ X-Frame-Options: DENY
 Content-Length: 461
 
 {
-  "timestamp" : "2026-10-06T13:24:20.226624909Z",
+  "timestamp" : "2026-11-18T13:40:39.919720265Z",
   "status" : 400,
   "error" : "Bad Request",
   "message" : "Échec de la validation",
   "fieldErrors" : {
     "firstName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\"",
-    "login" : "doit être une adresse électronique syntaxiquement correcte",
+    "lastName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\"",
     "password" : "la taille doit être comprise entre 8 et 72",
-    "lastName" : "doit correspondre à \"^[\\p{L}][\\p{L} '\\-]*[\\p{L}]$\""
+    "login" : "doit être une adresse électronique syntaxiquement correcte"
   }
 }</code></pre>
 </div>
@@ -2375,7 +2373,7 @@ X-Frame-Options: DENY
 Content-Length: 160
 
 {
-  "timestamp" : "2026-10-06T13:24:20.325791128Z",
+  "timestamp" : "2026-11-18T13:40:40.010107279Z",
   "status" : 409,
   "error" : "Conflict",
   "message" : "L'utilisateur existe déjà : test.user@test.com"
@@ -2401,7 +2399,7 @@ X-Frame-Options: DENY
 Content-Length: 181
 
 {
-  "timestamp" : "2026-10-06T13:24:20.676734105Z",
+  "timestamp" : "2026-11-18T13:40:40.348052754Z",
   "status" : 403,
   "error" : "Forbidden",
   "message" : "L'utilisateur dispose de droits insuffisants : test.manager@test.com"
@@ -2411,14 +2409,14 @@ Content-Length: 181
 </div>
 </div>
 <div class="sect2">
-<h3 id="users-update">4.6. <code>PUT /users/{login}</code></h3>
+<h3 id="users-update">4.6. <code>PUT /users/{id}</code></h3>
 <div class="paragraph">
 <p>Updates the first name, last name and login of a user. Requires <code>user:update</code>.
-The role cannot be changed here: see <a href="#users-role"><code>PUT /users/{login}/role</code></a>.</p>
+The role cannot be changed here: see <a href="#users-role"><code>PUT /users/{id}/role</code></a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.user@test.com HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer {access-token}
 Content-Length: 84
@@ -2432,7 +2430,7 @@ Host: localhost:8080
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. /users/{login}</caption>
+<caption class="title">Table 2. /users/{id}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2445,8 +2443,8 @@ Host: localhost:8080
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>login</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Login (email) of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Id of the user</p></td>
 </tr>
 </tbody>
 </table>
@@ -2487,7 +2485,6 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Content-Disposition: inline;filename=f.txt
 Content-Type: application/json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2510,13 +2507,13 @@ Content-Length: 188
 </div>
 </div>
 <div class="sect2">
-<h3 id="users-role">4.7. <code>PUT /users/{login}/role</code></h3>
+<h3 id="users-role">4.7. <code>PUT /users/{id}/role</code></h3>
 <div class="paragraph">
 <p>Changes the role of a user. Requires <code>user:update</code>; granting or removing the <code>ADMIN</code> role requires the <code>ADMIN</code> role.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/test.user@test.com/role HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /users/1/role HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Authorization: Bearer {access-token}
 Content-Length: 24
@@ -2528,7 +2525,7 @@ Host: localhost:8080
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. /users/{login}/role</caption>
+<caption class="title">Table 3. /users/{id}/role</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2541,8 +2538,8 @@ Host: localhost:8080
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>login</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Login (email) of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Id of the user</p></td>
 </tr>
 </tbody>
 </table>
@@ -2611,7 +2608,7 @@ X-Frame-Options: DENY
 Content-Length: 181
 
 {
-  "timestamp" : "2026-10-06T13:24:19.613567705Z",
+  "timestamp" : "2026-11-18T13:40:39.320300080Z",
   "status" : 403,
   "error" : "Forbidden",
   "message" : "L'utilisateur dispose de droits insuffisants : test.manager@test.com"
@@ -2637,7 +2634,7 @@ X-Frame-Options: DENY
 Content-Length: 189
 
 {
-  "timestamp" : "2026-10-06T13:24:19.849133588Z",
+  "timestamp" : "2026-11-18T13:40:39.541340830Z",
   "status" : 403,
   "error" : "Forbidden",
   "message" : "Vous ne pouvez pas modifier le rôle de votre propre compte, ni le supprimer"
@@ -2660,33 +2657,33 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 173
+Content-Length: 153
 
 {
-  "timestamp" : "2026-10-06T13:24:19.726101379Z",
+  "timestamp" : "2026-11-18T13:40:39.424974111Z",
   "status" : 409,
   "error" : "Conflict",
-  "message" : "L'utilisateur test.manager@test.com a déjà le rôle MANAGER"
+  "message" : "L'utilisateur 2 a déjà le rôle MANAGER"
 }</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="users-delete">4.8. <code>DELETE /users/{login}</code></h3>
+<h3 id="users-delete">4.8. <code>DELETE /users/{id}</code></h3>
 <div class="paragraph">
 <p>Deletes a user. Requires <code>user:delete</code>.
 By default the deletion is soft: the user can no longer log in but can be restored.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/test.user@test.com HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Authorization: Bearer {access-token}
 Host: localhost:8080</code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. /users/{login}</caption>
+<caption class="title">Table 4. /users/{id}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2699,8 +2696,8 @@ Host: localhost:8080</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>login</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Login (email) of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Id of the user</p></td>
 </tr>
 </tbody>
 </table>
@@ -2740,7 +2737,7 @@ X-Frame-Options: DENY</code></pre>
 <h4 id="_permanent_deletion">Permanent deletion</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/test.user@test.com HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /users/1 HTTP/1.1
 Authorization: Bearer {access-token}
 Content-Type: application/x-www-form-urlencoded
 Host: localhost:8080
@@ -2766,20 +2763,20 @@ X-Frame-Options: DENY</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="users-restore">4.9. <code>POST /users/{login}/restore</code></h3>
+<h3 id="users-restore">4.9. <code>POST /users/{id}/restore</code></h3>
 <div class="paragraph">
 <p>Restores a soft-deleted user. Requires <code>user:update</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /users/test.user@test.com/restore HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /users/1/restore HTTP/1.1
 Authorization: Bearer {access-token}
 Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded</code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. /users/{login}/restore</caption>
+<caption class="title">Table 5. /users/{id}/restore</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2792,8 +2789,8 @@ Content-Type: application/x-www-form-urlencoded</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>login</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Login (email) of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Id of the user</p></td>
 </tr>
 </tbody>
 </table>
@@ -2829,7 +2826,7 @@ Content-Length: 187
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-10-06 10:40:05 UTC
+Last updated 2026-11-18 13:24:07 UTC
 </div>
 </div>
 </body>
