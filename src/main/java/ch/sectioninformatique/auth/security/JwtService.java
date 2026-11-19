@@ -52,8 +52,8 @@ public class JwtService {
     public JwtService(
             @Value("${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}") String secretAccessKey,
             @Value("${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}") String secretRefreshKey,
-            @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME:5m}") Duration accessTokenLifetime,
-            @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME:30d}") Duration refreshTokenLifetime) {
+            @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME}") Duration accessTokenLifetime,
+            @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}") Duration refreshTokenLifetime) {
         // Signing keys are derived from the Base64 form of the secrets. This derivation is kept
         // so that tokens issued by previous versions of the application remain valid.
         this.accessAlgorithm = Algorithm.HMAC256(base64(secretAccessKey));
