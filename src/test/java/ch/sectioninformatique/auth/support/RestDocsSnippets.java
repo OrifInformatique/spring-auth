@@ -63,8 +63,8 @@ public final class RestDocsSnippets {
 
     // Parameters
 
-    public static Snippet loginPathParameter() {
-        return pathParameters(parameterWithName("login").description("Login (email) of the user"));
+    public static Snippet idPathParameter() {
+        return pathParameters(parameterWithName("id").description("Id of the user"));
     }
 
     public static Snippet userStatusQueryParameter() {

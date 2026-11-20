@@ -34,6 +34,7 @@ import ch.sectioninformatique.auth.user.dto.UserDto;
 public class JwtService {
 
     private static final String TYPE_CLAIM = "typ";
+    private static final String ID_CLAIM = "id";
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
 
@@ -51,8 +52,8 @@ public class JwtService {
     public JwtService(
             @Value("${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}") String secretAccessKey,
             @Value("${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}") String secretRefreshKey,
-            @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME:5m}") Duration accessTokenLifetime,
-            @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME:30d}") Duration refreshTokenLifetime) {
+            @Value("${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME}") Duration accessTokenLifetime,
+            @Value("${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}") Duration refreshTokenLifetime) {
         // Signing keys are derived from the Base64 form of the secrets. This derivation is kept
         // so that tokens issued by previous versions of the application remain valid.
         this.accessAlgorithm = Algorithm.HMAC256(base64(secretAccessKey));
@@ -83,6 +84,7 @@ public class JwtService {
                 .withJWTId(UUID.randomUUID().toString())
                 .withSubject(user.getLogin())
                 .withClaim(TYPE_CLAIM, ACCESS_TYPE)
+                .withClaim(ID_CLAIM, user.getId())
                 .withIssuedAt(issuedAt)
                 .withExpiresAt(issuedAt.plus(accessTokenLifetime))
                 .withClaim("firstName", user.getFirstName())
@@ -117,12 +119,15 @@ public class JwtService {
      *
      * @param token raw JWT
      * @return authenticated token holding the user and the authorities of their role
-     * @throws JWTVerificationException if the token is malformed, expired, badly signed
-     *                                  or does not carry a known role
+     * @throws JWTVerificationException if the token is malformed, expired, badly signed,
+     *                                  does not carry the user's id or a known role
      */
     public Authentication validateAccessToken(String token) {
         DecodedJWT decoded = JWT.require(accessAlgorithm)
                 .withClaim(TYPE_CLAIM, ACCESS_TYPE)
+                // The id must be a number: tokens issued before the id claim was added, or carrying
+                // a null id, are rejected (401) and the client refreshes them
+                .withClaim(ID_CLAIM, (claim, jwt) -> claim.asLong() != null)
                 .build()
                 .verify(token);
 
@@ -130,6 +135,7 @@ public class JwtService {
         List<String> permissions = decoded.getClaim("permissions").asList(String.class);
 
         UserDto user = UserDto.builder()
+                .id(decoded.getClaim(ID_CLAIM).asLong())
                 .login(decoded.getSubject())
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())

@@ -19,7 +19,7 @@ import ch.sectioninformatique.auth.support.AbstractIntegrationTest;
  * Fails when an endpoint exists in the code but is not described in the API documentation.
  *
  * Each endpoint must appear in {@code src/asciidoc/index.adoc} as {@code `METHOD /path`}
- * (e.g. {@code `PUT /users/{login}/role`}). Together with the REST Docs field contracts
+ * (e.g. {@code `PUT /users/{id}/role`}). Together with the REST Docs field contracts
  * and the Asciidoctor check on missing snippets, this keeps the documentation in sync
  * with the API.
  */

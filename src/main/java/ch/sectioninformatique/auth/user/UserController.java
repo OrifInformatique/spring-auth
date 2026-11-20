@@ -26,7 +26,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * The users resource. Users are identified by their login (email) in URLs.
+ * The users resource. Users are identified by their id in URLs.
  *
  * Every endpoint requires an access token; the permission required by each one is
  * declared with {@code @PreAuthorize}. Rules depending on the target user (admin
@@ -46,7 +46,7 @@ public class UserController {
      */
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.findByLogin(currentUser.getLogin()));
+        return ResponseEntity.ok(userService.findById(currentUser.getId()));
     }
 
     /**
@@ -59,7 +59,7 @@ public class UserController {
     @PutMapping("/me/password")
     public ResponseEntity<Void> updateOwnPassword(@AuthenticationPrincipal UserDto currentUser,
             @RequestBody @Valid PasswordUpdateDto request) {
-        userService.updatePassword(currentUser.getLogin(), request);
+        userService.updatePassword(currentUser.getId(), request);
         return ResponseEntity.noContent().build();
     }
 
@@ -75,13 +75,13 @@ public class UserController {
     }
 
     /**
-     * @param login login of the user
-     * @return 200 with the active user having this login
+     * @param id id of the user
+     * @return 200 with the active user having this id
      */
-    @GetMapping("/{login}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<UserDto> getUser(@PathVariable String login) {
-        return ResponseEntity.ok(userService.findByLogin(login));
+    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     /**
@@ -95,9 +95,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid CreateUserDto request,
             @AuthenticationPrincipal UserDto currentUser) {
-        UserDto created = userService.create(request, currentUser.getLogin());
-        URI location = UriComponentsBuilder.fromPath("/users/{login}")
-                .buildAndExpand(created.getLogin())
+        UserDto created = userService.create(request, currentUser.getId());
+        URI location = UriComponentsBuilder.fromPath("/users/{id}")
+                .buildAndExpand(created.getId())
                 .toUri();
         return ResponseEntity.created(location).body(created);
     }
@@ -105,63 +105,63 @@ public class UserController {
     /**
      * Updates the first name, last name and login of a user.
      *
-     * @param login       current login of the user
+     * @param id          id of the user
      * @param request     new values
      * @param currentUser authenticated user
      * @return 200 with the updated user
      */
-    @PutMapping("/{login}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<UserDto> updateUser(@PathVariable String login,
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
             @RequestBody @Valid UpdateUserDto request,
             @AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.update(login, request, currentUser.getLogin()));
+        return ResponseEntity.ok(userService.update(id, request, currentUser.getId()));
     }
 
     /**
      * Changes the role of a user.
      *
-     * @param login       login of the user
+     * @param id       id of the user
      * @param request     new role
      * @param currentUser authenticated user
      * @return 200 with the updated user
      */
-    @PutMapping("/{login}/role")
+    @PutMapping("/{id}/role")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<UserDto> updateUserRole(@PathVariable String login,
+    public ResponseEntity<UserDto> updateUserRole(@PathVariable Long id,
             @RequestBody @Valid RoleUpdateDto request,
             @AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.changeRole(login, request.role(), currentUser.getLogin()));
+        return ResponseEntity.ok(userService.changeRole(id, request.role(), currentUser.getId()));
     }
 
     /**
      * Deletes a user. The deletion is soft (restorable) unless {@code permanent=true}.
      *
-     * @param login       login of the user
+     * @param id          ID of the user
      * @param permanent   true to remove the user from the database
      * @param currentUser authenticated user
      * @return 204 No Content
      */
-    @DeleteMapping("/{login}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('user:delete')")
-    public ResponseEntity<Void> deleteUser(@PathVariable String login,
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id,
             @RequestParam(defaultValue = "false") boolean permanent,
             @AuthenticationPrincipal UserDto currentUser) {
-        userService.delete(login, permanent, currentUser.getLogin());
+        userService.delete(id, permanent, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Restores a soft-deleted user.
      *
-     * @param login       login of the user
+     * @param id       id of the user
      * @param currentUser authenticated user
      * @return 200 with the restored user
      */
-    @PostMapping("/{login}/restore")
+    @PostMapping("/{id}/restore")
     @PreAuthorize("hasAuthority('user:update')")
-    public ResponseEntity<UserDto> restoreUser(@PathVariable String login,
+    public ResponseEntity<UserDto> restoreUser(@PathVariable Long id,
             @AuthenticationPrincipal UserDto currentUser) {
-        return ResponseEntity.ok(userService.restore(login, currentUser.getLogin()));
+        return ResponseEntity.ok(userService.restore(id, currentUser.getId()));
     }
 }

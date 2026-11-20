@@ -24,7 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.sectioninformatique.auth.security.JwtService;
+import ch.sectioninformatique.auth.user.UserRepository;
 import ch.sectioninformatique.auth.user.UserService;
+import ch.sectioninformatique.auth.user.dto.UserDto;
 
 /**
  * Base class of the HTTP integration tests.
@@ -57,6 +59,9 @@ public abstract class AbstractIntegrationTest {
     protected UserService userService;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MessageSource messageSource;
 
     @AfterEach
@@ -65,11 +70,27 @@ public abstract class AbstractIntegrationTest {
     }
 
     /**
+     * @param login login of a user, soft-deleted or not
+     * @return the id of this user
+     */
+    protected Long idOf(String login) {
+        return userRepository.findByLogin(login).orElseThrow().getId();
+    }
+
+    /**
+     * @param login login of an active user
+     * @return this user, as returned by the API
+     */
+    protected UserDto user(String login) {
+        return userService.findById(idOf(login));
+    }
+
+    /**
      * @param login login of an active user
      * @return a valid "Bearer ..." Authorization header value for this user
      */
     protected String bearer(String login) {
-        return "Bearer " + jwtService.createAccessToken(userService.findByLogin(login));
+        return "Bearer " + jwtService.createAccessToken(user(login));
     }
 
     /**
@@ -78,7 +99,7 @@ public abstract class AbstractIntegrationTest {
      */
     protected String expiredBearer(String login) {
         Instant issuedLongAgo = Instant.now().minus(Duration.ofDays(1));
-        return "Bearer " + jwtService.createAccessToken(userService.findByLogin(login), issuedLongAgo);
+        return "Bearer " + jwtService.createAccessToken(user(login), issuedLongAgo);
     }
 
     /**

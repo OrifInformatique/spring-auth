@@ -34,7 +34,7 @@ class JwtServiceTest {
 
     private static UserDto manager() {
         return UserDto.builder()
-                .login("manager@test.com").firstName("Jane").lastName("Smith")
+                .id(42L).login("manager@test.com").firstName("Jane").lastName("Smith")
                 .mainRole("MANAGER").permissions(List.of("user:read", "user:write", "user:update"))
                 .build();
     }
@@ -44,6 +44,7 @@ class JwtServiceTest {
         Authentication authentication = jwtService.validateAccessToken(jwtService.createAccessToken(manager()));
 
         UserDto principal = (UserDto) authentication.getPrincipal();
+        assertThat(principal.getId()).isEqualTo(42L);
         assertThat(principal.getLogin()).isEqualTo("manager@test.com");
         assertThat(principal.getFirstName()).isEqualTo("Jane");
         assertThat(principal.getMainRole()).isEqualTo("MANAGER");
@@ -88,6 +89,23 @@ class JwtServiceTest {
     @Test
     void accessToken_withUnknownRole_isRejected() {
         String token = jwtService.createAccessToken(manager().toBuilder().mainRole("SUPERUSER").build());
+
+        assertThatThrownBy(() -> jwtService.validateAccessToken(token)).isInstanceOf(InvalidClaimException.class);
+    }
+
+    @Test
+    void accessToken_withoutUserId_isRejected() {
+        // Tokens issued before the id claim was added must not produce a principal without id
+        String token = jwtService.createAccessToken(manager().toBuilder().id(null).build());
+
+        assertThatThrownBy(() -> jwtService.validateAccessToken(token)).isInstanceOf(InvalidClaimException.class);
+    }
+
+    @Test
+    void accessTokenIssuedBeforeIdClaimExisted_isRejected() {
+        String signingKey = Base64.getEncoder().encodeToString(ACCESS_SECRET.getBytes(StandardCharsets.UTF_8));
+        String token = JWT.create().withSubject("manager@test.com").withClaim("typ", "access")
+                .withClaim("mainRole", "MANAGER").sign(Algorithm.HMAC256(signingKey));
 
         assertThatThrownBy(() -> jwtService.validateAccessToken(token)).isInstanceOf(InvalidClaimException.class);
     }

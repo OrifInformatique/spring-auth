@@ -99,7 +99,7 @@ class OAuth2ControllerIntegrationTest extends AbstractIntegrationTest {
             assertThat(redirect.getQueryParams().getFirst("loginType")).isEqualTo("azure");
             assertThat(redirect.getQueryParams().getFirst("authCode")).isNotBlank();
             assertThat(redirect.getQueryParams().getFirst("userId"))
-                    .isEqualTo(userService.findByLogin(TestUsers.USER).getId().toString());
+                    .isEqualTo(idOf(TestUsers.USER).toString());
             assertThat(session.isInvalid()).isTrue();
         }
 
@@ -122,7 +122,7 @@ class OAuth2ControllerIntegrationTest extends AbstractIntegrationTest {
                     .with(oauth2Login().attributes(attributes -> attributes.putAll(azureAttributes(email)))))
                     .andExpect(status().isFound());
 
-            assertThat(userService.findByLogin(email))
+            assertThat(user(email))
                     .satisfies(user -> {
                         assertThat(user.getFirstName()).isEqualTo("Azure");
                         assertThat(user.getLastName()).isEqualTo("User");
@@ -141,8 +141,8 @@ class OAuth2ControllerIntegrationTest extends AbstractIntegrationTest {
                     })))
                     .andExpect(status().isFound());
 
-            assertThat(userService.findByLogin(email).getFirstName()).isEqualTo("Display Name");
-            assertThat(userService.findByLogin(email).getLastName()).isNull();
+            assertThat(user(email).getFirstName()).isEqualTo("Display Name");
+            assertThat(user(email).getLastName()).isNull();
         }
 
         @Test
@@ -178,7 +178,7 @@ class OAuth2ControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void validCode_returnsUserWithAccessTokenAndUsableRefreshCookie() throws Exception {
-            Long userId = userService.findByLogin(TestUsers.USER).getId();
+            Long userId = idOf(TestUsers.USER);
             String code = authCodeService.generate(TestUsers.USER, CLIENT_CALLBACK);
 
             MvcResult result = mockMvc.perform(post("/oauth2/token")
@@ -202,7 +202,7 @@ class OAuth2ControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void codeCanOnlyBeUsedOnce() throws Exception {
-            Long userId = userService.findByLogin(TestUsers.USER).getId();
+            Long userId = idOf(TestUsers.USER);
             String code = authCodeService.generate(TestUsers.USER, CLIENT_CALLBACK);
             String body = exchangeBody(userId, code);
 
@@ -215,7 +215,7 @@ class OAuth2ControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void codeOfAnotherUser_returns400() throws Exception {
-            Long otherUserId = userService.findByLogin(TestUsers.MANAGER).getId();
+            Long otherUserId = idOf(TestUsers.MANAGER);
             String code = authCodeService.generate(TestUsers.USER, CLIENT_CALLBACK);
 
             mockMvc.perform(post("/oauth2/token")

@@ -228,7 +228,7 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void validlySignedTokenThatWasNeverIssued_returns401() throws Exception {
-            String unknownToken = jwtService.createRefreshToken(userService.findByLogin(TestUsers.USER));
+            String unknownToken = jwtService.createRefreshToken(user(TestUsers.USER));
 
             mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, unknownToken)))
                     .andExpect(status().isUnauthorized());
@@ -237,7 +237,7 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         void tokenOfUserDeletedSinceLogin_returns401() throws Exception {
             String refreshToken = loginAndGetRefreshToken(TestUsers.USER, TestUsers.USER_PASSWORD);
-            userService.delete(TestUsers.USER, false, TestUsers.ADMIN);
+            userService.delete(idOf(TestUsers.USER), false, idOf(TestUsers.ADMIN));
 
             mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, refreshToken)))
                     .andExpect(status().isUnauthorized());
@@ -312,7 +312,7 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void withRefreshTokenAsAccessToken_returns401() throws Exception {
-            String refreshToken = refreshTokenService.issue(userService.findByLogin(TestUsers.USER));
+            String refreshToken = refreshTokenService.issue(user(TestUsers.USER));
 
             mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, "Bearer " + refreshToken))
                     .andExpect(status().isUnauthorized());
@@ -329,7 +329,7 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void refreshTokens_areStoredHashed() {
-        String refreshToken = refreshTokenService.issue(userService.findByLogin(TestUsers.USER));
+        String refreshToken = refreshTokenService.issue(user(TestUsers.USER));
 
         RefreshToken stored = refreshTokenRepository.findByUserLoginAndRevokedFalse(TestUsers.USER).orElseThrow();
         assertThat(stored.getTokenHash())

@@ -8,7 +8,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import ch.sectioninformatique.auth.role.RoleEnum;
@@ -30,6 +30,9 @@ import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
  * HTTP tests of the users resource under {@code /users}.
  */
 class UserControllerIntegrationTest extends AbstractIntegrationTest {
+
+    /** Id that no user has. */
+    private static final Long UNKNOWN_ID = 999_999L;
 
     @Autowired
     private UserRepository userRepository;
@@ -165,26 +168,26 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void get_returnsUser() throws Exception {
-            mockMvc.perform(as(TestUsers.USER, get("/users/{login}", TestUsers.MANAGER)))
+            mockMvc.perform(as(TestUsers.USER, get("/users/{id}", idOf(TestUsers.MANAGER))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.login").value(TestUsers.MANAGER))
                     .andExpect(jsonPath("$.mainRole").value("MANAGER"))
                     .andDo(document("users/get",
-                            RestDocsSnippets.loginPathParameter(),
+                            RestDocsSnippets.idPathParameter(),
                             RestDocsSnippets.userResponse()));
         }
 
         @Test
         void get_unknownUser_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.USER, get("/users/{login}", "unknown@test.com")))
+            mockMvc.perform(as(TestUsers.USER, get("/users/{id}", UNKNOWN_ID)))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value(message("error.user.not.found", "unknown@test.com")))
+                    .andExpect(jsonPath("$.message").value(message("error.user.not.found", UNKNOWN_ID.toString())))
                     .andDo(document("users/get-not-found", RestDocsSnippets.errorResponse()));
         }
 
         @Test
         void get_softDeletedUser_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.USER, get("/users/{login}", TestUsers.DELETED)))
+            mockMvc.perform(as(TestUsers.USER, get("/users/{id}", idOf(TestUsers.DELETED))))
                     .andExpect(status().isNotFound());
         }
     }
@@ -194,9 +197,8 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void managerCreatesUser_returns201WithLocation() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser("created@test.com", "USER")))
+            MvcResult result = mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser("created@test.com", "USER")))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string(HttpHeaders.LOCATION, "/users/created@test.com"))
                     .andExpect(jsonPath("$.login").value("created@test.com"))
                     .andExpect(jsonPath("$.mainRole").value("USER"))
                     .andExpect(jsonPath("$.token").doesNotExist())
@@ -204,8 +206,11 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
                             RestDocsSnippets.authorizationHeader(),
                             RestDocsSnippets.createUserRequest(),
                             RestDocsSnippets.locationHeader(),
-                            RestDocsSnippets.userResponse()));
+                            RestDocsSnippets.userResponse()))
+                    .andReturn();
 
+            assertThat(result.getResponse().getHeader(HttpHeaders.LOCATION))
+                    .isEqualTo("/users/" + idOf("created@test.com"));
             String storedHash = userRepository.findByLogin("created@test.com").orElseThrow().getPassword();
             assertThat(storedHash).isNotEqualTo("NewUser123!");
             assertThat(passwordEncoder.matches("NewUser123!", storedHash)).isTrue();
@@ -287,13 +292,13 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void managerUpdatesUser_returnsUpdatedUser() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{login}", TestUsers.USER), UPDATE_BODY))
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}", idOf(TestUsers.USER)), UPDATE_BODY))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.firstName").value("Updated"))
                     .andExpect(jsonPath("$.login").value("updated@test.com"))
                     .andExpect(jsonPath("$.mainRole").value("USER"))
                     .andDo(document("users/update",
-                            RestDocsSnippets.loginPathParameter(),
+                            RestDocsSnippets.idPathParameter(),
                             RestDocsSnippets.updateUserRequest(),
                             RestDocsSnippets.userResponse()));
         }
@@ -304,14 +309,14 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
                     {"firstName": "Test", "lastName": "User", "login": "%s", "mainRole": "ADMIN"}"""
                     .formatted(TestUsers.USER);
 
-            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{login}", TestUsers.USER), body))
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}", idOf(TestUsers.USER)), body))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mainRole").value("USER"));
         }
 
         @Test
         void managerCannotUpdateAdmin() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{login}", TestUsers.ADMIN), UPDATE_BODY))
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}", idOf(TestUsers.ADMIN)), UPDATE_BODY))
                     .andExpect(status().isForbidden());
         }
 
@@ -320,19 +325,19 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
             String body = """
                     {"firstName": "Test", "lastName": "User", "login": "%s"}""".formatted(TestUsers.MANAGER);
 
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}", TestUsers.USER), body))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}", idOf(TestUsers.USER)), body))
                     .andExpect(status().isConflict());
         }
 
         @Test
         void unknownUser_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}", "unknown@test.com"), UPDATE_BODY))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}", UNKNOWN_ID), UPDATE_BODY))
                     .andExpect(status().isNotFound());
         }
 
         @Test
         void invalidLogin_returns400() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}", TestUsers.USER),
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}", idOf(TestUsers.USER)),
                     "{\"firstName\": \"Test\", \"login\": \"not-an-email\"}"))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
@@ -340,7 +345,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void regularUserCannotUpdateUsers() throws Exception {
-            mockMvc.perform(as(TestUsers.USER, put("/users/{login}", TestUsers.MANAGER), UPDATE_BODY))
+            mockMvc.perform(as(TestUsers.USER, put("/users/{id}", idOf(TestUsers.MANAGER)), UPDATE_BODY))
                     .andExpect(status().isForbidden());
         }
     }
@@ -350,33 +355,33 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void managerPromotesUserToManager() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{login}/role", TestUsers.USER), roleBody("MANAGER")))
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}/role", idOf(TestUsers.USER)), roleBody("MANAGER")))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mainRole").value("MANAGER"))
                     .andExpect(jsonPath("$.permissions").value(hasItem("user:update")))
                     .andDo(document("users/update-role",
-                            RestDocsSnippets.loginPathParameter(),
+                            RestDocsSnippets.idPathParameter(),
                             RestDocsSnippets.roleUpdateRequest(),
                             RestDocsSnippets.userResponse()));
         }
 
         @Test
         void adminPromotesUserToAdmin() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}/role", TestUsers.USER), roleBody("ADMIN")))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.USER)), roleBody("ADMIN")))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mainRole").value("ADMIN"));
         }
 
         @Test
         void adminDemotesAnotherAdmin() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}/role", TestUsers.OTHER_ADMIN), roleBody("MANAGER")))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.OTHER_ADMIN)), roleBody("MANAGER")))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.mainRole").value("MANAGER"));
         }
 
         @Test
         void managerCannotGrantAdminRole() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{login}/role", TestUsers.USER), roleBody("ADMIN")))
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}/role", idOf(TestUsers.USER)), roleBody("ADMIN")))
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.message").value(message("error.security.insufficient.rights", TestUsers.MANAGER)))
                     .andDo(document("users/update-role-forbidden", RestDocsSnippets.errorResponse()));
@@ -384,13 +389,13 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void managerCannotDemoteAdmin() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{login}/role", TestUsers.ADMIN), roleBody("USER")))
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}/role", idOf(TestUsers.ADMIN)), roleBody("USER")))
                     .andExpect(status().isForbidden());
         }
 
         @Test
         void adminCannotChangeOwnRole() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}/role", TestUsers.ADMIN), roleBody("USER")))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.ADMIN)), roleBody("USER")))
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.message").value(message("error.user.self.modification.forbidden")))
                     .andDo(document("users/update-role-self", RestDocsSnippets.errorResponse()));
@@ -398,29 +403,29 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void sameRole_returns409() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}/role", TestUsers.MANAGER), roleBody("MANAGER")))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.MANAGER)), roleBody("MANAGER")))
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.message")
-                            .value(message("error.user.already.has.role", TestUsers.MANAGER, "MANAGER")))
+                            .value(message("error.user.already.has.role", idOf(TestUsers.MANAGER).toString(), "MANAGER")))
                     .andDo(document("users/update-role-conflict", RestDocsSnippets.errorResponse()));
         }
 
         @Test
         void missingRole_returns400() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}/role", TestUsers.USER), "{}"))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.USER)), "{}"))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.fieldErrors.role").isNotEmpty());
         }
 
         @Test
         void unknownUser_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{login}/role", "unknown@test.com"), roleBody("USER")))
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", UNKNOWN_ID), roleBody("USER")))
                     .andExpect(status().isNotFound());
         }
 
         @Test
         void regularUserCannotChangeRoles() throws Exception {
-            mockMvc.perform(as(TestUsers.USER, put("/users/{login}/role", TestUsers.MANAGER), roleBody("USER")))
+            mockMvc.perform(as(TestUsers.USER, put("/users/{id}/role", idOf(TestUsers.MANAGER)), roleBody("USER")))
                     .andExpect(status().isForbidden());
         }
 
@@ -428,7 +433,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
         void me_reflectsRoleChangedAfterTheTokenWasIssued() throws Exception {
             // The token still says MANAGER, but /users/me reads the current role from the database
             String managerToken = bearer(TestUsers.MANAGER);
-            userService.changeRole(TestUsers.MANAGER, RoleEnum.USER, TestUsers.ADMIN);
+            userService.changeRole(idOf(TestUsers.MANAGER), RoleEnum.USER, idOf(TestUsers.ADMIN));
 
             mockMvc.perform(get("/users/me").header(HttpHeaders.AUTHORIZATION, managerToken))
                     .andExpect(status().isOk())
@@ -441,31 +446,31 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void softDelete_returns204AndUserCanBeRestored() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", TestUsers.USER)))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.USER))))
                     .andExpect(status().isNoContent())
                     .andDo(document("users/delete",
-                            RestDocsSnippets.loginPathParameter(),
+                            RestDocsSnippets.idPathParameter(),
                             RestDocsSnippets.permanentQueryParameter()));
 
-            mockMvc.perform(as(TestUsers.ADMIN, get("/users/{login}", TestUsers.USER)))
+            mockMvc.perform(as(TestUsers.ADMIN, get("/users/{id}", idOf(TestUsers.USER))))
                     .andExpect(status().isNotFound());
-            assertThat(userRepository.findByLoginAndDeletedTrue(TestUsers.USER)).isPresent();
+            assertThat(userRepository.findByIdAndDeletedTrue(idOf(TestUsers.USER))).isPresent();
 
-            mockMvc.perform(as(TestUsers.MANAGER, post("/users/{login}/restore", TestUsers.USER)))
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users/{id}/restore", idOf(TestUsers.USER))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.login").value(TestUsers.USER))
                     .andExpect(jsonPath("$.deleted").value(false))
                     .andDo(document("users/restore",
-                            RestDocsSnippets.loginPathParameter(),
+                            RestDocsSnippets.idPathParameter(),
                             RestDocsSnippets.userResponse()));
         }
 
         @Test
         void permanentDelete_removesUserFromDatabase() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", TestUsers.USER).param("permanent", "true")))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.USER)).param("permanent", "true")))
                     .andExpect(status().isNoContent())
                     .andDo(document("users/delete-permanent",
-                            RestDocsSnippets.loginPathParameter(),
+                            RestDocsSnippets.idPathParameter(),
                             RestDocsSnippets.permanentQueryParameter()));
 
             assertThat(userRepository.findByLogin(TestUsers.USER)).isEmpty();
@@ -473,7 +478,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void permanentDelete_ofSoftDeletedUser_isAllowed() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", TestUsers.DELETED).param("permanent", "true")))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.DELETED)).param("permanent", "true")))
                     .andExpect(status().isNoContent());
 
             assertThat(userRepository.findByLogin(TestUsers.DELETED)).isEmpty();
@@ -481,43 +486,43 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void adminCannotDeleteOwnAccount() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", TestUsers.ADMIN)))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.ADMIN))))
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.message").value(message("error.user.self.modification.forbidden")));
         }
 
         @Test
         void managerCannotDelete() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, delete("/users/{login}", TestUsers.USER)))
+            mockMvc.perform(as(TestUsers.MANAGER, delete("/users/{id}", idOf(TestUsers.USER))))
                     .andExpect(status().isForbidden());
 
-            assertThat(userService.findByLogin(TestUsers.USER)).isNotNull();
+            assertThat(user(TestUsers.USER)).isNotNull();
         }
 
         @Test
         void unknownUser_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", "unknown@test.com")))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", UNKNOWN_ID)))
                     .andExpect(status().isNotFound());
         }
 
         @Test
         void invalidPermanentParameter_returns400() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", TestUsers.USER).param("permanent", "maybe")))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.USER)).param("permanent", "maybe")))
                     .andExpect(status().isBadRequest());
         }
 
         @Test
         void restoreActiveUser_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.MANAGER, post("/users/{login}/restore", TestUsers.USER)))
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users/{id}/restore", idOf(TestUsers.USER))))
                     .andExpect(status().isNotFound());
         }
 
         @Test
         void deletedUser_isNoLongerFoundByService() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{login}", TestUsers.MANAGER)))
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.MANAGER))))
                     .andExpect(status().isNoContent());
 
-            assertThatThrownBy(() -> userService.findByLogin(TestUsers.MANAGER))
+            assertThatThrownBy(() -> user(TestUsers.MANAGER))
                     .isInstanceOf(UserNotFoundException.class);
         }
     }
@@ -535,7 +540,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         void unknownPath_returns404() throws Exception {
-            mockMvc.perform(as(TestUsers.ADMIN, get("/users/{login}/unknown", TestUsers.USER)))
+            mockMvc.perform(as(TestUsers.ADMIN, get("/users/{id}/unknown", idOf(TestUsers.USER))))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message").value(message("error.request.resource.not.found")));
         }
