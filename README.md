@@ -40,12 +40,12 @@ This project provides an authentication API to be used by other applications to 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-The Spring Boot version currently used in this project is 4.0.
+The Spring Boot version currently used in this project is 4.2.
 
 The project's environment must contain these tools. Make sure that your Windows or WSL environment variables contain the path to Java.
 
 - [Java / openJDK 25](https://adoptium.net/fr/temurin/releases/)
-- [Maven 3.9](https://maven.apache.org/docs/history.html) (or the provided Maven wrapper `./mvnw`)
+- [Maven 3.10](https://maven.apache.org/docs/history.html) (or the provided Maven wrapper `./mvnw`)
 - [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
 
 #### Docker (optional)

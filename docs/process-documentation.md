@@ -74,8 +74,8 @@ graph TD
 **Tools & Dependencies:**
 
 - **Java / OpenJDK:** 25
-- **Spring Boot:** 4.0
-- **Maven:** 3.9+
+- **Spring Boot:** 4.2
+- **Maven:** 3.10+
 - **MariaDB:** 11.4
 - **Docker Desktop** (in dev/test environment) : Latest
 
