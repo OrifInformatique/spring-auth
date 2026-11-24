@@ -1,5 +1,5 @@
 # Base stage
-FROM maven:3.9.9-amazoncorretto-21-alpine AS base
+FROM maven:3.10-amazoncorretto-25-alpine AS base
 WORKDIR /app
 
 # Copy only the POM file first
@@ -10,9 +10,7 @@ RUN mvn dependency:go-offline -B
 
 # Development stage
 FROM base AS dev
-# Copy the downloaded dependencies from the base stage
-COPY --from=base /root/.m2 /root/.m2
-# Copy the rest of your application code
+# Copy the rest of your application code (dependencies are already in the base stage)
 COPY . .
 CMD ["mvn", "spring-boot:run", "-DskipTests"]
 

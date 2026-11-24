@@ -1,110 +1,94 @@
 package ch.sectioninformatique.auth.auth;
 
-import java.net.URI;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserService;
+import ch.sectioninformatique.auth.auth.AuthService.AuthResult;
+import ch.sectioninformatique.auth.auth.dto.CredentialsDto;
+import ch.sectioninformatique.auth.auth.dto.TokenResponseDto;
+import ch.sectioninformatique.auth.auth.token.RefreshTokenCookieFactory;
+import ch.sectioninformatique.auth.user.dto.UserDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Controller handling user authentication and registration.
- * This controller provides endpoints for user login and registration,
- * managing the authentication process and user creation.
+ * Session endpoints: obtaining, refreshing and revoking tokens.
+ *
+ * The access token is returned in the response body and must be sent by the client
+ * in the "Authorization: Bearer" header. The refresh token is only ever exchanged
+ * through an HTTP-only cookie.
  */
+@RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@RestController
 public class AuthController {
 
-    private final UserService userService;
-    private final UserAuthenticationProvider userAuthenticationProvider;
+    private final AuthService authService;
+    private final RefreshTokenCookieFactory refreshTokenCookieFactory;
+    private final MessageSource messageSource;
 
     /**
-     * Authenticates a user with their credentials and returns a JWT token.
+     * Authenticates a user with login and password.
      *
-     * @param credentialsDto The user credentials containing login and password
-     * @return ResponseEntity containing the authenticated user's information and
-     *         JWT token
+     * @param credentials login and password
+     * @return 200 with the user and access token, refresh token in a cookie
      */
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
-        UserDto userDto = userService.login(credentialsDto);
-        userDto.setToken(userAuthenticationProvider.createToken(userDto));
-        userDto.setRefreshToken(userAuthenticationProvider.createRefreshToken(userDto));
-        return ResponseEntity.ok(userDto);
+    public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentials) {
+        AuthResult result = authService.login(credentials);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieFactory.create(result.refreshToken()).toString())
+                .body(result.user());
     }
 
     /**
-     * refresh a user's access token from his refresh token.
+     * Issues a new access token from the refresh token cookie, and rotates the refresh token.
      *
-     * @return ResponseEntity containing the authenticated user's information and
-     *         JWT token
+     * @param refreshToken refresh token read from the cookie
+     * @return 200 with the new access token, new refresh token in a cookie
      */
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/refresh")
-    public ResponseEntity<UserDto> refreshLogin() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
-        currentUser = userService.refreshLogin(currentUser.getLogin());
-        currentUser.setToken(userAuthenticationProvider.createToken(currentUser));
-        return ResponseEntity.ok(currentUser);
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponseDto> refresh(
+            @CookieValue(RefreshTokenCookieFactory.COOKIE_NAME) String refreshToken) {
+        AuthResult result = authService.refresh(refreshToken);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieFactory.create(result.refreshToken()).toString())
+                .body(new TokenResponseDto(result.user().getToken()));
     }
 
     /**
-     * Registers a new user in the system.
+     * Revokes the refresh token of the authenticated user and clears the cookie.
      *
-     * @param user The signup data containing the new user's information
-     * @return ResponseEntity containing the created user's information and JWT
-     *         token
+     * @param currentUser authenticated user
+     * @return 204 No Content
      */
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
-        UserDto createdUser = userService.register(user);
-        createdUser.setToken(userAuthenticationProvider.createToken(createdUser));
-        createdUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(createdUser));
-        return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal UserDto currentUser) {
+        authService.logout(currentUser.getLogin());
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieFactory.clear().toString())
+                .build();
     }
 
     /**
-     * Change the password of the User
-     * 
-     * @param passwords A password Dto who contain both the old password for verification and the new for update
-     * @return ResponseEntity containing a confirmation message
+     * Landing page of the Azure login flow when the client application gave no redirect URL.
+     *
+     * @return 200 with a localized confirmation message
      */
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping("/update-password")
-    public ResponseEntity<?> updatePassword(@RequestBody @Valid PasswordUpdateDto passwords) {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
-
-        if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-        }
-
-        userService.updatePassword(currentUser.getLogin(), passwords); // store securely (hashed!)
-
-        return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+    @GetMapping("/redirect-after-login")
+    public ResponseEntity<Map<String, String>> redirectAfterLogin() {
+        return ResponseEntity.ok(Map.of("message",
+                messageSource.getMessage("message.login.success", null, LocaleContextHolder.getLocale())));
     }
 }

@@ -1,107 +1,81 @@
 package ch.sectioninformatique.auth.security;
 
+import java.io.IOException;
+
+import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.auth0.jwt.exceptions.InvalidClaimException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+
+import ch.sectioninformatique.auth.common.web.ErrorResponseWriter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.stereotype.Component;
-import org.springframework.lang.NonNull;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
- * JWT Authentication Filter for processing JWT tokens in incoming requests.
- * This filter:
- * - Extends OncePerRequestFilter to ensure it's only executed once per request
- * - Intercepts all incoming HTTP requests
- * - Validates JWT tokens in the Authorization header
- * - Sets up Spring Security context with authenticated user information
- * 
- * The filter implements different validation strategies based on the HTTP
- * method:
- * - GET requests use standard token validation
- * - Other methods use strong token validation
+ * Authenticates requests carrying an "Authorization: Bearer &lt;access token&gt;" header.
+ *
+ * - No bearer header: the request continues unauthenticated; endpoints that require
+ *   authentication are then rejected by {@link UserAuthenticationEntryPoint}.
+ * - Valid token: the security context receives the authenticated user.
+ * - Invalid token: the request is stopped with a 401 response explaining why
+ *   (expired, bad signature, invalid claims), so that clients know when to refresh.
  */
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    /**
-     * Provider for user authentication and token validation.
-     * This field:
-     * - Is automatically injected via constructor
-     * - Handles token validation logic
-     * - Manages user authentication state
-     */
-    private final UserAuthenticationProvider userAuthenticationProvider;
+    private static final String BEARER_PREFIX = "bearer ";
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private final JwtService jwtService;
+    private final ErrorResponseWriter errorResponseWriter;
 
-    /**
-     * Processes each incoming request to validate JWT tokens.
-     * This method:
-     * - Extracts the Authorization header from the request
-     * - Validates the JWT token if present
-     * - Sets up the security context with authenticated user information
-     * - Applies different validation strategies based on HTTP method
-     * - Clears security context if validation fails
-     *
-     * @param request     The incoming HTTP request
-     * @param response    The HTTP response
-     * @param filterChain The filter chain for request processing
-     * @throws ServletException If there's a servlet-related error
-     * @throws IOException      If there's an I/O error
-     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        if (request == null || response == null || filterChain == null) {
-            throw new IllegalArgumentException("Request, response and filterChain cannot be null");
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null || !header.toLowerCase().startsWith(BEARER_PREFIX)) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (header != null) {
-            String[] authElements = header.split(" ");
-
-            if (authElements.length == 2
-                    && "Bearer".equals(authElements[0])) {
-                try {
-
-                    SecurityContextHolder.getContext().setAuthentication(
-                            userAuthenticationProvider.validateTokenStrongly(authElements[1]));
-                } catch (JWTVerificationException e) {
-                    SecurityContextHolder.clearContext();
-                    log.debug("Invalid JWT token: {}", e.getMessage());
-
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json;charset=UTF-8");
-
-                    Map<String, String> errorBody = Map.of("message", e.getMessage());
-                    mapper.writeValue(response.getWriter(), errorBody); // serializes JSON safely
-                    response.getWriter().flush();
-                    return;
-                } catch (RuntimeException e) {
-                    // Preserve behavior for other runtime exceptions
-                    SecurityContextHolder.clearContext();
-                    throw e;
-                }
-            }
+        String token = header.substring(BEARER_PREFIX.length()).trim();
+        try {
+            SecurityContextHolder.getContext().setAuthentication(jwtService.validateAccessToken(token));
+        } catch (JWTVerificationException e) {
+            SecurityContextHolder.clearContext();
+            log.debug("JWT validation failed: {}", e.getMessage());
+            errorResponseWriter.write(request, response, HttpStatus.UNAUTHORIZED, messageKeyFor(e));
+            return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static String messageKeyFor(JWTVerificationException e) {
+        if (e instanceof TokenExpiredException) {
+            return "error.security.token.expired";
+        }
+        if (e instanceof SignatureVerificationException) {
+            return "error.security.token.invalid.signature";
+        }
+        if (e instanceof InvalidClaimException) {
+            return "error.security.token.invalid.claims";
+        }
+        return "error.security.token.invalid";
     }
 }

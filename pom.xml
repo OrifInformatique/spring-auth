@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>4.2.0</version>
         <relativePath />
         <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.sectioninformatique</groupId>
     <artifactId>spring-auth</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
     <name>spring-auth</name>
     <description>Authentication API to be used by other applications to identify their users</description>
     <url />
@@ -29,17 +29,12 @@
         <url />
     </scm>
     <properties>
-        <java.version>21</java.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <spring-restdocs.version>3.0.1</spring-restdocs.version>
-        <!-- Match Spring Boot 3 -->
+        <java.version>25</java.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <spring-dotenv.version>5.1.0</spring-dotenv.version>
+        <asciidoctor-maven-plugin.version>3.2.0</asciidoctor-maven-plugin.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.0.0</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -47,10 +42,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,11 +93,7 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-            <version>4.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
+            <version>4.6.2</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -114,31 +101,33 @@
             <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-client</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
-
-        <!-- Plugin to let Spring read variables in .env file in dev and test environments -->
+        <!-- Lets Spring read variables from the .env file when running outside Docker.
+             Since 5.x the Spring Boot integration lives in a Boot-version-specific artifact. -->
         <dependency>
             <groupId>me.paulschwarz</groupId>
-            <artifactId>spring-dotenv</artifactId>
-            <version>4.0.0</version>
-            <scope>provided</scope>
+            <artifactId>springboot4-dotenv</artifactId>
+            <version>${spring-dotenv.version}</version>
+            <optional>true</optional>
         </dependency>
-
         <!-- Spring REST Docs -->
         <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-mockmvc</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restdocs</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -147,25 +136,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.36</version>
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>${asciidoctor-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>generate-docs</id>
@@ -177,14 +152,21 @@
                             <backend>html</backend>
                             <doctype>book</doctype>
                             <attributes>
-                            <toc>right</toc>
-                            <toclevels>4</toclevels>
-                            <toc-title>Table of Contents</toc-title>
+                                <toc>right</toc>
+                                <toclevels>4</toclevels>
+                                <toc-title>Table of Contents</toc-title>
                                 <snippets>${project.build.directory}/generated-snippets</snippets>
                             </attributes>
                             <sourceDocumentName>index.adoc</sourceDocumentName>
                             <sourceDirectory>${project.basedir}/src/asciidoc</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-snippets-html</outputDirectory>
+                            <!-- Fail the build when index.adoc includes a snippet that no test generated
+                                 (renamed or removed endpoint), so the documentation cannot silently go stale. -->
+                            <logHandler>
+                                <failIf>
+                                    <severity>WARN</severity>
+                                </failIf>
+                            </logHandler>
                         </configuration>
                     </execution>
                 </executions>
@@ -196,55 +178,41 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${java.version}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
+        <!-- The REST Docs snippets are generated by the tests: without them, Asciidoctor fails on
+             the missing includes. Skip the documentation when the tests are skipped (packaging
+             outside Docker, Dockerfile build stage). The generated HTML is not part of the jar. -->
         <profile>
-            <id>test-all</id>
-            <build>
-                <plugins>
-                    <!-- Integration Tests -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>3.1.2</version>
-                        <executions>
-                            <execution>
-                                <id>integration-tests</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                                <configuration>
-                                    <groups>integration</groups>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- REST Docs Tests (Run after integration tests) -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>3.1.2</version>
-                        <executions>
-                            <execution>
-                                <id>restdocs-tests</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>test</goal>
-                                </goals>
-                                <configuration>
-                                    <groups>restdocs</groups>
-                                    <useModulePath>false</useModulePath>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <id>skip-docs-without-tests</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>skipTests</name>
+                </property>
             </activation>
+            <properties>
+                <asciidoctor.skip>true</asciidoctor.skip>
+            </properties>
         </profile>
     </profiles>
 </project>

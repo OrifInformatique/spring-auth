@@ -1,1438 +1,548 @@
 package ch.sectioninformatique.auth.user;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import ch.sectioninformatique.auth.AuthApplication;
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+
+import ch.sectioninformatique.auth.role.RoleEnum;
+import ch.sectioninformatique.auth.support.AbstractIntegrationTest;
+import ch.sectioninformatique.auth.support.RestDocsSnippets;
+import ch.sectioninformatique.auth.support.TestUsers;
+import ch.sectioninformatique.auth.user.UserExceptions.UserNotFoundException;
 
 /**
- * Integration tests for the UserController.
- * 
- * These tests cover various scenarios for the user management endpoints,
- * including authentication, authorization, and role management.
- * 
- * The tests use MockMvc to perform HTTP requests and verify responses.
+ * HTTP tests of the users resource under {@code /users}.
  */
-@Tag("integration")
-@SpringBootTest(classes = AuthApplication.class)
-@AutoConfigureMockMvc
-public class UserControllerIntegrationTest {
+class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
-        /** MockMvc instance for performing HTTP requests in tests. */
-        @Autowired
-        private MockMvc mockMvc;
+    /** Id that no user has. */
+    private static final Long UNKNOWN_ID = 999_999L;
 
-        /** UserAuthenticationProvider instance for managing user authentication. */
-        @Autowired
-        private UserAuthenticationProvider userAuthenticationProvider;
+    @Autowired
+    private UserRepository userRepository;
 
-        /** UserService instance for user-related operations. */
-        @Autowired
-        private UserService userService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-        /** UserRepository instance for user-related operations. */
-        @Autowired
-        private UserRepository userRepository;
+    /** Adds the bearer token of the given user and a JSON body to a request. */
+    private MockHttpServletRequestBuilder as(String login, MockHttpServletRequestBuilder request, String json) {
+        return request.header(HttpHeaders.AUTHORIZATION, bearer(login))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+    }
 
-        /**
-         * Test the /users/me endpoint with real data.
-         * This test retrieves a known user, generates an authentication token,
-         * and performs a GET request to the /users/me endpoint.
-         * It verifies that the response contains the expected user information
-         * and saves the response and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
+    private MockHttpServletRequestBuilder as(String login, MockHttpServletRequestBuilder request) {
+        return request.header(HttpHeaders.AUTHORIZATION, bearer(login));
+    }
+
+    private static String newUser(String login, String role) {
+        String roleField = role == null ? "" : ", \"mainRole\": \"%s\"".formatted(role);
+        return """
+                {"firstName": "New", "lastName": "User", "login": "%s", "password": "NewUser123!"%s}"""
+                .formatted(login, roleField);
+    }
+
+    private static String roleBody(String role) {
+        return "{\"role\": \"%s\"}".formatted(role);
+    }
+
+    @Nested
+    class CurrentUser {
+
         @Test
-        @Transactional
-        public void me_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-me-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void returnsAuthenticatedUser() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, get("/users/me")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(TestUsers.MANAGER))
+                    .andExpect(jsonPath("$.id").isNumber())
+                    .andExpect(jsonPath("$.mainRole").value("MANAGER"))
+                    .andExpect(jsonPath("$.token").doesNotExist())
+                    .andDo(document("users/me",
+                            RestDocsSnippets.authorizationHeader(),
+                            RestDocsSnippets.userResponse()));
         }
 
-        /**
-         * Test the /users/me endpoint without Authorization header.
-         * This test performs a GET request to the /users/me endpoint
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void me_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void withoutToken_returns401() throws Exception {
+            mockMvc.perform(get("/users/me"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message")
+                            .value(message("error.security.authentication.token.invalid.or.missing")));
         }
 
-        /**
-         * Test the /users/me endpoint with a malformed token.
-         * This test performs a GET request to the /users/me endpoint
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void me_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
+        void changePassword_returns204AndNewPasswordWorks() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, put("/users/me/password"),
+                    "{\"oldPassword\": \"%s\", \"newPassword\": \"BrandNew123!\"}".formatted(TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isNoContent())
+                    .andDo(document("users/update-password",
+                            RestDocsSnippets.authorizationHeader(),
+                            RestDocsSnippets.passwordUpdateRequest()));
 
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-me-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            String storedHash = userRepository.findByLogin(TestUsers.USER).orElseThrow().getPassword();
+            assertThat(passwordEncoder.matches("BrandNew123!", storedHash)).isTrue();
         }
 
-        /**
-         * Test the /users/me endpoint with an expired token.
-         * This test retrieves a known user, generates an expired
-         * authentication token,
-         * and performs a GET request to the /users/me endpoint.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void me_withExpiredToken_shouldReturnUnauthorized() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto, Date.from(
-                                Instant.now().minus(2, ChronoUnit.HOURS)));
-
-                MvcResult result = mockMvc.perform(get("/users/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-me-response-expired-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-me-token-expired-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void changePassword_withWrongCurrentPassword_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, put("/users/me/password"),
+                    "{\"oldPassword\": \"WrongPassword1!\", \"newPassword\": \"BrandNew123!\"}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(message("error.user.current.password.invalid")))
+                    .andDo(document("users/update-password-wrong-current", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/all endpoint with real data.
-         * This test retrieves a known user, generates an authentication token,
-         * and performs a GET request to the /users/all endpoint.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void all_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Parse the JSON response
-                ObjectMapper mapper = new ObjectMapper();
-                List<Map<String, Object>> users = mapper.readValue(responseBody,
-                                new TypeReference<List<Map<String, Object>>>() {
-                                });
-
-                // Assert the number of users is 4 (from the seeder)
-                assertEquals(4, users.size(), "Should return 4 users");
-
-                // Assert specific users are present
-                List<String> expectedLogins = List.of(
-                                "test.user@test.com",
-                                "test.manager@test.com",
-                                "test.admin@test.com",
-                                "test.admin2@test.com");
-
-                List<String> returnedLogins = users.stream()
-                                .map(user -> (String) user.get("login"))
-                                .collect(Collectors.toList());
-
-                assertTrue(returnedLogins.containsAll(expectedLogins),
-                                "Returned users should include all seeded logins");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-all-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void changePassword_toSamePassword_returns400OnNewPasswordField() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, put("/users/me/password"),
+                    "{\"oldPassword\": \"%1$s\", \"newPassword\": \"%1$s\"}".formatted(TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors.newPassword").value(message("validation.password.not.reused")))
+                    .andDo(document("users/update-password-validation-error", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/all endpoint with missing authorization header.
-         * This test performs a GET request to the /users/all endpoint
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void all_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andReturn();
+        void changePassword_withoutBody_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, put("/users/me/password")).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(message("error.request.body.unreadable")));
+        }
+    }
 
-                String responseBody = result.getResponse().getContentAsString();
+    @Nested
+    class ListAndGet {
 
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
+        @Test
+        void list_returnsActiveUsersByDefault() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, get("/users")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[*].login").value(hasItem(TestUsers.ADMIN)))
+                    .andExpect(jsonPath("$[*].login").value(not(hasItem(TestUsers.DELETED))))
+                    .andDo(document("users/list",
+                            RestDocsSnippets.authorizationHeader(),
+                            RestDocsSnippets.userStatusQueryParameter(),
+                            RestDocsSnippets.userListResponse()));
         }
 
-        /**
-         * Test the /users/all endpoint with a malformed token.
-         * This test performs a GET request to the /users/all endpoint
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void all_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-all-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void list_withDeletedStatus_returnsOnlySoftDeletedUsers() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, get("/users").param("status", "DELETED")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[*].login").value(hasItem(TestUsers.DELETED)))
+                    .andExpect(jsonPath("$[*].deleted").value(not(hasItem(false))))
+                    .andDo(document("users/list-deleted",
+                            RestDocsSnippets.userStatusQueryParameter(),
+                            RestDocsSnippets.userListResponse()));
         }
 
-        /**
-         * Test the /users/all endpoint with an expired token.
-         * This test performs a GET request to the /users/all endpoint
-         * with an expired token
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void all_withExpiredToken_shouldReturnUnauthorized() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto, Date.from(
-                                Instant.now().minus(2, ChronoUnit.HOURS)));
-
-                MvcResult result = mockMvc.perform(get("/users/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-all-response-expired-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-all-token-expired-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void list_withAllStatus_returnsActiveAndDeletedUsers() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, get("/users").param("status", "ALL")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[*].login").value(hasItem(TestUsers.DELETED)))
+                    .andExpect(jsonPath("$[*].login").value(hasItem(TestUsers.ADMIN)));
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with real data.
-         * This test retrieves a known user and an admin user, generates an
-         * authentication token for the admin,
-         * and performs a PUT request to promote the user to manager.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + userDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("User promoted to manager successfully"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch user again and verify role changed to MANAGER
-                UserDto updatedUser = userService.findByLogin("test.user@test.com");
-                assertNotNull(updatedUser.getMainRole(), "User role should not be null after promotion");
-                assertEquals("MANAGER", updatedUser.getMainRole(),
-                                "User role should be MANAGER after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void list_withUnknownStatus_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, get("/users").param("status", "SOMETHING")))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(message("error.request.parameter.invalid", "status")));
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with missing
-         * authorization header.
-         * This test retrieves a known user and performs a PUT request to
-         * promote the user to manager
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                MvcResult result = mockMvc.perform(put("/users/" + userDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void get_returnsUser() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, get("/users/{id}", idOf(TestUsers.MANAGER))))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(TestUsers.MANAGER))
+                    .andExpect(jsonPath("$.mainRole").value("MANAGER"))
+                    .andDo(document("users/get",
+                            RestDocsSnippets.idPathParameter(),
+                            RestDocsSnippets.userResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with a malformed token.
-         * This test retrieves a known user and performs a PUT request to
-         * promote the user to manager
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                MvcResult result = mockMvc.perform(put("/users/" + userDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void get_unknownUser_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, get("/users/{id}", UNKNOWN_ID)))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(message("error.user.not.found", UNKNOWN_ID.toString())))
+                    .andDo(document("users/get-not-found", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known user, generates an authentication token
-         * for a non-admin user,
-         * and performs a PUT request to promote the user to manager.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_asNonAdmin_shouldReturnForbidden() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
+        void get_softDeletedUser_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, get("/users/{id}", idOf(TestUsers.DELETED))))
+                    .andExpect(status().isNotFound());
+        }
+    }
 
-                String token = userAuthenticationProvider.createToken(userDto);
+    @Nested
+    class Create {
 
-                MvcResult result = mockMvc.perform(put("/users/" + userDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        @Test
+        void managerCreatesUser_returns201WithLocation() throws Exception {
+            MvcResult result = mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser("created@test.com", "USER")))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.login").value("created@test.com"))
+                    .andExpect(jsonPath("$.mainRole").value("USER"))
+                    .andExpect(jsonPath("$.token").doesNotExist())
+                    .andDo(document("users/create",
+                            RestDocsSnippets.authorizationHeader(),
+                            RestDocsSnippets.createUserRequest(),
+                            RestDocsSnippets.locationHeader(),
+                            RestDocsSnippets.userResponse()))
+                    .andReturn();
 
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            assertThat(result.getResponse().getHeader(HttpHeaders.LOCATION))
+                    .isEqualTo("/users/" + idOf("created@test.com"));
+            String storedHash = userRepository.findByLogin("created@test.com").orElseThrow().getPassword();
+            assertThat(storedHash).isNotEqualTo("NewUser123!");
+            assertThat(passwordEncoder.matches("NewUser123!", storedHash)).isTrue();
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to promote a non-existing user to manager.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_userNotFound_shouldReturnNotFound() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                String fakeUserId = "9999";
-
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void withoutRole_createsRegularUser() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser("no.role@test.com", null)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.mainRole").value("USER"));
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with a user
-         * who is already a manager.
-         * This test retrieves a known manager user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to promote the manager to manager again.
-         * It verifies that the response status is Conflict and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_userAlreadyManager_shouldReturnConflict() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isConflict())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-already-manager.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-user-already-manager.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void adminCreatesAdmin_returns201() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, post("/users"), newUser("new.admin@test.com", "ADMIN")))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.mainRole").value("ADMIN"));
         }
 
-        /**
-         * Test the /users/{userId}/promote-manager endpoint with a user
-         * who is already an admin.
-         * This test retrieves a known admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to promote the admin to manager.
-         * It verifies that the response status is Conflict and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToManager_userAlreadyAdmin_shouldReturnConflict() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+        void managerCannotCreateAdmin() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser("new.admin@test.com", "ADMIN")))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(message("error.security.insufficient.rights", TestUsers.MANAGER)))
+                    .andDo(document("users/create-admin-forbidden", RestDocsSnippets.errorResponse()));
 
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + adminDto.getId().toString() + "/promote-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isConflict())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToManager-response-user-already-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToManager-token-user-already-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            assertThat(userRepository.existsByLogin("new.admin@test.com")).isFalse();
         }
 
-        /**
-         * Test the /users/{userId}/revoke-manager endpoint with real data.
-         * This test retrieves a known manager user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to revoke the manager role from the user.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeManagerRole_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
-
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Manager role revoked successfully"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch manager again and verify role changed to USER
-                UserDto updatedManager = userService.findByLogin("test.manager@test.com");
-                assertNotNull(updatedManager.getMainRole(), "Manager role should not be null after promotion");
-                assertEquals("USER", updatedManager.getMainRole(),
-                                "Manager role should be USER after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void regularUserCannotCreateUsers() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, post("/users"), newUser("created@test.com", "USER")))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(message("error.security.access.denied")))
+                    .andDo(document("users/access-denied", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-manager endpoint with missing
-         * authorization header.
-         * This test retrieves a known manager user and performs a PUT request to
-         * revoke the manager role
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeManagerRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void existingLogin_returns409() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser(TestUsers.USER, "USER")))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message").value(message("error.user.already.exists", TestUsers.USER)))
+                    .andDo(document("users/create-conflict", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-manager endpoint with a malformed token.
-         * This test retrieves a known manager user and performs a PUT request to
-         * revoke the manager role
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeManagerRole_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void loginOfSoftDeletedUser_returns409() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users"), newUser(TestUsers.DELETED, "USER")))
+                    .andExpect(status().isConflict());
         }
 
-        /**
-         * Test the /users/{userId}/revoke-manager endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known manager user, generates an authentication
-         * token for a non-admin user,
-         * and performs a PUT request to revoke the manager role from the user.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeManagerRole_asNonAdmin_shouldReturnForbidden() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+        void invalidFields_return400WithFieldErrors() throws Exception {
+            String body = """
+                    {"firstName": "R2D2", "lastName": "", "login": "not-an-email", "password": "short"}""";
 
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users"), body))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors.firstName").isNotEmpty())
+                    .andExpect(jsonPath("$.fieldErrors.lastName").isNotEmpty())
+                    .andExpect(jsonPath("$.fieldErrors.login").isNotEmpty())
+                    .andExpect(jsonPath("$.fieldErrors.password").isNotEmpty())
+                    .andDo(document("users/create-validation-error", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-manager endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to revoke the manager role from a non-existing
-         * user.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeManagerRole_userNotFound_shouldReturnNotFound() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+        void unknownRole_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, post("/users"), newUser("created@test.com", "SUPERUSER")))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(message("error.request.body.unreadable")));
+        }
+    }
 
-                String token = userAuthenticationProvider.createToken(adminDto);
+    @Nested
+    class Update {
 
-                String fakeUserId = "9999";
+        private static final String UPDATE_BODY = """
+                {"firstName": "Updated", "lastName": "Name", "login": "updated@test.com"}""";
 
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/revoke-manager")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeManagerRole-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeManagerRole-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        @Test
+        void managerUpdatesUser_returnsUpdatedUser() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}", idOf(TestUsers.USER)), UPDATE_BODY))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.firstName").value("Updated"))
+                    .andExpect(jsonPath("$.login").value("updated@test.com"))
+                    .andExpect(jsonPath("$.mainRole").value("USER"))
+                    .andDo(document("users/update",
+                            RestDocsSnippets.idPathParameter(),
+                            RestDocsSnippets.updateUserRequest(),
+                            RestDocsSnippets.userResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/promote-admin endpoint with real data.
-         * This test retrieves a known manager user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to promote the manager to admin.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToAdmin_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+        void roleInBody_isIgnoredAndCannotEscalatePrivileges() throws Exception {
+            String body = """
+                    {"firstName": "Test", "lastName": "User", "login": "%s", "mainRole": "ADMIN"}"""
+                    .formatted(TestUsers.USER);
 
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role assigned successfully"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch manager again and verify role changed to ADMIN
-                UserDto updatedManager = userService.findByLogin("test.manager@test.com");
-                assertNotNull(updatedManager.getMainRole(), "Manager role should not be null after promotion");
-                assertEquals("ADMIN", updatedManager.getMainRole(),
-                                "Manager role should be ADMIN after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}", idOf(TestUsers.USER)), body))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.mainRole").value("USER"));
         }
 
-        /**
-         * Test the /users/{userId}/promote-admin endpoint with missing
-         * authorization header.
-         * This test retrieves a known manager user and performs a PUT request to
-         * promote the manager to admin
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToAdmin_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void managerCannotUpdateAdmin() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}", idOf(TestUsers.ADMIN)), UPDATE_BODY))
+                    .andExpect(status().isForbidden());
         }
 
-        /**
-         * Test the /users/{userId}/promote-admin endpoint with a malformed token.
-         * This test retrieves a known manager user and performs a PUT request to
-         * promote the manager to admin
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToAdmin_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
+        void loginUsedByAnotherUser_returns409() throws Exception {
+            String body = """
+                    {"firstName": "Test", "lastName": "User", "login": "%s"}""".formatted(TestUsers.MANAGER);
 
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}", idOf(TestUsers.USER)), body))
+                    .andExpect(status().isConflict());
         }
 
-        /**
-         * Test the /users/{userId}/promote-admin endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known manager user, generates an authentication
-         * token for a non-admin user,
-         * and performs a PUT request to promote the manager to admin.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToAdmin_asNonAdmin_shouldReturnForbidden() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-                UserDto managerDto = userService.findByLogin("test.manager@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc.perform(put("/users/" + managerDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void unknownUser_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}", UNKNOWN_ID), UPDATE_BODY))
+                    .andExpect(status().isNotFound());
         }
 
-        /**
-         * Test the /users/{userId}/promote-admin endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to promote a non-existing user to admin.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToAdmin_userNotFound_shouldReturnNotFound() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                String fakeUserId = "9999";
-
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void invalidLogin_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}", idOf(TestUsers.USER)),
+                    "{\"firstName\": \"Test\", \"login\": \"not-an-email\"}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
         }
 
-        /**
-         * Test the /users/{userId}/promote-admin endpoint with a user
-         * who is already an admin.
-         * This test retrieves a known admin user,
-         * generates an authentication token for the admin,
-         * and performs a PUT request to promote the admin to admin.
-         * It verifies that the response status is Conflict and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void promoteToAdmin_userAlreadyAdmin_shouldReturnConflict() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
+        void regularUserCannotUpdateUsers() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, put("/users/{id}", idOf(TestUsers.MANAGER)), UPDATE_BODY))
+                    .andExpect(status().isForbidden());
+        }
+    }
 
-                String token = userAuthenticationProvider.createToken(adminDto);
+    @Nested
+    class ChangeRole {
 
-                MvcResult result = mockMvc.perform(put("/users/" + adminDto.getId().toString() + "/promote-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isConflict())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/users-promoteToAdmin-response-user-already-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                Path pathToken = Paths.get("target/test-data/users-promoteToAdmin-token-user-already-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        @Test
+        void managerPromotesUserToManager() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}/role", idOf(TestUsers.USER)), roleBody("MANAGER")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.mainRole").value("MANAGER"))
+                    .andExpect(jsonPath("$.permissions").value(hasItem("user:update")))
+                    .andDo(document("users/update-role",
+                            RestDocsSnippets.idPathParameter(),
+                            RestDocsSnippets.roleUpdateRequest(),
+                            RestDocsSnippets.userResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-admin endpoint with real data.
-         * This test retrieves a known admin user and another admin user,
-         * generates an authentication token for the first admin,
-         * and performs a PUT request to revoke the admin role from the second admin.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeAdminRole_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
-
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role revoked successfully"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch admin again and verify role changed to USER
-                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
-                assertNotNull(updatedAdmin.getMainRole(), "Admin role should not be null after promotion");
-                assertEquals("USER", updatedAdmin.getMainRole(),
-                                "Admin role should be USER after promotion");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response.txt");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void adminPromotesUserToAdmin() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.USER)), roleBody("ADMIN")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.mainRole").value("ADMIN"));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-admin endpoint with missing
-         * authorization header.
-         * This test retrieves a known admin user and performs a PUT request to
-         * revoke the admin role
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeAdminRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void adminDemotesAnotherAdmin() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.OTHER_ADMIN)), roleBody("MANAGER")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.mainRole").value("MANAGER"));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-admin endpoint with a malformed token.
-         * This test retrieves a known admin user and performs a PUT request to
-         * revoke the admin role
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeAdminRole_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-                UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void managerCannotGrantAdminRole() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}/role", idOf(TestUsers.USER)), roleBody("ADMIN")))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(message("error.security.insufficient.rights", TestUsers.MANAGER)))
+                    .andDo(document("users/update-role-forbidden", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/revoke-admin endpoint with real data
-         * as a non-admin user.
-         * This test retrieves a known admin user and generates an authentication
-         * token for a non-admin user,
-         * and performs a PUT request to revoke the admin role from the user.
-         * It verifies that the response status is Forbidden and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeAdminRole_asNonAdmin_shouldReturnForbidden() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-                UserDto adminToRevokeDto = userService.findByLogin("test.admin2@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToRevokeDto.getId().toString() + "/revoke-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-non-admin.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token-non-admin.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void managerCannotDemoteAdmin() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, put("/users/{id}/role", idOf(TestUsers.ADMIN)), roleBody("USER")))
+                    .andExpect(status().isForbidden());
         }
 
-        /**
-         * Test the /users/{userId}/revoke-admin endpoint with a non-existing user.
-         * This test retrieves a known admin user, generates an authentication token
-         * for the admin,
-         * and performs a PUT request to revoke the admin role from a non-existing user.
-         * It verifies that the response status is Not Found and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void revokeAdminRole_userNotFound_shouldReturnNotFound() throws Exception {
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                String fakeUserId = "9999";
-
-                MvcResult result = mockMvc.perform(put("/users/" + fakeUserId + "/revoke-admin")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-revokeAdminRole-response-user-not-found.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-revokeAdminRole-token-user-not-found.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void adminCannotChangeOwnRole() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.ADMIN)), roleBody("USER")))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(message("error.user.self.modification.forbidden")))
+                    .andDo(document("users/update-role-self", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/downgrade-admin endpoint with real data.
-         * This test retrieves a known admin user and another admin user,
-         * generates an authentication token for the first admin,
-         * and performs a PUT request to downgrade the second admin to manager.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void downgradeAdminRole_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
-
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("Admin role downgraded successfully"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response.txt");
-
-                // Assert: fetch admin again and verify role changed to MANAGER
-                UserDto updatedAdmin = userService.findByLogin("test.admin2@test.com");
-                assertNotNull(updatedAdmin.getMainRole(), "Admin role should not be null after promotion");
-                assertEquals("MANAGER", updatedAdmin.getMainRole(),
-                                "Admin role should be MANAGER after promotion");
-
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-downgradeAdminRole-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void sameRole_returns409() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.MANAGER)), roleBody("MANAGER")))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message")
+                            .value(message("error.user.already.has.role", idOf(TestUsers.MANAGER).toString(), "MANAGER")))
+                    .andDo(document("users/update-role-conflict", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /users/{userId}/downgrade-admin endpoint with missing
-         * authorization header.
-         * This test retrieves a known admin user and performs a PUT request to
-         * downgrade the admin role
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void downgradeAdminRole_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void missingRole_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", idOf(TestUsers.USER)), "{}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors.role").isNotEmpty());
         }
 
-        /**
-         * Test the /users/{userId}/downgrade-admin endpoint with a malformed token.
-         * This test retrieves a known admin user and performs a PUT request to
-         * downgrade the admin role
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void downgradeAdminRole_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-                UserDto adminToDowngradeDto = userService.findByLogin("test.admin2@test.com");
-
-                MvcResult result = mockMvc
-                                .perform(put("/users/" + adminToDowngradeDto.getId().toString() + "/downgrade-admin")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-downgradeAdminRole-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-downgradeAdminRole-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void unknownUser_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, put("/users/{id}/role", UNKNOWN_ID), roleBody("USER")))
+                    .andExpect(status().isNotFound());
         }
 
-        /**
-         * Test the /users/{userId} DELETE endpoint with real data.
-         * This test retrieves a known user and an admin user,
-         * generates an authentication token for the admin,
-         * and performs a DELETE request to delete the user.
-         * It verifies that the response status is OK and saves the response
-         * and token to files for later use.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void deleteUser_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                UserDto adminDto = userService.findByLogin("test.admin@test.com");
-
-                String token = userAuthenticationProvider.createToken(adminDto);
-
-                MvcResult result = mockMvc.perform(delete("/users/" + userDto.getId().toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message").value("User deleted successfully"))
-                                .andExpect(jsonPath("$.deletedUserLogin").value("test.user@test.com"))
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                Optional<User> deletedUserOpt = userRepository.findByLogin("test.user@test.com");
-                assertTrue(deletedUserOpt.isPresent(), "User should exist in the database");
-
-                User deletedUser = deletedUserOpt.get(); // Extract the User
-                assertTrue(deletedUser.isDeleted(), "User should be marked as deleted");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-deleteUser-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+        void regularUserCannotChangeRoles() throws Exception {
+            mockMvc.perform(as(TestUsers.USER, put("/users/{id}/role", idOf(TestUsers.MANAGER)), roleBody("USER")))
+                    .andExpect(status().isForbidden());
         }
 
-        /**
-         * Test the /users/{userId} DELETE endpoint with missing authorization
-         * header.
-         * This test retrieves a known user and performs a DELETE request to delete
-         * the user
-         * without providing an Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response to a file.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void deleteUser_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
+        void me_reflectsRoleChangedAfterTheTokenWasIssued() throws Exception {
+            // The token still says MANAGER, but /users/me reads the current role from the database
+            String managerToken = bearer(TestUsers.MANAGER);
+            userService.changeRole(idOf(TestUsers.MANAGER), RoleEnum.USER, idOf(TestUsers.ADMIN));
 
-                MvcResult result = mockMvc.perform(delete("/users/" + userDto.getId().toString())
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+            mockMvc.perform(get("/users/me").header(HttpHeaders.AUTHORIZATION, managerToken))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.mainRole").value("USER"));
+        }
+    }
 
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+    @Nested
+    class DeleteAndRestore {
+
+        @Test
+        void softDelete_returns204AndUserCanBeRestored() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.USER))))
+                    .andExpect(status().isNoContent())
+                    .andDo(document("users/delete",
+                            RestDocsSnippets.idPathParameter(),
+                            RestDocsSnippets.permanentQueryParameter()));
+
+            mockMvc.perform(as(TestUsers.ADMIN, get("/users/{id}", idOf(TestUsers.USER))))
+                    .andExpect(status().isNotFound());
+            assertThat(userRepository.findByIdAndDeletedTrue(idOf(TestUsers.USER))).isPresent();
+
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users/{id}/restore", idOf(TestUsers.USER))))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(TestUsers.USER))
+                    .andExpect(jsonPath("$.deleted").value(false))
+                    .andDo(document("users/restore",
+                            RestDocsSnippets.idPathParameter(),
+                            RestDocsSnippets.userResponse()));
         }
 
-        /**
-         * Test the /users/{userId} DELETE endpoint with a malformed token.
-         * This test retrieves a known user and performs a DELETE request to delete
-         * the user
-         * with an invalid JWT token in the Authorization header.
-         * It verifies that the response status is Unauthorized and
-         * saves the response and token to files.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void deleteUser_withMalformedToken_shouldReturnUnauthorized() throws Exception {
-                String token = "this.is.not.a.valid.token";
-                UserDto userDto = userService.findByLogin("test.user@test.com");
+        void permanentDelete_removesUserFromDatabase() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.USER)).param("permanent", "true")))
+                    .andExpect(status().isNoContent())
+                    .andDo(document("users/delete-permanent",
+                            RestDocsSnippets.idPathParameter(),
+                            RestDocsSnippets.permanentQueryParameter()));
 
-                MvcResult result = mockMvc.perform(delete("/users/" + userDto.getId().toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/users-deleteUser-response-malformed-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/users-deleteUser-token-malformed-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
+            assertThat(userRepository.findByLogin(TestUsers.USER)).isEmpty();
         }
+
+        @Test
+        void permanentDelete_ofSoftDeletedUser_isAllowed() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.DELETED)).param("permanent", "true")))
+                    .andExpect(status().isNoContent());
+
+            assertThat(userRepository.findByLogin(TestUsers.DELETED)).isEmpty();
+        }
+
+        @Test
+        void adminCannotDeleteOwnAccount() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.ADMIN))))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(message("error.user.self.modification.forbidden")));
+        }
+
+        @Test
+        void managerCannotDelete() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, delete("/users/{id}", idOf(TestUsers.USER))))
+                    .andExpect(status().isForbidden());
+
+            assertThat(user(TestUsers.USER)).isNotNull();
+        }
+
+        @Test
+        void unknownUser_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", UNKNOWN_ID)))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void invalidPermanentParameter_returns400() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.USER)).param("permanent", "maybe")))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void restoreActiveUser_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.MANAGER, post("/users/{id}/restore", idOf(TestUsers.USER))))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void deletedUser_isNoLongerFoundByService() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, delete("/users/{id}", idOf(TestUsers.MANAGER))))
+                    .andExpect(status().isNoContent());
+
+            assertThatThrownBy(() -> user(TestUsers.MANAGER))
+                    .isInstanceOf(UserNotFoundException.class);
+        }
+    }
+
+    @Nested
+    class GenericErrors {
+
+        @Test
+        void unsupportedMethod_returns405() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, post("/users/me")))
+                    .andExpect(status().isMethodNotAllowed())
+                    .andExpect(jsonPath("$.message").value(message("error.request.method.unsupported", "POST")))
+                    .andDo(document("users/method-not-allowed", RestDocsSnippets.errorResponse()));
+        }
+
+        @Test
+        void unknownPath_returns404() throws Exception {
+            mockMvc.perform(as(TestUsers.ADMIN, get("/users/{id}/unknown", idOf(TestUsers.USER))))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(message("error.request.resource.not.found")));
+        }
+    }
 }

@@ -9,8 +9,18 @@
 
 This project provides an authentication API to be used by other applications to identify their users.
 
+## Documentation
+
+| Document | Scope |
+| -------- | ----- |
+| **This README** | Setup, Docker, Maven, OAuth2 overview |
+| [docs/process-documentation.md](docs/process-documentation.md) | Application architecture, modules, security, database, test execution |
+| [docs/api-documentation-generation.md](docs/api-documentation-generation.md) | Spring REST Docs pipeline (snippets, Asciidoctor, Docker volumes) |
+| [docs/index.html](docs/index.html) | Generated API reference (endpoints, request/response examples) |
+
 # Table of Contents
 - [Spring authenticator](#spring-authenticator)
+- [Documentation](#documentation)
 - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -19,34 +29,35 @@ This project provides an authentication API to be used by other applications to 
     - [Run dev environment using docker](#run-dev-environment-using-docker)
     - [Run test environment using docker](#run-test-environment-using-docker)
     - [Do actions from within Docker (CLI)](#do-actions-from-within-docker-cli)
-  - [What's next ?](#whats-next)
-  - [Microsoft Entra Azure AD oAuth2](#microsoft-entra-azure-ad-oauth2)
+  - [Maven package](#maven-package)
+  - [Upgrading from 1.1 to 1.2](#upgrading-from-11-to-12)
   - [Commands cheat-sheet](#commands-cheat-sheet)
+  - [Microsoft Entra Azure AD oAuth2](#microsoft-entra-azure-ad-oauth2)
     - [Simplified sequence diagram](#simplified-sequence-diagram)
-  - [Spring REST Docs](#spring-rest-docs)
+  - [API documentation](#api-documentation)
 - [Sources](#sources)
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-The Spring Boot version currently used in this project is 3.3.5.
+The Spring Boot version currently used in this project is 4.2.
 
-The project's environment must contain these tools. Make sure that your Windows or WSL environnment variables contain the path to Java.
+The project's environment must contain these tools. Make sure that your Windows or WSL environment variables contain the path to Java.
 
-- [Java / openJDK 21](https://adoptium.net/fr/temurin/releases/)
-- [Maven 3.9](https://maven.apache.org/docs/history.html)
+- [Java / openJDK 25](https://adoptium.net/fr/temurin/releases/)
+- [Maven 3.10](https://maven.apache.org/docs/history.html) (or the provided Maven wrapper `./mvnw`)
 - [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
 
 #### Docker (optional)
 
-It is recommanded to develop the app using docker.
+It is recommended to develop the app using Docker.
 This is not a hard requirement but it's highly encouraged.
 For more info, head to the [Docker section](#docker) of this documentation.
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Docker-compose](https://docs.docker.com/compose/)
-- On linux or WSL (allready included in Docker Desktop): [Docker-buildx](https://github.com/docker/buildx)
+- On Linux or WSL (already included in Docker Desktop): [Docker-buildx](https://github.com/docker/buildx)
 
 ### Environment variables and application properties
 
@@ -74,7 +85,7 @@ The `application.properties` file located in the root folder is git ignored and 
 ## Docker
 
 In this app, we use docker-compose, a Docker wrapper.
-It allows you and other programmers to work in a same development or testing environment, starting a database container and a Spring Boot app container wich are working together.
+It allows you and other programmers to work in the same development or testing environment, starting a database container and a Spring Boot app container that work together.
 
 The main commands you'll have to use are described in the [commands cheat-sheet](#commands-cheat-sheet) sub-section.
 
@@ -83,7 +94,7 @@ First, you need to build the containers :
 
 1. Make sure `ENVIRONMENT=dev` is set in `.env` !
 2. Open a terminal and go to your root folder
-3. If needed, reset containers and volumes (datas) with `docker compose down -v`
+3. If needed, reset containers and volumes (data) with `docker compose down -v`
 4. Use the command `docker compose build`
 5. Now that the containers have been built, you can start them with `docker compose up`
 
@@ -93,7 +104,7 @@ the command `docker compose build` you can also use the short `docker compose up
 ### Run test environment using docker
 1. Make sure `ENVIRONMENT=test` is set in `.env` !
 2. Open a terminal and go to your root folder
-3. If needed, reset containers and volumes (datas) with `docker compose down -v`
+3. If needed, reset containers and volumes (data) with `docker compose down -v`
 4. In the root folder, use the command `docker compose build`
 5. Now that the containers have been built, you can start them with `docker compose up`
 
@@ -106,14 +117,27 @@ You're now using the container's terminal.
 
 ## Maven package
 
-### Package the project in a .jpa archive
-As the tests are meant to run in a Docker environment, we have to skip them when creating a .jpa archive.
+### Package the project in a .jar archive
+The tests need the MariaDB test database, so they are usually skipped when creating a .jar archive outside Docker.
 
 Use this command :
 
 ```
 mvn clean package -DskipTests
 ```
+
+The API documentation is not generated when the tests are skipped, because it is built from them.
+
+## Upgrading from 1.1 to 1.2
+
+Version 1.2.0 changes the REST API (see the [API documentation](docs/index.html)): client applications must be adapted. On the production server, before starting 1.2.0:
+
+1. Migrate the database once with [scripts/migration-1.2.0.sql](scripts/migration-1.2.0.sql): it creates the `refresh_tokens` and `auth_codes` tables and makes `users.last_name` optional. The application validates the schema at startup and does not start without it.
+2. Define the new environment variables, which have no default value:
+   - `SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY` and `SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY`: two different secret keys
+   - `SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME` and `SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME`, for example `5m` and `30d`
+3. Define `CORS_ALLOWED_ORIGINS` (comma-separated) with the URLs of the client applications. With the `prod` profile, the application does not start if the allowed origins contain `localhost` or a wildcard, which is the case of the default value. These origins are also the only allowed redirect targets after an Azure login.
+4. Optional: `SECURITY_AUTHENTICATION_CODES_LIFETIME` (default `5m`) and `SECURITY_REFRESH_COOKIE_SAME_SITE` (default `Strict`, `None` when a client application runs on another domain), see `env-dist`.
 
 ## Commands cheat-sheet
 
@@ -132,7 +156,7 @@ run in background
 stop containers
 `docker compose down`
 
-stop containers and delete volumes, wich are containing app datas
+stop containers and delete volumes, which contain application data
 `docker compose down -v`
 
 Enter a container with shell
@@ -165,20 +189,36 @@ Check if the project's structure is valid
 </p>
 
 
+## API overview
+
+| Endpoint | Description |
+| -------- | ----------- |
+| `POST /auth/login` | Log in with login and password |
+| `POST /auth/refresh` | Get a new access token with the refresh token cookie |
+| `POST /auth/logout` | Revoke the refresh token |
+| `GET /oauth2/login/azure` | Start a Microsoft login |
+| `POST /oauth2/token` | Exchange the code received after a Microsoft login for tokens |
+| `GET /users/me`, `PUT /users/me/password` | Current user, change own password |
+| `GET /users`, `GET /users/{login}` | List and read users |
+| `POST /users`, `PUT /users/{login}` | Create and update users |
+| `PUT /users/{login}/role` | Change the role of a user |
+| `DELETE /users/{login}`, `POST /users/{login}/restore` | Delete (soft by default) and restore users |
+
+## API documentation
+
+HTTP documentation is generated automatically from integration tests (Spring REST Docs) and published as [docs/index.html](docs/index.html). JWT and refresh-token values are replaced by placeholders in snippets before HTML is built (`RestDocsSensitiveDataMasking`). For the full pipeline, see [docs/api-documentation-generation.md](docs/api-documentation-generation.md).
+
+Quick start (MariaDB test database reachable through `TEST_SPRING_DATASOURCE_URL`):
+
+```bash
+./mvnw verify
+cp target/generated-snippets-html/index.html docs/index.html
+```
+
+The build fails if the documentation no longer matches the API (undocumented endpoint, field or parameter, or reference to an example that no test produces).
+
+GitHub Pages: [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)
+
 ## Sources
 
 [Microsoft oAuth2 grant flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
-
----
-
-## Spring REST Docs
-
-The application contains an automated documentation from the Spring REST Docs package. The documentation is created when running the application in test environment.
-
-It creates an index.adoc file in the "src/asciidoc" folder and an index.html page in the "docs" folder.
-
-Link to the generated index.adoc : [src/asciidoc/index.adoc](src/asciidoc/index.adoc)
-
-Link to the generated index.html : [docs/index.html](docs/index.html)
-
-Link to the doc on GitHub : [https://orifinformatique.github.io/spring-auth/](https://orifinformatique.github.io/spring-auth/)

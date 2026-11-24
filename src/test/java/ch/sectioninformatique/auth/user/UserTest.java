@@ -1,135 +1,57 @@
 package ch.sectioninformatique.auth.user;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.GrantedAuthority;
 
-import ch.sectioninformatique.auth.security.Role;
-import ch.sectioninformatique.auth.security.RoleEnum;
-
-import java.util.Date;
-import java.util.Collection;
-
-import static org.junit.jupiter.api.Assertions.*;
+import ch.sectioninformatique.auth.role.Role;
+import ch.sectioninformatique.auth.role.RoleEnum;
 
 /**
- * Test class for {@link User}.
- * This class tests the functionality of the User entity, including:
- * - UserDetails interface implementation
- * - Role and authority management
- * - Account status methods
- * - Entity field access and modification
+ * Tests of the Spring Security {@code UserDetails} contract of {@link User}.
  */
 class UserTest {
 
-    private static final Long TEST_ID = 1L;
-    private static final String TEST_FIRST_NAME = "John";
-    private static final String TEST_LAST_NAME = "Doe";
-    private static final String TEST_LOGIN = "john.doe@example.com";
-    private static final String TEST_PASSWORD = "hashedPassword";
-    private static final Date TEST_CREATED_AT = new Date();
-    private static final Date TEST_UPDATED_AT = new Date();
-
-    /**
-     * Tests the UserDetails interface implementation.
-     * Verifies that:
-     * - Username returns login
-     * - Password is correctly returned
-     * - Account status methods return true by default
-     */
     @Test
-    void testUserDetailsImplementation() {
-        // Given
-        User user = User.builder()
-                .login(TEST_LOGIN)
-                .password(TEST_PASSWORD)
-                .build();
+    void activeUser_isEnabledAndUsesLoginAsUsername() {
+        User user = User.builder().login("john.doe@test.com").password("hash").build();
 
-        // Then
-        assertEquals(TEST_LOGIN, user.getUsername());
-        assertEquals(TEST_PASSWORD, user.getPassword());
-        assertTrue(user.isAccountNonExpired());
-        assertTrue(user.isAccountNonLocked());
-        assertTrue(user.isCredentialsNonExpired());
-        assertTrue(user.isEnabled());
+        assertThat(user.getUsername()).isEqualTo("john.doe@test.com");
+        assertThat(user.isEnabled()).isTrue();
+        assertThat(user.isAccountNonExpired()).isTrue();
+        assertThat(user.isAccountNonLocked()).isTrue();
+        assertThat(user.isCredentialsNonExpired()).isTrue();
     }
 
-    /**
-     * Tests authority management with mainRole.
-     * Verifies that:
-     * - Authorities are correctly created from mainRole
-     * - Role names are properly prefixed with "ROLE_"
-     */
     @Test
-    void testAuthoritiesWithRoles() {
-        // Given
-        Role managerRole = new Role();
-        managerRole.setName(RoleEnum.MANAGER);
+    void softDeletedUser_isDisabled() {
+        User user = User.builder().login("john.doe@test.com").deleted(true).build();
 
-        User user = User.builder()
-                .mainRole(managerRole)
-                .build();
-
-        // When
-        Collection<? extends GrantedAuthority> authorities = user.getMainRole().getName().getGrantedAuthorities();
-
-        // Then
-        System.out.println("Authorities found: " + authorities);
-        assertTrue(authorities.stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER")));
+        assertThat(user.isEnabled()).isFalse();
+        assertThat(user.isAccountNonExpired()).isFalse();
+        assertThat(user.isAccountNonLocked()).isFalse();
+        assertThat(user.isCredentialsNonExpired()).isFalse();
     }
 
-    /**
-     * Tests the builder pattern with all fields.
-     * Verifies that:
-     * - All fields are correctly set
-     * - Values can be retrieved
-     */
     @Test
-    void testBuilderWithAllFields() {
-        // Given
+    void authorities_comeFromTheRole() {
         Role role = new Role();
-        role.setName(RoleEnum.USER);
+        role.setName(RoleEnum.MANAGER);
+        User user = User.builder().mainRole(role).build();
 
-        // When
-        User user = User.builder()
-                .id(TEST_ID)
-                .firstName(TEST_FIRST_NAME)
-                .lastName(TEST_LAST_NAME)
-                .login(TEST_LOGIN)
-                .password(TEST_PASSWORD)
-                .createdAt(TEST_CREATED_AT)
-                .updatedAt(TEST_UPDATED_AT)
-                .mainRole(role)
-                .build();
-
-        // Then
-        assertEquals(TEST_ID, user.getId());
-        assertEquals(TEST_FIRST_NAME, user.getFirstName());
-        assertEquals(TEST_LAST_NAME, user.getLastName());
-        assertEquals(TEST_LOGIN, user.getLogin());
-        assertEquals(TEST_PASSWORD, user.getPassword());
-        assertEquals(TEST_CREATED_AT, user.getCreatedAt());
-        assertEquals(TEST_UPDATED_AT, user.getUpdatedAt());
-        assertEquals(role, user.getMainRole());
+        assertThat(user.getAuthorities()).extracting("authority")
+                .containsExactlyInAnyOrder("ROLE_MANAGER", "user:read", "user:write", "user:update");
     }
 
-    /**
-     * Tests role management.
-     * Verifies that:
-     * - mainRole can be set
-     * - mainRole can be retrieved
-     */
     @Test
-    void testRoleManagement() {
-        // Given
-        User user = User.builder().build();
-        Role role = new Role();
-        role.setName(RoleEnum.USER);
-
-        // When
-        user.setMainRole(role);
-
-        // Then
-        assertEquals(role, user.getMainRole());
+    void userWithoutRole_hasNoAuthorities() {
+        assertThat(User.builder().build().getAuthorities()).isEmpty();
     }
-} 
+
+    @Test
+    void toString_neverContainsThePassword() {
+        User user = User.builder().login("john.doe@test.com").password("secret-hash").build();
+
+        assertThat(user.toString()).doesNotContain("secret-hash");
+    }
+}

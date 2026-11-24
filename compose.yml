@@ -22,12 +22,23 @@ services:
       TEST_SPRING_DATASOURCE_URL: "${TEST_SPRING_DATASOURCE_URL}"
       SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
       SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY: "${SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY}"
+      SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY: "${SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY}"
+      SECURITY_AUTHENTICATION_CODES_LIFETIME: "${SECURITY_AUTHENTICATION_CODES_LIFETIME:-5m}"
+      SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME: "${SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME:-5m}"
+      SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME: "${SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME}"
+      SECURITY_REFRESH_COOKIE_SAME_SITE: "${SECURITY_REFRESH_COOKIE_SAME_SITE:-Strict}"
+      AZURE_REDIRECT_BASE_URL: "${AZURE_REDIRECT_BASE_URL}"
+      AZURE_TENANT_ID : "${AZURE_TENANT_ID}"
+      AZURE_CLIENT_ID : "${AZURE_CLIENT_ID}"
+      AZURE_CLIENT_SECRET : "${AZURE_CLIENT_SECRET}"
     ports:
       - "${PORT}:${PORT}"
     depends_on:
       - db
     networks:
-      - spring_network
+      - spring_network # application network to let Spring app talk to the database
+      - shared_network # shared network to let Spring app talk to other services like spring-auth
 
   db:
     container_name: "spring-auth-mariadb"
@@ -47,4 +58,8 @@ services:
 
 networks:
   spring_network:
+    driver: bridge
+
+  shared_network:
+    name: shared_network # force name without project prefix to be accessible by other projects
     driver: bridge

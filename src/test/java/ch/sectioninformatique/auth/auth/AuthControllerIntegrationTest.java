@@ -1,1185 +1,339 @@
 package ch.sectioninformatique.auth.auth;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.sectioninformatique.auth.AuthApplication;
-import ch.sectioninformatique.auth.security.UserAuthenticationProvider;
-import ch.sectioninformatique.auth.user.User;
-import ch.sectioninformatique.auth.user.UserDto;
-import ch.sectioninformatique.auth.user.UserRepository;
-import ch.sectioninformatique.auth.user.UserService;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.junit.jupiter.api.Nested;
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+
+import ch.sectioninformatique.auth.auth.token.RefreshToken;
+import ch.sectioninformatique.auth.auth.token.RefreshTokenRepository;
+import ch.sectioninformatique.auth.auth.token.RefreshTokenService;
+import ch.sectioninformatique.auth.security.TokenHasher;
+import ch.sectioninformatique.auth.support.AbstractIntegrationTest;
+import ch.sectioninformatique.auth.support.RestDocsSnippets;
+import ch.sectioninformatique.auth.support.TestUsers;
+import jakarta.servlet.http.Cookie;
 
 /**
- * Integration tests for AuthController.
- * These tests use real data and the actual application context to verify
- * the authentication endpoints.
+ * HTTP tests of the session endpoints under {@code /auth}.
  */
-@Tag("integration")
-@SpringBootTest(classes = AuthApplication.class)
-@AutoConfigureMockMvc
-public class AuthControllerIntegrationTest {
+class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
-        /** MockMvc instance for performing HTTP requests in tests. */
-        @Autowired
-        private MockMvc mockMvc;
+    private static final String REFRESH_COOKIE = "refresh_token";
 
-        /** UserAuthenticationProvider instance for managing user authentication. */
-        @Autowired
-        private UserAuthenticationProvider userAuthenticationProvider;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
-        @Autowired
-        private UserService userService;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
-        @Autowired
-        private UserRepository userRepository;
+    private static MockHttpServletRequestBuilder jsonPost(String url, String body) {
+        return post(url).contentType(MediaType.APPLICATION_JSON).content(body);
+    }
 
-        /**
-         * Test the /auth/login endpoint with real data.
-         * This test performs a login request and expects a successful response.
-         * The response is saved to a file for use in other tests.
-         *
-         * @throws Exception if an error occurs during the test
-         */
+    private static String credentials(String login, String password) {
+        return """
+                {"login": "%s", "password": "%s"}""".formatted(login, password);
+    }
+
+    /** Logs in and returns the refresh token set in the cookie. */
+    private String loginAndGetRefreshToken(String login, String password) throws Exception {
+        MvcResult result = mockMvc.perform(jsonPost("/auth/login", credentials(login, password)))
+                .andExpect(status().isOk())
+                .andReturn();
+        return result.getResponse().getCookie(REFRESH_COOKIE).getValue();
+    }
+
+    @Nested
+    class Login {
+
         @Test
-        public void login_withRealData_shouldReturnSuccess() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                                "{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
-                                                                                    // not empty
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/auth-login-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void validCredentials_returnUserWithAccessTokenAndRefreshCookie() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials(TestUsers.USER, TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(TestUsers.USER))
+                    .andExpect(jsonPath("$.mainRole").value("USER"))
+                    .andExpect(jsonPath("$.permissions").isArray())
+                    .andExpect(jsonPath("$.token").isNotEmpty())
+                    .andExpect(cookie().exists(REFRESH_COOKIE))
+                    .andExpect(cookie().httpOnly(REFRESH_COOKIE, true))
+                    .andExpect(cookie().secure(REFRESH_COOKIE, true))
+                    .andExpect(cookie().path(REFRESH_COOKIE, "/auth/refresh"))
+                    .andExpect(cookie().maxAge(REFRESH_COOKIE, greaterThan(0)))
+                    .andDo(document("auth/login",
+                            RestDocsSnippets.loginRequest(),
+                            RestDocsSnippets.userResponse(),
+                            RestDocsSnippets.refreshCookieSet()));
         }
 
-        /**
-         * Test the /auth/login endpoint with missing login.
-         * This test performs a login request with missing login and expects a bad
-         * request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_missingLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"password\":\"Test1234!\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-missing-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void wrongPassword_returns401() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials(TestUsers.USER, "WrongPassword1!")))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.authorisation.invalid.credentials")))
+                    .andExpect(cookie().doesNotExist(REFRESH_COOKIE))
+                    .andDo(document("auth/login-invalid-credentials", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/login endpoint with missing password.
-         * This test performs a login request with missing password and expects a bad
-         * request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_missingPassword_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-missing-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void unknownUser_returnsSame401AsWrongPassword() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials("nobody@test.com", TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.authorisation.invalid.credentials")));
         }
 
-        /**
-         * Test the /auth/login endpoint with invalid email format.
-         * This test performs a login request with invalid email format and expects a
-         * bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_invalidEmailFormat_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"invalid-email-format\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-invalid-email-format.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void softDeletedUser_cannotLogIn() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials(TestUsers.DELETED, TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.authorisation.invalid.credentials")));
         }
 
-        /**
-         * Test the /auth/login endpoint with empty body.
-         * This test performs a login request with empty body and expects a bad request
-         * response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_emptyBody_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-empty-body.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void missingFields_return400WithFieldErrors() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", "{}"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(message("error.validation.failed")))
+                    .andExpect(jsonPath("$.fieldErrors.login").isNotEmpty())
+                    .andExpect(jsonPath("$.fieldErrors.password").isNotEmpty())
+                    .andDo(document("auth/login-validation-error", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/login endpoint with malformed JSON.
-         * This test performs a login request with malformed JSON and expects a bad
-         * request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_malformedJson_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-malformed-json.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void invalidEmailOrInjectionAttempt_returns400() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials("' OR '1'='1", TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors.login").isNotEmpty());
         }
 
-        /**
-         * Test the /auth/login endpoint with SQL injection attempt in login.
-         * This test performs a login request with SQL injection attempt in login and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_sqlInjectionAttemptLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"' OR '1'='1\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-sql-injection-attempt-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void passwordTooShort_returns400() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials(TestUsers.USER, "short")))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors.password").isNotEmpty());
         }
 
-        /**
-         * Test the /auth/login endpoint with wrong password.
-         * This test performs a login request with wrong password and expects an
-         * unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_wrongPassword_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"WrongPassword!\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-wrong-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void malformedJson_returns400WithoutParserDetails() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", "{\"login\": \"test.user@test.com\", "))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(message("error.request.body.unreadable")))
+                    .andDo(document("auth/login-malformed-json", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/login endpoint with non-existent user.
-         * This test performs a login request with non-existent user and expects an
-         * unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_nonExistentUser_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"login\":\"non.existent@test.com\", \"password\":\"WrongPassword!\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-response-non-existent-user.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void unsupportedMediaType_returns415() throws Exception {
+            mockMvc.perform(post("/auth/login")
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .content(credentials(TestUsers.USER, TestUsers.USER_PASSWORD)))
+                    .andExpect(status().isUnsupportedMediaType())
+                    .andExpect(jsonPath("$.status").value(415))
+                    .andDo(document("auth/login-unsupported-media-type", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test that a soft-deleted user cannot log in.
-         * Retrieves a known user, marks them as deleted,
-         * and tries to authenticate with valid credentials.
-         * Expects an Unauthorized (401) response.
-         * 
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        @Transactional
-        public void login_softDeletedUser_shouldReturnUnauthorized() throws Exception {
-                // Fetch the user to delete
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                // Soft delete the user
-                User user = userRepository.findById(userDto.getId()).orElseThrow();
-                user.setDeleted(true);
-                userRepository.save(user);
-
-                // Prepare login request
-                Map<String, String> loginRequest = new HashMap<>();
-                loginRequest.put("login", userDto.getLogin());
-                loginRequest.put("password", "Test1234!"); 
-
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(loginRequest)))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                // Save response for later analysis
-                String responseBody = result.getResponse().getContentAsString();
-                Path path = Paths.get("target/test-data/login-softDeletedUser-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void acceptLanguageHeader_selectsMessageLanguage() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login", credentials(TestUsers.USER, "WrongPassword1!"))
+                    .header(HttpHeaders.ACCEPT_LANGUAGE, "en"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value("Invalid credentials"));
         }
 
-        /**
-         * Test the /auth/login endpoint with wrong content type.
-         * This test performs a login request with wrong content type and expects an
-         * unsupported media type response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void login_wrongContentType_shouldReturnUnsupportedMediaType() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/login")
-                                .content("{\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isUnsupportedMediaType())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-login-wrong-content-type.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void langParameter_takesPrecedenceOverAcceptLanguage() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login?lang=fr", credentials(TestUsers.USER, "WrongPassword1!"))
+                    .header(HttpHeaders.ACCEPT_LANGUAGE, "en"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value("Identifiants invalides"));
         }
 
-        /**
-         * Test the /auth/register endpoint with real data.
-         * This test performs a registration request and expects a successful response.
-         * The response is saved to a file for use in other tests.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_withRealData_shouldReturnSuccess() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                                "{\"firstName\":\"Test\",\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isCreated())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("NewUser"))
-                                .andExpect(jsonPath("$.login").value("test.newuser@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andExpect(jsonPath("$.refreshToken").isNotEmpty()) // Verify refreshToken present and
-                                                                                    // not empty
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-
-                // Assert: fetch user again and verify user created
-                UserDto updatedUser = userService.findByLogin("test.newuser@test.com");
-                assertNotNull(updatedUser, "User should not be null after registration");
-                assertEquals("Test", updatedUser.getFirstName(), "User first name should match");
-                assertEquals("NewUser", updatedUser.getLastName(), "User last name should match");
-                assertEquals("test.newuser@test.com", updatedUser.getLogin(), "User login should match");
-                assertEquals("USER", updatedUser.getMainRole(), "User role should be USER");
-
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/auth-register-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
+        void unsupportedLanguage_fallsBackToFrench() throws Exception {
+            mockMvc.perform(jsonPost("/auth/login?lang=de", credentials(TestUsers.USER, "WrongPassword1!")))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value("Identifiants invalides"));
         }
+    }
 
-        /**
-         * Test the /auth/register endpoint with missing first name.
-         * This test performs a registration request with missing first name and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
+    @Nested
+    class Refresh {
+
         @Test
-        public void register_missingFirstName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"lastName\":\"NewUser\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void validCookie_returnsNewAccessTokenAndRotatesRefreshToken() throws Exception {
+            String refreshToken = loginAndGetRefreshToken(TestUsers.USER, TestUsers.USER_PASSWORD);
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
+            MvcResult result = mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, refreshToken)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                    .andExpect(cookie().exists(REFRESH_COOKIE))
+                    .andDo(document("auth/refresh",
+                            RestDocsSnippets.refreshCookieSent(),
+                            RestDocsSnippets.tokenResponse(),
+                            RestDocsSnippets.refreshCookieSet()))
+                    .andReturn();
 
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-first-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            String newAccessToken = JsonPath.read(
+                    result.getResponse().getContentAsString(), "$.accessToken");
+            mockMvc.perform(get("/users/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(TestUsers.USER));
         }
 
-        /**
-         * Test the /auth/register endpoint with missing last name.
-         * This test performs a registration request with missing last name and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_missingLastName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void previousRefreshToken_isRejectedAfterRotation() throws Exception {
+            String refreshToken = loginAndGetRefreshToken(TestUsers.USER, TestUsers.USER_PASSWORD);
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, refreshToken)))
+                    .andExpect(status().isOk());
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-last-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, refreshToken)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.security.refresh.token.invalid")));
         }
 
-        /**
-         * Test the /auth/register endpoint with missing login.
-         * This test performs a registration request with missing login and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_missingLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void missingCookie_returns401() throws Exception {
+            mockMvc.perform(post("/auth/refresh"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.security.refresh.token.missing")))
+                    .andDo(document("auth/refresh-missing-cookie", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/register endpoint with missing password.
-         * This test performs a registration request with missing password and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_missingPassword_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"test.newuser@test.com\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-missing-password.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void malformedToken_returns401() throws Exception {
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, "not.a.jwt")))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.security.refresh.token.invalid")))
+                    .andDo(document("auth/refresh-invalid-token", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/register endpoint with invalid email format.
-         * This test performs a registration request with invalid email format and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_invalidEmailFormat_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"NewUser\", \"login\":\"invalid-email-format\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void accessTokenUsedAsRefreshToken_returns401() throws Exception {
+            String accessToken = bearer(TestUsers.USER).substring("Bearer ".length());
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-invalid-email-format.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, accessToken)))
+                    .andExpect(status().isUnauthorized());
         }
 
-        /**
-         * Test the /auth/register endpoint with empty body.
-         * This test performs a registration request with empty body and expects a bad
-         * request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_emptyBody_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void validlySignedTokenThatWasNeverIssued_returns401() throws Exception {
+            String unknownToken = jwtService.createRefreshToken(user(TestUsers.USER));
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-empty-body.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, unknownToken)))
+                    .andExpect(status().isUnauthorized());
         }
 
-        /**
-         * Test the /auth/register endpoint with malformed JSON.
-         * This test performs a registration request with malformed JSON and expects a
-         * bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_malformedJson_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\""))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void tokenOfUserDeletedSinceLogin_returns401() throws Exception {
+            String refreshToken = loginAndGetRefreshToken(TestUsers.USER, TestUsers.USER_PASSWORD);
+            userService.delete(idOf(TestUsers.USER), false, idOf(TestUsers.ADMIN));
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-response-malformed-json.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, refreshToken)))
+                    .andExpect(status().isUnauthorized());
         }
+    }
 
-        /**
-         * Test the /auth/register endpoint with SQL injection attempt in first name.
-         * This test performs a registration request with SQL injection attempt in
-         * first name and expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
+    @Nested
+    class Logout {
+
         @Test
-        public void register_sqlInjectionAttemptFirstName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"' OR '1'='1\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void revokesRefreshTokenAndClearsCookie() throws Exception {
+            String refreshToken = loginAndGetRefreshToken(TestUsers.USER, TestUsers.USER_PASSWORD);
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
+            mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, bearer(TestUsers.USER)))
+                    .andExpect(status().isNoContent())
+                    .andExpect(cookie().value(REFRESH_COOKIE, ""))
+                    .andExpect(cookie().maxAge(REFRESH_COOKIE, 0))
+                    .andDo(document("auth/logout",
+                            RestDocsSnippets.authorizationHeader(),
+                            RestDocsSnippets.refreshCookieCleared()));
 
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-first-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/refresh").cookie(new Cookie(REFRESH_COOKIE, refreshToken)))
+                    .andExpect(status().isUnauthorized());
         }
 
-        /**
-         * Test the /auth/register endpoint with SQL injection attempt in last name.
-         * This test performs a registration request with SQL injection attempt in
-         * last name and expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_sqlInjectionAttemptLastName_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"' OR '1'='1\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-last-name.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void withoutAccessToken_returns401() throws Exception {
+            mockMvc.perform(post("/auth/logout"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message")
+                            .value(message("error.security.authentication.token.invalid.or.missing")))
+                    .andDo(document("auth/logout-unauthenticated", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/register endpoint with SQL injection attempt in login.
-         * This test performs a registration request with SQL injection attempt in
-         * login and expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_sqlInjectionAttemptLogin_shouldReturnBadRequest() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"' OR '1'='1\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-sql-injection-attempt-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void withExpiredAccessToken_returns401TokenExpired() throws Exception {
+            mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, expiredBearer(TestUsers.USER)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.security.token.expired")))
+                    .andDo(document("auth/expired-access-token", RestDocsSnippets.errorResponse()));
         }
 
-        /**
-         * Test the /auth/register endpoint with duplicate login.
-         * This test performs a registration request with duplicate login and
-         * expects a conflict response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_duplicateLogin_shouldReturnConflict() throws Exception {
+        void securityErrors_followTheRequestLanguage() throws Exception {
+            mockMvc.perform(post("/auth/logout")
+                    .header(HttpHeaders.AUTHORIZATION, expiredBearer(TestUsers.USER))
+                    .header(HttpHeaders.ACCEPT_LANGUAGE, "en"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value("Token has expired"));
 
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"firstName\":\"Test\",\"lastName\":\"User\",\"login\":\"test.user@test.com\", \"password\":\"Test1234!\"}"))
-                                .andExpect(status().isConflict()) // or isBadRequest(), depending on API
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-duplicate-login.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/logout").param("lang", "en"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value("Invalid or missing authentication token"));
         }
 
-        /**
-         * Test the /auth/register endpoint with wrong content type.
-         * This test performs a registration request with wrong content type and
-         * expects an unsupported media type response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void register_wrongContentType_shouldReturnUnsupportedMediaType() throws Exception {
-                MvcResult result = mockMvc.perform(post("/auth/register")
-                                .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"login\":\"test.newuser@test.com\", \"password\":\"testPassword\"}"))
-                                .andExpect(status().isUnsupportedMediaType())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-register-wrong-content-type.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+        void withMalformedAccessToken_returns401TokenInvalid() throws Exception {
+            mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, "Bearer this.is.not.a.valid.token"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.security.token.invalid")));
         }
 
-        /**
-         * Test the /auth/refresh endpoint with real data.
-         * This test performs a token refresh request and expects a successful response.
-         * The response is saved to a file for use in other tests.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void refresh_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
+        void withTamperedAccessToken_returns401InvalidSignature() throws Exception {
+            String token = bearer(TestUsers.USER);
+            String tampered = token.substring(0, token.length() - 4) + "AAAA";
 
-                String refreshToken = userAuthenticationProvider.createRefreshToken(userDto);
-
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + refreshToken))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").isNotEmpty())
-                                .andExpect(jsonPath("$.firstName").value("Test"))
-                                .andExpect(jsonPath("$.lastName").value("User"))
-                                .andExpect(jsonPath("$.login").value("test.user@test.com"))
-                                .andExpect(jsonPath("$.mainRole").value("USER"))
-                                .andExpect(jsonPath("$.token").isNotEmpty()) // Verify token present and not empty
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                // Save response to file for later tests
-                Path path = Paths.get("target/test-data/auth-refresh-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, responseBody);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/auth-refresh-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, refreshToken);
+            mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, tampered))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value(message("error.security.token.invalid.signature")));
         }
 
-        /**
-         * Test the /auth/refresh endpoint with missing Authorization header.
-         * This test performs a token refresh request without Authorization header and
-         * expects an unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
         @Test
-        public void refresh_missingAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+        void withRefreshTokenAsAccessToken_returns401() throws Exception {
+            String refreshToken = refreshTokenService.issue(user(TestUsers.USER));
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-refresh-missing-authorization.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
+            mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, "Bearer " + refreshToken))
+                    .andExpect(status().isUnauthorized());
         }
+    }
 
-        /**
-         * Test the /auth/refresh endpoint with invalid token.
-         * This test performs a token refresh request with an invalid token and
-         * 
-         * 
-         * expects an unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void refresh_invalidToken_shouldReturnUnauthorized() throws Exception {
-                String invalidToken = "this.is.not.a.valid.token";
+    @Test
+    void redirectAfterLogin_isPublicAndReturnsMessage() throws Exception {
+        mockMvc.perform(get("/auth/redirect-after-login"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(message("message.login.success")))
+                .andDo(document("auth/redirect-after-login", RestDocsSnippets.messageResponse()));
+    }
 
-                MvcResult result = mockMvc.perform(get("/auth/refresh")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + invalidToken))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
+    @Test
+    void refreshTokens_areStoredHashed() {
+        String refreshToken = refreshTokenService.issue(user(TestUsers.USER));
 
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-refresh-invalid-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
-
-        /**
-         * Test the /auth/update-password endpoint with real data.
-         * This test performs an update password request and expects a successful response.
-         * The response is saved to a file for use in other tests.
-         */
-         
-
-        public void updatePassword_withRealData_shouldReturnSuccess() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc.perform(put("/auth/update-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}")
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-update-password-response.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-
-                // Save token to file for later tests
-                Path pathToken = Paths.get("target/test-data/auth-update-password-token.txt");
-                Files.createDirectories(pathToken.getParent());
-                Files.writeString(pathToken, token);
-        }
-
-
-        /**
-         * Test the /auth/update-password endpoint with missing body.
-         * This test performs an update password request with missing body and
-         * expects a bad request response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void updatePassword_missingBody_shouldReturnBadRequest() throws Exception {
-                UserDto userDto = userService.findByLogin("test.user@test.com");
-
-                String token = userAuthenticationProvider.createToken(userDto);
-
-                MvcResult result = mockMvc.perform(put("/auth/update-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-update-password-response-missing-body.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
-
-        /**
-         * Test the /auth/update-password endpoint with missing token.
-         * This test performs an update password request with missing token and
-         * expects a unauthorized response.
-         * The response is saved to a file.
-         *
-         * @throws Exception if an error occurs during the test
-         */
-        @Test
-        public void updatePassword_missingToken_shouldReturnUnauthorized() throws Exception {
-
-                MvcResult result = mockMvc.perform(put("/auth/update-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"oldPassword\":\"Test1234!\", \"newPassword\":\"TestNewPassword\"}"))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").exists())
-                                .andReturn();
-
-                String responseBody = result.getResponse().getContentAsString();
-                int status = result.getResponse().getStatus();
-
-                // Parse original response body
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<>() {
-                });
-
-                // Add status code
-                responseMap.put("status", status);
-
-                // Serialize updated map to JSON
-                String wrappedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseMap);
-
-                // Save response to file
-                Path path = Paths.get("target/test-data/auth-update-password-response-missing-token.json");
-                Files.createDirectories(path.getParent());
-                Files.writeString(path, wrappedResponse);
-        }
+        RefreshToken stored = refreshTokenRepository.findByUserLoginAndRevokedFalse(TestUsers.USER).orElseThrow();
+        assertThat(stored.getTokenHash())
+                .isNotEqualTo(refreshToken)
+                .isEqualTo(TokenHasher.sha256(refreshToken));
+    }
 }
