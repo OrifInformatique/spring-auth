@@ -30,6 +30,7 @@ This project provides an authentication API to be used by other applications to 
     - [Run test environment using docker](#run-test-environment-using-docker)
     - [Do actions from within Docker (CLI)](#do-actions-from-within-docker-cli)
   - [Maven package](#maven-package)
+  - [Upgrading from 1.1 to 1.2](#upgrading-from-11-to-12)
   - [Commands cheat-sheet](#commands-cheat-sheet)
   - [Microsoft Entra Azure AD oAuth2](#microsoft-entra-azure-ad-oauth2)
     - [Simplified sequence diagram](#simplified-sequence-diagram)
@@ -40,12 +41,12 @@ This project provides an authentication API to be used by other applications to 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-The Spring Boot version currently used in this project is 4.0.
+The Spring Boot version currently used in this project is 4.2.
 
 The project's environment must contain these tools. Make sure that your Windows or WSL environment variables contain the path to Java.
 
 - [Java / openJDK 25](https://adoptium.net/fr/temurin/releases/)
-- [Maven 3.9](https://maven.apache.org/docs/history.html) (or the provided Maven wrapper `./mvnw`)
+- [Maven 3.10](https://maven.apache.org/docs/history.html) (or the provided Maven wrapper `./mvnw`)
 - [MariaDB 11.4](https://mariadb.org/mariadb/all-releases/)
 
 #### Docker (optional)
@@ -124,6 +125,19 @@ Use this command :
 ```
 mvn clean package -DskipTests
 ```
+
+The API documentation is not generated when the tests are skipped, because it is built from them.
+
+## Upgrading from 1.1 to 1.2
+
+Version 1.2.0 changes the REST API (see the [API documentation](docs/index.html)): client applications must be adapted. On the production server, before starting 1.2.0:
+
+1. Migrate the database once with [scripts/migration-1.2.0.sql](scripts/migration-1.2.0.sql): it creates the `refresh_tokens` and `auth_codes` tables and makes `users.last_name` optional. The application validates the schema at startup and does not start without it.
+2. Define the new environment variables, which have no default value:
+   - `SECURITY_JWT_TOKEN_SECRET_ACCESS_KEY` and `SECURITY_JWT_TOKEN_SECRET_REFRESH_KEY`: two different secret keys
+   - `SECURITY_JWT_TOKEN_ACCESS_TOKEN_LIFETIME` and `SECURITY_JWT_TOKEN_REFRESH_TOKEN_LIFETIME`, for example `5m` and `30d`
+3. Define `CORS_ALLOWED_ORIGINS` (comma-separated) with the URLs of the client applications. With the `prod` profile, the application does not start if the allowed origins contain `localhost` or a wildcard, which is the case of the default value. These origins are also the only allowed redirect targets after an Azure login.
+4. Optional: `SECURITY_AUTHENTICATION_CODES_LIFETIME` (default `5m`) and `SECURITY_REFRESH_COOKIE_SAME_SITE` (default `Strict`, `None` when a client application runs on another domain), see `env-dist`.
 
 ## Commands cheat-sheet
 

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -215,6 +216,10 @@ public class SecurityConfig {
         requestFactory.setConnectTimeout(Duration.ofSeconds(5));
         requestFactory.setReadTimeout(Duration.ofSeconds(10));
 
+        // Spring Security's error handler, applied through the non-deprecated status handler
+        // API: hasError() of this handler is true for any 4xx/5xx status
+        OAuth2ErrorResponseErrorHandler errorHandler = new OAuth2ErrorResponseErrorHandler();
+
         RestClient restClient = RestClient.builder()
                 .requestFactory(requestFactory)
                 // No registerDefaults(): only these converters, tried first, plus the
@@ -222,7 +227,8 @@ public class SecurityConfig {
                 .configureMessageConverters(converters -> converters
                         .addCustomConverter(new FormHttpMessageConverter())
                         .addCustomConverter(new OAuth2AccessTokenResponseHttpMessageConverter()))
-                .defaultStatusHandler(new OAuth2ErrorResponseErrorHandler())
+                .defaultStatusHandler(HttpStatusCode::isError, (request, response) ->
+                        errorHandler.handleError(request.getURI(), request.getMethod(), response))
                 .build();
 
         RestClientAuthorizationCodeTokenResponseClient client = new RestClientAuthorizationCodeTokenResponseClient();
