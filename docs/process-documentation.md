@@ -456,5 +456,5 @@ Users can be soft-deleted or permanently deleted:
 
 ---
 
-**Last Updated:** October 2026  
-**Version:** 1.2.0-SNAPSHOT
+**Last Updated:** November 2026  
+**Version:** 1.2.0
